@@ -32,8 +32,15 @@ Milestone 7 — metric and schema registries with run-scoped context: **delivere
 (`MetricRegistrySource`, `SchemaRegistrySource`), and exact-match run scoping so one
 run's private context cannot leak into another. No Retrieval Agent.
 
-Next phase: Operational PostgreSQL store, Schema Registry source, LLM implementations
-behind the existing Protocols.
+Milestone 8 — semantic normalization, requirement decomposition and adequacy:
+**delivered**. Constraint authority, canonical entity resolution + clarification,
+deterministic objective extraction, a Requirement Decomposer producing immutable
+INITIAL requirements, QualificationRule/SampleAdequacyRule, and a LeagueStateSnapshot
+separating official progress from local coverage. ADR 0011.
+
+Next phase: Source Mapping execution + Feature Engine metric artifacts, then
+AgentReport/state-transition contracts, then LLM Protocol implementations,
+observability, the Operational PostgreSQL store, a CLI and usage docs.
 
 ## Architecture status
 
@@ -107,6 +114,25 @@ Milestone 7 (ADR 0010):
 - Run scoping: `ContextItem.scope_run` / `ContextRequest.run_id` with exact-match
   filtering; global knowledge visible to all runs.
 
+Milestone 8 (ADR 0011):
+
+- Constraint `origin` extended and `authority` added with precedence; `_Constraint`
+  derives authority from origin. `app/semantic/constraints.py` normalizes with
+  precedence.
+- `app/models/entities.py` + `app/semantic/entity_resolver.py`: canonical entities,
+  alias/nickname resolution, clarification on ambiguity.
+- `app/models/clarification.py`, `app/models/semantic.py`: clarification and
+  `SemanticResult` contracts.
+- `app/semantic/objective_extractor.py` + `app/semantic/normalizer.py`:
+  raw query → `AnalysisObjective[]` with entities/constraints.
+- `app/semantic/requirement_decomposer.py`: Objective → semantic-atomic INITIAL
+  `ArtifactRequirement[]`.
+- `app/models/contracts.py`: `QualificationRule`, `SampleAdequacyRule`,
+  `LeagueStateSnapshot`; `ArtifactRequirement` gains both rule fields;
+  `RequirementState`/`ObjectiveState` enriched.
+- `app/assessment/adequacy.py`: sample adequacy, qualification and league coverage
+  signals; `validate_artifact` accepts an optional league state.
+
 ## In progress
 
 Nothing is partially edited.
@@ -115,11 +141,15 @@ Nothing is partially edited.
 
 - An Operational PostgreSQL implementation of `OperationalStore`; the local SQLite
   store is the current, replaceable implementation.
-- A Source Mapping execution layer (using `SourceMapping` to actually execute reads);
-  the mapping contract exists but is not yet consumed by the Router.- Semantic/Normalization layer (`app/semantic/*`, `app/conversation/service.py`).
-- LLM Planner/Judge/Response implementations behind the existing Protocol seams.
+- A Source Mapping execution layer (using `SourceMapping` to actually execute reads)
+  and a deterministic Feature Engine emitting metric Artifacts with lineage.
+- An `AgentReport` envelope and explicit state-transition contracts (reason/trigger).
+- A Web `RawWebResult` → Evidence Extractor path.
+- LLM Planner/Judge/Response/Semantic implementations behind the existing Protocols,
+  plus prompt versioning.
+- Observability and evaluation metrics.
 - Live integration test against a disposable PostgreSQL and synthetic Parquet.
-- Embeddings / pgvector (deliberately deferred until a registry source proves useful).
+- Embeddings / pgvector (deliberately deferred).
 
 ## Current branch
 
@@ -143,14 +173,9 @@ series was replayed on top. This was necessary because the original local ancest
 
 ## Tests passing
 
-130 tests, all passing (`Ran 130 tests ... OK`). Milestone 3: `test_tool_execution` 14.
-Milestone 4: `tests/persistence`. Milestone 5: `tests/context/test_context_service.py`
-8. Milestone 6: `tests/persistence/test_orchestrator_persistence.py` 5 and
-`tests/context/test_context_wiring.py` 4. Milestone 7: `tests/test_metrics.py` 4,
-`tests/test_schema_registry.py` 4 and `tests/context/test_registry_and_isolation.py` 5.
-Earlier modules: test_config 2, test_domain 5, test_safety 4, test_secret_scan 4,
-test_artifacts 11, test_state 7, test_planner 7, test_routing 6, test_executor 5,
-test_orchestrator 8, test_sql_guard 8.
+159 tests, all passing (`Ran 159 tests ... OK`). Milestone 8: `tests/semantic/`
+(entity resolver 5, constraints 5, objective extractor 4, normalizer 5, requirement
+decomposer 5) and `tests/test_adequacy.py` 5. Earlier milestones unchanged.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -188,6 +213,7 @@ None.
 - `docs/adr/0008-shared-context-retrieval.md` (milestone 5).
 - `docs/adr/0009-orchestrator-persistence-and-context-boundaries.md` (milestone 6).
 - `docs/adr/0010-metric-registry-and-run-scoped-context.md` (milestone 7).
+- `docs/adr/0011-semantic-normalization-and-decomposition.md` (milestone 8).
 - 0001–0005 from earlier sessions.
 
 ## Database / migration status
@@ -216,21 +242,20 @@ written or modified. The verified read-only executor is wired but not live-teste
 
 ## Exact next task
 
-Operational PostgreSQL store and a Schema Registry source, TDD, without changing domain
-contracts.
+Milestone 9 — Source Mapping execution + Feature Engine artifacts, TDD.
 
-1. `app/persistence/postgres_store.py`: implement the same `OperationalStore` Protocol
-   over PostgreSQL (psycopg2), reusing the `objects`/`checkpoints` schema and a `seq`
-   ordering column. Test with an injectable connection so no live database is required;
-   keep `SqliteOperationalStore` as the default local implementation.
-2. `SchemaRegistrySource` (`ContextSource`, kind SCHEMA) with deterministic table/column
-   lookup, plus a cross-run isolation test at the Orchestrator level.
-3. Then LLM implementations behind the existing `Planner`, `Judge` and response-builder
-   Protocols, keeping the deterministic implementations as the tested default.
+1. `app/features/engine.py` (new artifact-producing implementation): deterministic
+   `FeatureEngine` that turns a raw tabular artifact into a metric `Artifact` with
+   `artifact_type="FEATURE"`, `lineage=(input_artifact_id,)` and `Provenance(source_kind="FEATURE")`.
+   Keep the legacy plotting/snapshot writers fail-closed.
+2. `app/agent/source_mapping.py` or extend `Router`: given a task/requirement and a
+   `SourceMapping`, resolve DIRECT → tool, CALCULATED → Feature Engine, NO_MAPPING →
+   blocked. The Planner stays semantic; only the Router consumes physical mappings.
+3. Tests: `tests/semantic/../../tests/test_feature_engine.py` (lineage, provenance,
+   immutability) and `tests/test_source_mapping.py` (DIRECT/CALCULATED/NO_MAPPING).
 
-Do not: build a single giant AgentState dump; put runtime tables in the baseball
-analytics database; inline large payloads in the operational store; introduce a
-Retrieval Agent; start with embeddings before a registry source works.
+Then: AgentReport + state transitions, LLM Protocols + prompt versioning,
+observability/evaluation, PostgresOperationalStore, CLI + usage docs, E2E.
 
 ## Recommended Codex review priorities
 

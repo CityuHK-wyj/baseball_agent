@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 130 passing
+- tests: `python3 -m unittest discover -s tests -v` → 159 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
@@ -18,7 +18,19 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## What DeepSeek Implemented
 
-Milestone 7 (this session) — metric/schema registries and run-scoped context (ADR 0010):
+Milestone 8 (this session) — semantic normalization, decomposition and adequacy (ADR 0011):
+
+- Constraint `origin` extended + `authority` with precedence; `app/semantic/constraints.py`.
+- `app/models/entities.py` + `app/semantic/entity_resolver.py`: canonical entities,
+  aliases/nicknames, clarification on ambiguity.
+- `app/models/clarification.py`, `app/models/semantic.py`, `app/semantic/normalizer.py`,
+  `app/semantic/objective_extractor.py`.
+- `app/semantic/requirement_decomposer.py`: Objective → semantic-atomic INITIAL
+  `ArtifactRequirement[]`.
+- `QualificationRule`, `SampleAdequacyRule`, `LeagueStateSnapshot`; `app/assessment/adequacy.py`.
+- Tests: `tests/semantic/` (24) + `tests/test_adequacy.py` (5).
+
+Milestone 7 (previous session) — metric/schema registries and run-scoped context (ADR 0010):
 
 - `app/models/metrics.py`: `MetricDefinition`, `SourceMapping`.
 - `app/semantic/metric_registry.py`: `MetricRegistry` (exact lookup + deterministic
@@ -103,9 +115,12 @@ Milestones 1–2 (previous sessions, still passing):
 - A live integration test against a real analytical database/Parquet fixture.
 - LLM Planner / LLM Judge / Response generation. Only deterministic implementations
   exist; the Protocol seams are there but untested against a model.
-- Semantic/Normalization layer (`app/semantic/*`, `app/conversation/service.py`).
-- Cross-run context isolation tests.
-- Logging/observability.
+- LLM Planner / LLM Judge / Response generation / LLM semantic extraction. Only
+  deterministic implementations exist; the Protocol seams are there but untested
+  against a model.
+- Metric Registry / Schema Registry execution wiring and Source Mapping execution.
+- Logging/observability, evaluation metrics, prompt versioning.
+- Cross-run context isolation at the Orchestrator level (service-level covered).
 
 ## Architecture Decisions Used
 
