@@ -1,9 +1,9 @@
 """Operational store: agent runtime metadata, separate from baseball analytics.
 
-Stores versioned JSON objects (runs, objectives, requirements, plans, states,
-artifacts metadata, assessments, reports) and append-only checkpoints. The first
-implementation uses SQLite so it is local, testable and replaceable by an
-Operational PostgreSQL implementation of the same Protocol.
+Stores versioned JSON objects (runs, objectives, requirements, plans, states, artifact
+metadata, assessments, reports) and append-only checkpoints. The SQL is dialect-agnostic
+(``ON CONFLICT`` upsert, positional rows); SQLite is the local/dev and test
+implementation, and PostgreSQL is the production control plane behind the same Protocol.
 """
 
 import json
@@ -16,25 +16,29 @@ from app.models.artifacts import ArtifactContract
 from app.models.checkpoint import Checkpoint
 from app.models.contracts import Name
 
-_SCHEMA = """
-CREATE TABLE IF NOT EXISTS objects (
-    kind TEXT NOT NULL,
-    object_id TEXT NOT NULL,
-    run_id TEXT NOT NULL,
-    version INTEGER NOT NULL,
-    payload TEXT NOT NULL,
-    created_at TEXT NOT NULL,
-    PRIMARY KEY (kind, object_id)
-);
-CREATE INDEX IF NOT EXISTS idx_objects_run_kind ON objects(run_id, kind);
-CREATE TABLE IF NOT EXISTS checkpoints (
-    checkpoint_id TEXT PRIMARY KEY,
-    run_id TEXT NOT NULL,
-    payload TEXT NOT NULL,
-    created_at TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_checkpoints_run ON checkpoints(run_id);
-"""
+_SCHEMA_STATEMENTS = (
+    """
+    CREATE TABLE IF NOT EXISTS objects (
+        kind TEXT NOT NULL,
+        object_id TEXT NOT NULL,
+        run_id TEXT NOT NULL,
+        version INTEGER NOT NULL,
+        payload TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (kind, object_id)
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS idx_objects_run_kind ON objects(run_id, kind)",
+    """
+    CREATE TABLE IF NOT EXISTS checkpoints (
+        checkpoint_id TEXT PRIMARY KEY,
+        run_id TEXT NOT NULL,
+        payload TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS idx_checkpoints_run ON checkpoints(run_id)",
+)
 
 
 def _now() -> str:
@@ -65,67 +69,112 @@ class OperationalStore(Protocol):
     def close(self) -> None: ...
 
 
-class SqliteOperationalStore:
-    def __init__(self, path: str | Path = ":memory:") -> None:
-        self._connection = sqlite3.connect(str(path))
-        self._connection.row_factory = sqlite3.Row
-        self._connection.executescript(_SCHEMA)
+class SqlOperationalStore:
+    """Dialect-agnostic store. Subclasses set ``placeholder`` and supply a connection."""
+
+    placeholder = "?"
+
+    def __init__(self, connection) -> None:
+        self._connection = connection
+        self._ensure_schema()
+
+    # -- helpers ---------------------------------------------------------------
+    def _execute(self, sql: str, params: tuple = ()):
+        cursor = self._connection.cursor()
+        cursor.execute(sql, params)
+        return cursor
+
+    def _ensure_schema(self) -> None:
+        for statement in _SCHEMA_STATEMENTS:
+            self._execute(statement)
         self._connection.commit()
 
+    @staticmethod
+    def _row_to_object(row) -> StoredObject:
+        return StoredObject(kind=row[0], object_id=row[1], run_id=row[2],
+                            version=row[3], payload=json.loads(row[4]))
+
+    # -- objects ---------------------------------------------------------------
     def save_object(self, kind: str, object_id: str, run_id: str, payload: dict) -> StoredObject:
         existing = self.get_object(kind, object_id)
         if existing is not None and existing.payload == payload and existing.run_id == run_id:
             return existing
         version = existing.version + 1 if existing is not None else 0
-        self._connection.execute(
-            "INSERT INTO objects (kind, object_id, run_id, version, payload, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?) "
-            "ON CONFLICT(kind, object_id) DO UPDATE SET "
-            "run_id=excluded.run_id, version=excluded.version, payload=excluded.payload, "
-            "created_at=excluded.created_at",
-            (kind, object_id, run_id, version, json.dumps(payload), _now()))
+        p = self.placeholder
+        sql = (
+            f"INSERT INTO objects (kind, object_id, run_id, version, payload, created_at) "
+            f"VALUES ({p}, {p}, {p}, {p}, {p}, {p}) "
+            f"ON CONFLICT(kind, object_id) DO UPDATE SET run_id=excluded.run_id, "
+            f"version=excluded.version, payload=excluded.payload, created_at=excluded.created_at")
+        self._execute(sql, (kind, object_id, run_id, version, json.dumps(payload), _now()))
         self._connection.commit()
         return self.get_object(kind, object_id)
 
     def get_object(self, kind: str, object_id: str) -> StoredObject | None:
-        row = self._connection.execute(
-            "SELECT kind, object_id, run_id, version, payload FROM objects "
-            "WHERE kind = ? AND object_id = ?", (kind, object_id)).fetchone()
+        p = self.placeholder
+        cursor = self._execute(
+            f"SELECT kind, object_id, run_id, version, payload FROM objects "
+            f"WHERE kind = {p} AND object_id = {p}", (kind, object_id))
+        row = cursor.fetchone()
         return self._row_to_object(row) if row else None
 
     def list_objects(self, kind: str, run_id: str | None = None) -> tuple[StoredObject, ...]:
+        p = self.placeholder
         if run_id is None:
-            rows = self._connection.execute(
-                "SELECT kind, object_id, run_id, version, payload FROM objects "
-                "WHERE kind = ? ORDER BY rowid", (kind,)).fetchall()
+            cursor = self._execute(
+                f"SELECT kind, object_id, run_id, version, payload FROM objects "
+                f"WHERE kind = {p} ORDER BY created_at, object_id", (kind,))
         else:
-            rows = self._connection.execute(
-                "SELECT kind, object_id, run_id, version, payload FROM objects "
-                "WHERE kind = ? AND run_id = ? ORDER BY rowid", (kind, run_id)).fetchall()
-        return tuple(self._row_to_object(row) for row in rows)
+            cursor = self._execute(
+                f"SELECT kind, object_id, run_id, version, payload FROM objects "
+                f"WHERE kind = {p} AND run_id = {p} ORDER BY created_at, object_id", (kind, run_id))
+        return tuple(self._row_to_object(row) for row in cursor.fetchall())
 
-    @staticmethod
-    def _row_to_object(row: sqlite3.Row) -> StoredObject:
-        return StoredObject(kind=row["kind"], object_id=row["object_id"], run_id=row["run_id"],
-                            version=row["version"], payload=json.loads(row["payload"]))
-
+    # -- checkpoints -----------------------------------------------------------
     def save_checkpoint(self, checkpoint: Checkpoint) -> None:
-        self._connection.execute(
-            "INSERT INTO checkpoints (checkpoint_id, run_id, payload, created_at) VALUES (?, ?, ?, ?)",
+        p = self.placeholder
+        self._execute(
+            f"INSERT INTO checkpoints (checkpoint_id, run_id, payload, created_at) "
+            f"VALUES ({p}, {p}, {p}, {p})",
             (checkpoint.checkpoint_id, checkpoint.run_id,
              checkpoint.model_dump_json(), checkpoint.created_at.isoformat()))
         self._connection.commit()
 
     def latest_checkpoint(self, run_id: str) -> Checkpoint | None:
-        row = self._connection.execute(
-            "SELECT payload FROM checkpoints WHERE run_id = ? ORDER BY rowid DESC LIMIT 1",
-            (run_id,)).fetchone()
-        return Checkpoint.model_validate_json(row["payload"]) if row else None
+        p = self.placeholder
+        cursor = self._execute(
+            f"SELECT payload FROM checkpoints WHERE run_id = {p} "
+            f"ORDER BY created_at DESC, checkpoint_id DESC LIMIT 1", (run_id,))
+        row = cursor.fetchone()
+        return Checkpoint.model_validate_json(row[0]) if row else None
 
     def list_checkpoints(self, run_id: str) -> tuple[Checkpoint, ...]:
-        rows = self._connection.execute(
-            "SELECT payload FROM checkpoints WHERE run_id = ? ORDER BY rowid", (run_id,)).fetchall()
-        return tuple(Checkpoint.model_validate_json(row["payload"]) for row in rows)
+        p = self.placeholder
+        cursor = self._execute(
+            f"SELECT payload FROM checkpoints WHERE run_id = {p} "
+            f"ORDER BY created_at, checkpoint_id", (run_id,))
+        return tuple(Checkpoint.model_validate_json(row[0]) for row in cursor.fetchall())
 
     def close(self) -> None:
         self._connection.close()
+
+
+class SqliteOperationalStore(SqlOperationalStore):
+    """Local/dev and test implementation. Not the production control plane."""
+
+    placeholder = "?"
+
+    def __init__(self, path: str | Path = ":memory:") -> None:
+        super().__init__(sqlite3.connect(str(path)))
+
+
+class PostgresOperationalStore(SqlOperationalStore):
+    """Operational PostgreSQL control plane.
+
+    Accepts an injected DB-API connection so callers control credentials and pooling.
+    """
+
+    placeholder = "%s"
+
+    def __init__(self, connection) -> None:
+        super().__init__(connection)
