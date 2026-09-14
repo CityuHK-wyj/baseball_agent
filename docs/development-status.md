@@ -2,46 +2,220 @@
 
 Status: IN_PROGRESS
 
-## Baseline — 2026-09-14
+Last updated by: DeepSeek Implementation Engineer session (milestone 2).
 
-- Architecture: frozen; domain contracts are being formalized incrementally.
-- Branch: `codex/architecture-implementation`; local baseline: `9f2f44b`; foundation commit: `102c993`.
-- Target: `https://github.com/CityuHK-wyj/baseball_agent` (verified private, empty via GitHub connector).
-- Existing untracked AGENTS.md, CONTEXT.md, docs and skills were provided by the user and are preserved.
-- Tests before changes: no behavioral tests; default unittest discovery fails importing `app.data` because `app.config.settings` is missing.
+## Current phase
 
-## Source reconciliation
+Milestone 2 — evaluation, planning and accepted-product vertical slice: **delivered
+and tested with deterministic in-memory tools**. The loop is closed end to end
+(Objective/Requirement → Plan → Route → Execute → Artifact → Validate/Judge →
+Assessment → RequirementState → ObjectiveState → CompletionReport → ResponsePackage).
 
-Read the blog repository's `content/knowledge/{current-state.md,decisions.md,project-state.json,sources.md}` and articles 1–9. Source content is updated through 2026-09-14; generated `llms-full.txt` and published copies are stale at 2026-09-07. Use the source content, not generated copies. References: [current state](https://github.com/CityuHK-wyj/cityuhk-wyj.github.io/blob/main/content/knowledge/current-state.md), [decisions](https://github.com/CityuHK-wyj/cityuhk-wyj.github.io/blob/main/content/knowledge/decisions.md), [architecture](https://github.com/CityuHK-wyj/cityuhk-wyj.github.io/blob/main/content/posts/09-planning-artifacts-and-evidence.md).
+Not yet connected to live data. Persistence, checkpoints and Shared Context are not
+started.
 
-Confirmed: D034–D066 define immutable initial requirements, definition/state separation, contextual assessments, hard gates, Planner terminal ownership, accepted-product finalization, independent operational persistence, and architecture freeze. Blog schemas/algorithms remain designs, not implementation evidence. The earlier overall article's Planner-owned decomposition and quality on Artifact are superseded by articles 4/5/9 and D048/D058–D065.
+## Architecture status
 
-Observed implementation: four tool adapters and an unbounded LLM loop partially migrated; models/planner/validation/context/formatter remain placeholders. Feature Engine and ingestion helpers still write analytics tables; raw SQL is executed without validation; errors may expose connection details; config lacks its imported settings instance. No analytics databases or Parquet files were modified or executed.
+Frozen. ADRs 0001–0005 accepted. No architecture conflicts were found. No frozen
+boundary was violated; see "Architecture Deviations" below for the deliberate
+in-memory substitution and the still-fail-closed adapters.
 
-## Security audit
+## Implemented
 
-Current files and all reachable local commits were scanned for provider tokens, credential assignments, connection URLs and private keys. Findings: `SECRET_REDACTED` in legacy agent, database helpers and Compose, also present in local history. This is a heuristic audit, not a guarantee that no secret exists. Real credential values are never recorded here. No local `.env` was found at audit time.
+Domain definitions and state projections:
 
-Required user action: revoke/rotate exposed LLM and database credentials. Old commits retain the exposure; no history rewrite or force push is authorized or performed. Existing history also tracks nine Parquet archives. Do not push that history into the empty remote. A clean initial publication must exclude credentials, archives, caches and historical secret blobs while preserving the original local history.
+- `app/models/contracts.py`: `AnalysisObjective`, `ArtifactRequirement`,
+  `ArtifactDescriptor`, `Entity`, `TimeRange`, `Constraint`, `RequirementState`,
+  `ObjectiveState`, plus additive `optional_data_keys`, `evidence_purpose`,
+  `min_row_count`.
+- `app/models/requirements.py`: `RequirementCatalog` (immutable Initial Requirements,
+  append-only PLANNER_ADDED supporting requirements, idempotent replay).
 
-## Completed milestone 1
+Artifacts and assessment (ADR 0002):
 
-- Frozen validated definitions and distinct initial runtime states; append-only, idempotent supporting requirements with same-objective parent validation. Every objective must have at least one core Initial Requirement, preventing vacuous completion.
-- Environment credentials have no literal defaults and are hidden from Settings repr. Current source credential scan passes; heuristic coverage includes Python assignments/dicts, provider formats, credential URLs, YAML/env, JSON and notebook source.
-- Unvalidated SQL, the legacy unbounded LLM loop, ingestion/snapshot writers and archive audit bypasses fail closed. The plotting compatibility entry point now uses the blocked feature connection.
-- Parquet archives and IDE files removed from the index only; local files and historical commits remain intact. No data deletion occurred.
-- Validation: 15 unittest tests pass; compileall passes; CRLF-aware diff whitespace check passes. The staged-scanner integration uses an isolated temporary Git repository. History scan intentionally reports 6 exposed locations in the baseline history.
-- Code review: initial Standards findings 3 (audit SQL bypass, admin plotting connection, scanner format coverage), Spec findings 2 (audit bypass, staged test missing). All resolved with regression tests; both reviewers confirmed closure, no remaining blocking findings.
+- `app/models/artifacts.py`: `Artifact`, `Provenance`, `DeterministicResult`,
+  `HardFailure`, `SoftSignal`, `JudgeResult`, `ArtifactAssessment` (hard-failure veto
+  in the contract), `ArtifactIndexEntry`, `AssessmentSummary`.
+- `app/assessment/validator.py`: deterministic hard failures and soft signals.
+- `app/assessment/judge.py`: `Judge` Protocol + `RuleBasedJudge` using
+  `evidence_purpose`.
+- `app/assessment/service.py`: `AssessmentService` (contextual assessment storage).
+- `app/agent/registry.py`: `ArtifactRegistry` (identity, lineage, bounded index; no
+  quality judgement).
 
-## Plan and handoff
+State services (ADR 0005):
 
-1. Formalize glossary and accepted boundary ADR; specify public testing seams.
-2. TDD credential configuration/scanning and safe disabled legacy entry points.
-3. TDD immutable definitions, runtime projections and requirement baseline invariants.
-4. Assessment/matching → state updates → planning/terminal → routing/execution → accepted response.
-5. Separate operational persistence/checkpoints and Shared Context projections.
-6. Integration/adversarial SQL tests, two-axis review, documentation and safe publication.
+- `app/state/services.py`: pure `derive_requirement_state`, `derive_objective_state`,
+  `optional_gaps`, `unmet_core_requirements`. Not agents; no I/O, no LLM.
 
-Not yet implemented: ArtifactAssessment feedback loop, SQL AST enforcement, operational store/resume, model provider contracts and end-to-end acceptance suite. Tickets 02–05 record exact public seams and acceptance cases. Git CLI access failed after connection timeout; connector read/write access works. A clean README bootstrap was published to the empty remote as `c93953d4c7e54dfd2b98ffd7d559e5efc946e6b9`; complete safe source publication is in progress. The clean remote lineage deliberately excludes local historical secret blobs and binary datasets; local history is retained, not rewritten. Never push the old local branch ancestry.
+Planning, routing, execution (ADR 0003):
 
-SQLGlot is not installed. Installation from the configured package index failed both within the sandbox (DNS) and after approved escalation (no available distribution returned). Ticket 02 requires resolving this dependency before implementing SQL safety; do not restore raw execution as a workaround. Ticket 03 can progress independently. No paid API call has been made, and no real analytics schema/coverage or runtime PostgreSQL is validated.
+- `app/models/planning.py`: `AgentTask`, `TaskAttempt`, `TaskExecution`,
+  `PlanningDecision` (terminal contract), `RoutingDecision`, `StopReason`.
+- `app/agent/planner.py`: `PlannerContext`, `Planner` Protocol, `RuleBasedPlanner`,
+  `PlannerTerminalLatch`.
+- `app/agent/routing.py`: `ToolCapability`, `Router` with the mandated precedence.
+- `app/agent/executor.py`: `Tool` Protocol, `ToolResult`, `Executor` with bounded
+  retries only for retryable errors.
+
+Finalization:
+
+- `app/models/reports.py`: `RequirementCompletion`, `ExecutionSummary`,
+  `CompletionReport`, `AcceptedEvidence`, `ResponsePackage`.
+- `app/agent/orchestrator.py`: `Orchestrator`, `RunResult`; legacy
+  `run_all_channel_baseball_agent` still raises.
+- `app/agent/response.py`: `build_response_package` from accepted assessments only.
+
+Security:
+
+- `app/validation/sql_guard.py`: `guard_read_only_sql`, `resolve_within_root`
+  (ADR 0004). Parses with sqlglot; not yet wired to a live connection.
+- Legacy analytics writers, the legacy LLM loop, the unvalidated SQL adapters and the
+  archive/plot audit helpers remain fail-closed.
+
+## In progress
+
+Nothing is partially edited. Ticket 02 is PARTIAL by scope: guard done, live executor
+pending.
+
+## Not started
+
+- Ticket 02 remainder: live read-only PostgreSQL/DuckDB executor, result bounding,
+  timeouts, provider-error redaction, synthetic integration fixtures.
+- Ticket 05: Operational PostgreSQL, payload store, checkpoints, resume/idempotency,
+  Shared Context retrieval/projection.
+- Semantic/Normalization layer: `app/semantic/*` and `app/conversation/service.py` are
+  still placeholders. No LLM Planner/Judge/Response is wired; only deterministic
+  implementations exist.
+- Metric Registry / Source Mapping contracts.
+
+## Current branch
+
+`agent/deepseek-implementation`, created from `codex/architecture-implementation`
+HEAD so milestone 1 history is preserved. Rationale: the user requested this branch
+name; the repository previously had no `agent/*` rule.
+
+## Latest meaningful commit
+
+`6ccb2ad` at session start (milestone 1). This session's milestone-2 work is committed
+on top of it; see `git log --oneline` after the checkpoint commit.
+
+## Test command
+
+`python3 -m unittest discover -s tests -v`
+
+## Tests passing
+
+66 tests, all passing (`Ran 66 tests ... OK`). Distribution:
+
+- test_config 2, test_domain 5, test_safety 4, test_secret_scan 4
+- test_artifacts 10, test_state 7
+- test_planner 7, test_routing 6, test_executor 5, test_orchestrator 8
+- test_sql_guard 8
+
+`python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
+
+## Tests failing
+
+None.
+
+## Known bugs
+
+- `app/tools/postgres.py` and `app/tools/duckdb.py` deliberately return
+  `BLOCKED_BY_POLICY`; this is a containment state, not a bug, but it means no real
+  analytics query can run yet.
+- `main.py` still contains a raw DuckDB read of the local Parquet archive outside the
+  guard. It is not imported by the runtime and only reads, but it is an uncontrolled
+  entry point that ticket 02/containment should remove or route through the guard.
+
+## Technical debt
+
+- No live-source integration; the whole loop is proven only with deterministic tools.
+- `RuleBasedPlanner` is intentionally simple (one task per unmet core requirement); an
+  LLM Planner is a future seam, not implemented.
+- `RuleBasedJudge` is deterministic; no LLM Judge seam is exercised yet.
+- `Router` optimizes only by cost; coverage/freshness/previous-failure signals are
+  modeled in `ToolCapability` but not scored.
+- No logging/observability layer.
+- `RunResult` exposes internal diagnostics; only `ResponsePackage` is the Response
+  Agent contract. Nothing currently enforces that at the type boundary beyond
+  convention and tests.
+
+## Architecture deviations
+
+- The Orchestrator runs in memory; there is no `Checkpoint` implementation yet. This
+  is documented in ADR 0005, not a silent divergence.
+- `evidence_purpose` and `min_row_count` were added to `ArtifactRequirement`, and
+  `optional_data_keys` to `ArtifactDescriptor`. These are additive, defaulted fields
+  required for contextual judging. They do not change Initial Requirement semantics.
+- No conflict with any confirmed blog decision was discovered. Blog schemas beyond
+  those implemented remain designs, not evidence.
+
+## ADRs added
+
+- `docs/adr/0002-contextual-artifact-assessment.md`
+- `docs/adr/0003-planner-terminal-latch.md`
+- `docs/adr/0004-read-only-sql-ast-guard.md`
+- `docs/adr/0005-state-services-and-deferred-persistence.md`
+
+(ADR 0001 pre-existed from milestone 1.)
+
+## Database / migration status
+
+No operational database, no migrations, no schema. No analytics database or Parquet
+file was read, written or modified in this session. `docker-compose.yml` still only
+defines the analytics PostgreSQL; an Operational PostgreSQL is not added yet.
+
+## Security audit status
+
+- `scripts/secret_scan.py` current-tree scan passes (exit 0).
+- Known historical exposure from milestone 1 remains documented but unchanged:
+  `SECRET_REDACTED` in legacy files and local history. This session did not add or
+  remove credentials and did not rewrite history.
+- No live `DEEPSEEK_API_KEY`/`POSTGRES_PASSWORD` was used; no paid API call was made.
+- Read-only guard added and tested; adapters remain fail-closed.
+- User action still required: rotate/revoke the credentials flagged in milestone 1.
+
+## Current blockers
+
+- **Push blocked**: this environment has no GitHub credential (`git ls-remote origin`
+  fails with "could not read Username"). Commits are local only. The next agent with
+  credentials must push `agent/deepseek-implementation` and never push the old
+  credential-bearing ancestry.
+- Live execution blocked on a running read-only PostgreSQL/DuckDB target.
+
+## Exact next task
+
+Ticket 02 remainder: wire `app/validation/sql_guard.py` into the read-only adapters.
+
+Start from failing tests in a new `tests/test_tool_execution.py` (create it) that
+assert:
+
+1. `query_local_hot_db` validates through `guard_read_only_sql` and executes only
+   allowlisted tables with a `SELECT` under a bounded `LIMIT`.
+2. `query_local_cold_parquet` requires `file_root=settings.parquet_archive_path` and
+   rejects paths outside it.
+3. A `retryable` connection error is redacted and surfaced without connection details;
+   0 rows is `EMPTY`, not an error.
+4. A mutation or forbidden function never opens a connection.
+
+Relevant modules: `app/validation/sql_guard.py`, `app/tools/postgres.py`,
+`app/tools/duckdb.py`, `app/config.py`, `app/agent/executor.py` (`ToolResult`).
+
+Do not:
+
+- restore unrestricted execution or the legacy LLM loop,
+- relax the read-only boundary,
+- push the historical credential-bearing ancestry.
+
+## Recommended Codex review priorities
+
+1. `ArtifactAssessment` hard-failure veto: contract validator and service coercion.
+2. `PlannerTerminalLatch` fingerprint and the orchestrator `NO_PROGRESS` stop — look
+   for any path that can re-invoke planning without a new artifact.
+3. State derivation correctness (PARTIAL vs UNSATISFIED, COMPLETE optional gaps).
+4. `ResponsePackage` leakage: confirm no rejected evidence/attempt history can enter it.
+5. `guard_read_only_sql` bypasses: dialect edge cases, nested table functions, CTEs,
+   `exp.DDL`/`exp.DML` subclass coverage, path normalization.
+6. Router precedence: confirm preference never overrides policy or a user hard source
+   constraint.

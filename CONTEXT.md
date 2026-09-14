@@ -59,3 +59,23 @@ Baseball Agent answers baseball analytics questions by selecting an appropriate 
 **Sample Adequacy**: Whether the available sample supports the particular conclusion sought; distinct from qualification.
 
 **League Progress**: Authoritative season progress, independent of how much data a local archive has ingested.
+
+**Provenance**: The recorded origin of an Artifact (source, source kind, reference, retrieval time).
+
+**Lineage**: The `derived_from` references that connect a derived Artifact (for example a Feature Engine metric) back to its inputs.
+
+**TaskAttempt**: One real technical try against a tool, with its own status, error code, retryable flag and optional artifact reference.
+
+**Tool Capability**: What a tool can provide (source kind, supported artifact types, cost, availability), used by the Router before a task is executed. Capability is not a plan and not a requirement.
+
+**Routing Decision**: The Router's selection of a tool for a task, with rationale, fallbacks and policy notes. The Router may override a Planner source preference but never a constraint or policy.
+
+**Hard Failure**: A program-verifiable fact that disqualifies an Artifact for a Requirement (integrity, type, entity, required key, constraint or time-range mismatch). It cannot be overridden by the Judge.
+
+**Soft Signal**: A program-detected limitation whose interpretation depends on the Requirement (zero rows, low sample, partial coverage, optional key missing). The Judge may reinterpret it.
+
+**Evidence Purpose**: The requirement-level framing (EXISTENCE, DESCRIPTIVE, INFERENTIAL) that the Judge uses to interpret soft signals.
+
+**Planner Terminal Latch**: The guard that prevents re-invoking a terminal Planner unless an external condition (new artifact, source, permission or user constraint) changes.
+
+**Stop Reason**: The recorded reason planning ended for a run: COMPLETE, MAX_ROUNDS, BUDGET_EXHAUSTED, NO_RECOVERABLE_PATH, POLICY_BLOCKED or NO_PROGRESS.
