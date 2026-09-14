@@ -2,114 +2,72 @@
 
 Status: IN_PROGRESS
 
-Last updated by: DeepSeek Implementation Engineer session (milestone 2).
+Last updated by: DeepSeek Implementation Engineer session (milestone 3 — guarded tool
+execution). Milestones 1–2 delivered earlier and preserved.
 
 ## Current phase
 
-Milestone 2 — evaluation, planning and accepted-product vertical slice: **delivered
-and tested with deterministic in-memory tools**. The loop is closed end to end
-(Objective/Requirement → Plan → Route → Execute → Artifact → Validate/Judge →
-Assessment → RequirementState → ObjectiveState → CompletionReport → ResponsePackage).
+Milestone 3 — real safe analytical tool execution: **delivered (code level)**. SQL is
+validated before any connection, PostgreSQL runs read-only with a statement timeout,
+DuckDB paths are sandboxed, results are row-bounded and errors are redacted. No
+unguarded analytical path remains.
 
-Not yet connected to live data. Persistence, checkpoints and Shared Context are not
-started.
+Next phase: persistence / checkpoint / resume (ticket 05).
 
 ## Architecture status
 
-Frozen. ADRs 0001–0005 accepted. No architecture conflicts were found. No frozen
-boundary was violated; see "Architecture Deviations" below for the deliberate
-in-memory substitution and the still-fail-closed adapters.
+Frozen. ADRs 0001–0006 accepted. No architecture conflicts found. No frozen boundary
+was violated.
 
 ## Implemented
 
-Domain definitions and state projections:
+Milestone 1–2 (unchanged, still passing): immutable Objective/Requirement definitions
+and separate state projections; contextual Artifact assessment with a hard-failure
+veto; PLAN/REPLAN/STOP_PLANNING with a terminal latch; capability-based routing;
+bounded execution retries; CompletionReport/ResponsePackage from accepted products.
 
-- `app/models/contracts.py`: `AnalysisObjective`, `ArtifactRequirement`,
-  `ArtifactDescriptor`, `Entity`, `TimeRange`, `Constraint`, `RequirementState`,
-  `ObjectiveState`, plus additive `optional_data_keys`, `evidence_purpose`,
-  `min_row_count`.
-- `app/models/requirements.py`: `RequirementCatalog` (immutable Initial Requirements,
-  append-only PLANNER_ADDED supporting requirements, idempotent replay).
+Milestone 3 (ADR 0004, ADR 0006):
 
-Artifacts and assessment (ADR 0002):
-
-- `app/models/artifacts.py`: `Artifact`, `Provenance`, `DeterministicResult`,
-  `HardFailure`, `SoftSignal`, `JudgeResult`, `ArtifactAssessment` (hard-failure veto
-  in the contract), `ArtifactIndexEntry`, `AssessmentSummary`.
-- `app/assessment/validator.py`: deterministic hard failures and soft signals.
-- `app/assessment/judge.py`: `Judge` Protocol + `RuleBasedJudge` using
-  `evidence_purpose`.
-- `app/assessment/service.py`: `AssessmentService` (contextual assessment storage).
-- `app/agent/registry.py`: `ArtifactRegistry` (identity, lineage, bounded index; no
-  quality judgement).
-
-State services (ADR 0005):
-
-- `app/state/services.py`: pure `derive_requirement_state`, `derive_objective_state`,
-  `optional_gaps`, `unmet_core_requirements`. Not agents; no I/O, no LLM.
-
-Planning, routing, execution (ADR 0003):
-
-- `app/models/planning.py`: `AgentTask`, `TaskAttempt`, `TaskExecution`,
-  `PlanningDecision` (terminal contract), `RoutingDecision`, `StopReason`.
-- `app/agent/planner.py`: `PlannerContext`, `Planner` Protocol, `RuleBasedPlanner`,
-  `PlannerTerminalLatch`.
-- `app/agent/routing.py`: `ToolCapability`, `Router` with the mandated precedence.
-- `app/agent/executor.py`: `Tool` Protocol, `ToolResult`, `Executor` with bounded
-  retries only for retryable errors.
-
-Finalization:
-
-- `app/models/reports.py`: `RequirementCompletion`, `ExecutionSummary`,
-  `CompletionReport`, `AcceptedEvidence`, `ResponsePackage`.
-- `app/agent/orchestrator.py`: `Orchestrator`, `RunResult`; legacy
-  `run_all_channel_baseball_agent` still raises.
-- `app/agent/response.py`: `build_response_package` from accepted assessments only.
-
-Security:
-
-- `app/validation/sql_guard.py`: `guard_read_only_sql`, `resolve_within_root`
-  (ADR 0004). Parses with sqlglot; not yet wired to a live connection.
-- Legacy analytics writers, the legacy LLM loop, the unvalidated SQL adapters and the
-  archive/plot audit helpers remain fail-closed.
+- `app/validation/sql_guard.py`: `guard_read_only_sql`, `resolve_within_root`. Table
+  identity keeps schema/database qualification.
+- `app/tools/results.py`: `ToolResult` (status / error_type / retryable / policy_blocked
+  / safe_error_summary / row_count / execution_metadata) and `redact_secrets`.
+- `app/tools/execution.py`: `PostgresReadOnlyExecutor`, `DuckDBReadOnlyExecutor`.
+  Guard-before-connect, `SET TRANSACTION READ ONLY`, `SET LOCAL statement_timeout`,
+  bounded LIMIT wrapper + `fetchmany`, injectable connection factories.
+- `app/tools/postgres.py`, `app/tools/duckdb.py`: adapters execute only after
+  validation and return `BLOCKED_BY_POLICY` on rejection.
+- `app/agent/executor.py`: re-exports the shared `ToolResult`; `TaskAttempt` gains
+  `error_type` and `safe_error_summary`.
+- `main.py`: import-safe, guarded DuckDB summary; raw unguarded read removed.
+- `app/features/engine.generate_pitch_heatmap`: fails closed.
 
 ## In progress
 
-Nothing is partially edited. Ticket 02 is PARTIAL by scope: guard done, live executor
-pending.
+Nothing is partially edited.
 
 ## Not started
 
-- Ticket 02 remainder: live read-only PostgreSQL/DuckDB executor, result bounding,
-  timeouts, provider-error redaction, synthetic integration fixtures.
-- Ticket 05: Operational PostgreSQL, payload store, checkpoints, resume/idempotency,
+- Ticket 05: operational store, ArtifactStorage, checkpoints, resume/idempotency,
   Shared Context retrieval/projection.
-- Semantic/Normalization layer: `app/semantic/*` and `app/conversation/service.py` are
-  still placeholders. No LLM Planner/Judge/Response is wired; only deterministic
-  implementations exist.
-- Metric Registry / Source Mapping contracts.
+- Semantic/Normalization layer (`app/semantic/*`, `app/conversation/service.py`).
+- Metric Registry / Source Mapping.
+- LLM Planner/Judge/Response implementations behind the existing Protocol seams.
+- Live integration test against a disposable PostgreSQL and synthetic Parquet.
 
 ## Current branch
 
-`agent/deepseek-implementation`, created from `codex/architecture-implementation`
-HEAD so milestone 1 history is preserved. Rationale: the user requested this branch
-name; the repository previously had no `agent/*` rule.
+`agent/deepseek-implementation-safe`, a **history-reconstructed** branch. Its root is a
+clean import of the verified-safe milestone-1 tree (`6ccb2ad`); the milestone-2 commit
+series was replayed on top. This was necessary because the original local ancestry
+(`9f2f44b` / `cf8e2d3`) contains exposed credentials. The old branch
+`agent/deepseek-implementation` is retained locally but must not be pushed.
 
 ## Latest meaningful commit
 
-Milestone 2 feature tip: `aad6ec3` on `agent/deepseek-implementation` (documentation
-checkpoint commits follow it; use `git log --oneline` for the exact HEAD). Feature
-commit series on top of milestone 1 (`6ccb2ad`):
-
-- `2879215` feat: add immutable artifact contracts and contextual assessment
-- `f9be393` feat: add requirement and objective state services
-- `723798e` feat: add planning, routing and bounded execution
-- `d83cd2b` feat: add orchestrator finalization and accepted-product response
-- `05b12a5` feat: add dialect-aware read-only sql ast guard
-- `206a576` docs: record milestone 2 domain model, adrs and handoff
-- `aad6ec3` chore: vendor agent skill definitions and lockfile
-
-Nothing was pushed; this environment has no GitHub credential.
+See `git log --oneline`. Milestone-3 feature summary: guarded read-only tool execution
+with redacted result contract (commit message `feat: enforce guarded read-only tool
+execution`).
 
 ## Test command
 
@@ -117,13 +75,10 @@ Nothing was pushed; this environment has no GitHub credential.
 
 ## Tests passing
 
-66 tests before the final category-constraint regression; 67 tests now, all passing
-(`Ran 67 tests ... OK`). Distribution:
-
-- test_config 2, test_domain 5, test_safety 4, test_secret_scan 4
-- test_artifacts 11, test_state 7
-- test_planner 7, test_routing 6, test_executor 5, test_orchestrator 8
-- test_sql_guard 8
+81 tests, all passing (`Ran 81 tests ... OK`). New in milestone 3: `test_tool_execution`
+14. Earlier modules: test_config 2, test_domain 5, test_safety 4, test_secret_scan 4,
+test_artifacts 11, test_state 7, test_planner 7, test_routing 6, test_executor 5,
+test_orchestrator 8, test_sql_guard 8.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -133,101 +88,85 @@ None.
 
 ## Known bugs
 
-- `app/tools/postgres.py` and `app/tools/duckdb.py` deliberately return
-  `BLOCKED_BY_POLICY`; this is a containment state, not a bug, but it means no real
-  analytics query can run yet.
-- `main.py` still contains a raw DuckDB read of the local Parquet archive outside the
-  guard. It is not imported by the runtime and only reads, but it is an uncontrolled
-  entry point that ticket 02/containment should remove or route through the guard.
+- The tool executors have not run against a real database. Connection-phase retryability
+  and the exact DuckDB LIMIT-wrapper behavior are validated only with fakes.
+- `sqlglot` emits a parse warning for `LOAD` before classifying it as a forbidden
+  `Command`; behavior is correct but the warning is noisy.
 
 ## Technical debt
 
-- No live-source integration; the whole loop is proven only with deterministic tools.
-- `RuleBasedPlanner` is intentionally simple (one task per unmet core requirement); an
-  LLM Planner is a future seam, not implemented.
-- `RuleBasedJudge` is deterministic; no LLM Judge seam is exercised yet.
-- `Router` optimizes only by cost; coverage/freshness/previous-failure signals are
-  modeled in `ToolCapability` but not scored.
-- No logging/observability layer.
-- `RunResult` exposes internal diagnostics; only `ResponsePackage` is the Response
-  Agent contract. Nothing currently enforces that at the type boundary beyond
-  convention and tests.
+- No live-source integration; the loop is proven only with deterministic tools and fakes.
+- `RuleBasedPlanner` and `RuleBasedJudge` remain intentionally simple.
+- `Router` optimizes only by cost.
+- No logging/observability; redaction is centralized in `redact_secrets` but not yet
+  wired to a logging sink.
+- LIMIT wrapping changes the executed SQL for unbounded reads; verify against a real
+  engine and decide whether to require an explicit LIMIT instead.
 
 ## Architecture deviations
 
-- The Orchestrator runs in memory; there is no `Checkpoint` implementation yet. This
-  is documented in ADR 0005, not a silent divergence.
-- `evidence_purpose` and `min_row_count` were added to `ArtifactRequirement`, and
-  `optional_data_keys` to `ArtifactDescriptor`. These are additive, defaulted fields
-  required for contextual judging. They do not change Initial Requirement semantics.
-- No conflict with any confirmed blog decision was discovered. Blog schemas beyond
-  those implemented remain designs, not evidence.
+- `main.py` was previously an unguarded raw DuckDB read; it is now guarded. Documented.
+- History was reconstructed (see Current branch). No code or domain behavior changed.
+- No conflict with any confirmed blog decision was discovered.
 
 ## ADRs added
 
-- `docs/adr/0002-contextual-artifact-assessment.md`
-- `docs/adr/0003-planner-terminal-latch.md`
-- `docs/adr/0004-read-only-sql-ast-guard.md`
-- `docs/adr/0005-state-services-and-deferred-persistence.md`
-
-(ADR 0001 pre-existed from milestone 1.)
+- `docs/adr/0006-guarded-tool-execution.md` (this session).
+- 0001–0005 from earlier sessions.
 
 ## Database / migration status
 
-No operational database, no migrations, no schema. No analytics database or Parquet
-file was read, written or modified in this session. `docker-compose.yml` still only
-defines the analytics PostgreSQL; an Operational PostgreSQL is not added yet.
+No operational database or migrations. No analytics database or Parquet file was read,
+written or modified. The verified read-only executor is wired but not live-tested.
 
 ## Security audit status
 
-- `scripts/secret_scan.py` current-tree scan passes (exit 0).
-- Known historical exposure from milestone 1 remains documented but unchanged:
-  `SECRET_REDACTED` in legacy files and local history. This session did not add or
-  remove credentials and did not rewrite history.
-- No live `DEEPSEEK_API_KEY`/`POSTGRES_PASSWORD` was used; no paid API call was made.
-- Read-only guard added and tested; adapters remain fail-closed.
-- User action still required: rotate/revoke the credentials flagged in milestone 1.
+- Current working tree scan passes (exit 0).
+- **History reconstruction performed:** the safe branch has 0 real findings across all
+  reachable commits (verified by scanning every blob in `git rev-list`). The old local
+  ancestry still contains exposed credentials and must never be pushed.
+- `102c9939/tests/test_config.py:10` was a scanner false positive (synthetic values in
+  a dict literal); the current tree no longer triggers it.
+- No live credential was used; no paid API call was made.
+- **SECURITY_ACTION_REQUIRED: Rotate/revoke previously exposed credential.** A real
+  provider token and database password were committed in the old local history. They
+  were never printed, and history was not force-rewritten, but rotation is still
+  required.
 
 ## Current blockers
 
-- **Push blocked**: this environment has no GitHub credential (`git ls-remote origin`
-  fails with "could not read Username"). Commits are local only. The next agent with
-  credentials must push `agent/deepseek-implementation` and never push the old
-  credential-bearing ancestry.
-- Live execution blocked on a running read-only PostgreSQL/DuckDB target.
+- **GitHub push blocked:** `gh` is not installed and no git credential is configured
+  (`git ls-remote origin` fails). The safe branch is ready; authentication must be
+  completed by the user (`gh auth login`, HTTPS + browser).
+- Live DB integration blocked on a running read-only PostgreSQL/DuckDB target.
 
 ## Exact next task
 
-Ticket 02 remainder: wire `app/validation/sql_guard.py` into the read-only adapters.
+Ticket 05, persistence foundation, TDD. Create `tests/persistence/` first.
 
-Start from failing tests in a new `tests/test_tool_execution.py` (create it) that
-assert:
+1. `app/persistence/artifacts.py`: `ArtifactStorage` Protocol +
+   `LocalFilesystemArtifactStorage` (path-sandboxed, content hash, put/get/exists).
+2. `app/persistence/store.py`: `OperationalStore` Protocol + a local SQLite
+   implementation for runs, objectives, requirements, plans, assessments, reports and
+   checkpoints, keyed by run id and object kind.
+3. `app/models/checkpoint.py`: `Checkpoint` contract (run_id, state version refs,
+   active work refs, pending request refs, recovery position, timestamp).
+4. `app/persistence/resume.py`: on load, reclassify `RUNNING` executions as
+   `INTERRUPTED`, reuse already-persisted artifacts, and report what may be retried.
+5. Tests: artifact round-trip and path escape; store round-trip; checkpoint references
+   the correct state versions; resume after interruption; artifact persisted before a
+   state references it; planner terminal survives resume.
 
-1. `query_local_hot_db` validates through `guard_read_only_sql` and executes only
-   allowlisted tables with a `SELECT` under a bounded `LIMIT`.
-2. `query_local_cold_parquet` requires `file_root=settings.parquet_archive_path` and
-   rejects paths outside it.
-3. A `retryable` connection error is redacted and surfaced without connection details;
-   0 rows is `EMPTY`, not an error.
-4. A mutation or forbidden function never opens a connection.
-
-Relevant modules: `app/validation/sql_guard.py`, `app/tools/postgres.py`,
-`app/tools/duckdb.py`, `app/config.py`, `app/agent/executor.py` (`ToolResult`).
-
-Do not:
-
-- restore unrestricted execution or the legacy LLM loop,
-- relax the read-only boundary,
-- push the historical credential-bearing ancestry.
+Do not: build a single giant AgentState dump; put agent runtime tables in the baseball
+analytics database; inline large payloads in the operational store.
 
 ## Recommended Codex review priorities
 
-1. `ArtifactAssessment` hard-failure veto: contract validator and service coercion.
-2. `PlannerTerminalLatch` fingerprint and the orchestrator `NO_PROGRESS` stop — look
-   for any path that can re-invoke planning without a new artifact.
-3. State derivation correctness (PARTIAL vs UNSATISFIED, COMPLETE optional gaps).
-4. `ResponsePackage` leakage: confirm no rejected evidence/attempt history can enter it.
-5. `guard_read_only_sql` bypasses: dialect edge cases, nested table functions, CTEs,
-   `exp.DDL`/`exp.DML` subclass coverage, path normalization.
-6. Router precedence: confirm preference never overrides policy or a user hard source
-   constraint.
+1. Guard-before-connect: prove no executor path can connect on rejected SQL.
+2. Redaction completeness in `redact_secrets` and every `ToolResult` error path.
+3. `guard_read_only_sql` bypasses: nested table functions, CTE shadowing, dialect
+   spellings, schema-qualified allowlist behavior.
+4. LIMIT-wrapper correctness on real PostgreSQL and DuckDB.
+5. `PlannerTerminalLatch` and `NO_PROGRESS` termination.
+6. `ResponsePackage` leakage of rejected evidence/history.
+7. History safety: confirm no push includes the old ancestry.

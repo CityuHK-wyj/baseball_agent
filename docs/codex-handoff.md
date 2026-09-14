@@ -5,19 +5,31 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## Repository State
 
-- branch: `agent/deepseek-implementation`
-- base commit: `6ccb2ad` (`codex/architecture-implementation` HEAD, milestone 1)
-- milestone 2 feature tip: `aad6ec3` (documentation checkpoint commits follow; use
-  `git log --oneline 6ccb2ad..HEAD` for the exact series)
-- working tree: clean after the checkpoint commit
-- tests: `python3 -m unittest discover -s tests -v` → 67 passing
-- remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; **push blocked locally**
-  (no GitHub credential in this environment). Do not push the historical
-  credential-bearing ancestry.
+- branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
+  `agent/deepseek-implementation` must not be pushed)
+- root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
+- tests: `python3 -m unittest discover -s tests -v` → 81 passing
+- secret scan: current tree exit 0; all commits reachable from the safe branch have
+  0 real findings (verified by scanning every blob)
+- remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; **push blocked** — `gh`
+  is not installed and no git credential is configured. The user must authenticate.
 
 ## What DeepSeek Implemented
 
-Milestone 2 vertical slice, deterministic and fully tested:
+Milestone 3 (this session) — guarded read-only tool execution (ADR 0004, 0006):
+
+- `app/tools/results.py`: `ToolResult` contract (SUCCESS / NO_DATA / POLICY_REJECTED /
+  TECHNICAL_FAILURE) and `redact_secrets`.
+- `app/tools/execution.py`: `PostgresReadOnlyExecutor` and `DuckDBReadOnlyExecutor`.
+  Guard runs before connect; PostgreSQL uses `SET TRANSACTION READ ONLY` +
+  `SET LOCAL statement_timeout`; LIMIT-less reads are wrapped and `fetchmany`-bounded.
+- Rewired `app/tools/postgres.py`, `app/tools/duckdb.py`; removed the unguarded DuckDB
+  read from `main.py`; `generate_pitch_heatmap` fails closed.
+- `TaskAttempt` gained `error_type` and `safe_error_summary`.
+- `guard_read_only_sql` now uses schema-qualified table identity.
+- Tests: `tests/test_tool_execution.py` (14) + existing `tests/test_sql_guard.py` (8).
+
+Milestones 1–2 (previous sessions, still passing):
 
 - Artifact domain: immutable `Artifact`, `DeterministicResult` (hard/soft),
   `JudgeResult`, contextual `ArtifactAssessment` with a hard-failure veto.
@@ -37,16 +49,15 @@ Milestone 2 vertical slice, deterministic and fully tested:
 
 ## What Was Intentionally Not Implemented
 
-- Live PostgreSQL/DuckDB execution. Adapters remain fail-closed (ticket 02).
+- Operational PostgreSQL, payload store, checkpoints, resume, idempotent replay and
+  Shared Context projection (ticket 05) — next up.
+- A live integration test against a real analytical database/Parquet fixture.
 - LLM Planner / LLM Judge / Response generation. Only deterministic implementations
   exist; the Protocol seams are there but untested against a model.
-- Operational PostgreSQL, payload store, checkpoints, resume, idempotent replay and
-  Shared Context projection (ticket 05).
 - Semantic/Normalization layer (`app/semantic/*`, `app/conversation/service.py`).
 - Metric Registry / Source Mapping.
 - Logging/observability.
-- Supporting-requirement proposals from the Planner (the catalog supports them; the
-  rule Planner never proposes one).
+- Supporting-requirement proposals from the Planner.
 
 ## Architecture Decisions Used
 
@@ -61,13 +72,13 @@ Milestone 2 vertical slice, deterministic and fully tested:
 
 1. `AGENTS.md`, `CONTEXT.md`
 2. `docs/development-status.md` (this session's exact evidence + next task)
-3. `docs/adr/0002-*.md`, `0003-*.md`, `0004-*.md`, `0005-*.md`
+3. `docs/adr/0006-guarded-tool-execution.md`, `0002-*.md`, `0003-*.md`, `0004-*.md`, `0005-*.md`
 4. `.scratch/architecture-implementation/spec.md` and `issues/02..05`
-5. `app/models/{contracts,artifacts,planning,reports}.py`
-6. `app/agent/{planner,routing,executor,orchestrator,response,registry}.py`
-7. `app/assessment/{validator,judge,service}.py`, `app/state/services.py`
-8. `app/validation/sql_guard.py`
-9. `tests/{test_artifacts,test_state,test_planner,test_routing,test_executor,test_orchestrator,test_sql_guard}.py`
+5. `app/tools/{results,execution,postgres,duckdb}.py`, `app/validation/sql_guard.py`
+6. `app/models/{contracts,artifacts,planning,reports}.py`
+7. `app/agent/{planner,routing,executor,orchestrator,response,registry}.py`
+8. `app/assessment/{validator,judge,service}.py`, `app/state/services.py`
+9. `tests/{test_tool_execution,test_sql_guard,test_artifacts,test_state,test_planner,test_routing,test_executor,test_orchestrator}.py`
 
 ## Important Tests
 
@@ -109,13 +120,15 @@ Milestone 2 vertical slice, deterministic and fully tested:
 
 ## Security Concerns
 
-- Historical credentials remain in local history (milestone 1). Rotate them; do not
-  publish that ancestry.
-- `main.py` bypasses the guard with a raw DuckDB read. Remove or route it through the
-  guard.
-- The guard is not wired to any connection, so its live enforcement is unproven.
-- DuckDB extension loading / ATTACH denial depends on the node denylist; add tests for
-  new dialect spellings before trusting it.
+- Historical credentials remain in the OLD local branch ancestry. It must never be
+  pushed. The safe branch (`agent/deepseek-implementation-safe`) was reconstructed
+  from a clean root; scan all reachable commits → 0 findings.
+- `guard_read_only_sql` + executors are wired but not live-tested against a real
+  engine. DuckDB extension/ATTACH denial depends on the node denylist; add dialect
+  spellings before trusting it.
+- Redaction is centralized but not wired to a logging sink; any new error path must
+  route through `redact_secrets`.
+- SECURITY_ACTION_REQUIRED: rotate/revoke the previously exposed credential.
 
 ## Performance Concerns
 
@@ -126,7 +139,8 @@ Milestone 2 vertical slice, deterministic and fully tested:
 ## Persistence Concerns
 
 - None implemented. `Artifact.payload_ref` is a coordinate with no backing store.
-- Checkpoint/resume, INTERRUPTED handling and idempotency are ticket 05.
+- Checkpoint/resume, INTERRUPTED handling and idempotency are ticket 05 and are the
+  exact continuation point.
 
 ## Context / RAG Concerns
 
@@ -143,7 +157,10 @@ Milestone 2 vertical slice, deterministic and fully tested:
 - Router with a preference for a policy-blocked source → falls back, never blocked.
 - SQL: `WITH x AS (SELECT ...) INSERT ...`; nested `read_parquet` in a subquery;
   `COPY` inside a CTE; mixed-case/comment-obfuscated `DROP`; `;` inside a string
-  literal; `SELECT ... FROM read_parquet(?)` with a parameter.
+  literal; `SELECT ... FROM read_parquet(?)` with a parameter; `other_schema.table`
+  against an unqualified allowlist.
+- Tool execution: a rejected query must leave an `ExplodingConnect` with 0 calls;
+  connection error summary must never contain the configured password.
 - Requirement state after re-assessing the same artifact twice → version does not
   spuriously advance.
 
@@ -151,12 +168,14 @@ Milestone 2 vertical slice, deterministic and fully tested:
 
 - Should `TaskExecution` outcomes feed `PlannerContext` explicitly?
 - What is the operational schema and checkpoint coordinate (ticket 05)?
+- Are SQL `BASEBALL_DATABASE_URL` and the current discrete Settings fields both wanted?
 - Is `RuleBasedPlanner` sufficient for v1, or is an LLM Planner required next?
-- Which Shared Context sources are authoritative for freshness/league progress?
 
 ## Exact Continuation Point
 
-Implement ticket 02's remainder: wire `guard_read_only_sql` into
-`app/tools/postgres.py` and `app/tools/duckdb.py` behind a new read-only executor and
-`tests/test_tool_execution.py`, per `docs/development-status.md` → "Exact next task".
-Then commit, and only then start ticket 05.
+Implement ticket 05's persistence foundation TDD, per `docs/development-status.md` →
+"Exact next task": `app/persistence/artifacts.py` (`ArtifactStorage` +
+`LocalFilesystemArtifactStorage`), `app/persistence/store.py` (`OperationalStore` +
+local SQLite implementation), `app/models/checkpoint.py` (`Checkpoint`), and
+`app/persistence/resume.py` (interrupted-run reclassification and artifact reuse),
+with `tests/persistence/`. Do not build a single giant AgentState dump.

@@ -81,12 +81,19 @@ MAX_ROUNDS, BUDGET_EXHAUSTED, NO_RECOVERABLE_PATH, POLICY_BLOCKED or NO_PROGRESS
 
 `guard_read_only_sql` is the structural read-only control (ADR 0004). It parses with
 sqlglot and rejects multiple statements, non-SELECT roots, DDL/DML, administration
-statements, forbidden functions, non-allowlisted tables and file paths outside an
-explicit root. It is not yet wired to a live connection; the adapters remain fail-closed.
+statements, forbidden functions, non-allowlisted tables (schema-qualified identity)
+and file paths outside an explicit root.
+
+Milestone 3 wires it into execution (ADR 0006). `app/tools/execution.py` validates
+before opening any connection, runs PostgreSQL in a read-only transaction with a
+statement timeout, wraps LIMIT-less reads and bounds rows, and redacts every error
+summary through `app/tools/results.py:redact_secrets`. `main.py` and the plotting
+helper no longer expose unguarded analytical paths.
 
 ## Tests and evidence
 
 `python3 -m unittest discover -s tests -v` runs the suite. Milestone 1 evidence: 15
 tests. Milestone 2 adds artifact/validation/judge/registry, state derivation, planner
 and latch, routing precedence, executor retry/empty, orchestrator end-to-end and the
-SQL AST guard.
+SQL AST guard. Milestone 3 adds guarded read-only execution and the redacted tool
+result contract. Total: 81 tests.
