@@ -1,17 +1,12 @@
 """Bounded technical execution. Retries live here; recovery lives in the Planner."""
 
-from typing import Callable, Literal, Protocol
+from typing import Callable, Protocol
 
 from app.models.artifacts import Artifact, ArtifactContract
 from app.models.planning import AgentTask, RoutingDecision, TaskAttempt, TaskExecution
+from app.tools.results import ToolResult
 
-
-class ToolResult(ArtifactContract):
-    status: Literal["OK", "EMPTY", "ERROR"] = "OK"
-    artifact: Artifact | None = None
-    error_code: str = ""
-    retryable: bool = False
-    policy_blocked: bool = False
+__all__ = ["Executor", "Tool", "ToolResult", "ExecutionOutcome"]
 
 
 class ExecutionOutcome(ArtifactContract):
@@ -56,7 +51,8 @@ class Executor:
             attempts.append(TaskAttempt(
                 attempt_id=self._id_factory("attempt"), execution_ref=execution_id, tool=tool.name,
                 status=_STATUS[result.status], retryable=result.retryable,
-                error_code=result.error_code,
+                error_code=result.error_code, error_type=result.error_type,
+                safe_error_summary=result.safe_error_summary,
                 artifact_ref=result.artifact.artifact_id if result.artifact else None))
             status = _STATUS[result.status]
             if result.status != "ERROR" or not result.retryable:

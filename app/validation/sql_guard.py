@@ -93,8 +93,12 @@ def _referenced_tables(tree: exp.Expression) -> tuple[str, ...]:
         if not isinstance(table.this, (exp.Identifier, exp.Dot)):
             continue  # table function such as read_parquet(...)
         name = table.name
-        if name and name not in cte_names:
-            names.append(name)
+        if not name or name in cte_names:
+            continue
+        # Keep schema/database qualification so an unqualified allowlist entry
+        # cannot be satisfied by a trusted name in an untrusted schema.
+        qualified = f"{table.db}.{name}" if table.db else name
+        names.append(qualified)
     return tuple(dict.fromkeys(names))
 
 

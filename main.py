@@ -1,23 +1,28 @@
-import duckdb
+"""Guarded read-only Parquet summary.
 
-con = duckdb.connect(database=':memory:')
-
-# 🚨 这一段完全复制了 DeepSeek 刚才在终端里自动生成的最终极 SQL
-final_sql = """
-SELECT 
-    player_name, 
-    COUNT(*) AS hr_count, 
-    ROUND(AVG(launch_speed)::NUMERIC, 1) AS avg_launch_speed, 
-    ROUND(MAX(launch_speed)::NUMERIC, 1) AS max_launch_speed
-FROM read_parquet('/home/158112/baseball_agent/baseball_agent/data_loader/parquet_archive/mlb_statcast_*.parquet')
-WHERE events ILIKE '%home_run%'
-  AND launch_speed IS NOT NULL
-GROUP BY player_name
-HAVING COUNT(*) >= 30
-ORDER BY avg_launch_speed DESC
-LIMIT 5
+Importing this module has no side effects and opens no connection. The previous
+raw, unguarded DuckDB query was removed: all analytical reads must go through the
+AST guard in ``app.validation.sql_guard``.
 """
 
-df = con.execute(final_sql).df()
-print("\n🔥 2015-2023 全联盟本垒打暴力美学最终前五名：")
-print(df.to_string(index=False))
+from app.config import settings
+from app.tools.execution import DuckDBReadOnlyExecutor
+
+
+def build_query() -> str:
+    pattern = settings.parquet_archive_path / "mlb_statcast_*.parquet"
+    return f"SELECT COUNT(*) AS pitch_count FROM read_parquet('{pattern}')"
+
+
+def run() -> int:
+    executor = DuckDBReadOnlyExecutor(settings.parquet_archive_path)
+    result, rows = executor.execute_with_rows(build_query())
+    if result.status == "ERROR":
+        print(f"Read blocked or failed: {result.safe_error_summary}")
+        return 1
+    print(f"rows={result.row_count} pitch_count={rows[0][0] if rows else 0}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(run())

@@ -29,6 +29,8 @@ class TaskAttempt(ArtifactContract):
     status: Literal["SUCCEEDED", "EMPTY", "FAILED", "INTERRUPTED"]
     retryable: bool = False
     error_code: str = ""
+    error_type: Literal["NONE", "POLICY_REJECTED", "NO_DATA", "TECHNICAL_FAILURE"] = "NONE"
+    safe_error_summary: str = ""
     artifact_ref: Name | None = None
     started_at: datetime = Field(default_factory=utcnow)
     finished_at: datetime = Field(default_factory=utcnow)

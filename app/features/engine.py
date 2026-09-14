@@ -60,6 +60,8 @@ def generate_pitch_heatmap(
     config: Settings = settings,
 ) -> Path | None:
     """Generate the existing strike-zone KDE heatmap and return its output path."""
+    from app.validation.policy import deny_analytics_write
+    deny_analytics_write()
     query = "SELECT plate_x, plate_z FROM statcast_pitches WHERE player_name ILIKE %s AND plate_x IS NOT NULL AND plate_z IS NOT NULL"
     parameters = [f"%{pitcher_name}%"]
     if start_date:
