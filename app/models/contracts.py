@@ -53,6 +53,7 @@ class ArtifactDescriptor(Contract):
     artifact_type: Literal["TABLE", "EVIDENCE", "FEATURE"]
     entities: tuple[Entity, ...] = ()
     data_keys: tuple[Name, ...] = Field(min_length=1)
+    optional_data_keys: tuple[Name, ...] = ()
     time_range: TimeRange | None = None
     constraints: tuple[Constraint, ...] = ()
     granularity: Name
@@ -76,6 +77,10 @@ class ArtifactRequirement(Contract):
     origin: Literal["INITIAL", "PLANNER_ADDED"] = "INITIAL"
     base_criticality: Literal["CORE", "OPTIONAL"] = "CORE"
     parent_ref: Name | None = None
+    # Contextual framing, not a property of any Artifact: the Judge uses it to
+    # reinterpret soft signals for this requirement.
+    evidence_purpose: Literal["EXISTENCE", "DESCRIPTIVE", "INFERENTIAL"] = "DESCRIPTIVE"
+    min_row_count: int | None = Field(default=None, ge=0)
 
 
 class RequirementState(Contract):
