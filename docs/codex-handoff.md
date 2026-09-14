@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 185 passing
+- tests: `python3 -m unittest discover -s tests -v` → 207 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
@@ -18,7 +18,15 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## What DeepSeek Implemented
 
-Milestone 10 (this session) — AgentReport, state transitions, review order (ADR 0013):
+Milestone 11 (this session) — LLM Protocols + prompts (ADR 0014):
+
+- `app/llm/provider.py` (ModelProvider, FakeModelProvider), `app/llm/prompts.py`
+  (versioned PromptTemplate), `app/llm/parsing.py`, `app/llm/openai_provider.py`,
+  `app/llm/planner.py`, `app/llm/judge.py`, `app/llm/response.py`.
+- Per-agent `*_MODEL` configuration; API keys env-only.
+- Tests: `tests/llm/` (21).
+
+Milestone 10 (previous session) — AgentReport, state transitions, review order (ADR 0013):
 
 - `app/models/report.py` (`AgentReport`, `DOMAIN_OWNERSHIP`), `app/models/transition.py`
   (`StateTransition`), `app/agent/review.py` (`ReportReviewer`, `ReviewOutcome`,

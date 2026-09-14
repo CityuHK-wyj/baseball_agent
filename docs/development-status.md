@@ -48,8 +48,14 @@ Milestone 10 — AgentReport, explicit state transitions and dependency-ordered 
 (continuity + monotonic version), and `ReportReviewer` that DEFERs reports with
 unresolved prerequisites instead of applying arrival order. ADR 0013.
 
-Next phase: LLM Protocol implementations + prompt versioning, observability/evaluation,
-the Operational PostgreSQL store, a CLI and usage docs, then E2E.
+Milestone 11 — LLM implementations behind the Protocols: **delivered**.
+Provider-agnostic `ModelProvider` + `FakeModelProvider`, environment-driven per-agent
+models, versioned `PromptTemplate`s, and `LLMPlanner`/`LLMJudge`/`LLMResponseComposer`
+with deterministic fallbacks. Structured output is validated; the Judge never overrides
+a hard failure; the Planner cannot invent requirements. ADR 0014.
+
+Next phase: observability/evaluation metrics, the Operational PostgreSQL store, a CLI,
+docs/usage + README, and the end-to-end vertical flow test.
 
 ## Architecture status
 
@@ -186,7 +192,9 @@ series was replayed on top. This was necessary because the original local ancest
 (entity resolver 5, constraints 5, objective extractor 4, normalizer 5, requirement
 decomposer 5) and `tests/test_adequacy.py` 5. Milestone 9: `tests/test_feature_engine.py`
 5 and `tests/test_source_mapping.py` 7. Milestone 10: `tests/test_state_transition.py` 5,
-`tests/test_agent_report.py` 3, `tests/test_report_review.py` 6. Total now 185.
+`tests/test_agent_report.py` 3, `tests/test_report_review.py` 6. Milestone 11:
+`tests/llm/` (provider/prompts 5, planner 6, judge 4, response 3, openai provider 3).
+Total now 207.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -227,6 +235,7 @@ None.
 - `docs/adr/0011-semantic-normalization-and-decomposition.md` (milestone 8).
 - `docs/adr/0012-feature-engine-and-source-mapping.md` (milestone 9).
 - `docs/adr/0013-agent-report-and-state-transitions.md` (milestone 10).
+- `docs/adr/0014-llm-protocols-and-prompts.md` (milestone 11).
 - 0001–0005 from earlier sessions.
 
 ## Database / migration status
@@ -255,23 +264,19 @@ written or modified. The verified read-only executor is wired but not live-teste
 
 ## Exact next task
 
-Milestone 11 — LLM Protocol implementations and prompt versioning, TDD.
+Milestone 12 — observability and evaluation metrics, TDD.
 
-1. `app/llm/provider.py`: a provider-agnostic `ModelProvider` Protocol with a
-   `FakeModelProvider` for tests and a thin OpenAI-compatible implementation
-   (`app/llm/openai_provider.py`) reading `*_MODEL` and API keys from the environment.
-   Model choice is configuration-driven (`PLANNER_MODEL`, `JUDGE_MODEL`, `RESPONSE_MODEL`,
-   `SEMANTIC_MODEL`).
-2. `app/llm/prompts.py`: versioned prompt templates (`PromptTemplate` with an id and
-   version), not long strings inline in functions.
-3. Implementations behind existing Protocols: `LLMPlanner`, `LLMJudge`, `LLMResponse`,
-   plus `LLMSemanticNormalizer`. Every structured output is schema-validated and
-   policy-validated; an LLM Planner may not modify Initial Requirements or bypass
-   terminal state.
-4. Tests: `tests/llm/test_provider.py` (timeout + redacted failure), `tests/llm/test_planner_contract.py`
-   (malformed output rejected, initial requirement invariants enforced), `tests/llm/test_prompts.py`.
+1. `app/observability/metrics.py`: a structured `RunMetrics`/`RunTrace` recorder with
+   fields (run_id, objective_id, task_id, attempt_id, artifact_id, agent, duration_ms,
+   status, retry_count, replan_count, source, tool, tokens, cost) and `redact_secrets`
+   applied to every string. Never record credentials.
+2. `app/observability/evaluation.py`: `RunEvaluation` aggregating COMPLETE/LIMITED/FAILED
+   rate, replan rate, retry rate, artifact reuse rate, source failure rate, judge
+   disagreement (deterministic vs LLM), average steps, context size.
+3. Tests: `tests/observability/test_metrics.py` (redaction, no secret in any field) and
+   `tests/observability/test_evaluation.py` (rates computed from synthetic runs).
 
-Do not: leak a provider SDK into the domain layer; make LLM the only implementation.
+Then: Operational PostgreSQL store, CLI + usage docs, E2E vertical flow.
 
 ## Recommended Codex review priorities
 

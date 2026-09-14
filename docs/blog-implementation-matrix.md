@@ -66,7 +66,7 @@ This file is maintained as implementation proceeds. It is the evidence for
 | Planner sees RequirementState + artifact index + assessment summary (D064) | IMPLEMENTED | `PlannerContext` | `tests/context/test_context_wiring.py` | |
 | Planner keeps semantic level (D015) | IMPLEMENTED | `PlannerContext` has no physical schema | — | |
 | `base_criticality` stable (D035) | IMPLEMENTED | frozen contract | `tests/test_domain.py` | |
-| LLM Planner behind protocol (§55) | MISSING | `RuleBasedPlanner` only | — | |
+| LLM Planner behind protocol (§55) | IMPLEMENTED | `app/llm/planner.py` | `tests/llm/test_planner.py` | Validated output; deterministic fallback; not yet orchestrator-wired |
 
 ## E. Router / Source Mapping (D015, D016, D020, D021, D040)
 
@@ -103,7 +103,7 @@ This file is maintained as implementation proceeds. It is the evidence for
 | Critical gate before weighted coverage (D049) | PARTIAL | `derive_objective_state` core gate | `tests/test_state.py` | No weighted coverage |
 | COMPLETE retains optional gaps (D050) | IMPLEMENTED | `optional_gaps` | `tests/test_state.py` | |
 | LIMITED / FAILED semantics (D030) | PARTIAL | `derive_objective_state` | `tests/test_state.py` | "useful bounded result" not modeled |
-| LLM Judge behind protocol (§30) | MISSING | `RuleBasedJudge` only | — | |
+| LLM Judge behind protocol (§30) | IMPLEMENTED | `app/llm/judge.py` | `tests/llm/test_judge.py` | Hard failure bypasses the provider |
 | RequirementState rich projection (§14) | IMPLEMENTED | `RequirementState` + `derive_requirement_state` | `tests/test_state.py` | artifact/limitation/unresolved/blocking refs, recoverable |
 
 ## H. Orchestration & State (D041, D043, D044, D053)
@@ -137,7 +137,7 @@ This file is maintained as implementation proceeds. It is the evidence for
 | CompletionReport internal record (D053) | IMPLEMENTED | `app/models/reports.py` | `tests/test_orchestrator.py` | |
 | Critical shared knowledge retained (D052) | IMPLEMENTED | `ContextService` RESPONSE purpose | `tests/context/test_context_wiring.py` | |
 | CompletionReport richer fields (§49) | PARTIAL | has most; missing permission events/follow-ups | — | |
-| LLM Response behind protocol (§54) | MISSING | `ResponsePackage` only | — | |
+| LLM Response behind protocol (§54) | IMPLEMENTED | `app/llm/response.py` | `tests/llm/test_response.py` | Accepted evidence only; deterministic fallback |
 
 ## K. Shared Knowledge & Context (D017, D022, D057)
 
@@ -163,7 +163,8 @@ This file is maintained as implementation proceeds. It is the evidence for
 | Clarification/permission escalation (§42-43) | MISSING | — | — | |
 | Observability structured metrics (§58) | MISSING | — | — | |
 | Evaluation metrics (§59) | MISSING | — | — | |
-| Prompt versioning (§57) | MISSING | — | — | |
+| Prompt versioning (§57) | IMPLEMENTED | `app/llm/prompts.py` | `tests/llm/test_provider_and_prompts.py` | `PromptTemplate` id + version |
+| Provider-agnostic config (§56) | IMPLEMENTED | `app/config.py`, `app/llm/openai_provider.py` | `tests/llm/test_openai_provider.py` | Per-agent `*_MODEL`; keys env-only |
 
 ## M. Deliverables (this task)
 
