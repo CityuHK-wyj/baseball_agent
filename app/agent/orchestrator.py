@@ -156,7 +156,7 @@ class Orchestrator:
                                                          tasks_planned, budget),
                 context_items=self._retrieve_context(ContextRequest(
                     request_id=f"planner-{run_id}-{round_index}", purpose="PLANNER",
-                    kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS)),
+                    kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS, run_id=run_id)),
                 prior_plan_count=len(decisions), planner_terminal=self._latch.latched)
             decision = self._planner.decide(context)
             decisions.append(decision)
@@ -249,7 +249,7 @@ class Orchestrator:
             self._assessment_service, self._registry,
             context_items=self._retrieve_context(ContextRequest(
                 request_id=f"response-{run_id}", purpose="RESPONSE",
-                kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS)))
+                kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS, run_id=run_id)))
         if self._recorder is not None:
             self._recorder.record_objective_state(run_id, objective_state)
             self._recorder.record_completion_report(run_id, completion)

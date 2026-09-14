@@ -30,6 +30,7 @@ class ContextItem(ArtifactContract):
     entity_ref: str = ""
     freshness_rank: int = Field(default=0, ge=0)
     provenance_ref: str = ""
+    scope_run: str = ""
 
 
 class ContextRequest(ArtifactContract):
@@ -39,6 +40,7 @@ class ContextRequest(ArtifactContract):
     kinds: tuple[Name, ...] = ()
     entity_refs: tuple[Name, ...] = ()
     max_items: int = Field(default=10, ge=1)
+    run_id: str = ""
 
 
 class ContextPackage(ArtifactContract):
@@ -93,6 +95,8 @@ class ContextService:
                 continue
             for item in source.retrieve(request):
                 if _excluded(item.kind, request.purpose) or not item.accepted:
+                    continue
+                if item.scope_run and item.scope_run != request.run_id:
                     continue
                 if request.entity_refs and item.entity_ref and item.entity_ref not in request.entity_refs:
                     continue
