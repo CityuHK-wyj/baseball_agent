@@ -6,7 +6,7 @@ from app.agent.registry import ArtifactRegistry
 from app.assessment.judge import Judge
 from app.assessment.validator import validate_artifact
 from app.models.artifacts import ArtifactAssessment, AssessmentSummary
-from app.models.contracts import ArtifactRequirement
+from app.models.contracts import ArtifactRequirement, LeagueStateSnapshot
 
 
 class AssessmentService:
@@ -20,9 +20,10 @@ class AssessmentService:
         self._assessments: dict[str, ArtifactAssessment] = {}
 
     def assess(self, artifact_id: str, requirement: ArtifactRequirement,
-               objective_ref: str | None = None) -> ArtifactAssessment:
+               objective_ref: str | None = None,
+               league_state: LeagueStateSnapshot | None = None) -> ArtifactAssessment:
         artifact = self._registry.get(artifact_id)
-        deterministic = validate_artifact(artifact, requirement)
+        deterministic = validate_artifact(artifact, requirement, league_state)
         judge_result = self._judge.assess(artifact, requirement, deterministic)
         # Hard veto is enforced here as well as in the contract.
         final_level = "REJECT" if not deterministic.passed else judge_result.level

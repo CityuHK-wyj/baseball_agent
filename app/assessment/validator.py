@@ -6,8 +6,9 @@ contextual Judge may reinterpret for a specific requirement).
 
 import json
 
+from app.assessment.adequacy import qualification_signal, sample_adequacy_signal
 from app.models.artifacts import Artifact, DeterministicResult, HardFailure, SoftSignal
-from app.models.contracts import ArtifactRequirement, Constraint, Entity
+from app.models.contracts import ArtifactRequirement, Constraint, Entity, LeagueStateSnapshot
 
 
 def _entity_key(entity: Entity) -> tuple[str, str, str]:
@@ -29,7 +30,8 @@ def _coverage_fraction(required, observed) -> float:
     return observed_days / required_days
 
 
-def validate_artifact(artifact: Artifact, requirement: ArtifactRequirement) -> DeterministicResult:
+def validate_artifact(artifact: Artifact, requirement: ArtifactRequirement,
+                      league_state: LeagueStateSnapshot | None = None) -> DeterministicResult:
     """Compare one Artifact against one Requirement on program-verifiable facts only."""
     hard: list[HardFailure] = []
     soft: list[SoftSignal] = []
@@ -88,11 +90,20 @@ def validate_artifact(artifact: Artifact, requirement: ArtifactRequirement) -> D
 
     if artifact.row_count == 0:
         soft.append(SoftSignal(code="ZERO_ROWS", severity="MAJOR", detail="Artifact contains no rows"))
+
+    if requirement.sample_adequacy_rule is not None:
+        signal = sample_adequacy_signal(requirement.sample_adequacy_rule, artifact.row_count)
+        if signal is not None:
+            soft.append(signal)
     elif artifact.row_count is not None and requirement.min_row_count is not None:
         if artifact.row_count < requirement.min_row_count:
             severity = "MODERATE" if artifact.row_count * 2 >= requirement.min_row_count else "MAJOR"
             soft.append(SoftSignal(
                 code="LOW_SAMPLE", severity=severity,
                 detail=f"{artifact.row_count} rows below the {requirement.min_row_count} row floor"))
+
+    qualification = qualification_signal(requirement.qualification_rule, league_state)
+    if qualification is not None:
+        soft.append(qualification)
 
     return DeterministicResult(hard_failures=tuple(hard), soft_signals=tuple(soft))
