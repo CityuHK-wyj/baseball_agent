@@ -201,7 +201,7 @@ series was replayed on top. This was necessary because the original local ancest
 
 - Branch `agent/deepseek-implementation-safe` is published and tracks
   `origin/agent/deepseek-implementation-safe`.
-- Latest pushed commit: `7e9692990b5cfdc494f06b06e7eb75658187ca96` (documentation
+- Latest pushed commit: `01fe20cf799c2ccbf627d018180ce0d3028a587d` (documentation
   commits created after this push are pushed again immediately).
 - `main` is not touched; the old `agent/deepseek-implementation` branch is never pushed.
 
