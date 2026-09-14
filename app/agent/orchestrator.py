@@ -224,10 +224,13 @@ class Orchestrator:
 
         objective_state = derive_objective_state(
             objective.objective_id, requirements, states, planner_terminal=True)
-        all_assessments = self._assessment_service.all_assessments()
+        # Scope to this objective: services may be shared across objectives in a run.
+        run_assessments = tuple(
+            item for item in self._assessment_service.all_assessments()
+            if item.objective_ref in (None, objective.objective_id))
         execution_summary = self._execution_summary(executions, round_index, tasks_planned, budget)
         accepted_ids = tuple(
-            dict.fromkeys(item.artifact_ref for item in all_assessments if item.accepted))
+            dict.fromkeys(item.artifact_ref for item in run_assessments if item.accepted))
         completion = CompletionReport(
             run_id=run_id, query=objective.raw_query, confirmed_intent=confirmed_intent,
             objective_ref=objective.objective_id, objective_status=objective_state.status,
@@ -238,7 +241,7 @@ class Orchestrator:
                 for item in requirements),
             final_artifact_refs=accepted_ids,
             limitations=tuple(dict.fromkeys(
-                limitation for item in all_assessments if item.accepted
+                limitation for item in run_assessments if item.accepted
                 for limitation in item.limitations)),
             unresolved_gaps=tuple(item.requirement_id for item in unmet_core_requirements(requirements, states)),
             plan_revisions=sum(1 for item in decisions if item.kind in ("PLAN", "REPLAN")),
@@ -258,7 +261,7 @@ class Orchestrator:
         return RunResult(
             run_id=run_id, completion_report=completion, response_package=response,
             objective_state=objective_state, requirement_states=tuple(states.values()),
-            assessments=all_assessments, planning_decisions=tuple(decisions),
+            assessments=run_assessments, planning_decisions=tuple(decisions),
             routing_decisions=tuple(routings), executions=tuple(executions),
             retrieved_artifacts=tuple(item.artifact_id for item in self._registry.artifacts()))
 

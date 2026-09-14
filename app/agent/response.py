@@ -17,7 +17,11 @@ def build_response_package(run_id: str, objective_state: ObjectiveState,
                            assessment_service: AssessmentService,
                            registry: ArtifactRegistry,
                            context_items: tuple = ()) -> ResponsePackage:
-    accepted = tuple(item for item in assessment_service.all_assessments() if item.accepted)
+    # Only this objective's assessments: a shared service must not leak another
+    # objective's accepted evidence into this response.
+    accepted = tuple(
+        item for item in assessment_service.all_assessments()
+        if item.accepted and item.objective_ref in (None, objective_state.objective_ref))
     evidence = []
     for assessment in accepted:
         artifact = registry.get(assessment.artifact_ref)
