@@ -47,8 +47,25 @@ class Router:
         )
 
     def route(self, task: AgentTask, artifact_type: str,
-              user_hard_sources: tuple[str, ...] = ()) -> RoutingDecision:
+              user_hard_sources: tuple[str, ...] = (),
+              execution_route: object | None = None) -> RoutingDecision:
+        """Pick a tool. ``execution_route`` (from SourceMappingResolver) acts as a
+        system-derived capability constraint above Planner preference."""
         notes: list[str] = []
+        user_sources = tuple(user_hard_sources)
+        mapped_kind = ""
+        if execution_route is not None:
+            mode = getattr(execution_route, "mode", "")
+            if mode == "NO_MAPPING":
+                reason = getattr(execution_route, "reason", "no source mapping")
+                return RoutingDecision(
+                    decision_id=self._id_factory("routing"), task_ref=task.task_id,
+                    selected_tool=None, rationale=f"Source mapping blocked execution: {reason}",
+                    policy_notes=(reason,))
+            mapped_kind = getattr(execution_route, "required_source_kind", "")
+            if mapped_kind:
+                notes.append(f"source mapping requires {mapped_kind}")
+
         eligible: list[ToolCapability] = []
         for capability in self._capabilities:
             if not capability.available:
@@ -60,8 +77,11 @@ class Router:
             if artifact_type not in capability.supported_artifact_types:
                 notes.append(f"{capability.tool}: cannot provide {artifact_type}")
                 continue
-            if user_hard_sources and capability.source_kind not in user_hard_sources:
+            if user_sources and capability.source_kind not in user_sources:
                 notes.append(f"{capability.tool}: violates a user source constraint")
+                continue
+            if mapped_kind and capability.source_kind != mapped_kind:
+                notes.append(f"{capability.tool}: violates the source mapping")
                 continue
             eligible.append(capability)
 
