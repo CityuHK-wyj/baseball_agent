@@ -38,8 +38,12 @@ deterministic objective extraction, a Requirement Decomposer producing immutable
 INITIAL requirements, QualificationRule/SampleAdequacyRule, and a LeagueStateSnapshot
 separating official progress from local coverage. ADR 0011.
 
-Next phase: Source Mapping execution + Feature Engine metric artifacts, then
-AgentReport/state-transition contracts, then LLM Protocol implementations,
+Milestone 9 — Feature Engine metric artifacts and Source Mapping execution:
+**delivered**. `FeatureEngine` emits FEATURE artifacts with lineage; `SourceMappingResolver`
+turns required data keys into DIRECT / CALCULATED / NO_MAPPING routes that the Router
+consumes as a capability constraint. ADR 0012.
+
+Next phase: AgentReport/state-transition contracts, then LLM Protocol implementations,
 observability, the Operational PostgreSQL store, a CLI and usage docs.
 
 ## Architecture status
@@ -175,7 +179,8 @@ series was replayed on top. This was necessary because the original local ancest
 
 159 tests, all passing (`Ran 159 tests ... OK`). Milestone 8: `tests/semantic/`
 (entity resolver 5, constraints 5, objective extractor 4, normalizer 5, requirement
-decomposer 5) and `tests/test_adequacy.py` 5. Earlier milestones unchanged.
+decomposer 5) and `tests/test_adequacy.py` 5. Milestone 9: `tests/test_feature_engine.py`
+5 and `tests/test_source_mapping.py` 7. Earlier milestones unchanged.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -214,6 +219,7 @@ None.
 - `docs/adr/0009-orchestrator-persistence-and-context-boundaries.md` (milestone 6).
 - `docs/adr/0010-metric-registry-and-run-scoped-context.md` (milestone 7).
 - `docs/adr/0011-semantic-normalization-and-decomposition.md` (milestone 8).
+- `docs/adr/0012-feature-engine-and-source-mapping.md` (milestone 9).
 - 0001–0005 from earlier sessions.
 
 ## Database / migration status
@@ -242,20 +248,23 @@ written or modified. The verified read-only executor is wired but not live-teste
 
 ## Exact next task
 
-Milestone 9 — Source Mapping execution + Feature Engine artifacts, TDD.
+Milestone 10 — AgentReport envelope and explicit state transitions, TDD.
 
-1. `app/features/engine.py` (new artifact-producing implementation): deterministic
-   `FeatureEngine` that turns a raw tabular artifact into a metric `Artifact` with
-   `artifact_type="FEATURE"`, `lineage=(input_artifact_id,)` and `Provenance(source_kind="FEATURE")`.
-   Keep the legacy plotting/snapshot writers fail-closed.
-2. `app/agent/source_mapping.py` or extend `Router`: given a task/requirement and a
-   `SourceMapping`, resolve DIRECT → tool, CALCULATED → Feature Engine, NO_MAPPING →
-   blocked. The Planner stays semantic; only the Router consumes physical mappings.
-3. Tests: `tests/semantic/../../tests/test_feature_engine.py` (lineage, provenance,
-   immutability) and `tests/test_source_mapping.py` (DIRECT/CALCULATED/NO_MAPPING).
+1. `app/models/report.py`: `AgentReport` management envelope (identity, assignment
+   refs, status, summary, result refs, state refs, cross-domain impact proposals,
+   requests, handoff, trace) plus `ReportStatus` (RECEIVED / READY_FOR_REVIEW /
+   ACCEPTED / REJECTED / DEFERRED). Domain results stay separate and are referenced by
+   `result_refs`.
+2. `app/models/transition.py`: `StateTransition` (domain, subject_ref, from_status,
+   to_status, reason, trigger, version, created_at). State services emit transitions;
+   no silent mutation.
+3. `app/agent/review.py`: review-order decider that DEFERs a report whose upstream
+   prerequisites are unresolved instead of applying it in arrival order.
+4. Tests: `tests/test_agent_report.py`, `tests/test_state_transition.py`,
+   `tests/test_report_review.py` (deferral, cross-domain proposal requires review).
 
-Then: AgentReport + state transitions, LLM Protocols + prompt versioning,
-observability/evaluation, PostgresOperationalStore, CLI + usage docs, E2E.
+Then: LLM Protocols + prompt versioning, observability/evaluation, PostgresOperationalStore,
+CLI + usage docs, E2E.
 
 ## Recommended Codex review priorities
 

@@ -74,8 +74,8 @@ This file is maintained as implementation proceeds. It is the evidence for
 | --- | --- | --- | --- | --- |
 | Narrow routing, precedence (D040) | IMPLEMENTED | `app/agent/routing.py` | `tests/test_routing.py` | |
 | Source preference is soft | IMPLEMENTED | `app/agent/routing.py` | `tests/test_routing.py` | |
-| `MetricDefinition` + `SourceMapping` (D020, D021) | PARTIAL | `app/models/metrics.py`, `app/semantic/metric_registry.py` | `tests/test_metrics.py` | DIRECT/CALCULATED modeled; Router does not consume mappings |
-| Source Mapping execution (§21) | MISSING | — | — | DIRECT/CALCULATED/NO_MAPPING execution path |
+| `MetricDefinition` + `SourceMapping` (D020, D021) | IMPLEMENTED | `app/models/metrics.py`, `app/semantic/metric_registry.py` | `tests/test_metrics.py` | DIRECT/CALCULATED modeled and consumed by the resolver |
+| Source Mapping execution (§21) | IMPLEMENTED | `app/agent/source_mapping.py`, `Router.route(execution_route=...)` | `tests/test_source_mapping.py` | Orchestrator wiring pending |
 | Schema Registry semantic→physical (D015) | PARTIAL | `app/semantic/schema_registry.py` | `tests/test_schema_registry.py` | Lookup only; no planner/tool consumption |
 
 ## F. Data & Tool layer (D002, D009, D016, D047)
@@ -87,7 +87,7 @@ This file is maintained as implementation proceeds. It is the evidence for
 | 0 rows vs tool failure (D009) | IMPLEMENTED | `app/tools/results.py` | `tests/test_tool_execution.py` | |
 | retryable vs recoverable (D011) | IMPLEMENTED | `app/tools/results.py`, `Executor` | `tests/test_executor.py` | |
 | RawWebResult → Evidence extraction (D016, P004) | MISSING | `app/tools/web_api.py` returns raw JSON | — | No Evidence Extractor |
-| Feature Engine → Metric Artifact with lineage (D037) | PARTIAL | `app/features/engine.py` | `tests/test_safety.py` only | Not artifact-producing; fails closed |
+| Feature Engine → Metric Artifact with lineage (D037) | IMPLEMENTED | `app/features/metrics.py` | `tests/test_feature_engine.py` | Deterministic computations; FEATURE artifact with lineage |
 | Coverage manifest for Router (§02) | MISSING | — | — | |
 
 ## G. Evaluation & Sufficiency (D018, D027, D028, D029, D049, D050, D060)

@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 159 passing
+- tests: `python3 -m unittest discover -s tests -v` → 171 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
@@ -18,7 +18,14 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## What DeepSeek Implemented
 
-Milestone 8 (this session) — semantic normalization, decomposition and adequacy (ADR 0011):
+Milestone 9 (this session) — Feature Engine + Source Mapping execution (ADR 0012):
+
+- `app/features/metrics.py`: `FeatureEngine` → FEATURE artifact with lineage/provenance.
+- `app/agent/source_mapping.py`: `SourceMappingResolver` → DIRECT / CALCULATED / NO_MAPPING.
+- `Router.route(..., execution_route=...)` consumes the route as a capability constraint.
+- Tests: `tests/test_feature_engine.py` (5), `tests/test_source_mapping.py` (7).
+
+Milestone 8 (previous session) — semantic normalization, decomposition and adequacy (ADR 0011):
 
 - Constraint `origin` extended + `authority` with precedence; `app/semantic/constraints.py`.
 - `app/models/entities.py` + `app/semantic/entity_resolver.py`: canonical entities,
@@ -135,7 +142,7 @@ Milestones 1–2 (previous sessions, still passing):
 
 1. `AGENTS.md`, `CONTEXT.md`
 2. `docs/development-status.md` (this session's exact evidence + next task)
-3. `docs/adr/0010-metric-registry-and-run-scoped-context.md`, `0009-orchestrator-persistence-and-context-boundaries.md`, `0008-shared-context-retrieval.md`, `0007-operational-stores-and-checkpoints.md`, `0006-guarded-tool-execution.md`, `0002`–`0005`
+3. `docs/adr/0012-feature-engine-and-source-mapping.md`, `0011-semantic-normalization-and-decomposition.md`, `0010-metric-registry-and-run-scoped-context.md`, `0009`, `0008`, `0007`, `0006`, `0002`–`0005`
 4. `.scratch/architecture-implementation/spec.md` and `issues/02..05`
 5. `app/context/service.py`, `app/persistence/{store,artifacts,recorder,resume}.py`, `app/models/checkpoint.py`
 6. `app/tools/{results,execution,postgres,duckdb}.py`, `app/validation/sql_guard.py`
