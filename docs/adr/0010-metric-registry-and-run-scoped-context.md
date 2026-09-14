@@ -18,9 +18,10 @@ against premature embeddings. A concrete, testable source was missing behind
 - `app/semantic/metric_registry.py`: `MetricRegistry` with exact `get`/`mapping_for` and
   a deterministic token `search`. Duplicate metric keys and mappings to unknown metrics
   are rejected. It performs no semantic reasoning and no retrieval.
-- `app/context/registry_source.py`: `MetricRegistrySource` implements `ContextSource`
-  (`kind="METRIC"`) over the registry, so registry knowledge reaches the Planner and the
-  Response through the existing Shared Context boundary instead of a new agent.
+- `app/context/registry_source.py`: `MetricRegistrySource` and `SchemaRegistrySource`
+  implement `ContextSource` (`kind="METRIC"` and `kind="SCHEMA"`), so registry
+  knowledge reaches the Planner and the Response through the existing Shared Context
+  boundary instead of a new agent.
 - Run scoping: `ContextItem.scope_run` and `ContextRequest.run_id` isolate per-run
   material. A run-scoped item is returned only when the request's `run_id` matches
   exactly; global knowledge (`scope_run=""`) is visible to every run, and an unscoped
@@ -39,7 +40,7 @@ against premature embeddings. A concrete, testable source was missing behind
 
 ## Consequences
 
-- Metric knowledge is deterministic and testable with no database, embeddings or model.
-- A Schema Registry source can implement the same `ContextSource` seam later.
+- Metric and schema knowledge is deterministic and testable with no database,
+  embeddings or model.
 - `scope_run` is a simple exact-match filter; it is not an authorization boundary and
   should not be treated as one.

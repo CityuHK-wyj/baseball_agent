@@ -122,7 +122,7 @@ the Planner and a `purpose=RESPONSE` package for the Response builder; the Respo
 
 ## Tests and evidence
 
-`python3 -m unittest discover -s tests -v` runs the suite. Total: 126 tests.
+`python3 -m unittest discover -s tests -v` runs the suite. Total: 130 tests.
 
 - Milestone 1: settings/secrets, domain baseline, containment (15).
 - Milestone 2: artifacts/validation/judge/registry, state derivation, planner+latch,
@@ -133,5 +133,5 @@ routing, executor, orchestrator, SQL guard.
 - Milestone 5: Shared Context retrieval (`tests/context/`).
 - Milestone 6: orchestrator persistence + context wiring
   (`tests/persistence/test_orchestrator_persistence.py`, `tests/context/test_context_wiring.py`).
-- Milestone 7: metric registry + run-scoped context (`tests/test_metrics.py`,
-  `tests/context/test_registry_and_isolation.py`).
+- Milestone 7: metric/schema registries + run-scoped context (`tests/test_metrics.py`,
+  `tests/test_schema_registry.py`, `tests/context/test_registry_and_isolation.py`).

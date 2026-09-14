@@ -26,10 +26,11 @@ Orchestrator records products in safe order, takes checkpoints at `PLAN_ACCEPTED
 reusing artifacts without re-execution, and passes bounded knowledge to the Planner and
 to the Response only. The safe branch is published.
 
-Milestone 7 — metric registry and run-scoped context: **delivered**.
-`MetricDefinition`/`SourceMapping` + a deterministic `MetricRegistry`,
-`MetricRegistrySource` behind `ContextSource`, and exact-match run scoping so one run's
-private context cannot leak into another.
+Milestone 7 — metric and schema registries with run-scoped context: **delivered**.
+`MetricDefinition`/`SourceMapping` + a deterministic `MetricRegistry`, a
+`SchemaRegistry` with `SchemaTable`, both exposed through `ContextSource`
+(`MetricRegistrySource`, `SchemaRegistrySource`), and exact-match run scoping so one
+run's private context cannot leak into another. No Retrieval Agent.
 
 Next phase: Operational PostgreSQL store, Schema Registry source, LLM implementations
 behind the existing Protocols.
@@ -99,7 +100,10 @@ Milestone 7 (ADR 0010):
 - `app/models/metrics.py`: `MetricDefinition`, `SourceMapping`.
 - `app/semantic/metric_registry.py`: `MetricRegistry` (exact lookup + deterministic
   token search; rejects duplicates and unknown mappings).
-- `app/context/registry_source.py`: `MetricRegistrySource` (`ContextSource`, kind METRIC).
+- `app/models/schema.py` + `app/semantic/schema_registry.py`: `SchemaTable` and
+  `SchemaRegistry` (deterministic table/column lookup).
+- `app/context/registry_source.py`: `MetricRegistrySource` (METRIC) and
+  `SchemaRegistrySource` (SCHEMA) behind `ContextSource`.
 - Run scoping: `ContextItem.scope_run` / `ContextRequest.run_id` with exact-match
   filtering; global knowledge visible to all runs.
 
@@ -111,9 +115,8 @@ Nothing is partially edited.
 
 - An Operational PostgreSQL implementation of `OperationalStore`; the local SQLite
   store is the current, replaceable implementation.
-- A Schema Registry / Source Mapping `ContextSource`; only `MetricRegistrySource` and
-  `StaticContextSource` exist.
-- Semantic/Normalization layer (`app/semantic/*`, `app/conversation/service.py`).
+- A Source Mapping execution layer (using `SourceMapping` to actually execute reads);
+  the mapping contract exists but is not yet consumed by the Router.- Semantic/Normalization layer (`app/semantic/*`, `app/conversation/service.py`).
 - LLM Planner/Judge/Response implementations behind the existing Protocol seams.
 - Live integration test against a disposable PostgreSQL and synthetic Parquet.
 - Embeddings / pgvector (deliberately deferred until a registry source proves useful).
@@ -140,13 +143,14 @@ series was replayed on top. This was necessary because the original local ancest
 
 ## Tests passing
 
-126 tests, all passing (`Ran 126 tests ... OK`). Milestone 3: `test_tool_execution` 14.
+130 tests, all passing (`Ran 130 tests ... OK`). Milestone 3: `test_tool_execution` 14.
 Milestone 4: `tests/persistence`. Milestone 5: `tests/context/test_context_service.py`
 8. Milestone 6: `tests/persistence/test_orchestrator_persistence.py` 5 and
-`tests/context/test_context_wiring.py` 3. Milestone 7: `tests/test_metrics.py` 4 and
-`tests/context/test_registry_and_isolation.py` 5. Earlier modules: test_config 2,
-test_domain 5, test_safety 4, test_secret_scan 4, test_artifacts 11, test_state 7,
-test_planner 7, test_routing 6, test_executor 5, test_orchestrator 8, test_sql_guard 8.
+`tests/context/test_context_wiring.py` 4. Milestone 7: `tests/test_metrics.py` 4,
+`tests/test_schema_registry.py` 4 and `tests/context/test_registry_and_isolation.py` 5.
+Earlier modules: test_config 2, test_domain 5, test_safety 4, test_secret_scan 4,
+test_artifacts 11, test_state 7, test_planner 7, test_routing 6, test_executor 5,
+test_orchestrator 8, test_sql_guard 8.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 

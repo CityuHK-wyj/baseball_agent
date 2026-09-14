@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 126 passing
+- tests: `python3 -m unittest discover -s tests -v` → 130 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
@@ -18,14 +18,18 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## What DeepSeek Implemented
 
-Milestone 7 (this session) — metric registry and run-scoped context (ADR 0010):
+Milestone 7 (this session) — metric/schema registries and run-scoped context (ADR 0010):
 
 - `app/models/metrics.py`: `MetricDefinition`, `SourceMapping`.
 - `app/semantic/metric_registry.py`: `MetricRegistry` (exact lookup + deterministic
-  token search).
-- `app/context/registry_source.py`: `MetricRegistrySource` behind `ContextSource`.
+  token search). `app/models/schema.py` + `app/semantic/schema_registry.py`:
+  `SchemaTable`, `SchemaRegistry`.
+- `app/context/registry_source.py`: `MetricRegistrySource` (METRIC) and
+  `SchemaRegistrySource` (SCHEMA) behind `ContextSource`.
 - Run scoping: `ContextItem.scope_run` / `ContextRequest.run_id` exact-match isolation.
-- Tests: `tests/test_metrics.py` (4), `tests/context/test_registry_and_isolation.py` (5).
+- Tests: `tests/test_metrics.py` (4), `tests/test_schema_registry.py` (4),
+  `tests/context/test_registry_and_isolation.py` (5), plus run-id plumbing in
+  `tests/context/test_context_wiring.py`.
 
 Milestone 6 (previous session) — persistence wiring and context boundaries (ADR 0009):
 
@@ -93,8 +97,9 @@ Milestones 1–2 (previous sessions, still passing):
 
 - An Operational PostgreSQL implementation of `OperationalStore`; SQLite is the local,
   replaceable first version.
-- A Schema Registry `ContextSource`; only `MetricRegistrySource` and
-  `StaticContextSource` exist. No embeddings/pgvector, deliberately.
+- A Source Mapping execution layer (the `SourceMapping` contract exists but the Router
+  does not consume it yet).
+- Embeddings/pgvector, deliberately deferred.
 - A live integration test against a real analytical database/Parquet fixture.
 - LLM Planner / LLM Judge / Response generation. Only deterministic implementations
   exist; the Protocol seams are there but untested against a model.
@@ -195,8 +200,8 @@ Milestones 1–2 (previous sessions, still passing):
 - `ContextService` is wired into both boundaries: Planner gets `purpose=PLANNER`
   bounded knowledge + summaries; Response gets accepted evidence and `purpose=RESPONSE`
   critical knowledge only.
-- `MetricRegistrySource` and `StaticContextSource` are the sources; no Schema Registry
-  or RAG source yet. No embeddings or pgvector, deliberately.
+- `MetricRegistrySource`, `SchemaRegistrySource` and `StaticContextSource` are the
+  sources; no RAG source yet. No embeddings or pgvector, deliberately.
 - Run scoping (`scope_run`/`run_id`) gives exact-match isolation; it is not an
   authorization boundary.
 - Exclusion policy (`_ALWAYS_EXCLUDED`, `_RESPONSE_ONLY_EXCLUDED`) is enforced in the
