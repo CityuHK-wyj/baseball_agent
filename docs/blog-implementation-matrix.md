@@ -43,7 +43,7 @@ This file is maintained as implementation proceeds. It is the evidence for
 | Implicit constraint marked as inferred (D026) | IMPLEMENTED | `app/models/contracts.py` origin/authority | `tests/semantic/test_constraints.py` | CONTEXT_INFERRED → INFERRED_DEFAULT |
 | Clarification with options when ambiguous (D045) | IMPLEMENTED | `app/models/clarification.py`, `app/semantic/entity_resolver.py` | `tests/semantic/test_entity_resolver.py` | Recommendation, never silent choice |
 | Entity resolution + alias/nickname (D004) | IMPLEMENTED | `app/semantic/entity_resolver.py` | `tests/semantic/test_entity_resolver.py` | In-memory dictionary; persistent dictionary pending |
-| Evidence/Artifact/Metric transformation (post 09 §1) | MISSING | — | — | Evidence extraction pending |
+| Evidence/Artifact/Metric transformation (post 09 §1) | PARTIAL | `app/semantic/evidence.py`, `app/features/metrics.py` | `tests/test_evidence.py`, `tests/test_feature_engine.py` | Extraction + Feature Engine done; web source unwired |
 
 ## C. Requirement Decomposer (D034, D062)
 
@@ -86,7 +86,7 @@ This file is maintained as implementation proceeds. It is the evidence for
 | Read-only analytics (D047) | IMPLEMENTED | `app/tools/execution.py` | `tests/test_tool_execution.py` | Guard-before-connect, read-only txn |
 | 0 rows vs tool failure (D009) | IMPLEMENTED | `app/tools/results.py` | `tests/test_tool_execution.py` | |
 | retryable vs recoverable (D011) | IMPLEMENTED | `app/tools/results.py`, `Executor` | `tests/test_executor.py` | |
-| RawWebResult → Evidence extraction (D016, P004) | MISSING | `app/tools/web_api.py` returns raw JSON | — | No Evidence Extractor |
+| RawWebResult → Evidence extraction (D016, P004) | PARTIAL | `app/models/evidence.py`, `app/semantic/evidence.py`, `app/llm/evidence.py` | `tests/test_evidence.py`, `tests/llm/test_evidence.py` | Extractor done; not wired to a live web tool |
 | Feature Engine → Metric Artifact with lineage (D037) | IMPLEMENTED | `app/features/metrics.py` | `tests/test_feature_engine.py` | Deterministic computations; FEATURE artifact with lineage |
 | Coverage manifest for Router (§02) | MISSING | — | — | |
 

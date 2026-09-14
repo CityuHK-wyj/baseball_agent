@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 226 passing
+- tests: `python3 -m unittest discover -s tests -v` → 234 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
@@ -18,7 +18,13 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## What DeepSeek Implemented
 
-Milestone 14 (this session) — pipeline, CLI, E2E and usage docs (ADR 0017):
+Milestone 15 (this session) — Web evidence extraction (ADR 0018):
+
+- `app/models/evidence.py`, `app/semantic/evidence.py` (deterministic extractor +
+  `evidence_to_artifact`), `app/llm/evidence.py` (+ `EVIDENCE_PROMPT`).
+- Tests: `tests/test_evidence.py` (4), `tests/llm/test_evidence.py` (4).
+
+Milestone 14 (previous session) — pipeline, CLI, E2E and usage docs (ADR 0017):
 
 - `app/tools/synthetic.py` (`SyntheticDataTool`), `app/pipeline.py` (`AnalysisPipeline`),
   `app/cli.py`, `tests/integration/test_end_to_end.py`.

@@ -68,9 +68,13 @@ accepted-product boundary, and `README.md` + `docs/usage/` + `docs/development/`
 install, configure, run, resume and extension. A cross-objective ResponsePackage leak was
 found and fixed. ADR 0017.
 
-Next phase: Web `RawWebResult` → Evidence extraction, live DB integration tests
-(UNVERIFIED_LIVE), cross-run context isolation at the Orchestrator level, and an
-adversarial test pass.
+Milestone 15 — Web evidence extraction: **delivered (stage)**. `RawWebResult` →
+`EvidenceExtractor` → structured `Evidence` → unified EVIDENCE artifact with lineage;
+deterministic and LLM extractors behind one Protocol. Not wired to a live web tool yet.
+ADR 0018.
+
+Next phase: live DB/web wiring (UNVERIFIED_LIVE), an adversarial test pass, and a final
+matrix/status review.
 
 ## Architecture status
 
@@ -210,7 +214,8 @@ decomposer 5) and `tests/test_adequacy.py` 5. Milestone 9: `tests/test_feature_e
 `tests/test_agent_report.py` 3, `tests/test_report_review.py` 6. Milestone 11:
 `tests/llm/` (provider/prompts 5, planner 6, judge 4, response 3, openai provider 3).
 Milestone 12: `tests/observability/` 7. Milestone 13: `tests/persistence/test_postgres_store.py` 7.
-Milestone 14: `tests/integration/test_end_to_end.py` 5. Total now 226.
+Milestone 14: `tests/integration/test_end_to_end.py` 5. Milestone 15: `tests/test_evidence.py` 4
+and `tests/llm/test_evidence.py` 4. Total now 234.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -259,6 +264,7 @@ None.
 - `docs/adr/0015-observability-and-evaluation.md` (milestone 12).
 - `docs/adr/0016-operational-store-dialect.md` (milestone 13).
 - `docs/adr/0017-pipeline-cli-and-usage-docs.md` (milestone 14).
+- `docs/adr/0018-evidence-extraction.md` (milestone 15).
 - 0001–0005 from earlier sessions.
 
 ## Database / migration status
