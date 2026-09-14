@@ -43,8 +43,13 @@ Milestone 9 — Feature Engine metric artifacts and Source Mapping execution:
 turns required data keys into DIRECT / CALCULATED / NO_MAPPING routes that the Router
 consumes as a capability constraint. ADR 0012.
 
-Next phase: AgentReport/state-transition contracts, then LLM Protocol implementations,
-observability, the Operational PostgreSQL store, a CLI and usage docs.
+Milestone 10 — AgentReport, explicit state transitions and dependency-ordered review:
+**delivered**. `AgentReport` reference envelope, `StateTransition` + `StateTransitionLog`
+(continuity + monotonic version), and `ReportReviewer` that DEFERs reports with
+unresolved prerequisites instead of applying arrival order. ADR 0013.
+
+Next phase: LLM Protocol implementations + prompt versioning, observability/evaluation,
+the Operational PostgreSQL store, a CLI and usage docs, then E2E.
 
 ## Architecture status
 
@@ -180,7 +185,8 @@ series was replayed on top. This was necessary because the original local ancest
 159 tests, all passing (`Ran 159 tests ... OK`). Milestone 8: `tests/semantic/`
 (entity resolver 5, constraints 5, objective extractor 4, normalizer 5, requirement
 decomposer 5) and `tests/test_adequacy.py` 5. Milestone 9: `tests/test_feature_engine.py`
-5 and `tests/test_source_mapping.py` 7. Earlier milestones unchanged.
+5 and `tests/test_source_mapping.py` 7. Milestone 10: `tests/test_state_transition.py` 5,
+`tests/test_agent_report.py` 3, `tests/test_report_review.py` 6. Total now 185.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -220,6 +226,7 @@ None.
 - `docs/adr/0010-metric-registry-and-run-scoped-context.md` (milestone 7).
 - `docs/adr/0011-semantic-normalization-and-decomposition.md` (milestone 8).
 - `docs/adr/0012-feature-engine-and-source-mapping.md` (milestone 9).
+- `docs/adr/0013-agent-report-and-state-transitions.md` (milestone 10).
 - 0001–0005 from earlier sessions.
 
 ## Database / migration status
@@ -248,23 +255,23 @@ written or modified. The verified read-only executor is wired but not live-teste
 
 ## Exact next task
 
-Milestone 10 — AgentReport envelope and explicit state transitions, TDD.
+Milestone 11 — LLM Protocol implementations and prompt versioning, TDD.
 
-1. `app/models/report.py`: `AgentReport` management envelope (identity, assignment
-   refs, status, summary, result refs, state refs, cross-domain impact proposals,
-   requests, handoff, trace) plus `ReportStatus` (RECEIVED / READY_FOR_REVIEW /
-   ACCEPTED / REJECTED / DEFERRED). Domain results stay separate and are referenced by
-   `result_refs`.
-2. `app/models/transition.py`: `StateTransition` (domain, subject_ref, from_status,
-   to_status, reason, trigger, version, created_at). State services emit transitions;
-   no silent mutation.
-3. `app/agent/review.py`: review-order decider that DEFERs a report whose upstream
-   prerequisites are unresolved instead of applying it in arrival order.
-4. Tests: `tests/test_agent_report.py`, `tests/test_state_transition.py`,
-   `tests/test_report_review.py` (deferral, cross-domain proposal requires review).
+1. `app/llm/provider.py`: a provider-agnostic `ModelProvider` Protocol with a
+   `FakeModelProvider` for tests and a thin OpenAI-compatible implementation
+   (`app/llm/openai_provider.py`) reading `*_MODEL` and API keys from the environment.
+   Model choice is configuration-driven (`PLANNER_MODEL`, `JUDGE_MODEL`, `RESPONSE_MODEL`,
+   `SEMANTIC_MODEL`).
+2. `app/llm/prompts.py`: versioned prompt templates (`PromptTemplate` with an id and
+   version), not long strings inline in functions.
+3. Implementations behind existing Protocols: `LLMPlanner`, `LLMJudge`, `LLMResponse`,
+   plus `LLMSemanticNormalizer`. Every structured output is schema-validated and
+   policy-validated; an LLM Planner may not modify Initial Requirements or bypass
+   terminal state.
+4. Tests: `tests/llm/test_provider.py` (timeout + redacted failure), `tests/llm/test_planner_contract.py`
+   (malformed output rejected, initial requirement invariants enforced), `tests/llm/test_prompts.py`.
 
-Then: LLM Protocols + prompt versioning, observability/evaluation, PostgresOperationalStore,
-CLI + usage docs, E2E.
+Do not: leak a provider SDK into the domain layer; make LLM the only implementation.
 
 ## Recommended Codex review priorities
 

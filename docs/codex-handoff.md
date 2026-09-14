@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 171 passing
+- tests: `python3 -m unittest discover -s tests -v` → 185 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
@@ -18,7 +18,15 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## What DeepSeek Implemented
 
-Milestone 9 (this session) — Feature Engine + Source Mapping execution (ADR 0012):
+Milestone 10 (this session) — AgentReport, state transitions, review order (ADR 0013):
+
+- `app/models/report.py` (`AgentReport`, `DOMAIN_OWNERSHIP`), `app/models/transition.py`
+  (`StateTransition`), `app/agent/review.py` (`ReportReviewer`, `ReviewOutcome`,
+  `StateTransitionLog`).
+- Tests: `tests/test_state_transition.py` (5), `tests/test_agent_report.py` (3),
+  `tests/test_report_review.py` (6).
+
+Milestone 9 (previous session) — Feature Engine + Source Mapping execution (ADR 0012):
 
 - `app/features/metrics.py`: `FeatureEngine` → FEATURE artifact with lineage/provenance.
 - `app/agent/source_mapping.py`: `SourceMappingResolver` → DIRECT / CALCULATED / NO_MAPPING.

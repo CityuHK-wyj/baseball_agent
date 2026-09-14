@@ -30,7 +30,7 @@ This file is maintained as implementation proceeds. It is the evidence for
 | `AgentTask` / `TaskExecution` / `TaskAttempt` (D006, D007) | IMPLEMENTED | `app/models/planning.py` | `tests/test_executor.py` | |
 | `Artifact` immutable + provenance + lineage (D010, D037) | IMPLEMENTED | `app/models/artifacts.py` | `tests/test_artifacts.py` | |
 | `ArtifactAssessment` contextual (D048, D059) | IMPLEMENTED | `app/models/artifacts.py`, `app/assessment/` | `tests/test_artifacts.py` | |
-| `AgentReport` envelope (P005) | MISSING | — | — | |
+| `AgentReport` envelope (P005) | IMPLEMENTED | `app/models/report.py` | `tests/test_agent_report.py` | Reference envelope; results stay separate |
 | `Checkpoint` coordinate (D054) | IMPLEMENTED | `app/models/checkpoint.py` | `tests/persistence/` | |
 | `ContextPackage` (O002) | IMPLEMENTED | `app/context/service.py` | `tests/context/` | |
 
@@ -112,9 +112,9 @@ This file is maintained as implementation proceeds. It is the evidence for
 | --- | --- | --- | --- | --- |
 | Orchestrator is manager (D041) | IMPLEMENTED | `app/agent/orchestrator.py` | `tests/test_orchestrator.py` | |
 | Multiple state domains, refs not copies (D043) | PARTIAL | states are small projections | `tests/test_state.py` | No explicit Query/Planning/Routing/Execution/Permission/Budget state objects |
-| Local ownership + reviewed transition (D044) | PARTIAL | recorder + orchestrator apply | `tests/persistence/test_orchestrator_persistence.py` | No explicit transition contract/reason |
-| State transition reason/version/timestamps (§41) | MISSING | version only | — | |
-| `AgentReport` review order (§37, §38) | MISSING | — | — | |
+| Local ownership + reviewed transition (D044) | IMPLEMENTED | `app/models/report.py`, `app/agent/review.py` | `tests/test_report_review.py` | Cross-domain proposals require review |
+| State transition reason/version/timestamps (§41) | IMPLEMENTED | `app/models/transition.py`, `StateTransitionLog` | `tests/test_state_transition.py` | Continuity + monotonic version; no silent mutation |
+| `AgentReport` review order (§37, §38) | IMPLEMENTED | `ReportReviewer.review_all` | `tests/test_report_review.py` | Dependency order; cycles stay DEFERRED |
 | Checkpoint timing (D054) | IMPLEMENTED | `RunRecorder.checkpoint` | `tests/persistence/test_orchestrator_persistence.py` | 4 positions; WAITING_FOR_USER not yet used |
 
 ## I. Persistence (D054, D055, D056, O005)
