@@ -61,7 +61,16 @@ Milestone 13 — Operational PostgreSQL store: **delivered (code)**. `SqlOperati
 shares all logic across dialects; `PostgresOperationalStore` accepts an injected DB-API
 connection. UNVERIFIED_LIVE. ADR 0016.
 
-Next phase: CLI, docs/usage + README, and the end-to-end vertical flow test.
+Milestone 14 — pipeline, CLI, E2E and usage docs: **delivered**. `AnalysisPipeline`
+composes the full flow, `SyntheticDataTool` makes it runnable offline, `app/cli.py` exposes
+ask/resume/inspect/show-artifact/metrics, an end-to-end integration test covers the
+accepted-product boundary, and `README.md` + `docs/usage/` + `docs/development/` document
+install, configure, run, resume and extension. A cross-objective ResponsePackage leak was
+found and fixed. ADR 0017.
+
+Next phase: Web `RawWebResult` → Evidence extraction, live DB integration tests
+(UNVERIFIED_LIVE), cross-run context isolation at the Orchestrator level, and an
+adversarial test pass.
 
 ## Architecture status
 
@@ -201,7 +210,7 @@ decomposer 5) and `tests/test_adequacy.py` 5. Milestone 9: `tests/test_feature_e
 `tests/test_agent_report.py` 3, `tests/test_report_review.py` 6. Milestone 11:
 `tests/llm/` (provider/prompts 5, planner 6, judge 4, response 3, openai provider 3).
 Milestone 12: `tests/observability/` 7. Milestone 13: `tests/persistence/test_postgres_store.py` 7.
-Total now 221.
+Milestone 14: `tests/integration/test_end_to_end.py` 5. Total now 226.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -211,10 +220,14 @@ None.
 
 ## Known bugs
 
-- The tool executors have not run against a real database. Connection-phase retryability
-  and the exact DuckDB LIMIT-wrapper behavior are validated only with fakes.
+- The tool executors and the Operational PostgreSQL store have not run against a real
+  database or real Parquet. Marked UNVERIFIED_LIVE.
 - `sqlglot` emits a parse warning for `LOAD` before classifying it as a forbidden
   `Command`; behavior is correct but the warning is noisy.
+- `AnalysisPipeline` does not yet wire `SourceMappingResolver` per task; the Router still
+  selects by capability. Source Mapping is tested in isolation.
+- Fixed in milestone 14: `ResponsePackage`/`CompletionReport` leaked another objective's
+  accepted evidence when services were shared; now scoped by `objective_ref`.
 
 ## Technical debt
 
@@ -245,6 +258,7 @@ None.
 - `docs/adr/0014-llm-protocols-and-prompts.md` (milestone 11).
 - `docs/adr/0015-observability-and-evaluation.md` (milestone 12).
 - `docs/adr/0016-operational-store-dialect.md` (milestone 13).
+- `docs/adr/0017-pipeline-cli-and-usage-docs.md` (milestone 14).
 - 0001–0005 from earlier sessions.
 
 ## Database / migration status

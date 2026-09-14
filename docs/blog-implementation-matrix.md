@@ -171,10 +171,10 @@ This file is maintained as implementation proceeds. It is the evidence for
 | Requirement | Status | Notes |
 | --- | --- | --- |
 | `docs/blog-implementation-matrix.md` | IMPLEMENTED | this file |
-| Usage documentation (`docs/usage/`) | MISSING | |
-| CLI entry point | MISSING | |
-| End-to-end vertical flow test | PARTIAL | orchestrator E2E; no semantic layer |
-| Baseball query integration fixtures | MISSING | |
+| Usage documentation (`docs/usage/`) | IMPLEMENTED | `docs/usage/*`, `docs/development/*` | commands verified manually | |
+| CLI entry point | IMPLEMENTED | `app/cli.py` | `tests/integration/test_end_to_end.py` | `ask`/`resume`/`inspect`/`show-artifact`/`metrics` |
+| End-to-end vertical flow test | IMPLEMENTED | `tests/integration/test_end_to_end.py` | deterministic, offline | Live sources UNVERIFIED_LIVE |
+| Baseball query integration fixtures | PARTIAL | `docs/usage/examples.md`, E2E scenarios | behavior covered; real-query fixtures pending |
 | Adversarial/security test battery | PARTIAL | many exist; LLM/SQL/context gaps |
 
 ## Open questions (O001–O009)

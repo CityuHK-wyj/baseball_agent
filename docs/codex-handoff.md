@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 221 passing
+- tests: `python3 -m unittest discover -s tests -v` → 226 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
@@ -18,7 +18,14 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## What DeepSeek Implemented
 
-Milestone 13 (this session) — Operational PostgreSQL store (ADR 0016):
+Milestone 14 (this session) — pipeline, CLI, E2E and usage docs (ADR 0017):
+
+- `app/tools/synthetic.py` (`SyntheticDataTool`), `app/pipeline.py` (`AnalysisPipeline`),
+  `app/cli.py`, `tests/integration/test_end_to_end.py`.
+- `README.md` rewritten; `docs/usage/*` and `docs/development/*` added.
+- Fixed a cross-objective accepted-evidence leak in `ResponsePackage`/`CompletionReport`.
+
+Milestone 13 (previous session) — Operational PostgreSQL store (ADR 0016):
 
 - `app/persistence/store.py`: `SqlOperationalStore` base + `SqliteOperationalStore` +
   `PostgresOperationalStore` (injected connection). UNVERIFIED_LIVE.
