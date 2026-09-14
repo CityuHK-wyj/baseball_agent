@@ -12,7 +12,11 @@ validated before any connection, PostgreSQL runs read-only with a statement time
 DuckDB paths are sandboxed, results are row-bounded and errors are redacted. No
 unguarded analytical path remains.
 
-Next phase: persistence / checkpoint / resume (ticket 05).
+Milestone 4 — persistence foundation: **delivered (service level)**. Operational store,
+filesystem artifact storage, checkpoint coordinates and an idempotent resume slice.
+Not yet wired into the Orchestrator.
+
+Next phase: wire persistence into the Orchestrator, then Shared Context projection.
 
 ## Architecture status
 
@@ -42,18 +46,32 @@ Milestone 3 (ADR 0004, ADR 0006):
 - `main.py`: import-safe, guarded DuckDB summary; raw unguarded read removed.
 - `app/features/engine.generate_pitch_heatmap`: fails closed.
 
+Milestone 4 (ADR 0007):
+
+- `app/persistence/store.py`: `OperationalStore` Protocol + `SqliteOperationalStore`
+  (versioned JSON objects, append-only checkpoints).
+- `app/persistence/artifacts.py`: `ArtifactStorage` Protocol +
+  `LocalFilesystemArtifactStorage` (path-sandboxed, SHA-256, immutable references).
+- `app/models/checkpoint.py`: `Checkpoint` with recovery positions and state-version refs.
+- `app/persistence/recorder.py`: `RunRecorder` writes payloads before states, records
+  assessments/executions/reports and takes checkpoints.
+- `app/persistence/resume.py`: `ResumeService` reclassifies interrupted executions and
+  reuses persisted artifacts.
+
 ## In progress
 
 Nothing is partially edited.
 
 ## Not started
 
-- Ticket 05: operational store, ArtifactStorage, checkpoints, resume/idempotency,
-  Shared Context retrieval/projection.
+- Wiring `RunRecorder`/`ResumeService` into the `Orchestrator`; persisting tool payload
+  bytes (today `ToolResult` carries artifact metadata, not bytes).
+- Shared Context retrieval/projection and cross-run context isolation tests.
 - Semantic/Normalization layer (`app/semantic/*`, `app/conversation/service.py`).
 - Metric Registry / Source Mapping.
 - LLM Planner/Judge/Response implementations behind the existing Protocol seams.
 - Live integration test against a disposable PostgreSQL and synthetic Parquet.
+- Operational PostgreSQL implementation of `OperationalStore`.
 
 ## Current branch
 
@@ -75,10 +93,11 @@ execution`).
 
 ## Tests passing
 
-81 tests, all passing (`Ran 81 tests ... OK`). New in milestone 3: `test_tool_execution`
-14. Earlier modules: test_config 2, test_domain 5, test_safety 4, test_secret_scan 4,
-test_artifacts 11, test_state 7, test_planner 7, test_routing 6, test_executor 5,
-test_orchestrator 8, test_sql_guard 8.
+101 tests, all passing (`Ran 101 tests ... OK`). Milestone 3: `test_tool_execution` 14.
+Milestone 4: `tests/persistence` 10 (artifact storage 5, operational store 5) plus the
+resume and flow tests (5+3). Earlier modules: test_config 2, test_domain 5, test_safety
+4, test_secret_scan 4, test_artifacts 11, test_state 7, test_planner 7, test_routing 6,
+test_executor 5, test_orchestrator 8, test_sql_guard 8.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -111,7 +130,8 @@ None.
 
 ## ADRs added
 
-- `docs/adr/0006-guarded-tool-execution.md` (this session).
+- `docs/adr/0006-guarded-tool-execution.md` (milestone 3).
+- `docs/adr/0007-operational-stores-and-checkpoints.md` (milestone 4).
 - 0001–0005 from earlier sessions.
 
 ## Database / migration status
@@ -142,22 +162,21 @@ written or modified. The verified read-only executor is wired but not live-teste
 
 ## Exact next task
 
-Ticket 05, persistence foundation, TDD. Create `tests/persistence/` first.
+Wire persistence into the `Orchestrator`, TDD, without changing domain contracts.
 
-1. `app/persistence/artifacts.py`: `ArtifactStorage` Protocol +
-   `LocalFilesystemArtifactStorage` (path-sandboxed, content hash, put/get/exists).
-2. `app/persistence/store.py`: `OperationalStore` Protocol + a local SQLite
-   implementation for runs, objectives, requirements, plans, assessments, reports and
-   checkpoints, keyed by run id and object kind.
-3. `app/models/checkpoint.py`: `Checkpoint` contract (run_id, state version refs,
-   active work refs, pending request refs, recovery position, timestamp).
-4. `app/persistence/resume.py`: on load, reclassify `RUNNING` executions as
-   `INTERRUPTED`, reuse already-persisted artifacts, and report what may be retried.
-5. Tests: artifact round-trip and path escape; store round-trip; checkpoint references
-   the correct state versions; resume after interruption; artifact persisted before a
-   state references it; planner terminal survives resume.
+1. Give tools a way to supply payload bytes (extend `ToolResult` with an optional
+   `payload: bytes | None`, or have the executor build the `Artifact` plus payload).
+2. Add an optional `recorder: RunRecorder | None` to `Orchestrator.__init__`; when
+   present, record artifacts (payload first), assessments, requirement/objective
+   states and executions, and take checkpoints at `PLAN_ACCEPTED`, `ARTIFACT_ASSESSED`,
+   `PLANNER_TERMINAL` and `FINALIZATION`.
+3. Add `tests/persistence/test_orchestrator_persistence.py`: a full run persists a
+   checkpoint; `ResumeService.build_plan` finds it, reuses artifacts and preserves a
+   terminal decision; no rejected evidence is persisted as accepted.
+4. Then start the Shared Context minimal slice: `ContextRequest` → deterministic
+   reference retrieval → `ContextPackage`, excluding failed attempts.
 
-Do not: build a single giant AgentState dump; put agent runtime tables in the baseball
+Do not: build a single giant AgentState dump; put runtime tables in the baseball
 analytics database; inline large payloads in the operational store.
 
 ## Recommended Codex review priorities
@@ -167,6 +186,8 @@ analytics database; inline large payloads in the operational store.
 3. `guard_read_only_sql` bypasses: nested table functions, CTE shadowing, dialect
    spellings, schema-qualified allowlist behavior.
 4. LIMIT-wrapper correctness on real PostgreSQL and DuckDB.
-5. `PlannerTerminalLatch` and `NO_PROGRESS` termination.
-6. `ResponsePackage` leakage of rejected evidence/history.
-7. History safety: confirm no push includes the old ancestry.
+5. Persistence: artifact-before-state ordering, checkpoint version refs, idempotent
+   resume, immutability of `LocalFilesystemArtifactStorage`.
+6. `PlannerTerminalLatch` and `NO_PROGRESS` termination.
+7. `ResponsePackage` leakage of rejected evidence/history.
+8. History safety: confirm no push includes the old ancestry.

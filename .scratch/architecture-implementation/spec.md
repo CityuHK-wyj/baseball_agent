@@ -90,10 +90,27 @@ statement timeout, wraps LIMIT-less reads and bounds rows, and redacts every err
 summary through `app/tools/results.py:redact_secrets`. `main.py` and the plotting
 helper no longer expose unguarded analytical paths.
 
+## Persistence
+
+Runtime data is separated from the analytics data plane (ADR 0007).
+`OperationalStore` (local SQLite first) keeps versioned JSON objects — runs,
+objectives, requirements, plans, states, artifact metadata, assessments, reports — and
+append-only `Checkpoint` coordinates. `ArtifactStorage` keeps large payloads
+(filesystem first, path-sandboxed, SHA-256, immutable). `RunRecorder` writes payloads
+before any state references them and takes checkpoints whose `state_version_refs` are
+derived from stored state versions. `ResumeService` reads the latest checkpoint,
+reclassifies `PENDING`/`RUNNING` executions as `INTERRUPTED` (idempotently), lists
+reusable artifacts and preserves a terminal Planner decision.
+
+Not yet wired into the `Orchestrator`; that is the next task.
+
 ## Tests and evidence
 
-`python3 -m unittest discover -s tests -v` runs the suite. Milestone 1 evidence: 15
-tests. Milestone 2 adds artifact/validation/judge/registry, state derivation, planner
-and latch, routing precedence, executor retry/empty, orchestrator end-to-end and the
-SQL AST guard. Milestone 3 adds guarded read-only execution and the redacted tool
-result contract. Total: 81 tests.
+`python3 -m unittest discover -s tests -v` runs the suite. Total: 101 tests.
+
+- Milestone 1: settings/secrets, domain baseline, containment (15).
+- Milestone 2: artifacts/validation/judge/registry, state derivation, planner+latch,
+routing, executor, orchestrator, SQL guard.
+- Milestone 3: guarded read-only tool execution and the redacted result contract
+(`tests/test_tool_execution.py`).
+- Milestone 4: persistence (`tests/persistence/`).

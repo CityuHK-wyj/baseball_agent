@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 81 passing
+- tests: `python3 -m unittest discover -s tests -v` → 101 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; **push blocked** — `gh`
@@ -16,7 +16,18 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## What DeepSeek Implemented
 
-Milestone 3 (this session) — guarded read-only tool execution (ADR 0004, 0006):
+Milestone 4 (this session) — persistence foundation (ADR 0007):
+
+- `app/persistence/store.py`: `OperationalStore` Protocol + `SqliteOperationalStore`
+  (versioned JSON objects, append-only checkpoints).
+- `app/persistence/artifacts.py`: `ArtifactStorage` Protocol +
+  `LocalFilesystemArtifactStorage` (path-sandboxed, SHA-256, immutable).
+- `app/models/checkpoint.py`: `Checkpoint`. `app/persistence/recorder.py`: `RunRecorder`.
+- `app/persistence/resume.py`: `ResumeService` (RUNNING→INTERRUPTED, artifact reuse).
+- Tests: `tests/persistence/` (artifact storage, operational store, resume, flow).
+- `TaskExecution.status` gained `RUNNING`.
+
+Milestone 3 (previous session) — guarded read-only tool execution (ADR 0004, 0006):
 
 - `app/tools/results.py`: `ToolResult` contract (SUCCESS / NO_DATA / POLICY_REJECTED /
   TECHNICAL_FAILURE) and `redact_secrets`.
@@ -49,15 +60,17 @@ Milestones 1–2 (previous sessions, still passing):
 
 ## What Was Intentionally Not Implemented
 
-- Operational PostgreSQL, payload store, checkpoints, resume, idempotent replay and
-  Shared Context projection (ticket 05) — next up.
+- Wiring `RunRecorder`/`ResumeService` into the `Orchestrator`; persisting tool payload
+  bytes (today `ToolResult` carries artifact metadata only).
+- Shared Context retrieval/projection and cross-run context isolation (ticket 05 rest).
+- An Operational PostgreSQL implementation of `OperationalStore` (SQLite is the local,
+  replaceable first version).
 - A live integration test against a real analytical database/Parquet fixture.
 - LLM Planner / LLM Judge / Response generation. Only deterministic implementations
   exist; the Protocol seams are there but untested against a model.
 - Semantic/Normalization layer (`app/semantic/*`, `app/conversation/service.py`).
 - Metric Registry / Source Mapping.
 - Logging/observability.
-- Supporting-requirement proposals from the Planner.
 
 ## Architecture Decisions Used
 
@@ -72,13 +85,14 @@ Milestones 1–2 (previous sessions, still passing):
 
 1. `AGENTS.md`, `CONTEXT.md`
 2. `docs/development-status.md` (this session's exact evidence + next task)
-3. `docs/adr/0006-guarded-tool-execution.md`, `0002-*.md`, `0003-*.md`, `0004-*.md`, `0005-*.md`
+3. `docs/adr/0007-operational-stores-and-checkpoints.md`, `0006-guarded-tool-execution.md`, `0002`–`0005`
 4. `.scratch/architecture-implementation/spec.md` and `issues/02..05`
-5. `app/tools/{results,execution,postgres,duckdb}.py`, `app/validation/sql_guard.py`
-6. `app/models/{contracts,artifacts,planning,reports}.py`
-7. `app/agent/{planner,routing,executor,orchestrator,response,registry}.py`
-8. `app/assessment/{validator,judge,service}.py`, `app/state/services.py`
-9. `tests/{test_tool_execution,test_sql_guard,test_artifacts,test_state,test_planner,test_routing,test_executor,test_orchestrator}.py`
+5. `app/persistence/{store,artifacts,recorder,resume}.py`, `app/models/checkpoint.py`
+6. `app/tools/{results,execution,postgres,duckdb}.py`, `app/validation/sql_guard.py`
+7. `app/models/{contracts,artifacts,planning,reports}.py`
+8. `app/agent/{planner,routing,executor,orchestrator,response,registry}.py`
+9. `app/assessment/{validator,judge,service}.py`, `app/state/services.py`
+10. `tests/persistence/`, `tests/test_tool_execution.py`, `tests/test_sql_guard.py`
 
 ## Important Tests
 
@@ -138,9 +152,11 @@ Milestones 1–2 (previous sessions, still passing):
 
 ## Persistence Concerns
 
-- None implemented. `Artifact.payload_ref` is a coordinate with no backing store.
-- Checkpoint/resume, INTERRUPTED handling and idempotency are ticket 05 and are the
-  exact continuation point.
+- Operational store, artifact storage, checkpoint and resume services exist and are
+  tested, but are NOT wired into the Orchestrator yet. A run is not actually recoverable
+  end to end; the pieces are proven in isolation and via a service-level flow test.
+- `SqliteOperationalStore` is single-writer and not concurrency-tested.
+- Tool payload bytes are not yet persisted from the execution layer.
 
 ## Context / RAG Concerns
 
@@ -173,9 +189,10 @@ Milestones 1–2 (previous sessions, still passing):
 
 ## Exact Continuation Point
 
-Implement ticket 05's persistence foundation TDD, per `docs/development-status.md` →
-"Exact next task": `app/persistence/artifacts.py` (`ArtifactStorage` +
-`LocalFilesystemArtifactStorage`), `app/persistence/store.py` (`OperationalStore` +
-local SQLite implementation), `app/models/checkpoint.py` (`Checkpoint`), and
-`app/persistence/resume.py` (interrupted-run reclassification and artifact reuse),
-with `tests/persistence/`. Do not build a single giant AgentState dump.
+Wire persistence into the `Orchestrator` TDD, per `docs/development-status.md` →
+"Exact next task": add an optional `RunRecorder` to the Orchestrator, persist payload
+bytes from the tool layer, record artifacts (payload first) + assessments + states +
+executions, take checkpoints at `PLAN_ACCEPTED`/`ARTIFACT_ASSESSED`/`PLANNER_TERMINAL`/
+`FINALIZATION`, and test a full run → checkpoint → resume. Then start the Shared
+Context minimal slice (`ContextRequest` → deterministic reference retrieval →
+`ContextPackage`, excluding failed attempts). Do not build a single giant AgentState dump.
