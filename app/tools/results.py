@@ -33,6 +33,8 @@ def redact_secrets(text: str, secrets: tuple[str, ...] | list[str] = ()) -> str:
 class ToolResult(ArtifactContract):
     status: ToolStatus = "OK"
     artifact: Artifact | None = None
+    payload: bytes | None = None
+    payload_content_type: str = "application/json"
     error_code: str = ""
     error_type: ToolErrorType = "NONE"
     retryable: bool = False
@@ -42,8 +44,11 @@ class ToolResult(ArtifactContract):
     execution_metadata: tuple[str, ...] = ()
 
     @classmethod
-    def ok(cls, row_count: int, metadata: tuple[str, ...] = ()) -> "ToolResult":
-        return cls(status="OK", error_type="NONE", row_count=row_count, execution_metadata=metadata)
+    def ok(cls, row_count: int, metadata: tuple[str, ...] = (), *,
+           artifact: Artifact | None = None, payload: bytes | None = None,
+           payload_content_type: str = "application/json") -> "ToolResult":
+        return cls(status="OK", error_type="NONE", row_count=row_count, execution_metadata=metadata,
+                   artifact=artifact, payload=payload, payload_content_type=payload_content_type)
 
     @classmethod
     def no_data(cls) -> "ToolResult":

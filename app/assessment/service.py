@@ -59,6 +59,10 @@ class AssessmentService:
     def all_assessments(self) -> tuple[ArtifactAssessment, ...]:
         return tuple(self._assessments.values())
 
+    def restore(self, assessment: ArtifactAssessment) -> None:
+        """Rehydrate a persisted assessment for a resumed run. Does not re-judge."""
+        self._assessments[assessment.assessment_id] = assessment
+
     def summaries(self) -> tuple[AssessmentSummary, ...]:
         return tuple(
             AssessmentSummary(assessment_ref=item.assessment_id, artifact_ref=item.artifact_ref,

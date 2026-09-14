@@ -13,6 +13,8 @@ class ExecutionOutcome(ArtifactContract):
     execution: TaskExecution
     attempts: tuple[TaskAttempt, ...] = ()
     artifact: Artifact | None = None
+    payload: bytes | None = None
+    payload_content_type: str = "application/json"
 
 
 class Tool(Protocol):
@@ -44,10 +46,14 @@ class Executor:
         tool = self._tools[routing.selected_tool]
         attempts: list[TaskAttempt] = []
         artifact: Artifact | None = None
+        last_payload: bytes | None = None
+        last_content_type = "application/json"
         status = "FAILED"
         for _ in range(self._max_retries + 1):
             result = tool.execute(task)
             artifact = result.artifact
+            last_payload = result.payload
+            last_content_type = result.payload_content_type
             attempts.append(TaskAttempt(
                 attempt_id=self._id_factory("attempt"), execution_ref=execution_id, tool=tool.name,
                 status=_STATUS[result.status], retryable=result.retryable,
@@ -62,4 +68,5 @@ class Executor:
                 execution_id=execution_id, task_ref=task.task_id, status=status,
                 attempt_refs=tuple(item.attempt_id for item in attempts),
                 artifact_refs=(artifact.artifact_id,) if artifact else ()),
-            attempts=tuple(attempts), artifact=artifact)
+            attempts=tuple(attempts), artifact=artifact, payload=last_payload,
+            payload_content_type=last_content_type)

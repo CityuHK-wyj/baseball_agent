@@ -2,6 +2,10 @@
 
 It is a workflow manager, not a domain expert. It does not decompose requirements,
 interpret metrics, choose sources, judge evidence or write baseball conclusions.
+
+Persistence is optional. When a ``RunRecorder`` is injected, products are recorded in
+safe order (payload, then artifact metadata, assessment, states, execution references,
+checkpoint) so that no state ever references an artifact that failed to persist.
 """
 
 from collections.abc import Callable
@@ -12,14 +16,24 @@ from app.agent.registry import ArtifactRegistry
 from app.agent.response import build_response_package
 from app.agent.routing import Router
 from app.assessment.service import AssessmentService
+from app.context.service import ContextRequest, ContextService
 from app.models.artifacts import ArtifactAssessment, ArtifactContract
 from app.models.contracts import (AnalysisObjective, ArtifactRequirement, ObjectiveState,
                                   RequirementState)
 from app.models.planning import PlanningDecision, RoutingDecision
 from app.models.reports import (CompletionReport, ExecutionSummary, RequirementCompletion,
                                 ResponsePackage)
+from app.persistence.recorder import RunRecorder
+from app.persistence.resume import RestoredRun
 from app.state.services import (derive_objective_state, derive_requirement_state,
                                 unmet_core_requirements)
+
+# Knowledge kinds a Planner or Response may receive through Shared Context. History
+# (attempts, routing, drafts, judge reasoning, rejected evidence, unused RAG) is never
+# a knowledge kind and is structurally excluded by ContextService.
+KNOWLEDGE_KINDS: tuple[str, ...] = ("METRIC", "SCHEMA", "SOURCE_MAPPING", "REFERENCE",
+                                    "COMPLETION_REPORT")
+MAX_CONTEXT_ITEMS = 8
 
 
 class RunResult(ArtifactContract):
@@ -42,7 +56,10 @@ class Orchestrator:
                  assessment_service: AssessmentService, registry: ArtifactRegistry,
                  max_rounds: int = 3, budget: int = 10,
                  id_factory: Callable[[str], str] | None = None,
-                 permitted_sources: tuple[str, ...] = ()) -> None:
+                 permitted_sources: tuple[str, ...] = (),
+                 recorder: RunRecorder | None = None,
+                 context_service: ContextService | None = None,
+                 run_id: str | None = None) -> None:
         if max_rounds < 1 or budget < 1:
             raise ValueError("max_rounds and budget must be positive")
         self._planner = planner
@@ -53,6 +70,9 @@ class Orchestrator:
         self._max_rounds = max_rounds
         self._budget = budget
         self._permitted_sources = permitted_sources
+        self._recorder = recorder
+        self._context_service = context_service
+        self._fixed_run_id = run_id
         counter = iter(range(1, 10_000))
         self._id_factory = id_factory or (lambda prefix: f"{prefix}-{next(counter)}")
         self._latch = PlannerTerminalLatch()
@@ -61,21 +81,53 @@ class Orchestrator:
         return (tuple(sorted(item.artifact_id for item in self._registry.artifacts())),
                 self._permitted_sources)
 
+    def _execution_summary(self, executions: list[ExecutionOutcome], round_index: int,
+                           tasks_planned: int, budget: int) -> ExecutionSummary:
+        return ExecutionSummary(
+            rounds=round_index, tasks_planned=tasks_planned,
+            tasks_succeeded=sum(1 for item in executions if item.execution.status == "SUCCEEDED"),
+            tasks_empty=sum(1 for item in executions if item.execution.status == "EMPTY"),
+            tasks_failed=sum(1 for item in executions if item.execution.status == "FAILED"),
+            attempts=sum(len(item.attempts) for item in executions),
+            budget_spent=self._budget - max(budget, 0))
+
+    def _retrieve_context(self, request: ContextRequest) -> tuple:
+        if self._context_service is None:
+            return ()
+        return self._context_service.retrieve(request).items
+
+    def _apply_restored(self, restored: RestoredRun, states: dict[str, RequirementState]) -> None:
+        """Rehydrate persisted domains. Each domain keeps its own representation."""
+        for artifact in restored.artifacts:
+            if artifact.artifact_id not in self._registry:
+                self._registry.register(artifact)
+        for assessment in restored.assessments:
+            self._assessment_service.restore(assessment)
+        for state in restored.requirement_states:
+            if state.requirement_ref in states:
+                states[state.requirement_ref] = state
+        if restored.planner_terminal:
+            complete = restored.objective_state is not None and restored.objective_state.status == "COMPLETE"
+            reason = "COMPLETE" if complete else "NO_RECOVERABLE_PATH"
+            self._latch.latch(reason, self._external_condition())
+
     def run(self, objective: AnalysisObjective,
             initial_requirements: tuple[ArtifactRequirement, ...],
-            confirmed_intent: str = "") -> RunResult:
+            confirmed_intent: str = "",
+            restored: RestoredRun | None = None) -> RunResult:
         from app.models.requirements import RequirementCatalog
         catalog = RequirementCatalog((objective,), initial_requirements)
         requirements = tuple(catalog.initial_requirements) + tuple(catalog.supporting_requirements)
         states = {state.requirement_ref: state for state in catalog.requirement_states}
         by_id = {item.requirement_id: item for item in requirements}
 
-        run_id = self._id_factory("run")
+        run_id = self._fixed_run_id or self._id_factory("run")
         self._latch = PlannerTerminalLatch()
+        if restored is not None:
+            self._apply_restored(restored, states)
         decisions: list[PlanningDecision] = []
         routings: list[RoutingDecision] = []
         executions: list[ExecutionOutcome] = []
-        assessments: list[ArtifactAssessment] = []
         round_index = 0
         budget = self._budget
         tasks_planned = 0
@@ -100,16 +152,28 @@ class Orchestrator:
                 assessment_summaries=self._assessment_service.summaries(), round=round_index,
                 max_rounds=self._max_rounds, budget_remaining=budget,
                 recoverable_gaps=recoverable, policy_blocked_gaps=policy_blocked,
+                execution_summary=self._execution_summary(executions, round_index,
+                                                         tasks_planned, budget),
+                context_items=self._retrieve_context(ContextRequest(
+                    request_id=f"planner-{run_id}-{round_index}", purpose="PLANNER",
+                    kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS)),
                 prior_plan_count=len(decisions), planner_terminal=self._latch.latched)
             decision = self._planner.decide(context)
             decisions.append(decision)
             if decision.planner_terminal:
                 self._latch.latch(decision.terminal_reason, condition)
                 stop_reason = decision.terminal_reason
+                if self._recorder is not None:
+                    self._recorder.checkpoint(run_id, "PLANNER_TERMINAL")
                 break
 
+            if self._recorder is not None:
+                self._recorder.checkpoint(run_id, "PLAN_ACCEPTED",
+                                          active_work_refs=tuple(task.task_id for task in decision.tasks))
             tasks_planned += len(decision.tasks)
             new_artifact_ids: list[str] = []
+            round_assessments: list[ArtifactAssessment] = []
+            round_executions: list[tuple[ExecutionOutcome]] = []
             for task in decision.tasks:
                 if budget <= 0:
                     break
@@ -119,19 +183,38 @@ class Orchestrator:
                 routings.append(routing)
                 outcome = self._executor.run(task, routing)
                 executions.append(outcome)
+                round_executions.append((outcome,))
                 budget -= 1
                 if outcome.artifact is not None:
                     if outcome.artifact.artifact_id not in self._registry:
                         new_artifact_ids.append(outcome.artifact.artifact_id)
                     self._registry.register(outcome.artifact)
-                    assessments.append(self._assessment_service.assess(
-                        outcome.artifact.artifact_id, requirement, objective.objective_id))
+                    # Payload and artifact metadata are persisted before any state or
+                    # assessment that references them. A failure here aborts the round.
+                    if self._recorder is not None:
+                        self._recorder.record_artifact(run_id, outcome.artifact, outcome.payload,
+                                                       outcome.payload_content_type)
+                    assessment = self._assessment_service.assess(
+                        outcome.artifact.artifact_id, requirement, objective.objective_id)
+                    round_assessments.append(assessment)
 
             for item in requirements:
                 states[item.requirement_id] = derive_requirement_state(
                     item.requirement_id,
                     self._assessment_service.assessments_for(item.requirement_id),
                     states[item.requirement_id])
+
+            if self._recorder is not None:
+                for assessment in round_assessments:
+                    self._recorder.record_assessment(run_id, assessment)
+                self._recorder.record_requirement_states(run_id, states)
+                self._recorder.record_objective_state(run_id, derive_objective_state(
+                    objective.objective_id, requirements, states, planner_terminal=False))
+                for (outcome,) in round_executions:
+                    self._recorder.record_execution(run_id, outcome.execution, outcome.attempts,
+                                                    outcome.artifact)
+                if round_assessments:
+                    self._recorder.checkpoint(run_id, "ARTIFACT_ASSESSED")
             round_index += 1
 
             if not new_artifact_ids:
@@ -141,15 +224,10 @@ class Orchestrator:
 
         objective_state = derive_objective_state(
             objective.objective_id, requirements, states, planner_terminal=True)
-        execution_summary = ExecutionSummary(
-            rounds=round_index, tasks_planned=tasks_planned,
-            tasks_succeeded=sum(1 for item in executions if item.execution.status == "SUCCEEDED"),
-            tasks_empty=sum(1 for item in executions if item.execution.status == "EMPTY"),
-            tasks_failed=sum(1 for item in executions if item.execution.status == "FAILED"),
-            attempts=sum(len(item.attempts) for item in executions),
-            budget_spent=self._budget - max(budget, 0))
+        all_assessments = self._assessment_service.all_assessments()
+        execution_summary = self._execution_summary(executions, round_index, tasks_planned, budget)
         accepted_ids = tuple(
-            dict.fromkeys(item.artifact_ref for item in assessments if item.accepted))
+            dict.fromkeys(item.artifact_ref for item in all_assessments if item.accepted))
         completion = CompletionReport(
             run_id=run_id, query=objective.raw_query, confirmed_intent=confirmed_intent,
             objective_ref=objective.objective_id, objective_status=objective_state.status,
@@ -160,18 +238,27 @@ class Orchestrator:
                 for item in requirements),
             final_artifact_refs=accepted_ids,
             limitations=tuple(dict.fromkeys(
-                limitation for item in assessments if item.accepted
+                limitation for item in all_assessments if item.accepted
                 for limitation in item.limitations)),
             unresolved_gaps=tuple(item.requirement_id for item in unmet_core_requirements(requirements, states)),
             plan_revisions=sum(1 for item in decisions if item.kind in ("PLAN", "REPLAN")),
             execution_summary=execution_summary,
             stop_reason=stop_reason)
-        response = build_response_package(run_id, objective_state, requirements, states,
-                                          self._assessment_service, self._registry)
+        response = build_response_package(
+            run_id, objective_state, requirements, states,
+            self._assessment_service, self._registry,
+            context_items=self._retrieve_context(ContextRequest(
+                request_id=f"response-{run_id}", purpose="RESPONSE",
+                kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS)))
+        if self._recorder is not None:
+            self._recorder.record_objective_state(run_id, objective_state)
+            self._recorder.record_completion_report(run_id, completion)
+            self._recorder.record_response_package(run_id, response)
+            self._recorder.checkpoint(run_id, "FINALIZATION")
         return RunResult(
             run_id=run_id, completion_report=completion, response_package=response,
             objective_state=objective_state, requirement_states=tuple(states.values()),
-            assessments=tuple(assessments), planning_decisions=tuple(decisions),
+            assessments=all_assessments, planning_decisions=tuple(decisions),
             routing_decisions=tuple(routings), executions=tuple(executions),
             retrieved_artifacts=tuple(item.artifact_id for item in self._registry.artifacts()))
 

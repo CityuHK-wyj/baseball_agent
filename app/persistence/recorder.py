@@ -24,10 +24,18 @@ class RunRecorder:
         self._storage = artifact_storage
         self._id_factory = id_factory or (lambda prefix: f"{prefix}-{uuid4().hex}")
 
-    def record_artifact(self, run_id: str, artifact: Artifact, payload: bytes,
-                        content_type: str = "application/json") -> StoredArtifact:
-        stored = self._storage.put(artifact.artifact_id, payload, content_type)
-        record = artifact.model_copy(update={"payload_ref": stored.location})
+    def record_artifact(self, run_id: str, artifact: Artifact, payload: bytes | None = None,
+                        content_type: str = "application/json") -> StoredArtifact | None:
+        """Persist the payload before the metadata that points at it.
+
+        Returns the stored payload record, or ``None`` when no inline payload was
+        supplied. The metadata is never written before a successful payload write.
+        """
+        stored: StoredArtifact | None = None
+        record = artifact
+        if payload is not None:
+            stored = self._storage.put(artifact.artifact_id, payload, content_type)
+            record = artifact.model_copy(update={"payload_ref": stored.location})
         self._store.save_object("artifact", artifact.artifact_id, run_id, record.model_dump(mode="json"))
         return stored
 

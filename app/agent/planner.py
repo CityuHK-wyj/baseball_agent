@@ -8,9 +8,11 @@ from typing import Callable, Protocol
 
 from pydantic import Field
 
+from app.context.service import ContextItem
 from app.models.artifacts import ArtifactContract, ArtifactIndexEntry, AssessmentSummary
 from app.models.contracts import AnalysisObjective, ArtifactRequirement, RequirementState
 from app.models.planning import AgentTask, PlanningDecision
+from app.models.reports import ExecutionSummary
 
 
 class PlannerContext(ArtifactContract):
@@ -26,6 +28,8 @@ class PlannerContext(ArtifactContract):
     budget_remaining: int = Field(default=10, ge=0)
     recoverable_gaps: tuple[str, ...] = ()
     policy_blocked_gaps: tuple[str, ...] = ()
+    execution_summary: ExecutionSummary = Field(default_factory=ExecutionSummary)
+    context_items: tuple[ContextItem, ...] = ()
     prior_plan_count: int = Field(default=0, ge=0)
     planner_terminal: bool = False
     terminal_reason: str = ""

@@ -15,7 +15,8 @@ def build_response_package(run_id: str, objective_state: ObjectiveState,
                            requirements: tuple[ArtifactRequirement, ...],
                            requirement_states: dict[str, RequirementState],
                            assessment_service: AssessmentService,
-                           registry: ArtifactRegistry) -> ResponsePackage:
+                           registry: ArtifactRegistry,
+                           context_items: tuple = ()) -> ResponsePackage:
     accepted = tuple(item for item in assessment_service.all_assessments() if item.accepted)
     evidence = []
     for assessment in accepted:
@@ -33,6 +34,7 @@ def build_response_package(run_id: str, objective_state: ObjectiveState,
     return ResponsePackage(
         run_id=run_id, objective_ref=objective_state.objective_ref,
         objective_status=objective_state.status, accepted_evidence=tuple(evidence),
+        critical_shared_knowledge=tuple(f"{entry.kind}:{entry.item_id}" for entry in context_items),
         objective_result="", limitations=limitations,
         optional_gaps=optional_gaps(requirements, requirement_states),
         unresolved_items=unresolved)
