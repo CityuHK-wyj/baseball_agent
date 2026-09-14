@@ -39,7 +39,7 @@ class TaskAttempt(ArtifactContract):
 class TaskExecution(ArtifactContract):
     execution_id: Name
     task_ref: Name
-    status: Literal["PENDING", "SUCCEEDED", "EMPTY", "FAILED", "BLOCKED", "INTERRUPTED"]
+    status: Literal["PENDING", "RUNNING", "SUCCEEDED", "EMPTY", "FAILED", "BLOCKED", "INTERRUPTED"]
     attempt_refs: tuple[Name, ...] = ()
     artifact_refs: tuple[Name, ...] = ()
     version: int = Field(default=0, ge=0)
