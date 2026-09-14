@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 117 passing
+- tests: `python3 -m unittest discover -s tests -v` → 126 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
@@ -18,7 +18,16 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## What DeepSeek Implemented
 
-Milestone 6 (this session) — persistence wiring and context boundaries (ADR 0009):
+Milestone 7 (this session) — metric registry and run-scoped context (ADR 0010):
+
+- `app/models/metrics.py`: `MetricDefinition`, `SourceMapping`.
+- `app/semantic/metric_registry.py`: `MetricRegistry` (exact lookup + deterministic
+  token search).
+- `app/context/registry_source.py`: `MetricRegistrySource` behind `ContextSource`.
+- Run scoping: `ContextItem.scope_run` / `ContextRequest.run_id` exact-match isolation.
+- Tests: `tests/test_metrics.py` (4), `tests/context/test_registry_and_isolation.py` (5).
+
+Milestone 6 (previous session) — persistence wiring and context boundaries (ADR 0009):
 
 - `ToolResult`/`ExecutionOutcome` carry an optional payload; `Orchestrator` accepts
   optional `RunRecorder` + `ContextService` and records in safe order (payload →
@@ -84,8 +93,8 @@ Milestones 1–2 (previous sessions, still passing):
 
 - An Operational PostgreSQL implementation of `OperationalStore`; SQLite is the local,
   replaceable first version.
-- Real Metric/Schema Registry `ContextSource`s; only `StaticContextSource` exists, and
-  no embeddings/pgvector.
+- A Schema Registry `ContextSource`; only `MetricRegistrySource` and
+  `StaticContextSource` exist. No embeddings/pgvector, deliberately.
 - A live integration test against a real analytical database/Parquet fixture.
 - LLM Planner / LLM Judge / Response generation. Only deterministic implementations
   exist; the Protocol seams are there but untested against a model.
@@ -106,7 +115,7 @@ Milestones 1–2 (previous sessions, still passing):
 
 1. `AGENTS.md`, `CONTEXT.md`
 2. `docs/development-status.md` (this session's exact evidence + next task)
-3. `docs/adr/0009-orchestrator-persistence-and-context-boundaries.md`, `0008-shared-context-retrieval.md`, `0007-operational-stores-and-checkpoints.md`, `0006-guarded-tool-execution.md`, `0002`–`0005`
+3. `docs/adr/0010-metric-registry-and-run-scoped-context.md`, `0009-orchestrator-persistence-and-context-boundaries.md`, `0008-shared-context-retrieval.md`, `0007-operational-stores-and-checkpoints.md`, `0006-guarded-tool-execution.md`, `0002`–`0005`
 4. `.scratch/architecture-implementation/spec.md` and `issues/02..05`
 5. `app/context/service.py`, `app/persistence/{store,artifacts,recorder,resume}.py`, `app/models/checkpoint.py`
 6. `app/tools/{results,execution,postgres,duckdb}.py`, `app/validation/sql_guard.py`
@@ -186,8 +195,10 @@ Milestones 1–2 (previous sessions, still passing):
 - `ContextService` is wired into both boundaries: Planner gets `purpose=PLANNER`
   bounded knowledge + summaries; Response gets accepted evidence and `purpose=RESPONSE`
   critical knowledge only.
-- No Metric Registry, Schema Registry or RAG source is implemented; `StaticContextSource`
-  is the only source. No embeddings or pgvector, deliberately.
+- `MetricRegistrySource` and `StaticContextSource` are the sources; no Schema Registry
+  or RAG source yet. No embeddings or pgvector, deliberately.
+- Run scoping (`scope_run`/`run_id`) gives exact-match isolation; it is not an
+  authorization boundary.
 - Exclusion policy (`_ALWAYS_EXCLUDED`, `_RESPONSE_ONLY_EXCLUDED`) is enforced in the
   service; the wiring tests assert attempts/rejected/plan never reach either boundary.
 - No cross-run context isolation test yet.
@@ -216,11 +227,11 @@ Milestones 1–2 (previous sessions, still passing):
 
 ## Exact Continuation Point
 
-Implement the Operational PostgreSQL `OperationalStore` and a real registry context
+Implement the Operational PostgreSQL `OperationalStore` and a Schema Registry context
 source TDD, per `docs/development-status.md` → "Exact next task":
-`app/persistence/postgres_store.py` behind an injectable connection, a
-`MetricRegistrySource`/`SchemaRegistrySource` implementing `ContextSource` with
-deterministic lookup, and a cross-run context isolation test. Then add LLM
+`app/persistence/postgres_store.py` behind an injectable connection and a
+`SchemaRegistrySource` implementing `ContextSource` with deterministic table/column
+lookup, plus a cross-run isolation test at the Orchestrator level. Then add LLM
 implementations behind the existing Planner/Judge/Response Protocols, keeping the
 deterministic implementations as the tested default. Do not build a single giant
 AgentState dump or introduce a Retrieval Agent.
