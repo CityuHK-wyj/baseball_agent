@@ -97,8 +97,9 @@ name; the repository previously had no `agent/*` rule.
 
 ## Latest meaningful commit
 
-Milestone 2 tip: `aad6ec3` on `agent/deepseek-implementation`. Commit series on top
-of milestone 1 (`6ccb2ad`):
+Milestone 2 feature tip: `aad6ec3` on `agent/deepseek-implementation` (documentation
+checkpoint commits follow it; use `git log --oneline` for the exact HEAD). Feature
+commit series on top of milestone 1 (`6ccb2ad`):
 
 - `2879215` feat: add immutable artifact contracts and contextual assessment
 - `f9be393` feat: add requirement and objective state services
