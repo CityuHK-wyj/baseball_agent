@@ -15,6 +15,8 @@ Status values:
 This file is maintained as implementation proceeds. It is the evidence for
 "which blog designs are actually implemented", not a wish list.
 
+Last reviewed at commit `7e96929`; 242 tests pass. Status legend below.
+
 ## A. Core domain contracts (O001, D005, D013, D014, D036)
 
 | Requirement | Status | Implementation | Tests | Notes |
@@ -189,4 +191,55 @@ This file is maintained as implementation proceeds. It is the evidence for
 | O006 context retrieval/projection policy | PARTIAL | Deterministic; no semantic/full-text retrieval yet |
 | O007 QualificationRule/SampleAdequacyRule/LeagueState | IMPLEMENTED | `app/models/contracts.py`, `app/assessment/adequacy.py` | `tests/test_adequacy.py` | Dynamic thresholds remain configurable |
 | O008 permission/cost levels + escalation | PARTIAL | Cost filter only |
-| O009 LangGraph adoption timing | DEFERRED | Testable state machine first; no adoption needed yet |
+| O009 LangGraph adoption timing | DEFERRED | Testable state machine works; no adoption needed yet |
+
+## Remaining gaps and explicit deferrals
+
+Not yet implemented (next work, no decision change required):
+
+- Wiring `SourceMappingResolver` into the `Orchestrator` per task (Source Mapping is
+  tested in isolation; the Router still selects by capability).
+- Wiring a live Web tool through `EvidenceExtractor` and the Orchestrator.
+- Wiring `RunMetrics`/`RunSummary` emission into the Orchestrator loop and a metrics sink.
+- A persistent Entity Dictionary and a RAG knowledge base source.
+- Cross-run context isolation asserted at the Orchestrator level (service-level tested).
+- Weighted objective coverage beyond the critical gate (O003).
+- `ConstraintRevisionRequest` / `PermissionRequest` escalation flows (clarification is
+  implemented).
+- A live PostgreSQL/DuckDB integration test — **UNVERIFIED_LIVE**; no live database exists
+  in this environment.
+
+Explicitly deferred with reason:
+
+- **pgvector / embeddings** — deferred until a deterministic registry source proves
+  useful; `ContextSource` already allows adding one without changing callers.
+- **Retention / compaction** (O005) — deferred; there is no retention pressure at this
+  scale and no data to delete.
+- **LangGraph** (O009) — deferred; the deterministic state machine is testable and the
+  migration value is unproven.
+- **Redis** — deferred; not required for v1 (D056).
+- **Full weighted sufficiency algorithm** (O003) — the critical-requirement hard gate is
+  implemented; weighting is deferred to avoid pseudo-precision without evidence.
+
+## Open-question resolutions
+
+| ID | Resolution |
+| --- | --- |
+| O001 core domain schemas | RESOLVED — `app/models/*` contracts; ADR 0002, 0011 |
+| O002 transitions/report/checkpoint/context contracts | RESOLVED — ADR 0003 (PlanningDecision), 0007 (Checkpoint), 0008 (ContextPackage), 0013 (AgentReport/StateTransition) |
+| O003 state update / sufficiency algorithm | PARTIAL — deterministic critical gate implemented; weighting DEFERRED |
+| O004 Planner/Router ↔ Registry/Context interfaces | RESOLVED — `PlannerContext`, `Router`, `SourceMappingResolver`, `MetricRegistry`, `SchemaRegistry` |
+| O005 persistence schema/version/retention | PARTIAL — schema + version RESOLVED (ADR 0007/0016); retention DEFERRED |
+| O006 context retrieval/projection policy | PARTIAL — deterministic retrieval + purpose projection RESOLVED; semantic/vector DEFERRED |
+| O007 qualification/sample adequacy/league state | RESOLVED — ADR 0011 |
+| O008 permission/cost levels + escalation | PARTIAL — Router cost filter RESOLVED; escalation requests DEFERRED |
+| O009 LangGraph adoption | DEFERRED — deterministic state machine first |
+
+## Completion assessment
+
+Status: **IN_PROGRESS — stable checkpoint**, not `ARCHITECTURE_IMPLEMENTATION_COMPLETE`.
+All core domain contracts, the semantic→requirement→plan→route→execute→assess→state→
+response loop, source mapping execution, persistence, checkpoint/resume, shared context,
+LLM Protocol implementations, read-only safety, secret safety, docs, usage guide and E2E
+tests are present. Remaining before the completion claim: live source wiring and
+integration tests (UNVERIFIED_LIVE), RAG/web wiring, and the deferred items above.

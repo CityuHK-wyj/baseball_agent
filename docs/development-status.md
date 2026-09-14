@@ -201,7 +201,7 @@ series was replayed on top. This was necessary because the original local ancest
 
 - Branch `agent/deepseek-implementation-safe` is published and tracks
   `origin/agent/deepseek-implementation-safe`.
-- Latest pushed commit: `ce4ce645a2368ae9082823828ecbd57aa40e4d56` (documentation
+- Latest pushed commit: `7e9692990b5cfdc494f06b06e7eb75658187ca96` (documentation
   commits created after this push are pushed again immediately).
 - `main` is not touched; the old `agent/deepseek-implementation` branch is never pushed.
 
@@ -243,11 +243,13 @@ None.
 
 - No live-source integration; the loop is proven only with deterministic tools and fakes.
 - `RuleBasedPlanner` and `RuleBasedJudge` remain intentionally simple.
-- `Router` optimizes only by cost.
-- No logging/observability; redaction is centralized in `redact_secrets` but not yet
-  wired to a logging sink.
+- `Router` optimizes only by cost; coverage/freshness are not scored.
+- `RunMetrics` is not yet emitted by the Orchestrator, and there is no metrics sink.
 - LIMIT wrapping changes the executed SQL for unbounded reads; verify against a real
   engine and decide whether to require an explicit LIMIT instead.
+- `SourceMappingResolver` is not wired into the Orchestrator per task.
+- A live Web tool is not wired through the Evidence Extractor.
+- No RAG knowledge base, persistent Entity Dictionary, or pgvector (all deferred).
 
 ## Architecture deviations
 
@@ -298,36 +300,35 @@ written or modified. The verified read-only executor is wired but not live-teste
 
 ## Exact next task
 
-Milestone 14 — CLI, end-to-end vertical flow and usage documentation.
+Milestone 17 — wire the remaining stages into the runtime, TDD.
 
-1. `app/cli.py` (or `scripts/agent_cli.py`) with subcommands `ask` (one query, prints the
-   response), `run` (persist + checkpoint), `resume --run-id`, `inspect --run-id`,
-   `show-artifact --artifact-id`, and `metrics`. Use the deterministic semantic →
-   decomposer → planner → router → executor → judge → state → response pipeline with
-   injectable tools; default to a synthetic/offline tool so the CLI runs without a
-   database. Never print credentials.
-2. `tests/integration/test_end_to_end.py`: raw query → SemanticNormalizer →
-   RequirementDecomposer → RequirementCatalog → Orchestrator (deterministic tool) →
-   CompletionReport → ResponsePackage → ResponseComposer, asserting the accepted-product
-   boundary and that a rejected artifact never reaches the response.
-3. Docs: rewrite `README.md`; add `docs/usage/{quickstart,configuration,databases,running,examples,security,troubleshooting}.md`;
-   add `docs/development/architecture.md`. Every command must be run to verify it.
-4. Update `docs/blog-implementation-matrix.md` and both handoff files.
+1. Wire `SourceMappingResolver` into the `Orchestrator`: per task, resolve the
+   requirement's `data_keys` to an `ExecutionRoute` and pass it to `Router.route(...)` as
+   `execution_route`. Test DIRECT/CALCULATED/NO_MAPPING end to end through the Orchestrator.
+2. Wire the Web tool through the Evidence Extractor: a `WebEvidenceTool` that fetches (or is
+   fed) a `RawWebResult`, extracts `Evidence`, and returns an `EVIDENCE` artifact. Test with
+   a fake fetcher; no network.
+3. Emit `RunMetrics`/`RunSummary` from the Orchestrator loop (plan, route, task, attempt,
+   artifact, assessment events) and expose them through the `RunResult`.
+4. Then attempt a live read-only PostgreSQL/DuckDB integration test; if no database is
+   available, keep it marked UNVERIFIED_LIVE and provide a documented manual procedure.
 
-Do not: require live credentials for the default CLI path; print secrets.
+Do not: change the frozen architecture; let the Planner touch physical mappings; print or
+persist credentials.
 
 ## Recommended Codex review priorities
 
 1. Guard-before-connect: prove no executor path can connect on rejected SQL.
-2. Redaction completeness in `redact_secrets` and every `ToolResult` error path.
-3. `guard_read_only_sql` bypasses: nested table functions, CTE shadowing, dialect
-   spellings, schema-qualified allowlist behavior.
+2. Redaction completeness in `redact_secrets` and every `ToolResult`, metric and LLM error path.
+3. `guard_read_only_sql` bypasses: nested table functions, CTE-hidden mutations, dialect
+   spellings, schema-qualified allowlist behavior, `LOAD`.
 4. LIMIT-wrapper correctness on real PostgreSQL and DuckDB.
 5. Persistence: artifact-before-state ordering, checkpoint version refs, idempotent
-   resume, immutability of `LocalFilesystemArtifactStorage`, and that a restored run
-   performs zero duplicate executions.
-6. Context boundaries: prove no attempt/rejected/plan/judge-reasoning item can reach
-   the Planner or Response through `ContextService` wiring.
-7. `PlannerTerminalLatch` and `NO_PROGRESS` termination.
-7. `ResponsePackage` leakage of rejected evidence/history.
-8. History safety: confirm no push includes the old ancestry.
+   resume, immutability of `LocalFilesystemArtifactStorage`, zero duplicate executions.
+6. Context boundaries: no attempt/rejected/plan/judge-reasoning item reaches the Planner
+   or Response; run-scoped isolation.
+7. `PlannerTerminalLatch` and `NO_PROGRESS` termination; no re-invocation after terminal.
+8. `ResponsePackage`/`CompletionReport` objective scoping (the milestone-14 leak class).
+9. LLM structured output validation: Planner cannot invent/edit requirements; Judge
+   cannot override a hard failure.
+10. History safety: confirm no push includes the old credential-bearing ancestry.

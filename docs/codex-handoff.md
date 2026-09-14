@@ -13,7 +13,7 @@ This file lets the next agent continue without the prior chat. Read it after
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
   `origin/agent/deepseek-implementation-safe`
-- latest pushed commit: `ce4ce645a2368ae9082823828ecbd57aa40e4d56`; `main` is untouched and
+- latest pushed commit: `7e9692990b5cfdc494f06b06e7eb75658187ca96`; `main` is untouched and
   the old `agent/deepseek-implementation` branch is never pushed
 
 ## What DeepSeek Implemented
@@ -295,11 +295,15 @@ Milestones 1–2 (previous sessions, still passing):
 
 ## Exact Continuation Point
 
-Implement the Operational PostgreSQL `OperationalStore` and a Schema Registry context
-source TDD, per `docs/development-status.md` → "Exact next task":
-`app/persistence/postgres_store.py` behind an injectable connection and a
-`SchemaRegistrySource` implementing `ContextSource` with deterministic table/column
-lookup, plus a cross-run isolation test at the Orchestrator level. Then add LLM
-implementations behind the existing Planner/Judge/Response Protocols, keeping the
-deterministic implementations as the tested default. Do not build a single giant
-AgentState dump or introduce a Retrieval Agent.
+Milestone 17 — wire the remaining stages into the runtime, per
+`docs/development-status.md` → "Exact next task":
+
+1. Wire `SourceMappingResolver` into the `Orchestrator` (per-task `ExecutionRoute` passed
+   to `Router.route(execution_route=...)`) and test DIRECT/CALCULATED/NO_MAPPING end to end.
+2. Wire the Web tool through `EvidenceExtractor` into an `EVIDENCE` artifact (fake fetcher).
+3. Emit `RunMetrics`/`RunSummary` from the Orchestrator loop into `RunResult`.
+4. Attempt a live read-only PostgreSQL/DuckDB integration test; otherwise keep it
+   UNVERIFIED_LIVE with a documented manual procedure.
+
+Then a final Codex architecture-compliance review. Do not change the frozen architecture,
+let the Planner touch physical mappings, or print/persist credentials.
