@@ -49,7 +49,7 @@ class OneShotTool:
         return ToolResult(status="OK", artifact=self.item, payload=b"{}")
 
 
-def build(tool, planner, context_service=None, recorder=None):
+def build(tool, planner, context_service=None, recorder=None, run_id="run-1"):
     registry = ArtifactRegistry()
     counter = iter(f"id-{index}" for index in range(1000))
     ids = lambda prefix: f"{prefix}-{next(counter)}"
@@ -59,7 +59,7 @@ def build(tool, planner, context_service=None, recorder=None):
     executor = Executor({"tool": tool}, max_retries=0, id_factory=ids)
     orchestrator = Orchestrator(planner, router, executor, assessment, registry,
                                 max_rounds=3, budget=10, id_factory=ids,
-                                context_service=context_service, recorder=recorder, run_id="run-1")
+                                context_service=context_service, recorder=recorder, run_id=run_id)
     return orchestrator, registry
 
 
@@ -89,6 +89,21 @@ class PlannerContextWiringTests(unittest.TestCase):
         self.assertTrue(any(context.requirement_states for context in planner.contexts))
         self.assertTrue(all(len(context.context_items) <= 8 for context in planner.contexts))
         self.assertTrue(any(context.execution_summary.rounds >= 1 for context in planner.contexts))
+
+    def test_planner_context_is_scoped_to_the_run(self):
+        scoped = ContextService((StaticContextSource("REFERENCE", (
+            ContextItem(item_id="run2-only", kind="REFERENCE", title="private",
+                        source="reports", scope_run="run-2"),)),))
+
+        own_planner = CapturingPlanner(id_factory=lambda _p: "decision")
+        own, _ = build(OneShotTool(artifact("a1")), own_planner, scoped, run_id="run-2")
+        own.run(objective(), (requirement(),))
+        self.assertIn("run2-only", [e.item_id for c in own_planner.contexts for e in c.context_items])
+
+        other_planner = CapturingPlanner(id_factory=lambda _p: "decision")
+        other, _ = build(OneShotTool(artifact("a2")), other_planner, scoped, run_id="run-1")
+        other.run(objective(), (requirement(),))
+        self.assertNotIn("run2-only", [e.item_id for c in other_planner.contexts for e in c.context_items])
 
 
 class ResponseContextWiringTests(unittest.TestCase):
