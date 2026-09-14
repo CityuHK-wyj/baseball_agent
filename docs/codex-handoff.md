@@ -11,8 +11,10 @@ This file lets the next agent continue without the prior chat. Read it after
 - tests: `python3 -m unittest discover -s tests -v` → 109 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
-- remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; **push blocked** — `gh`
-  is not installed and no git credential is configured. The user must authenticate.
+- remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
+  `origin/agent/deepseek-implementation-safe`
+- latest pushed commit: `4d93ba459c0a60280251a8dc8065e6b24512f50e`; `main` is untouched and
+  the old `agent/deepseek-implementation` branch is never pushed
 
 ## What DeepSeek Implemented
 

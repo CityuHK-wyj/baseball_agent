@@ -95,9 +95,11 @@ series was replayed on top. This was necessary because the original local ancest
 
 ## Latest meaningful commit
 
-See `git log --oneline`. Milestone-3 feature summary: guarded read-only tool execution
-with redacted result contract (commit message `feat: enforce guarded read-only tool
-execution`).
+- Branch `agent/deepseek-implementation-safe` is published and tracks
+  `origin/agent/deepseek-implementation-safe`.
+- Latest pushed commit: `4d93ba459c0a60280251a8dc8065e6b24512f50e` (documentation
+  commits created after this push are pushed again immediately).
+- `main` is not touched; the old `agent/deepseek-implementation` branch is never pushed.
 
 ## Test command
 
@@ -168,9 +170,7 @@ written or modified. The verified read-only executor is wired but not live-teste
 
 ## Current blockers
 
-- **GitHub push blocked:** `gh` is not installed and no git credential is configured
-  (`git ls-remote origin` fails). The safe branch is ready; authentication must be
-  completed by the user (`gh auth login`, HTTPS + browser).
+- No GitHub blocker: `gh auth` is configured and the safe branch is pushed.
 - Live DB integration blocked on a running read-only PostgreSQL/DuckDB target.
 
 ## Exact next task
