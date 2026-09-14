@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 207 passing
+- tests: `python3 -m unittest discover -s tests -v` → 214 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
@@ -18,7 +18,13 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## What DeepSeek Implemented
 
-Milestone 11 (this session) — LLM Protocols + prompts (ADR 0014):
+Milestone 12 (this session) — observability + evaluation (ADR 0015):
+
+- `app/observability/metrics.py` (redacted `RunEvent`/`RunMetrics`),
+  `app/observability/evaluation.py` (`RunSummary`/`RunEvaluation`).
+- Tests: `tests/observability/` (7).
+
+Milestone 11 (previous session) — LLM Protocols + prompts (ADR 0014):
 
 - `app/llm/provider.py` (ModelProvider, FakeModelProvider), `app/llm/prompts.py`
   (versioned PromptTemplate), `app/llm/parsing.py`, `app/llm/openai_provider.py`,

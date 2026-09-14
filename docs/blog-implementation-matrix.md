@@ -161,8 +161,8 @@ This file is maintained as implementation proceeds. It is the evidence for
 | Secret scanning (D060 scope) | IMPLEMENTED | `scripts/secret_scan.py` | `tests/test_secret_scan.py` | |
 | Permission/cost policy levels (O008) | PARTIAL | Router cost filter | `tests/test_routing.py` | |
 | Clarification/permission escalation (§42-43) | MISSING | — | — | |
-| Observability structured metrics (§58) | MISSING | — | — | |
-| Evaluation metrics (§59) | MISSING | — | — | |
+| Observability structured metrics (§58) | IMPLEMENTED | `app/observability/metrics.py` | `tests/observability/test_metrics.py` | Every message redacted at the boundary |
+| Evaluation metrics (§59) | IMPLEMENTED | `app/observability/evaluation.py` | `tests/observability/test_evaluation.py` | Completion/replan/retry/failure rates, steps |
 | Prompt versioning (§57) | IMPLEMENTED | `app/llm/prompts.py` | `tests/llm/test_provider_and_prompts.py` | `PromptTemplate` id + version |
 | Provider-agnostic config (§56) | IMPLEMENTED | `app/config.py`, `app/llm/openai_provider.py` | `tests/llm/test_openai_provider.py` | Per-agent `*_MODEL`; keys env-only |
 

@@ -54,8 +54,11 @@ models, versioned `PromptTemplate`s, and `LLMPlanner`/`LLMJudge`/`LLMResponseCom
 with deterministic fallbacks. Structured output is validated; the Judge never overrides
 a hard failure; the Planner cannot invent requirements. ADR 0014.
 
-Next phase: observability/evaluation metrics, the Operational PostgreSQL store, a CLI,
-docs/usage + README, and the end-to-end vertical flow test.
+Milestone 12 — observability and evaluation: **delivered**. Redacted `RunEvent`/`RunMetrics`
+and `RunSummary`/`RunEvaluation` with completion/replan/retry/failure rates. ADR 0015.
+
+Next phase: the Operational PostgreSQL store, a CLI, docs/usage + README, and the
+end-to-end vertical flow test.
 
 ## Architecture status
 
@@ -194,7 +197,7 @@ decomposer 5) and `tests/test_adequacy.py` 5. Milestone 9: `tests/test_feature_e
 5 and `tests/test_source_mapping.py` 7. Milestone 10: `tests/test_state_transition.py` 5,
 `tests/test_agent_report.py` 3, `tests/test_report_review.py` 6. Milestone 11:
 `tests/llm/` (provider/prompts 5, planner 6, judge 4, response 3, openai provider 3).
-Total now 207.
+Milestone 12: `tests/observability/` 7. Total now 214.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -236,6 +239,7 @@ None.
 - `docs/adr/0012-feature-engine-and-source-mapping.md` (milestone 9).
 - `docs/adr/0013-agent-report-and-state-transitions.md` (milestone 10).
 - `docs/adr/0014-llm-protocols-and-prompts.md` (milestone 11).
+- `docs/adr/0015-observability-and-evaluation.md` (milestone 12).
 - 0001–0005 from earlier sessions.
 
 ## Database / migration status
@@ -264,19 +268,21 @@ written or modified. The verified read-only executor is wired but not live-teste
 
 ## Exact next task
 
-Milestone 12 — observability and evaluation metrics, TDD.
+Milestone 13 — Operational PostgreSQL store, TDD.
 
-1. `app/observability/metrics.py`: a structured `RunMetrics`/`RunTrace` recorder with
-   fields (run_id, objective_id, task_id, attempt_id, artifact_id, agent, duration_ms,
-   status, retry_count, replan_count, source, tool, tokens, cost) and `redact_secrets`
-   applied to every string. Never record credentials.
-2. `app/observability/evaluation.py`: `RunEvaluation` aggregating COMPLETE/LIMITED/FAILED
-   rate, replan rate, retry rate, artifact reuse rate, source failure rate, judge
-   disagreement (deterministic vs LLM), average steps, context size.
-3. Tests: `tests/observability/test_metrics.py` (redaction, no secret in any field) and
-   `tests/observability/test_evaluation.py` (rates computed from synthetic runs).
+1. `app/persistence/postgres_store.py`: implement the `OperationalStore` Protocol over
+   PostgreSQL using an injectable DB-API connection. Keep the same `objects`/`checkpoints`
+   schema plus a monotonic `seq` ordering column; parameter style `%s`. `save_object`
+   upserts with idempotent versioning; `save_checkpoint` is append-only and
+   `latest_checkpoint` orders by `seq`.
+2. `app/persistence/migrations.py`: idempotent schema creation for both SQLite and
+   PostgreSQL.
+3. Tests: `tests/persistence/test_postgres_store.py` with a fake DB-API connection
+   asserting the emitted SQL/params and idempotent versioning; no live database.
+4. Then the CLI + usage docs + E2E vertical flow test.
 
-Then: Operational PostgreSQL store, CLI + usage docs, E2E vertical flow.
+Do not: put runtime tables in the baseball analytics database; require a live database
+for tests; inline large payloads in the operational store.
 
 ## Recommended Codex review priorities
 
