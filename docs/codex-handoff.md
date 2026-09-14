@@ -7,8 +7,9 @@ This file lets the next agent continue without the prior chat. Read it after
 
 - branch: `agent/deepseek-implementation`
 - base commit: `6ccb2ad` (`codex/architecture-implementation` HEAD, milestone 1)
-- working tree: clean after the checkpoint commit (verify with `git status`)
-- tests: `python3 -m unittest discover -s tests -v` → 66 passing
+- milestone 2 tip: `aad6ec3` (7 commits; see `git log --oneline 6ccb2ad..HEAD`)
+- working tree: clean after the checkpoint commit
+- tests: `python3 -m unittest discover -s tests -v` → 67 passing
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; **push blocked locally**
   (no GitHub credential in this environment). Do not push the historical
   credential-bearing ancestry.

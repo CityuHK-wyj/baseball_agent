@@ -97,8 +97,18 @@ name; the repository previously had no `agent/*` rule.
 
 ## Latest meaningful commit
 
-`6ccb2ad` at session start (milestone 1). This session's milestone-2 work is committed
-on top of it; see `git log --oneline` after the checkpoint commit.
+Milestone 2 tip: `aad6ec3` on `agent/deepseek-implementation`. Commit series on top
+of milestone 1 (`6ccb2ad`):
+
+- `2879215` feat: add immutable artifact contracts and contextual assessment
+- `f9be393` feat: add requirement and objective state services
+- `723798e` feat: add planning, routing and bounded execution
+- `d83cd2b` feat: add orchestrator finalization and accepted-product response
+- `05b12a5` feat: add dialect-aware read-only sql ast guard
+- `206a576` docs: record milestone 2 domain model, adrs and handoff
+- `aad6ec3` chore: vendor agent skill definitions and lockfile
+
+Nothing was pushed; this environment has no GitHub credential.
 
 ## Test command
 
@@ -106,10 +116,11 @@ on top of it; see `git log --oneline` after the checkpoint commit.
 
 ## Tests passing
 
-66 tests, all passing (`Ran 66 tests ... OK`). Distribution:
+66 tests before the final category-constraint regression; 67 tests now, all passing
+(`Ran 67 tests ... OK`). Distribution:
 
 - test_config 2, test_domain 5, test_safety 4, test_secret_scan 4
-- test_artifacts 10, test_state 7
+- test_artifacts 11, test_state 7
 - test_planner 7, test_routing 6, test_executor 5, test_orchestrator 8
 - test_sql_guard 8
 
