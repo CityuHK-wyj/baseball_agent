@@ -122,7 +122,7 @@ This file is maintained as implementation proceeds. It is the evidence for
 | Requirement | Status | Implementation | Tests | Notes |
 | --- | --- | --- | --- | --- |
 | Separate operational store | IMPLEMENTED | `SqliteOperationalStore` | `tests/persistence/test_operational_store.py` | SQLite is local/dev |
-| Operational PostgreSQL (D055) | MISSING | — | — | |
+| Operational PostgreSQL (D055) | PARTIAL | `PostgresOperationalStore` (injected connection) | `tests/persistence/test_postgres_store.py` | UNVERIFIED_LIVE; no real database used |
 | Artifact payload storage (D056) | IMPLEMENTED | `LocalFilesystemArtifactStorage` | `tests/persistence/test_artifact_storage.py` | |
 | Checkpoint coordinate (D054) | IMPLEMENTED | `Checkpoint` | `tests/persistence/test_resume.py` | |
 | Resume RUNNING → INTERRUPTED | IMPLEMENTED | `ResumeService` | `tests/persistence/test_resume.py` | |
@@ -185,7 +185,7 @@ This file is maintained as implementation proceeds. It is the evidence for
 | O002 StateTransition/AgentReport/PlanningDecision/Checkpoint/ContextPackage | PARTIAL | PlanningDecision/Checkpoint/ContextPackage done; AgentReport + transitions missing |
 | O003 state update / sufficiency algorithm | PARTIAL | Simple deterministic gate; weighted coverage not implemented |
 | O004 Planner/Router ↔ Registry/Context interfaces | PARTIAL | Context wired; SourceMapping execution missing |
-| O005 persistence schema/version/retention | PARTIAL | Versioned objects + checkpoints; retention DEFERRED |
+| O005 persistence schema/version/retention | PARTIAL | Versioned objects + checkpoints; Postgres + SQLite stores | `tests/persistence/` | Retention DEFERRED |
 | O006 context retrieval/projection policy | PARTIAL | Deterministic; no semantic/full-text retrieval yet |
 | O007 QualificationRule/SampleAdequacyRule/LeagueState | IMPLEMENTED | `app/models/contracts.py`, `app/assessment/adequacy.py` | `tests/test_adequacy.py` | Dynamic thresholds remain configurable |
 | O008 permission/cost levels + escalation | PARTIAL | Cost filter only |

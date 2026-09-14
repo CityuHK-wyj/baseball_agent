@@ -57,8 +57,11 @@ a hard failure; the Planner cannot invent requirements. ADR 0014.
 Milestone 12 — observability and evaluation: **delivered**. Redacted `RunEvent`/`RunMetrics`
 and `RunSummary`/`RunEvaluation` with completion/replan/retry/failure rates. ADR 0015.
 
-Next phase: the Operational PostgreSQL store, a CLI, docs/usage + README, and the
-end-to-end vertical flow test.
+Milestone 13 — Operational PostgreSQL store: **delivered (code)**. `SqlOperationalStore`
+shares all logic across dialects; `PostgresOperationalStore` accepts an injected DB-API
+connection. UNVERIFIED_LIVE. ADR 0016.
+
+Next phase: CLI, docs/usage + README, and the end-to-end vertical flow test.
 
 ## Architecture status
 
@@ -197,7 +200,8 @@ decomposer 5) and `tests/test_adequacy.py` 5. Milestone 9: `tests/test_feature_e
 5 and `tests/test_source_mapping.py` 7. Milestone 10: `tests/test_state_transition.py` 5,
 `tests/test_agent_report.py` 3, `tests/test_report_review.py` 6. Milestone 11:
 `tests/llm/` (provider/prompts 5, planner 6, judge 4, response 3, openai provider 3).
-Milestone 12: `tests/observability/` 7. Total now 214.
+Milestone 12: `tests/observability/` 7. Milestone 13: `tests/persistence/test_postgres_store.py` 7.
+Total now 221.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -240,6 +244,7 @@ None.
 - `docs/adr/0013-agent-report-and-state-transitions.md` (milestone 10).
 - `docs/adr/0014-llm-protocols-and-prompts.md` (milestone 11).
 - `docs/adr/0015-observability-and-evaluation.md` (milestone 12).
+- `docs/adr/0016-operational-store-dialect.md` (milestone 13).
 - 0001–0005 from earlier sessions.
 
 ## Database / migration status
@@ -268,21 +273,23 @@ written or modified. The verified read-only executor is wired but not live-teste
 
 ## Exact next task
 
-Milestone 13 — Operational PostgreSQL store, TDD.
+Milestone 14 — CLI, end-to-end vertical flow and usage documentation.
 
-1. `app/persistence/postgres_store.py`: implement the `OperationalStore` Protocol over
-   PostgreSQL using an injectable DB-API connection. Keep the same `objects`/`checkpoints`
-   schema plus a monotonic `seq` ordering column; parameter style `%s`. `save_object`
-   upserts with idempotent versioning; `save_checkpoint` is append-only and
-   `latest_checkpoint` orders by `seq`.
-2. `app/persistence/migrations.py`: idempotent schema creation for both SQLite and
-   PostgreSQL.
-3. Tests: `tests/persistence/test_postgres_store.py` with a fake DB-API connection
-   asserting the emitted SQL/params and idempotent versioning; no live database.
-4. Then the CLI + usage docs + E2E vertical flow test.
+1. `app/cli.py` (or `scripts/agent_cli.py`) with subcommands `ask` (one query, prints the
+   response), `run` (persist + checkpoint), `resume --run-id`, `inspect --run-id`,
+   `show-artifact --artifact-id`, and `metrics`. Use the deterministic semantic →
+   decomposer → planner → router → executor → judge → state → response pipeline with
+   injectable tools; default to a synthetic/offline tool so the CLI runs without a
+   database. Never print credentials.
+2. `tests/integration/test_end_to_end.py`: raw query → SemanticNormalizer →
+   RequirementDecomposer → RequirementCatalog → Orchestrator (deterministic tool) →
+   CompletionReport → ResponsePackage → ResponseComposer, asserting the accepted-product
+   boundary and that a rejected artifact never reaches the response.
+3. Docs: rewrite `README.md`; add `docs/usage/{quickstart,configuration,databases,running,examples,security,troubleshooting}.md`;
+   add `docs/development/architecture.md`. Every command must be run to verify it.
+4. Update `docs/blog-implementation-matrix.md` and both handoff files.
 
-Do not: put runtime tables in the baseball analytics database; require a live database
-for tests; inline large payloads in the operational store.
+Do not: require live credentials for the default CLI path; print secrets.
 
 ## Recommended Codex review priorities
 
