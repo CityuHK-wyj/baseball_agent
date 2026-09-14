@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: secret-scan
+        name: Redacted staged credential scan
+        entry: python3 scripts/secret_scan.py --staged
+        language: system
+        pass_filenames: false
+        always_run: true
