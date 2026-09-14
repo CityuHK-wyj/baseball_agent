@@ -16,7 +16,12 @@ Milestone 4 — persistence foundation: **delivered (service level)**. Operation
 filesystem artifact storage, checkpoint coordinates and an idempotent resume slice.
 Not yet wired into the Orchestrator.
 
-Next phase: wire persistence into the Orchestrator, then Shared Context projection.
+Milestone 5 — Shared Context minimal slice: **delivered**. Deterministic reference
+retrieval (`ContextRequest` → `ContextPackage`) with structural exclusion of failed,
+rejected and superseded history. No vector search, embeddings or Retrieval Agent.
+
+Next phase: wire persistence into the Orchestrator, then wire Shared Context into the
+Planner/Response boundaries.
 
 ## Architecture status
 
@@ -58,6 +63,13 @@ Milestone 4 (ADR 0007):
 - `app/persistence/resume.py`: `ResumeService` reclassifies interrupted executions and
   reuses persisted artifacts.
 
+Milestone 5 (ADR 0008):
+
+- `app/context/service.py`: `ContextRequest`, `ContextItem`, `ContextPackage`,
+  `ContextSource` Protocol, `StaticContextSource`, `ContextService`. Deterministic
+  filtering/ranking with structural exclusion of attempts, routing, drafts, judge
+  reasoning, rejected evidence, unused RAG and (for Response) superseded plans.
+
 ## In progress
 
 Nothing is partially edited.
@@ -93,11 +105,11 @@ execution`).
 
 ## Tests passing
 
-101 tests, all passing (`Ran 101 tests ... OK`). Milestone 3: `test_tool_execution` 14.
-Milestone 4: `tests/persistence` 10 (artifact storage 5, operational store 5) plus the
-resume and flow tests (5+3). Earlier modules: test_config 2, test_domain 5, test_safety
-4, test_secret_scan 4, test_artifacts 11, test_state 7, test_planner 7, test_routing 6,
-test_executor 5, test_orchestrator 8, test_sql_guard 8.
+109 tests, all passing (`Ran 109 tests ... OK`). Milestone 3: `test_tool_execution` 14.
+Milestone 4: `tests/persistence` (artifact storage, operational store, resume, flow).
+Milestone 5: `tests/context/test_context_service.py` 8. Earlier modules: test_config 2,
+test_domain 5, test_safety 4, test_secret_scan 4, test_artifacts 11, test_state 7,
+test_planner 7, test_routing 6, test_executor 5, test_orchestrator 8, test_sql_guard 8.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -132,6 +144,7 @@ None.
 
 - `docs/adr/0006-guarded-tool-execution.md` (milestone 3).
 - `docs/adr/0007-operational-stores-and-checkpoints.md` (milestone 4).
+- `docs/adr/0008-shared-context-retrieval.md` (milestone 5).
 - 0001–0005 from earlier sessions.
 
 ## Database / migration status
@@ -173,8 +186,11 @@ Wire persistence into the `Orchestrator`, TDD, without changing domain contracts
 3. Add `tests/persistence/test_orchestrator_persistence.py`: a full run persists a
    checkpoint; `ResumeService.build_plan` finds it, reuses artifacts and preserves a
    terminal decision; no rejected evidence is persisted as accepted.
-4. Then start the Shared Context minimal slice: `ContextRequest` → deterministic
-   reference retrieval → `ContextPackage`, excluding failed attempts.
+4. Then wire Shared Context into the Planner/Response boundaries: give the Planner a
+   bounded `ContextPackage` instead of raw payloads, and pass only `purpose=RESPONSE`
+   accepted items to the Response builder.
+5. Then add a Metric Registry / Source Mapping source behind `ContextSource`,
+   avoiding a Retrieval Agent and avoiding premature embeddings.
 
 Do not: build a single giant AgentState dump; put runtime tables in the baseball
 analytics database; inline large payloads in the operational store.

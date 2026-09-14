@@ -104,9 +104,19 @@ reusable artifacts and preserves a terminal Planner decision.
 
 Not yet wired into the `Orchestrator`; that is the next task.
 
+## Shared Context
+
+Retrieval is a capability, not an agent (ADR 0008). `ContextService.retrieve` answers a
+`ContextRequest` from registered `ContextSource`s with deterministic filtering,
+deduplication, freshness ordering and `max_items` truncation. Attempts, routing
+decisions, planner drafts, judge reasoning, rejected evidence and unused RAG are never
+projected; superseded plans are excluded for the `RESPONSE` purpose. `StaticContextSource`
+is the first source; Metric/Schema Registry and vector sources can implement the same
+Protocol later. Not yet wired into the Planner or Response builder.
+
 ## Tests and evidence
 
-`python3 -m unittest discover -s tests -v` runs the suite. Total: 101 tests.
+`python3 -m unittest discover -s tests -v` runs the suite. Total: 109 tests.
 
 - Milestone 1: settings/secrets, domain baseline, containment (15).
 - Milestone 2: artifacts/validation/judge/registry, state derivation, planner+latch,
@@ -114,3 +124,4 @@ routing, executor, orchestrator, SQL guard.
 - Milestone 3: guarded read-only tool execution and the redacted result contract
 (`tests/test_tool_execution.py`).
 - Milestone 4: persistence (`tests/persistence/`).
+- Milestone 5: Shared Context retrieval (`tests/context/`).
