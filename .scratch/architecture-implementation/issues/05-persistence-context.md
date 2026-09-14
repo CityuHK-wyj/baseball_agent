@@ -7,14 +7,20 @@ Use independent Operational PostgreSQL for runtime metadata, and a replaceable f
 
 ## Comments
 
-- Delivered (ADR 0007): `app/persistence/store.py` (`OperationalStore` +
+- Delivered (ADR 0007, 0009): `app/persistence/store.py` (`OperationalStore` +
   `SqliteOperationalStore`), `app/persistence/artifacts.py` (`ArtifactStorage` +
   `LocalFilesystemArtifactStorage`), `app/models/checkpoint.py`, `app/persistence/recorder.py`
-  (`RunRecorder`), `app/persistence/resume.py` (`ResumeService`).
-- Tests: `tests/persistence/` — artifact round-trip/path escape/immutability, object
-  versioning, append-only checkpoints, file reopen, interrupted-run reclassification,
-  artifact reuse, terminal survival, idempotent resume, finalization products.
-- Remaining: wire `RunRecorder`/`ResumeService` into the `Orchestrator`; persist tool
-  payload bytes (today `ToolResult` carries metadata only); Operational PostgreSQL
-  implementation of the same Protocol; Shared Context projection and cross-run
-  retrieval/context isolation tests.
+  (`RunRecorder`), `app/persistence/resume.py` (`ResumeService`, `RestoredRun`).
+- Orchestrator is wired: optional `RunRecorder` + `ContextService`; safe record order
+  (payload → artifact → assessment → states → execution refs → checkpoint); checkpoints
+  at `PLAN_ACCEPTED`, `ARTIFACT_ASSESSED`, `PLANNER_TERMINAL`, `FINALIZATION`; and
+  `run(..., restored=...)` reuses artifacts and preserves a terminal decision.
+- Context is wired (ADR 0008, 0009): Planner receives a bounded `purpose=PLANNER`
+  package plus summaries; Response receives accepted evidence and `purpose=RESPONSE`
+  critical knowledge only.
+- Tests: `tests/persistence/` including `test_orchestrator_persistence.py` (full run →
+  persist → checkpoint → interrupt → resume → reuse, planner-terminal survival), and
+  `tests/context/test_context_wiring.py` (Planner/Response boundaries).
+- Remaining: an Operational PostgreSQL implementation of the same `OperationalStore`
+  Protocol, real Metric/Schema Registry `ContextSource`s, and cross-run context
+  isolation tests.

@@ -104,6 +104,10 @@ reusable artifacts and preserves a terminal Planner decision.
 
 Not yet wired into the `Orchestrator`; that is the next task.
 
+_(Superseded by milestone 6: the Orchestrator is now wired — optional `RunRecorder`,
+safe record order, checkpoints at PLAN_ACCEPTED/ARTIFACT_ASSESSED/PLANNER_TERMINAL/
+FINALIZATION, and `run(..., restored=...)` reuse without duplicate execution.)_
+
 ## Shared Context
 
 Retrieval is a capability, not an agent (ADR 0008). `ContextService.retrieve` answers a
@@ -112,11 +116,13 @@ deduplication, freshness ordering and `max_items` truncation. Attempts, routing
 decisions, planner drafts, judge reasoning, rejected evidence and unused RAG are never
 projected; superseded plans are excluded for the `RESPONSE` purpose. `StaticContextSource`
 is the first source; Metric/Schema Registry and vector sources can implement the same
-Protocol later. Not yet wired into the Planner or Response builder.
+Protocol later. The Orchestrator now retrieves a bounded `purpose=PLANNER` package for
+the Planner and a `purpose=RESPONSE` package for the Response builder; the Response's
+`critical_shared_knowledge` is drawn from the latter.
 
 ## Tests and evidence
 
-`python3 -m unittest discover -s tests -v` runs the suite. Total: 109 tests.
+`python3 -m unittest discover -s tests -v` runs the suite. Total: 117 tests.
 
 - Milestone 1: settings/secrets, domain baseline, containment (15).
 - Milestone 2: artifacts/validation/judge/registry, state derivation, planner+latch,
@@ -125,3 +131,5 @@ routing, executor, orchestrator, SQL guard.
 (`tests/test_tool_execution.py`).
 - Milestone 4: persistence (`tests/persistence/`).
 - Milestone 5: Shared Context retrieval (`tests/context/`).
+- Milestone 6: orchestrator persistence + context wiring
+  (`tests/persistence/test_orchestrator_persistence.py`, `tests/context/test_context_wiring.py`).

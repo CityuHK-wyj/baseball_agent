@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 109 passing
+- tests: `python3 -m unittest discover -s tests -v` → 117 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
@@ -18,7 +18,20 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## What DeepSeek Implemented
 
-Milestone 5 (this session) — Shared Context minimal slice (ADR 0008):
+Milestone 6 (this session) — persistence wiring and context boundaries (ADR 0009):
+
+- `ToolResult`/`ExecutionOutcome` carry an optional payload; `Orchestrator` accepts
+  optional `RunRecorder` + `ContextService` and records in safe order (payload →
+  artifact → assessment → states → execution refs → checkpoint).
+- Checkpoints at `PLAN_ACCEPTED`, `ARTIFACT_ASSESSED`, `PLANNER_TERMINAL`, `FINALIZATION`.
+- `ResumeService.rehydrate` + `Orchestrator.run(..., restored=...)`: artifacts reused,
+  terminal decision preserved, zero duplicate executions.
+- Planner gets a bounded `purpose=PLANNER` context package + execution summary; Response
+  gets accepted evidence and `purpose=RESPONSE` critical knowledge only.
+- Tests: `tests/persistence/test_orchestrator_persistence.py` (5),
+  `tests/context/test_context_wiring.py` (3).
+
+Milestone 5 (previous session) — Shared Context minimal slice (ADR 0008):
 
 - `app/context/service.py`: `ContextRequest` → deterministic reference retrieval →
   `ContextPackage`; structural exclusion of attempts, routing, drafts, judge reasoning,
@@ -69,17 +82,15 @@ Milestones 1–2 (previous sessions, still passing):
 
 ## What Was Intentionally Not Implemented
 
-- Wiring `RunRecorder`/`ResumeService` into the `Orchestrator`; persisting tool payload
-  bytes (today `ToolResult` carries artifact metadata only).
-- Wiring `ContextService` into the Planner/Response boundaries.
-- Shared Context cross-run context isolation tests and a Metric Registry source.
-- An Operational PostgreSQL implementation of `OperationalStore` (SQLite is the local,
-  replaceable first version).
+- An Operational PostgreSQL implementation of `OperationalStore`; SQLite is the local,
+  replaceable first version.
+- Real Metric/Schema Registry `ContextSource`s; only `StaticContextSource` exists, and
+  no embeddings/pgvector.
 - A live integration test against a real analytical database/Parquet fixture.
 - LLM Planner / LLM Judge / Response generation. Only deterministic implementations
   exist; the Protocol seams are there but untested against a model.
 - Semantic/Normalization layer (`app/semantic/*`, `app/conversation/service.py`).
-- Metric Registry / Source Mapping.
+- Cross-run context isolation tests.
 - Logging/observability.
 
 ## Architecture Decisions Used
@@ -95,7 +106,7 @@ Milestones 1–2 (previous sessions, still passing):
 
 1. `AGENTS.md`, `CONTEXT.md`
 2. `docs/development-status.md` (this session's exact evidence + next task)
-3. `docs/adr/0008-shared-context-retrieval.md`, `0007-operational-stores-and-checkpoints.md`, `0006-guarded-tool-execution.md`, `0002`–`0005`
+3. `docs/adr/0009-orchestrator-persistence-and-context-boundaries.md`, `0008-shared-context-retrieval.md`, `0007-operational-stores-and-checkpoints.md`, `0006-guarded-tool-execution.md`, `0002`–`0005`
 4. `.scratch/architecture-implementation/spec.md` and `issues/02..05`
 5. `app/context/service.py`, `app/persistence/{store,artifacts,recorder,resume}.py`, `app/models/checkpoint.py`
 6. `app/tools/{results,execution,postgres,duckdb}.py`, `app/validation/sql_guard.py`
@@ -162,20 +173,24 @@ Milestones 1–2 (previous sessions, still passing):
 
 ## Persistence Concerns
 
-- Operational store, artifact storage, checkpoint and resume services exist and are
-  tested, but are NOT wired into the Orchestrator yet. A run is not actually recoverable
-  end to end; the pieces are proven in isolation and via a service-level flow test.
+- Persistence is wired: payload-before-state ordering, checkpoints at four positions,
+  and resume that reuses artifacts with zero duplicate executions (deterministic tools).
 - `SqliteOperationalStore` is single-writer and not concurrency-tested.
-- Tool payload bytes are not yet persisted from the execution layer.
+- `record_requirement_states` rewrites every requirement each round; version bumps are
+  meaningful but the round-trip cost grows with requirement count.
+- Checkpoint `state_version_refs` reference requirement/objective state versions only,
+  not artifact versions or assessment versions.
 
 ## Context / RAG Concerns
 
-- The minimal `ContextService` slice exists and is tested, but is NOT wired into the
-  Planner or Response builder. It projects nothing yet in a real run.
+- `ContextService` is wired into both boundaries: Planner gets `purpose=PLANNER`
+  bounded knowledge + summaries; Response gets accepted evidence and `purpose=RESPONSE`
+  critical knowledge only.
 - No Metric Registry, Schema Registry or RAG source is implemented; `StaticContextSource`
   is the only source. No embeddings or pgvector, deliberately.
 - Exclusion policy (`_ALWAYS_EXCLUDED`, `_RESPONSE_ONLY_EXCLUDED`) is enforced in the
-  service; confirm no caller bypasses it when wiring.
+  service; the wiring tests assert attempts/rejected/plan never reach either boundary.
+- No cross-run context isolation test yet.
 
 ## Suggested Adversarial Tests
 
@@ -201,9 +216,11 @@ Milestones 1–2 (previous sessions, still passing):
 
 ## Exact Continuation Point
 
-Wire persistence into the `Orchestrator` TDD, per `docs/development-status.md` →
-"Exact next task": add an optional `RunRecorder` to the Orchestrator, persist payload
-bytes from the tool layer, record artifacts (payload first) + assessments + states +
-executions, take checkpoints at `PLAN_ACCEPTED`/`ARTIFACT_ASSESSED`/`PLANNER_TERMINAL`/
-`FINALIZATION`, and test a full run → checkpoint → resume. Then wire `ContextService`
-into the Planner/Response boundaries. Do not build a single giant AgentState dump.
+Implement the Operational PostgreSQL `OperationalStore` and a real registry context
+source TDD, per `docs/development-status.md` → "Exact next task":
+`app/persistence/postgres_store.py` behind an injectable connection, a
+`MetricRegistrySource`/`SchemaRegistrySource` implementing `ContextSource` with
+deterministic lookup, and a cross-run context isolation test. Then add LLM
+implementations behind the existing Planner/Judge/Response Protocols, keeping the
+deterministic implementations as the tested default. Do not build a single giant
+AgentState dump or introduce a Retrieval Agent.
