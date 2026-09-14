@@ -55,6 +55,16 @@ JUDGE_PROMPT = PromptTemplate(
         "Artifact: {artifact_json}\nRequirement: {requirement_json}\n"
         "Deterministic facts: {deterministic_json}\n"))
 
+EVIDENCE_PROMPT = PromptTemplate(
+    prompt_id="evidence.extract", version=1,
+    required_variables=("url", "title", "text"),
+    template=(
+        "Extract factual claims from this baseball document. Record only what the text "
+        "states; do not infer, and do not add outside knowledge.\n"
+        "Return ONLY JSON with a \"claims\" array of "
+        "{claim:str, support:str, claim_time:str}.\n"
+        "URL: {url}\nTitle: {title}\nText:\n{text}\n"))
+
 RESPONSE_PROMPT = PromptTemplate(
     prompt_id="response.compose", version=1,
     required_variables=("objective_ref", "objective_status", "evidence_json", "limitations"),
