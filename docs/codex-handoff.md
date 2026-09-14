@@ -8,7 +8,7 @@ This file lets the next agent continue without the prior chat. Read it after
 - branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
   `agent/deepseek-implementation` must not be pushed)
 - root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 234 passing
+- tests: `python3 -m unittest discover -s tests -v` → 242 passing
 - secret scan: current tree exit 0; all commits reachable from the safe branch have
   0 real findings (verified by scanning every blob)
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as

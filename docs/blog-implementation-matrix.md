@@ -175,7 +175,7 @@ This file is maintained as implementation proceeds. It is the evidence for
 | CLI entry point | IMPLEMENTED | `app/cli.py` | `tests/integration/test_end_to_end.py` | `ask`/`resume`/`inspect`/`show-artifact`/`metrics` |
 | End-to-end vertical flow test | IMPLEMENTED | `tests/integration/test_end_to_end.py` | deterministic, offline | Live sources UNVERIFIED_LIVE |
 | Baseball query integration fixtures | PARTIAL | `docs/usage/examples.md`, E2E scenarios | behavior covered; real-query fixtures pending |
-| Adversarial/security test battery | PARTIAL | many exist; LLM/SQL/context gaps |
+| Adversarial/security test battery | IMPLEMENTED | `tests/security/test_adversarial.py` + per-module suites | planner invariants, CTE mutations, response exclusion, resume integrity, loop bound, context isolation |
 
 ## Open questions (O001–O009)
 

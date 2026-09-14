@@ -73,8 +73,12 @@ Milestone 15 — Web evidence extraction: **delivered (stage)**. `RawWebResult` 
 deterministic and LLM extractors behind one Protocol. Not wired to a live web tool yet.
 ADR 0018.
 
-Next phase: live DB/web wiring (UNVERIFIED_LIVE), an adversarial test pass, and a final
-matrix/status review.
+Milestone 16 — adversarial test battery: **delivered**. `tests/security/test_adversarial.py`
+covers planner invariants, CTE-hidden SQL mutations, accepted-evidence exclusion, resume
+integrity with a missing artifact, bounded planning, and context history isolation.
+
+Next phase: live DB/web wiring (UNVERIFIED_LIVE) and a final architecture-compliance
+review by Codex.
 
 ## Architecture status
 
@@ -215,7 +219,8 @@ decomposer 5) and `tests/test_adequacy.py` 5. Milestone 9: `tests/test_feature_e
 `tests/llm/` (provider/prompts 5, planner 6, judge 4, response 3, openai provider 3).
 Milestone 12: `tests/observability/` 7. Milestone 13: `tests/persistence/test_postgres_store.py` 7.
 Milestone 14: `tests/integration/test_end_to_end.py` 5. Milestone 15: `tests/test_evidence.py` 4
-and `tests/llm/test_evidence.py` 4. Total now 234.
+and `tests/llm/test_evidence.py` 4. Milestone 16: `tests/security/test_adversarial.py` 8.
+Total now 242.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
