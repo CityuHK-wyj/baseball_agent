@@ -30,11 +30,11 @@ Ground truth (2026-09-15, Python 3.14.4):
 | RAH-006 | HIGH | Web evidence runtime chain | Raw-web extraction could not execute through the runtime: final evidence had an unregistered lineage parent and an extractor-only descriptor that failed semantic validation. | Add `WebEvidenceTool`, register the raw page only as a supporting internal artifact, project the requirement descriptor onto extracted evidence, and persist/register the support before the final artifact. | `WebEvidenceToolTests` | FIXED (injected fetcher; live provider remains unverified) |
 | RAH-007 | CRITICAL | DuckDB filesystem guard | File reader lists, URIs, dynamic reader arguments, and DuckDB quoted file-table syntax passed the guard and opened a connection outside the archive root. | Require static literal paths (including literal arrays), reject URIs, and reject quoted DuckDB table expressions before connect. | `DuckDBGuardTests.test_paths_outside_the_root_are_rejected_before_connect` | FIXED |
 | RAH-008 | HIGH | LLM evidence grounding | `LLMEvidenceExtractor` accepted arbitrary non-empty model claims and ignored unknown fields, allowing fabricated facts into Evidence. | Require a bounded, closed JSON schema and require every claim and support string to occur in the raw page; invalid output uses the deterministic fallback when configured. | `LLMEvidenceExtractorTests.test_hallucinated_claim_falls_back_to_grounded_extraction` and `test_extra_fields_are_rejected` | FIXED |
+| RAH-009 | HIGH | Persisted planner terminal lifecycle | Resume recreated a terminal latch from the current external condition, so a newly permitted source stayed blocked; it also did not clear the latch before calling Planner. | Store the terminal-condition fingerprint in checkpoints, compare it on resume, and observe a changed condition before building `PlannerContext`. Legacy checkpoints retain terminal behavior when no fingerprint exists. | `OrchestratorPersistenceTests.test_new_permitted_source_reopens_a_persisted_noncomplete_terminal_plan` | FIXED |
 
 ## Open audit areas
 
-- Persistence crash consistency, checkpoint completeness, cross-run identity isolation,
-  and partial-resume idempotency.
+- Persistence crash consistency, checkpoint completeness, and partial-resume idempotency.
 - Cross-run/cross-objective assessment and ResponsePackage isolation.
 - Web result → Evidence → EVIDENCE Artifact runtime wiring.
 - Orchestrator RunMetrics emission and redaction of every text field.

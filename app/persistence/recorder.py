@@ -65,7 +65,8 @@ class RunRecorder:
 
     def checkpoint(self, run_id: str, position: RecoveryPosition, *,
                    active_work_refs: Iterable[str] = (),
-                   pending_request_refs: Iterable[str] = ()) -> Checkpoint:
+                   pending_request_refs: Iterable[str] = (),
+                   terminal_condition: tuple[tuple[str, ...], tuple[str, ...]] | None = None) -> Checkpoint:
         references = [
             f"{record.kind}:{record.object_id}:v{record.version}"
             for record in self._store.list_objects("requirement_state", run_id)
@@ -77,6 +78,6 @@ class RunRecorder:
         checkpoint = Checkpoint(
             checkpoint_id=self._id_factory("checkpoint"), run_id=run_id, recovery_position=position,
             state_version_refs=tuple(references), active_work_refs=tuple(active_work_refs),
-            pending_request_refs=tuple(pending_request_refs))
+            pending_request_refs=tuple(pending_request_refs), terminal_condition=terminal_condition)
         self._store.save_checkpoint(checkpoint)
         return checkpoint

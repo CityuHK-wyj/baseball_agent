@@ -108,6 +108,10 @@ class PlannerTerminalLatch:
     def reason(self) -> str | None:
         return self._reason
 
+    @property
+    def condition(self) -> object | None:
+        return self._condition
+
     def latch(self, reason: str, condition: object) -> None:
         self._reason = reason
         self._condition = condition

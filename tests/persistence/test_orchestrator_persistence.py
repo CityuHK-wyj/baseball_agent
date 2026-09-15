@@ -49,17 +49,19 @@ class FailingStorage(LocalFilesystemArtifactStorage):
         raise OSError("simulated storage failure")
 
 
-def build_orchestrator(tool, recorder=None, planner=None):
+def build_orchestrator(tool, recorder=None, planner=None, *, source_kind="SYNTHETIC",
+                       permitted_sources=()):
     registry = ArtifactRegistry()
     counter = iter(f"id-{index}" for index in range(1000))
     ids = lambda prefix: f"{prefix}-{next(counter)}"
     assessment = AssessmentService(registry, RuleBasedJudge(), id_factory=ids)
-    router = Router((ToolCapability(tool="tool", source_kind="SYNTHETIC",
+    router = Router((ToolCapability(tool="tool", source_kind=source_kind,
                                     supported_artifact_types=("TABLE",)),), id_factory=ids)
     executor = Executor({"tool": tool}, max_retries=0, id_factory=ids)
     orchestrator = Orchestrator(planner or RuleBasedPlanner(id_factory=ids), router, executor,
                                 assessment, registry, max_rounds=3, budget=10,
-                                id_factory=ids, recorder=recorder, run_id=RUN_ID)
+                                id_factory=ids, recorder=recorder, run_id=RUN_ID,
+                                permitted_sources=permitted_sources)
     return orchestrator, registry, assessment
 
 
@@ -148,6 +150,25 @@ class OrchestratorPersistenceTests(unittest.TestCase):
 
         self.assertEqual(tool.calls, 0)
         self.assertEqual(result.completion_report.stop_reason, "COMPLETE")
+        self.assertEqual(result.objective_state.status, "COMPLETE")
+
+    def test_new_permitted_source_reopens_a_persisted_noncomplete_terminal_plan(self):
+        blocked_tool = RecordingTool(artifact("a-blocked"))
+        blocked, _, _ = build_orchestrator(
+            blocked_tool, recorder=self.recorder, source_kind="POSTGRES",
+            permitted_sources=("PARQUET",))
+        first = blocked.run(objective(), (requirement(),))
+        self.assertEqual(first.completion_report.stop_reason, "POLICY_BLOCKED")
+        self.assertEqual(blocked_tool.calls, 0)
+
+        restored = self.resume.rehydrate(RUN_ID)
+        permitted_tool = RecordingTool(artifact("a-permitted"))
+        resumed, _, _ = build_orchestrator(
+            permitted_tool, recorder=self.recorder, source_kind="POSTGRES",
+            permitted_sources=("POSTGRES",))
+        result = resumed.run(objective(), (requirement(),), restored=restored)
+
+        self.assertEqual(permitted_tool.calls, 1)
         self.assertEqual(result.objective_state.status, "COMPLETE")
 
     def test_no_checkpoint_means_no_rehydration(self):

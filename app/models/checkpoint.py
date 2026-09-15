@@ -33,4 +33,5 @@ class Checkpoint(ArtifactContract):
     state_version_refs: tuple[Name, ...] = ()
     active_work_refs: tuple[Name, ...] = ()
     pending_request_refs: tuple[Name, ...] = ()
+    terminal_condition: tuple[tuple[Name, ...], tuple[Name, ...]] | None = None
     created_at: datetime = Field(default_factory=utcnow)

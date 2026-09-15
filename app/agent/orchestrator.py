@@ -117,7 +117,10 @@ class Orchestrator:
         if restored.planner_terminal:
             complete = restored.objective_state is not None and restored.objective_state.status == "COMPLETE"
             reason = "COMPLETE" if complete else "NO_RECOVERABLE_PATH"
-            self._latch.latch(reason, self._external_condition())
+            # Old checkpoints have no saved fingerprint; preserving their terminal
+            # behavior is safer than automatically re-planning an unknown run.
+            condition = restored.terminal_condition or self._external_condition()
+            self._latch.latch(reason, condition)
 
     def run(self, objective: AnalysisObjective,
             initial_requirements: tuple[ArtifactRequirement, ...],
@@ -154,6 +157,7 @@ class Orchestrator:
             if not self._latch.may_invoke(condition):
                 stop_reason = self._latch.reason
                 break
+            self._latch.observe(condition)
             unmet = unmet_core_requirements(requirements, states)
             recoverable = tuple(
                 item.requirement_id for item in unmet
@@ -184,7 +188,8 @@ class Orchestrator:
                 self._latch.latch(decision.terminal_reason, condition)
                 stop_reason = decision.terminal_reason
                 if self._recorder is not None:
-                    self._recorder.checkpoint(run_id, "PLANNER_TERMINAL")
+                    self._recorder.checkpoint(run_id, "PLANNER_TERMINAL",
+                                              terminal_condition=condition)
                 break
 
             if self._recorder is not None:
@@ -305,7 +310,8 @@ class Orchestrator:
             self._recorder.record_objective_state(run_id, objective_state)
             self._recorder.record_completion_report(run_id, completion)
             self._recorder.record_response_package(run_id, response)
-            self._recorder.checkpoint(run_id, "FINALIZATION")
+            self._recorder.checkpoint(run_id, "FINALIZATION",
+                                      terminal_condition=self._latch.condition)
         metrics.record("FINALIZATION", subject_ref=objective.objective_id, agent="ORCHESTRATOR",
                        status=objective_state.status,
                        duration_ms=round((monotonic() - started_at) * 1000),

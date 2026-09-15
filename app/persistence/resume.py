@@ -25,6 +25,7 @@ class ResumePlan(ArtifactContract):
     pending_request_refs: tuple[Name, ...] = ()
     state_version_refs: tuple[Name, ...] = ()
     planner_terminal: bool = False
+    terminal_condition: tuple[tuple[Name, ...], tuple[Name, ...]] | None = None
 
 
 class RestoredRun(ArtifactContract):
@@ -41,6 +42,7 @@ class RestoredRun(ArtifactContract):
     assessments: tuple[ArtifactAssessment, ...] = ()
     requirement_states: tuple[RequirementState, ...] = ()
     objective_state: ObjectiveState | None = None
+    terminal_condition: tuple[tuple[Name, ...], tuple[Name, ...]] | None = None
 
 
 class ResumeService:
@@ -69,7 +71,8 @@ class ResumeService:
             reusable_artifact_refs=reusable, interrupted_execution_refs=tuple(interrupted),
             pending_request_refs=checkpoint.pending_request_refs,
             state_version_refs=checkpoint.state_version_refs,
-            planner_terminal=checkpoint.recovery_position in TERMINAL_POSITIONS)
+            planner_terminal=checkpoint.recovery_position in TERMINAL_POSITIONS,
+            terminal_condition=checkpoint.terminal_condition)
 
     def rehydrate(self, run_id: str) -> RestoredRun | None:
         """Load persisted domains for a resumed run, without merging them into one blob."""
@@ -92,4 +95,4 @@ class ResumeService:
             run_id=run_id, recovery_position=plan.recovery_position,
             planner_terminal=plan.planner_terminal, artifacts=artifacts,
             assessments=assessments, requirement_states=requirement_states,
-            objective_state=objective_state)
+            objective_state=objective_state, terminal_condition=plan.terminal_condition)
