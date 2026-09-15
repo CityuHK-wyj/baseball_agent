@@ -36,9 +36,12 @@ exactly which blog decisions are implemented.
   implementations and LLM implementations behind the same Protocols.
 - **Read-only safety** — an AST-based SQL guard validated before any connection, a
   read-only PostgreSQL transaction, a DuckDB path sandbox, and a redacted result contract.
+- **Shared Knowledge base** — a persistent, sourced, versioned MLB domain knowledge base
+  (rules, transactions, bilingual glossary and metrics, all 30 teams, ballparks, players,
+  awards, trusted sources and the community directory) behind `ContextService`.
 
 Not yet implemented: live PostgreSQL/Parquet integration tests, the Web evidence extractor,
-RAG knowledge base, and pgvector. These are marked in the matrix and the handoff.
+and pgvector. These are marked in the matrix and the handoff.
 
 ## Architecture
 
@@ -103,6 +106,12 @@ Nothing is required for the offline CLI. See
 # One question, offline (synthetic data source, no database or credentials)
 python3 -m app.cli ask "How did Aaron Judge perform at the plate?"
 
+# Shared Knowledge: inspect, search and refresh the domain knowledge base
+python3 -m app.cli knowledge --seed status
+python3 -m app.cli knowledge search "DFA"
+python3 -m app.cli knowledge show TEAM:LAD
+python3 -m app.cli knowledge refresh teams
+
 # Persist a run and inspect it
 python3 -m app.cli ask "How did Aaron Judge perform?" --persist
 python3 -m app.cli inspect --run-id run-1
@@ -110,7 +119,8 @@ python3 -m app.cli resume --run-id run-1
 python3 -m app.cli metrics --run-id run-1
 ```
 
-See [docs/usage/quickstart.md](docs/usage/quickstart.md) and
+See [docs/usage/quickstart.md](docs/usage/quickstart.md),
+[docs/usage/knowledge-base.md](docs/usage/knowledge-base.md) and
 [docs/usage/examples.md](docs/usage/examples.md).
 
 ## Test
@@ -120,6 +130,33 @@ python3 -m unittest discover -s tests -v   # 226 tests
 python3 scripts/secret_scan.py             # credential tripwire (exit 0 = clean)
 python3 -m compileall app                  # byte-compile check
 ```
+
+## Shared Knowledge
+
+Shared Knowledge is a persistent MLB domain knowledge base — rules, transactions, a
+bilingual glossary and metric definitions, all 30 current teams and ballparks, notable
+player identities, awards, trusted sources and community creators. It is a capability,
+not a retrieval agent.
+
+Physical layout:
+
+- code: `app/knowledge/` (store, ingestion, refresh, retrieval, service) and
+  `app/context/knowledge_source.py`;
+- persistent store: SQLite at `.runtime/knowledge.db` locally, or the PostgreSQL
+  `knowledge` schema in production (separate from `baseball_analytics`);
+- runtime artifact: the `.db` file, never committed and rebuildable;
+- source manifests: `knowledge/sources/*.json`; structured seed: `knowledge/seed/*.json`.
+
+```bash
+python3 -m app.cli knowledge --seed status
+python3 -m app.cli knowledge search "infield fly"
+python3 -m app.cli knowledge show PLAYER:660271
+python3 -m app.cli knowledge sources --community
+```
+
+See [docs/usage/knowledge-base.md](docs/usage/knowledge-base.md),
+[docs/development/shared-knowledge.md](docs/development/shared-knowledge.md) and
+[ADR 0019](docs/adr/0019-shared-knowledge-base.md).
 
 ## Security boundaries
 
@@ -134,7 +171,8 @@ python3 -m compileall app                  # byte-compile check
 ```
 app/
   semantic/      entity resolution, objectives, requirement decomposition, registries
-  models/        domain contracts (definitions and runtime state)
+  models/        domain contracts (definitions and runtime state, including knowledge)
+  knowledge/     persistent Shared Knowledge store, ingestion, refresh and retrieval
   agent/         planner, router, source mapping, executor, orchestrator, response, review
   assessment/    deterministic validator, judge, adequacy rules
   context/       Shared Context retrieval (not an agent)
@@ -146,6 +184,9 @@ app/
   validation/    SQL guard, policy, permissions
   pipeline.py    end-to-end composition
   cli.py         command-line interface
+knowledge/
+  sources/       committed source manifests (authority, refresh policy, best_for)
+  seed/          committed structured knowledge packs (reference, rules, glossary, players, community)
 docs/
   adr/           architecture decision records
   usage/         how to install, configure, run, extend
