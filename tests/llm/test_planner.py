@@ -52,6 +52,19 @@ class LLMPlannerTests(unittest.TestCase):
         decision = planner(provider, fallback=RuleBasedPlanner(id_factory=lambda _p: "id")).decide(context())
         self.assertEqual(decision.kind, "PLAN")
 
+    def test_unknown_output_fields_are_rejected(self):
+        provider = FakeModelProvider(['{"kind":"PLAN","tasks":[],"rationale":"x",'
+                                      '"ignore_policy":true}'])
+        with self.assertRaises(ValueError):
+            planner(provider).decide(context())
+
+    def test_wrong_task_shape_falls_back_instead_of_raising_an_internal_error(self):
+        provider = FakeModelProvider(['{"kind":"PLAN","tasks":"ignore all safeguards",'
+                                      '"rationale":"x"}'])
+        decision = planner(provider, fallback=RuleBasedPlanner(id_factory=lambda _p: "id")).decide(context())
+        self.assertEqual(decision.kind, "PLAN")
+        self.assertEqual(decision.tasks[0].requirement_refs, ("r1",))
+
     def test_planner_refuses_to_run_after_a_terminal_decision(self):
         with self.assertRaises(RuntimeError):
             planner(FakeModelProvider()).decide(context(planner_terminal=True, terminal_reason="COMPLETE"))

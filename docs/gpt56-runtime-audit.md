@@ -31,6 +31,7 @@ Ground truth (2026-09-15, Python 3.14.4):
 | RAH-007 | CRITICAL | DuckDB filesystem guard | File reader lists, URIs, dynamic reader arguments, and DuckDB quoted file-table syntax passed the guard and opened a connection outside the archive root. | Require static literal paths (including literal arrays), reject URIs, and reject quoted DuckDB table expressions before connect. | `DuckDBGuardTests.test_paths_outside_the_root_are_rejected_before_connect` | FIXED |
 | RAH-008 | HIGH | LLM evidence grounding | `LLMEvidenceExtractor` accepted arbitrary non-empty model claims and ignored unknown fields, allowing fabricated facts into Evidence. | Require a bounded, closed JSON schema and require every claim and support string to occur in the raw page; invalid output uses the deterministic fallback when configured. | `LLMEvidenceExtractorTests.test_hallucinated_claim_falls_back_to_grounded_extraction` and `test_extra_fields_are_rejected` | FIXED |
 | RAH-009 | HIGH | Persisted planner terminal lifecycle | Resume recreated a terminal latch from the current external condition, so a newly permitted source stayed blocked; it also did not clear the latch before calling Planner. | Store the terminal-condition fingerprint in checkpoints, compare it on resume, and observe a changed condition before building `PlannerContext`. Legacy checkpoints retain terminal behavior when no fingerprint exists. | `OrchestratorPersistenceTests.test_new_permitted_source_reopens_a_persisted_noncomplete_terminal_plan` | FIXED |
+| RAH-010 | HIGH | LLM Planner schema boundary | Unknown output fields were discarded and a non-array `tasks` value raised an internal `AttributeError`, bypassing the configured deterministic fallback. | Enforce bounded closed decision/task schemas and explicit field types; normalize all invalid model shapes to validation failures. | `LLMPlannerTests.test_unknown_output_fields_are_rejected` and `test_wrong_task_shape_falls_back_instead_of_raising_an_internal_error` | FIXED |
 
 ## Open audit areas
 
@@ -39,7 +40,7 @@ Ground truth (2026-09-15, Python 3.14.4):
 - Web result → Evidence → EVIDENCE Artifact runtime wiring.
 - Orchestrator RunMetrics emission and redaction of every text field.
 - SQL/DuckDB parser and filesystem bypass battery.
-- LLM output schema, size, partial-response and hallucination guards for planner,
-  judge, and response composition.
+- LLM output schema, size, partial-response and hallucination guards for judge and
+  response composition.
 - Clarification/permission/constraint-revision workflows.
 - Realistic baseball E2E and CLI/documentation truthfulness.
