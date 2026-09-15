@@ -36,13 +36,17 @@ class RunMetrics:
     """Collects redacted events for one run. Not an agent; pure bookkeeping."""
 
     def __init__(self, run_id: str, secrets: tuple[str, ...] = ()) -> None:
-        self._run_id = run_id
         self._secrets = tuple(secrets)
+        self._run_id = redact_secrets(run_id, self._secrets)
         self._events: list[RunEvent] = []
 
     def record(self, event_type: EventType, message: str = "", **fields) -> RunEvent:
+        safe_fields = {
+            key: redact_secrets(value, self._secrets) if isinstance(value, str) else value
+            for key, value in fields.items()
+        }
         event = RunEvent(run_id=self._run_id, event_type=event_type,
-                         message=redact_secrets(message, self._secrets), **fields)
+                         message=redact_secrets(message, self._secrets), **safe_fields)
         self._events.append(event)
         return event
 

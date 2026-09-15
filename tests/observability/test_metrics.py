@@ -22,8 +22,17 @@ class RunMetricsTests(unittest.TestCase):
 
     def test_no_stored_field_contains_the_known_value(self):
         known_value = "synthetic-second-value"
-        metrics = RunMetrics("run-1", secrets=(known_value,))
-        metrics.record("LLM", message=f"provider error token={known_value}", tokens=10)
+        metrics = RunMetrics(f"run-{known_value}", secrets=(known_value,))
+        metrics.record(
+            "LLM",
+            subject_ref=f"subject-{known_value}",
+            agent=f"agent-{known_value}",
+            status=f"status-{known_value}",
+            source=f"source-{known_value}",
+            tool=f"tool-{known_value}",
+            message=f"provider error token={known_value}",
+            tokens=10,
+        )
         for event in metrics.events():
             self.assertNotIn(known_value, str(event.model_dump()))
 
