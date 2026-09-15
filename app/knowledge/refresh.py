@@ -131,6 +131,25 @@ def build_reference_pack(store, *, teams: tuple[dict, ...] | None = None,
             as_of=today, last_verified_at=verified, freshness_policy="ANNUAL",
             verification_status="VERIFIED", status="ACTIVE"))
 
+    # Must be part of the reference pack, otherwise a refresh would supersede it.
+    items.append(KnowledgeItem(
+        knowledge_id="LEAGUE_STRUCTURE:MLB", knowledge_type="LEAGUE_STRUCTURE",
+        canonical_key="mlb_league_structure",
+        title="Major League Baseball structure (30 teams, 2 leagues, 6 divisions)",
+        aliases=("MLB structure", "league and division structure"), language="en",
+        summary="MLB has 30 active franchises: 15 in the American League and 15 in the National "
+                "League, each split into East, Central and West divisions of five clubs.",
+        structured_payload={
+            "franchise_count": 30, "league_count": 2, "division_count": 6,
+            "leagues": {"American League": ["ALE", "ALC", "ALW"],
+                        "National League": ["NLE", "NLC", "NLW"]},
+            "teams": sorted(team["abbreviation"] for team in teams),
+            "refreshed_at": today.isoformat()},
+        entity_refs=("LEAGUE:AL", "LEAGUE:NL"), tags=("mlb", "league_structure"),
+        source_refs=("mlb_statsapi", "mlb_official"), source_authority="OFFICIAL",
+        as_of=today, last_verified_at=verified, freshness_policy="ANNUAL",
+        verification_status="VERIFIED", status="ACTIVE"))
+
     return KnowledgePack(domain="reference", items=tuple(items),
                          expected_team_keys=tuple(team["abbreviation"] for team in teams))
 

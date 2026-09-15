@@ -53,6 +53,11 @@ class RefreshTests(unittest.TestCase):
         self.assertEqual(lad.structured_payload["zh_name"], "洛杉矶道奇")  # curated field preserved
         self.assertEqual(lad.last_verified_at.date(), date(2026, 9, 15))
         self.assertTrue(lad.structured_payload["franchise_lineage"])
+        # The refresh pack must re-assert every reference item it owns, or a refresh would
+        # supersede the league structure and silently degrade the store.
+        self.assertEqual(self.store.get_item("LEAGUE_STRUCTURE:MLB").status, "ACTIVE")
+        self.assertEqual([item.knowledge_id for item in self.store.list_items()
+                          if item.status == "SUPERSEDED"], [])
 
     def test_reference_refresh_supersedes_a_franchise_key_that_disappears(self):
         teams = [team for team in all_fake_teams(self.store) if team["abbreviation"] != "ATH"]
