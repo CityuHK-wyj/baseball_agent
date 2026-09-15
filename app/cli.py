@@ -15,6 +15,13 @@ from app.agent.routing import Router, ToolCapability
 from app.assessment.judge import RuleBasedJudge
 from app.assessment.service import AssessmentService
 from app.config import settings
+from app.context.knowledge_source import KnowledgeContextSource
+from app.context.service import ContextService
+from app.knowledge.entities import entity_dictionary_from_knowledge
+from app.knowledge.loader import load_packs, load_sources, seed_store
+from app.knowledge.refresh import refresh_domain
+from app.knowledge.service import KnowledgeBase
+from app.knowledge.store import SqliteKnowledgeStore
 from app.models.entities import CanonicalEntity
 from app.observability.evaluation import RunSummary, evaluate_runs
 from app.persistence.artifacts import LocalFilesystemArtifactStorage
@@ -41,9 +48,13 @@ def _id_factory():
     return factory
 
 
-def build_pipeline(*, persist: bool = False, empty: bool = False) -> AnalysisPipeline:
+def build_pipeline(*, persist: bool = False, empty: bool = False,
+                   knowledge: KnowledgeBase | None = None) -> AnalysisPipeline:
     ids = _id_factory()
-    dictionary = EntityDictionary(DEFAULT_ENTITIES)
+    knowledge = knowledge or _open_knowledge()
+    dictionary = entity_dictionary_from_knowledge(knowledge.store)
+    if not dictionary.entities():
+        dictionary = EntityDictionary(DEFAULT_ENTITIES)
     resolver = EntityResolver(dictionary, id_factory=ids)
     semantic = SemanticNormalizer(RuleBasedObjectiveExtractor(id_factory=ids), resolver,
                                   dictionary, id_factory=ids)
@@ -52,6 +63,7 @@ def build_pipeline(*, persist: bool = False, empty: bool = False) -> AnalysisPip
                     id_factory=ids)
     registry = ArtifactRegistry()
     assessment = AssessmentService(registry, RuleBasedJudge(), id_factory=ids)
+    context_service = ContextService((KnowledgeContextSource(knowledge),))
     recorder = None
     if persist:
         settings.operational_store_path.parent.mkdir(parents=True, exist_ok=True)
@@ -62,6 +74,7 @@ def build_pipeline(*, persist: bool = False, empty: bool = False) -> AnalysisPip
         semantic, RuleBasedRequirementDecomposer(id_factory=ids),
         RuleBasedPlanner(id_factory=ids, max_rounds=3), router, assessment, registry,
         tool_factory=default_tool_factory(0 if empty else 1200), recorder=recorder,
+        context_service=context_service,
         max_rounds=3, budget=10, id_factory=ids)
 
 
@@ -161,6 +174,137 @@ def command_metrics(args) -> int:
         store.close()
 
 
+def _open_knowledge(*, reseed: bool = False) -> KnowledgeBase:
+    settings.knowledge_store_path.parent.mkdir(parents=True, exist_ok=True)
+    store = SqliteKnowledgeStore(settings.knowledge_store_path)
+    base = KnowledgeBase(store)
+    if reseed or store.item_count() == 0:
+        seed_store(store, settings.knowledge_source_path, settings.knowledge_seed_path)
+        base.reload_sources()
+    return base
+
+
+def command_knowledge_status(args) -> int:
+    base = _open_knowledge(reseed=args.seed)
+    try:
+        status = base.status()
+        print(f"total_items={status['total_items']}  sources={status['sources']}  "
+              f"verified={status['verified_items']}  stale={status['stale_items']}")
+        for knowledge_type, count in sorted(status["by_type"].items()):
+            print(f"  {knowledge_type:<20} {count:>5}")
+        print("by_status:", dict(sorted(status["by_status"].items())))
+        snapshot = status["latest_snapshot"]
+        if snapshot is not None:
+            print(f"latest_snapshot={snapshot.snapshot_id} label={snapshot.label} "
+                  f"activated={snapshot.activated}")
+        print("freshness_max_age_days:", status["freshness_policies"])
+        return 0
+    finally:
+        base.store.close()
+
+
+def command_knowledge_sources(args) -> int:
+    base = _open_knowledge(reseed=args.seed)
+    try:
+        sources = base.sources.sources()
+        if args.community:
+            sources = tuple(s for s in sources if s.authority_level == "COMMUNITY")
+        if args.authority:
+            sources = tuple(s for s in sources if s.authority_level == args.authority)
+        for source in sources:
+            checked = source.last_checked.isoformat() if source.last_checked else "never"
+            print(f"{source.source_id:<28} {source.authority_level:<22} {source.refresh_policy:<14} "
+                  f"checked={checked:<12} {source.name}")
+        print(f"total={len(sources)}")
+        return 0
+    finally:
+        base.store.close()
+
+
+def command_knowledge_search(args) -> int:
+    from datetime import date
+
+    base = _open_knowledge(reseed=args.seed)
+    try:
+        changes = {"max_items": args.max}
+        if args.knowledge_type:
+            changes["knowledge_types"] = tuple(args.knowledge_type)
+        if args.as_of:
+            changes["as_of"] = date.fromisoformat(args.as_of)
+        matches = base.search(args.query, **changes)
+        if not matches:
+            print("no matches")
+            return 1
+        for match in matches:
+            item = match.item
+            print(f"[{item.knowledge_type}] {item.knowledge_id}  ({item.source_authority}, "
+                  f"score={match.score}, {','.join(match.reasons)})")
+            print(f"    {item.title}: {item.summary[:160]}")
+        print(f"total={len(matches)} (store has {base.store.item_count()} items)")
+        return 0
+    finally:
+        base.store.close()
+
+
+def command_knowledge_show(args) -> int:
+    base = _open_knowledge(reseed=args.seed)
+    try:
+        item = base.get(args.identifier)
+        if item is None:
+            print(f"knowledge item {args.identifier!r} not found", file=sys.stderr)
+            return 1
+        print(json.dumps(item.model_dump(mode="json"), indent=2, ensure_ascii=False))
+        history = base.store.history(item.knowledge_id)
+        print(f"versions={[entry.version for entry in history]}")
+        relations = base.store.relations(from_key=item.knowledge_id)
+        for relation in relations:
+            print(f"  {relation.relation_type} -> {relation.to_key}")
+        return 0
+    finally:
+        base.store.close()
+
+
+def command_knowledge_refresh(args) -> int:
+    base = _open_knowledge(reseed=args.seed)
+    try:
+        try:
+            diff = refresh_domain(base.store, args.domain, seed_dir=settings.knowledge_seed_path,
+                                  source_dir=settings.knowledge_source_path)
+        except Exception as error:  # noqa: BLE001 - a refresh failure must be reported, not crash
+            print(f"refresh failed: {type(error).__name__}: {error}", file=sys.stderr)
+            return 1
+        print(f"domain={diff.domain} added={len(diff.added)} updated={len(diff.updated)} "
+              f"unchanged={len(diff.unchanged)} rejected={len(diff.rejected)}")
+        if diff.message:
+            print(diff.message)
+        return 0
+    finally:
+        base.store.close()
+
+
+def command_knowledge_validate(args) -> int:
+    from app.knowledge.ingestion import KnowledgeValidator
+
+    sources = load_sources(settings.knowledge_source_path)
+    packs = load_packs(settings.knowledge_seed_path)
+    known_keys = [key for pack in packs for item in pack.items
+                  for key in (item.canonical_key, item.knowledge_id)]
+    manifest_source_ids = {source.source_id for source in sources}
+    failed = False
+    for pack in packs:
+        source_ids = manifest_source_ids | {source.source_id for source in pack.sources}
+        report = KnowledgeValidator(source_ids, known_keys).validate(pack)
+        status = "OK" if report.ok and not report.rejected else "PROBLEMS"
+        print(f"{pack.domain:<12} items={len(pack.items):<5} fatals={len(report.fatals)} "
+              f"rejected={len(report.rejected)}  {status}")
+        for fatal in report.fatals:
+            print("   FATAL:", fatal)
+        for key, reason in list(report.rejected.items())[:10]:
+            print("   REJECT:", key, "->", reason)
+        failed = failed or not report.ok or bool(report.rejected)
+    return 1 if failed else 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="baseball-agent", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -188,6 +332,40 @@ def build_parser() -> argparse.ArgumentParser:
     metrics = sub.add_parser("metrics", help="evaluation metrics for a run")
     metrics.add_argument("--run-id", required=True)
     metrics.set_defaults(func=command_metrics)
+
+    knowledge = sub.add_parser("knowledge", help="inspect and refresh the Shared Knowledge base")
+    knowledge.add_argument("--seed", action="store_true",
+                           help="rebuild from committed manifests + seed packs first")
+    ksub = knowledge.add_subparsers(dest="knowledge_command", required=True)
+
+    kstatus = ksub.add_parser("status", help="counts, freshness and latest snapshot")
+    kstatus.set_defaults(func=command_knowledge_status)
+
+    ksources = ksub.add_parser("sources", help="list the source registry")
+    ksources.add_argument("--authority", choices=("OFFICIAL", "AUTHORITATIVE_REFERENCE",
+                                                   "TRUSTED_ANALYTICS", "TRUSTED_MEDIA",
+                                                   "COMMUNITY", "UNVERIFIED"))
+    ksources.add_argument("--community", action="store_true", help="only COMMUNITY sources")
+    ksources.set_defaults(func=command_knowledge_sources)
+
+    ksearch = ksub.add_parser("search", help="search knowledge by term, alias or key")
+    ksearch.add_argument("query")
+    ksearch.add_argument("--type", dest="knowledge_type", action="append")
+    ksearch.add_argument("--max", type=int, default=8)
+    ksearch.add_argument("--as-of", help="ISO date for temporal validity")
+    ksearch.set_defaults(func=command_knowledge_search)
+
+    kshow = ksub.add_parser("show", help="show one item with provenance and history")
+    kshow.add_argument("identifier")
+    kshow.set_defaults(func=command_knowledge_show)
+
+    krefresh = ksub.add_parser("refresh", help="refresh a knowledge domain")
+    krefresh.add_argument("domain", choices=("reference", "teams", "ballparks", "rules",
+                                              "glossary", "players", "community", "context", "all"))
+    krefresh.set_defaults(func=command_knowledge_refresh)
+
+    kvalidate = ksub.add_parser("validate", help="validate committed seed packs")
+    kvalidate.set_defaults(func=command_knowledge_validate)
     return parser
 
 

@@ -2,7 +2,7 @@
 
 Status: IN_PROGRESS
 
-Runtime audit update (2026-09-15, `gpt56/runtime-audit-hardening`): 254 tests pass.
+Integration update (2026-09-15): runtime hardening `b68ccf7` + Shared Knowledge `7d44ef4`.
 The audit wired SourceMapping, Web Evidence and Orchestrator metrics; fixed cross-objective
 evidence leakage, DuckDB path bypasses, LLM evidence/planner validation, physical mapped-tool
 routing, and persisted planner-terminal reopening on a new permission. Live data sources remain
@@ -10,8 +10,8 @@ UNVERIFIED_LIVE; clarification persistence is delivered, while permission/constr
 workflows are now partially delivered: scoped paid/high-cost permission is checkpointed and
 single-use; constraint revision remains open.
 
-Last updated by: DeepSeek Implementation Engineer session (milestone 3 — guarded tool
-execution). Milestones 1–2 delivered earlier and preserved.
+Last updated by: Shared Knowledge session (milestone 17 — persistent MLB domain knowledge
+base). Earlier milestones preserved.
 
 ## Current phase
 
@@ -85,8 +85,17 @@ Milestone 16 — adversarial test battery: **delivered**. `tests/security/test_a
 covers planner invariants, CTE-hidden SQL mutations, accepted-evidence exclusion, resume
 integrity with a missing artifact, bounded planning, and context history isolation.
 
-Next phase: live DB/web wiring (UNVERIFIED_LIVE) and a final architecture-compliance
-review by Codex.
+Milestone 17 — persistent Shared Knowledge base: **delivered**. `app/models/knowledge.py`
+contracts; a versioned `KnowledgeStore` (SQLite dev + PostgreSQL `knowledge` schema) with
+snapshots and relations; a source registry with an authority ladder; validate → stage →
+activate ingestion with supersession; deterministic retrieval (canonical/alias/filter/
+token/relations) with authority/freshness/temporal ranking; live refresh from the MLB Stats
+API and the official OBR PDF; `KnowledgeContextSource` wired into the Orchestrator; entity
+dictionary and metric registry projections; a `knowledge` CLI; and committed seed packs for
+reference data, rules, glossary, players, league/competition context and community. ADR 0019.
+
+Next phase: live DB/web wiring (UNVERIFIED_LIVE), a recheck of the unverified community
+profiles, and a final architecture-compliance review by Codex.
 
 ## Architecture status
 
@@ -199,11 +208,10 @@ Nothing is partially edited.
 
 ## Current branch
 
-`agent/deepseek-implementation-safe`, a **history-reconstructed** branch. Its root is a
-clean import of the verified-safe milestone-1 tree (`6ccb2ad`); the milestone-2 commit
-series was replayed on top. This was necessary because the original local ancestry
-(`9f2f44b` / `cf8e2d3`) contains exposed credentials. The old branch
-`agent/deepseek-implementation` is retained locally but must not be pushed.
+`agent/shared-knowledge`, branched from `agent/deepseek-implementation-safe` (6675ddd).
+`agent/deepseek-implementation-safe` remains the baseline and is not overwritten. A WIP
+security-hardening change found uncommitted on local `codex/review-hardening` was preserved
+with `git stash push -u` (stash@{0}) and is not part of this branch.
 
 ## Latest meaningful commit
 
@@ -219,16 +227,8 @@ series was replayed on top. This was necessary because the original local ancest
 
 ## Tests passing
 
-159 tests, all passing (`Ran 159 tests ... OK`). Milestone 8: `tests/semantic/`
-(entity resolver 5, constraints 5, objective extractor 4, normalizer 5, requirement
-decomposer 5) and `tests/test_adequacy.py` 5. Milestone 9: `tests/test_feature_engine.py`
-5 and `tests/test_source_mapping.py` 7. Milestone 10: `tests/test_state_transition.py` 5,
-`tests/test_agent_report.py` 3, `tests/test_report_review.py` 6. Milestone 11:
-`tests/llm/` (provider/prompts 5, planner 6, judge 4, response 3, openai provider 3).
-Milestone 12: `tests/observability/` 7. Milestone 13: `tests/persistence/test_postgres_store.py` 7.
-Milestone 14: `tests/integration/test_end_to_end.py` 5. Milestone 15: `tests/test_evidence.py` 4
-and `tests/llm/test_evidence.py` 4. Milestone 16: `tests/security/test_adversarial.py` 8.
-Historical milestone total: 242. Runtime audit branch total: 254.
+Branch baselines reported 258 runtime / 299 knowledge tests. Milestone 17 adds `tests/knowledge/`:
+store (11), retrieval (8), ingestion (6), domains (48), CLI + refresh (7).
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -266,6 +266,7 @@ None.
 
 ## ADRs added
 
+- `docs/adr/0019-shared-knowledge-base.md` (milestone 17).
 - `docs/adr/0006-guarded-tool-execution.md` (milestone 3).
 - `docs/adr/0007-operational-stores-and-checkpoints.md` (milestone 4).
 - `docs/adr/0008-shared-context-retrieval.md` (milestone 5).
@@ -307,18 +308,17 @@ written or modified. The verified read-only executor is wired but not live-teste
 
 ## Exact next task
 
-Milestone 17 — wire the remaining stages into the runtime, TDD.
+Milestone 18 — finish the knowledge refresh surface and the remaining runtime wiring, TDD.
 
-1. Add a checkpointed clarification/confirmation resume flow and permission/constraint-revision
-   contracts; do not silently violate a hard user constraint.
+1. Complete permission expiry and constraint-revision resume; preserve checkpointed clarification.
 2. Inject SourceMapping and a Web provider in a real configured pipeline, then test the live
    providers only against approved read-only targets.
-3. Add a durable metrics sink only when a consumer exists.
+3. Add a durable metrics sink.
 4. Then attempt a live read-only PostgreSQL/DuckDB integration test; if no database is
    available, keep it marked UNVERIFIED_LIVE and provide a documented manual procedure.
 
-Do not: change the frozen architecture; let the Planner touch physical mappings; print or
-persist credentials.
+Do not: change the frozen architecture; turn Shared Knowledge into a retrieval agent; let
+community knowledge override official facts; print or persist credentials.
 
 ## Recommended Codex review priorities
 

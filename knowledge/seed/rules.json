@@ -1,0 +1,6169 @@
+{
+ "domain": "rules",
+ "items": [
+  {
+   "knowledge_id": "RULEBOOK:OBR_2026",
+   "knowledge_type": "RULE",
+   "canonical_key": "official_baseball_rules_2026",
+   "title": "Official Baseball Rules, 2026 Edition",
+   "aliases": [
+    "OBR 2026",
+    "2026 Official Baseball Rules",
+    "MLB rulebook"
+   ],
+   "language": "en",
+   "summary": "The current code of playing rules governing MLB and the professional development leagues. Nine numbered rule groups (1.00-9.00), a Definitions of Terms glossary and appendices with field/strike-zone diagrams.",
+   "structured_payload": {
+    "rule_reference": "1.00-9.00",
+    "edition": 2026,
+    "page_count": 192,
+    "rule_groups": [
+     "1.00",
+     "2.00",
+     "3.00",
+     "4.00",
+     "5.00",
+     "6.00",
+     "7.00",
+     "8.00",
+     "9.00"
+    ],
+    "official_url": "https://mktg.mlbstatic.com/mlb/official-information/2026-official-baseball-rules.pdf",
+    "publisher": "Office of the Commissioner of Baseball",
+    "integrates": [
+     "playing rules",
+     "Definitions of Terms",
+     "appendices"
+    ]
+   },
+   "entity_refs": [
+    "RULEBOOK:OBR_2026"
+   ],
+   "tags": [
+    "obr",
+    "rulebook",
+    "official"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:1.00",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_1_00",
+   "title": "Rule 1.00 — Objectives of the Game",
+   "aliases": [
+    "1.00 Objectives of the Game",
+    "Objectives of the Game"
+   ],
+   "language": "en",
+   "summary": "Baseball is a game between two teams of nine players under a manager, played on an enclosed field under umpires. The offense tries to have batters become runners and advance; the defense tries to prevent that. A run scores when a runner legally touches all bases, and the team with more runs at the end of a regulation game wins.",
+   "structured_payload": {
+    "rule_reference": "1.00",
+    "rule_title": "Objectives of the Game",
+    "key_points": [
+     "1.01-1.06",
+     "nine players per side",
+     "more runs wins"
+    ],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:1.00"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:1"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:2.00",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_2_00",
+   "title": "Rule 2.00 — The Playing Field",
+   "aliases": [
+    "2.00 The Playing Field",
+    "The Playing Field"
+   ],
+   "language": "en",
+   "summary": "Specifies field layout and mandatory dimensions: a 90-foot infield square, home-to-second of 127 feet 3 3/8 inches, a pitcher's plate 60 feet 6 inches from home and 10 inches above it, minimum fence distances, a 95-foot infield grass-line radius, and the size of home plate, the bases and the pitcher's plate.",
+   "structured_payload": {
+    "rule_reference": "2.00",
+    "rule_title": "The Playing Field",
+    "key_points": [
+     "90-foot square",
+     "60'6\" pitcher's plate",
+     "250 ft minimum fence",
+     "325/400 ft for fields built after June 1, 1958"
+    ],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:2.00"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:2"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:3.00",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_3_00",
+   "title": "Rule 3.00 — Equipment and Uniforms",
+   "aliases": [
+    "3.00 Equipment and Uniforms",
+    "Equipment and Uniforms"
+   ],
+   "language": "en",
+   "summary": "Governs the ball, the bat, uniforms, catcher's mitt, first baseman's glove, fielding gloves, pitcher's glove, helmets, undue commercialization and equipment on the field. It sets maximum bat dimensions and glove sizes and restricts the pitcher's glove colour.",
+   "structured_payload": {
+    "rule_reference": "3.00",
+    "rule_title": "Equipment and Uniforms",
+    "key_points": [
+     "bat max 42 in / 2.61 in diameter",
+     "glove max 12 in",
+     "pitcher's glove may not be white or gray"
+    ],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:3.00"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:3"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:4.00",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_4_00",
+   "title": "Rule 4.00 — Game Preliminaries",
+   "aliases": [
+    "4.00 Game Preliminaries",
+    "Game Preliminaries"
+   ],
+   "language": "en",
+   "summary": "Covers umpire duties before the game, the manager, the exchange of lineup cards (including how to handle a player not listed on the card), weather and field conditions, special ground rules, fraternization, security and doubleheaders.",
+   "structured_payload": {
+    "rule_reference": "4.00",
+    "rule_title": "Game Preliminaries",
+    "key_points": [
+     "lineup card exchange",
+     "ground rules",
+     "doubleheaders"
+    ],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:4.00"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:4"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.00",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_00",
+   "title": "Rule 5.00 — Playing the Game",
+   "aliases": [
+    "5.00 Playing the Game",
+    "Playing the Game"
+   ],
+   "language": "en",
+   "summary": "The core playing rules: starting the game, fielding positions, base coaches, batting and the batting order, when the batter becomes a runner, running the bases, pitching mechanics and violations, scoring, making an out, appeal plays, substitutions and pitching changes including mound visits and the three-batter minimum, the designated hitter and dead balls.",
+   "structured_payload": {
+    "rule_reference": "5.00",
+    "rule_title": "Playing the Game",
+    "key_points": [
+     "5.04 batting",
+     "5.06 running",
+     "5.07 pitching",
+     "5.09 making an out",
+     "5.10 substitutions",
+     "5.11 DH",
+     "5.12 dead balls"
+    ],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.00"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:6.00",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_6_00",
+   "title": "Rule 6.00 — Improper Play, Illegal Action and Misconduct",
+   "aliases": [
+    "6.00 Improper Play, Illegal Action and Misconduct",
+    "Improper Play, Illegal Action and Misconduct"
+   ],
+   "language": "en",
+   "summary": "Defines interference (offensive, defensive, umpire, spectator), obstruction, catcher collisions, the fielder right of way, pitcher illegal actions including balks and illegal pitches, batter illegal actions including batting out of turn, and unsportsmanlike conduct.",
+   "structured_payload": {
+    "rule_reference": "6.00",
+    "rule_title": "Improper Play, Illegal Action and Misconduct",
+    "key_points": [
+     "6.01 interference/obstruction",
+     "6.02 balks",
+     "6.03 batting out of turn",
+     "6.04 misconduct"
+    ],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:6.00"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:6"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:7.00",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_7_00",
+   "title": "Rule 7.00 — Ending the Game",
+   "aliases": [
+    "7.00 Ending the Game",
+    "Ending the Game"
+   ],
+   "language": "en",
+   "summary": "Defines regulation games, suspended games, forfeited games and protested games, including when a game becomes official and how play is terminated.",
+   "structured_payload": {
+    "rule_reference": "7.00",
+    "rule_title": "Ending the Game",
+    "key_points": [
+     "7.01 regulation",
+     "7.02 suspended",
+     "7.03 forfeited",
+     "7.04 protests"
+    ],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:7.00"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:7"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:8.00",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_8_00",
+   "title": "Rule 8.00 — The Umpire",
+   "aliases": [
+    "8.00 The Umpire",
+    "The Umpire"
+   ],
+   "language": "en",
+   "summary": "Covers umpire qualifications and authority, appeal of umpire decisions, umpire positioning, reporting, and the General Instructions to Umpires.",
+   "structured_payload": {
+    "rule_reference": "8.00",
+    "rule_title": "The Umpire",
+    "key_points": [
+     "8.01 authority",
+     "8.02 appeals",
+     "8.03 position"
+    ],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:8.00"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:8"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.00",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_00",
+   "title": "Rule 9.00 — The Official Scorer",
+   "aliases": [
+    "9.00 The Official Scorer",
+    "The Official Scorer"
+   ],
+   "language": "en",
+   "summary": "The official scoring rules: scorer duties and reports, runs batted in, base hits and their value, stolen bases and caught stealing, sacrifices, putouts, assists, double and triple plays, errors, wild pitches and passed balls, walks, strikeouts, earned runs, winning and losing pitchers, shutouts, saves, statistics, percentage records and minimum standards for championships.",
+   "structured_payload": {
+    "rule_reference": "9.00",
+    "rule_title": "The Official Scorer",
+    "key_points": [
+     "9.04 RBI",
+     "9.05 base hits",
+     "9.12 errors",
+     "9.16 earned runs",
+     "9.19 saves",
+     "9.22 minimum standards"
+    ],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.00"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:1.01",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_1_01",
+   "title": "Rule 1.01 — Objectives",
+   "aliases": [
+    "1.01 Objectives",
+    "Objectives"
+   ],
+   "language": "en",
+   "summary": "Baseball is a game between two teams of nine players each under a manager, played on an enclosed field under one or more umpires.",
+   "structured_payload": {
+    "rule_reference": "1.01",
+    "rule_title": "Objectives",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:1.01"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:1"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:1.02",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_1_02",
+   "title": "Rule 1.02 — Offensive objective",
+   "aliases": [
+    "1.02 Offensive objective",
+    "Offensive objective"
+   ],
+   "language": "en",
+   "summary": "The offensive team's objective is to have its batter become a runner and its runners advance.",
+   "structured_payload": {
+    "rule_reference": "1.02",
+    "rule_title": "Offensive objective",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:1.02"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:1"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:1.03",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_1_03",
+   "title": "Rule 1.03 — Defensive objective",
+   "aliases": [
+    "1.03 Defensive objective",
+    "Defensive objective"
+   ],
+   "language": "en",
+   "summary": "The defensive team's objective is to prevent offensive players from becoming runners and to prevent their advance.",
+   "structured_payload": {
+    "rule_reference": "1.03",
+    "rule_title": "Defensive objective",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:1.03"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:1"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:1.04",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_1_04",
+   "title": "Rule 1.04 — Scoring a run",
+   "aliases": [
+    "1.04 Scoring a run",
+    "Scoring a run"
+   ],
+   "language": "en",
+   "summary": "A batter who becomes a runner and legally touches all bases scores one run.",
+   "structured_payload": {
+    "rule_reference": "1.04",
+    "rule_title": "Scoring a run",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:1.04"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:1"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:1.05",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_1_05",
+   "title": "Rule 1.05 — Winning objective",
+   "aliases": [
+    "1.05 Winning objective",
+    "Winning objective"
+   ],
+   "language": "en",
+   "summary": "Each team's objective is to win by scoring more runs than the opponent.",
+   "structured_payload": {
+    "rule_reference": "1.05",
+    "rule_title": "Winning objective",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:1.05"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:1"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:1.06",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_1_06",
+   "title": "Rule 1.06 — Winner",
+   "aliases": [
+    "1.06 Winner",
+    "Winner"
+   ],
+   "language": "en",
+   "summary": "The team that has scored more runs at the conclusion of a regulation game wins.",
+   "structured_payload": {
+    "rule_reference": "1.06",
+    "rule_title": "Winner",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:1.06"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:1"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:2.01",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_2_01",
+   "title": "Rule 2.01 — Layout of the field",
+   "aliases": [
+    "2.01 Layout of the field",
+    "Layout of the field"
+   ],
+   "language": "en",
+   "summary": "The infield is a 90-foot square; the pitcher's plate is 10 inches above home plate; minimum distance requirements apply to fences and stands, with stricter minima for fields constructed after June 1, 1958.",
+   "structured_payload": {
+    "rule_reference": "2.01",
+    "rule_title": "Layout of the field",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:2.01"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:2"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:2.02",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_2_02",
+   "title": "Rule 2.02 — Home base",
+   "aliases": [
+    "2.02 Home base",
+    "Home base"
+   ],
+   "language": "en",
+   "summary": "Home base is a five-sided slab of whitened rubber, a 17-inch square with two corners removed, set with its point at the intersection of the first and third base lines.",
+   "structured_payload": {
+    "rule_reference": "2.02",
+    "rule_title": "Home base",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:2.02"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:2"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:2.03",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_2_03",
+   "title": "Rule 2.03 — The bases",
+   "aliases": [
+    "2.03 The bases",
+    "The bases"
+   ],
+   "language": "en",
+   "summary": "First, second and third bases are 18-inch square bags between three and five inches thick, filled with soft material.",
+   "structured_payload": {
+    "rule_reference": "2.03",
+    "rule_title": "The bases",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:2.03"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:2"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:2.04",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_2_04",
+   "title": "Rule 2.04 — The pitcher's plate",
+   "aliases": [
+    "2.04 The pitcher's plate",
+    "The pitcher's plate"
+   ],
+   "language": "en",
+   "summary": "The pitcher's plate is a 24-inch by 6-inch slab set so the distance from the plate to the rear point of home plate is 60 feet 6 inches.",
+   "structured_payload": {
+    "rule_reference": "2.04",
+    "rule_title": "The pitcher's plate",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:2.04"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:2"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:2.05",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_2_05",
+   "title": "Rule 2.05 — Benches",
+   "aliases": [
+    "2.05 Benches",
+    "Benches"
+   ],
+   "language": "en",
+   "summary": "The home club furnishes roofed benches for both teams, not less than 25 feet from the base lines.",
+   "structured_payload": {
+    "rule_reference": "2.05",
+    "rule_title": "Benches",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:2.05"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:2"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:3.01",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_3_01",
+   "title": "Rule 3.01 — The ball",
+   "aliases": [
+    "3.01 The ball",
+    "The ball"
+   ],
+   "language": "en",
+   "summary": "Specifies the weight, circumference and construction of the official ball.",
+   "structured_payload": {
+    "rule_reference": "3.01",
+    "rule_title": "The ball",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:3.01"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:3"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:3.02",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_3_02",
+   "title": "Rule 3.02 — The bat",
+   "aliases": [
+    "3.02 The bat",
+    "The bat"
+   ],
+   "language": "en",
+   "summary": "The bat must be a smooth round stick; MLB bats are solid wood with a maximum length of 42 inches and maximum diameter of 2.61 inches at the thickest part.",
+   "structured_payload": {
+    "rule_reference": "3.02",
+    "rule_title": "The bat",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:3.02"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:3"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:3.03",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_3_03",
+   "title": "Rule 3.03 — Player uniforms",
+   "aliases": [
+    "3.03 Player uniforms",
+    "Player uniforms"
+   ],
+   "language": "en",
+   "summary": "Every player on a team must wear a uniform of the same colour, style and pattern, with no ragged or distracting elements.",
+   "structured_payload": {
+    "rule_reference": "3.03",
+    "rule_title": "Player uniforms",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:3.03"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:3"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:3.04",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_3_04",
+   "title": "Rule 3.04 — Catcher's mitt",
+   "aliases": [
+    "3.04 Catcher's mitt",
+    "Catcher's mitt"
+   ],
+   "language": "en",
+   "summary": "Specifies the dimensions and padding of the catcher's mitt.",
+   "structured_payload": {
+    "rule_reference": "3.04",
+    "rule_title": "Catcher's mitt",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:3.04"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:3"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:3.05",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_3_05",
+   "title": "Rule 3.05 — First baseman's glove",
+   "aliases": [
+    "3.05 First baseman's glove",
+    "First baseman's glove"
+   ],
+   "language": "en",
+   "summary": "Specifies the dimensions of the first baseman's glove, which may be a mitt or a glove.",
+   "structured_payload": {
+    "rule_reference": "3.05",
+    "rule_title": "First baseman's glove",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:3.05"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:3"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:3.06",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_3_06",
+   "title": "Rule 3.06 — Fielding gloves",
+   "aliases": [
+    "3.06 Fielding gloves",
+    "Fielding gloves"
+   ],
+   "language": "en",
+   "summary": "Fielding gloves are limited in size (maximum 12 inches from top to heel) and in the width of the web.",
+   "structured_payload": {
+    "rule_reference": "3.06",
+    "rule_title": "Fielding gloves",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:3.06"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:3"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:3.07",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_3_07",
+   "title": "Rule 3.07 — Pitcher's glove",
+   "aliases": [
+    "3.07 Pitcher's glove",
+    "Pitcher's glove"
+   ],
+   "language": "en",
+   "summary": "The pitcher's glove may not be white or gray, nor may it have a colour that distracts the batter.",
+   "structured_payload": {
+    "rule_reference": "3.07",
+    "rule_title": "Pitcher's glove",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:3.07"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:3"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:3.08",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_3_08",
+   "title": "Rule 3.08 — Helmets",
+   "aliases": [
+    "3.08 Helmets",
+    "Helmets"
+   ],
+   "language": "en",
+   "summary": "Batters, runners and catcher's headgear must meet the prescribed protective requirements.",
+   "structured_payload": {
+    "rule_reference": "3.08",
+    "rule_title": "Helmets",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:3.08"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:3"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:3.09",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_3_09",
+   "title": "Rule 3.09 — Undue commercialization",
+   "aliases": [
+    "3.09 Undue commercialization",
+    "Undue commercialization"
+   ],
+   "language": "en",
+   "summary": "Uniforms and equipment may not carry undue commercialization.",
+   "structured_payload": {
+    "rule_reference": "3.09",
+    "rule_title": "Undue commercialization",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:3.09"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:3"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:3.10",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_3_10",
+   "title": "Rule 3.10 — Equipment on the field",
+   "aliases": [
+    "3.10 Equipment on the field",
+    "Equipment on the field"
+   ],
+   "language": "en",
+   "summary": "Only permitted equipment may be on the playing field.",
+   "structured_payload": {
+    "rule_reference": "3.10",
+    "rule_title": "Equipment on the field",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:3.10"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:3"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:4.01",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_4_01",
+   "title": "Rule 4.01 — Umpire duties",
+   "aliases": [
+    "4.01 Umpire duties",
+    "Umpire duties"
+   ],
+   "language": "en",
+   "summary": "Umpires have pre-game duties including field inspection and receiving the lineup cards.",
+   "structured_payload": {
+    "rule_reference": "4.01",
+    "rule_title": "Umpire duties",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:4.01"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:4"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:4.02",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_4_02",
+   "title": "Rule 4.02 — Field manager",
+   "aliases": [
+    "4.02 Field manager",
+    "Field manager"
+   ],
+   "language": "en",
+   "summary": "The manager represents the team in communications with umpires and is responsible for the club's conduct.",
+   "structured_payload": {
+    "rule_reference": "4.02",
+    "rule_title": "Field manager",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:4.02"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:4"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:4.03",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_4_03",
+   "title": "Rule 4.03 — Exchange of lineup cards",
+   "aliases": [
+    "4.03 Exchange of lineup cards",
+    "Exchange of lineup cards"
+   ],
+   "language": "en",
+   "summary": "The manager delivers the batting order to the umpire, who gives a copy to the opposing manager; the rule also addresses a player not listed on the lineup card.",
+   "structured_payload": {
+    "rule_reference": "4.03",
+    "rule_title": "Exchange of lineup cards",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:4.03"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:4"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:4.04",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_4_04",
+   "title": "Rule 4.04 — Weather and field conditions",
+   "aliases": [
+    "4.04 Weather and field conditions",
+    "Weather and field conditions"
+   ],
+   "language": "en",
+   "summary": "The home manager decides whether to start or continue a game because of weather or field conditions, subject to the umpire-in-chief's authority.",
+   "structured_payload": {
+    "rule_reference": "4.04",
+    "rule_title": "Weather and field conditions",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:4.04"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:4"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:4.05",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_4_05",
+   "title": "Rule 4.05 — Special ground rules",
+   "aliases": [
+    "4.05 Special ground rules",
+    "Special ground rules"
+   ],
+   "language": "en",
+   "summary": "The home club may establish special ground rules for its park, which must be approved by the umpire-in-chief and communicated to both teams.",
+   "structured_payload": {
+    "rule_reference": "4.05",
+    "rule_title": "Special ground rules",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:4.05"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:4"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:4.06",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_4_06",
+   "title": "Rule 4.06 — No fraternization",
+   "aliases": [
+    "4.06 No fraternization",
+    "No fraternization"
+   ],
+   "language": "en",
+   "summary": "Players and coaches may not fraternize with the opposing team during a game.",
+   "structured_payload": {
+    "rule_reference": "4.06",
+    "rule_title": "No fraternization",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:4.06"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:4"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:4.07",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_4_07",
+   "title": "Rule 4.07 — Security",
+   "aliases": [
+    "4.07 Security",
+    "Security"
+   ],
+   "language": "en",
+   "summary": "The home club must provide adequate security and keep the field and stands orderly.",
+   "structured_payload": {
+    "rule_reference": "4.07",
+    "rule_title": "Security",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:4.07"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:4"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:4.08",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_4_08",
+   "title": "Rule 4.08 — Doubleheaders",
+   "aliases": [
+    "4.08 Doubleheaders",
+    "Doubleheaders"
+   ],
+   "language": "en",
+   "summary": "A doubleheader consists of two games played in immediate succession, with rules for when one is scheduled or rescheduled.",
+   "structured_payload": {
+    "rule_reference": "4.08",
+    "rule_title": "Doubleheaders",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:4.08"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:4"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.01",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_01",
+   "title": "Rule 5.01 — Starting the game",
+   "aliases": [
+    "5.01 Starting the game",
+    "Starting the game"
+   ],
+   "language": "en",
+   "summary": "The umpire-in-chief calls 'Play Ball!' to start the game; the visiting team bats first unless otherwise agreed.",
+   "structured_payload": {
+    "rule_reference": "5.01",
+    "rule_title": "Starting the game",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.01"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.02",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_02",
+   "title": "Rule 5.02 — Fielding positions",
+   "aliases": [
+    "5.02 Fielding positions",
+    "Fielding positions"
+   ],
+   "language": "en",
+   "summary": "Defines the nine fielding positions and the pitcher's legal position (windup and set).",
+   "structured_payload": {
+    "rule_reference": "5.02",
+    "rule_title": "Fielding positions",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.02"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.03",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_03",
+   "title": "Rule 5.03 — Base coaches",
+   "aliases": [
+    "5.03 Base coaches",
+    "Base coaches"
+   ],
+   "language": "en",
+   "summary": "Two base coaches may be stationed in the coach's boxes; the 2026 edition adds penalties for a coach who does not stay within the box.",
+   "structured_payload": {
+    "rule_reference": "5.03",
+    "rule_title": "Base coaches",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.03"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.04",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_04",
+   "title": "Rule 5.04 — Batting",
+   "aliases": [
+    "5.04 Batting",
+    "Batting"
+   ],
+   "language": "en",
+   "summary": "Covers the batting order (each player bats in turn), the batter's box (the batter must stay within it), and completing a time at bat. Includes the three-official check-swing guidance.",
+   "structured_payload": {
+    "rule_reference": "5.04",
+    "rule_title": "Batting",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.04"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.05",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_05",
+   "title": "Rule 5.05 — When the batter becomes a runner",
+   "aliases": [
+    "5.05 When the batter becomes a runner",
+    "When the batter becomes a runner"
+   ],
+   "language": "en",
+   "summary": "A batter becomes a runner on a fair hit, a walk, a hit-by-pitch, catcher's interference and other specified events, with base awards.",
+   "structured_payload": {
+    "rule_reference": "5.05",
+    "rule_title": "When the batter becomes a runner",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.05"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.06",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_06",
+   "title": "Rule 5.06 — Running the bases",
+   "aliases": [
+    "5.06 Running the bases",
+    "Running the bases"
+   ],
+   "language": "en",
+   "summary": "How runners occupy and advance bases, when they must retouch, and which balls are dead; the 2026 edition clarifies the retouch responsibility.",
+   "structured_payload": {
+    "rule_reference": "5.06",
+    "rule_title": "Running the bases",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.06"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.07",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_07",
+   "title": "Rule 5.07 — Pitching",
+   "aliases": [
+    "5.07 Pitching",
+    "Pitching"
+   ],
+   "language": "en",
+   "summary": "Legal pitching deliveries from the windup and set positions, warm-up pitches, pitcher delays, throwing to bases, removing the pivot foot and ambidextrous pitchers.",
+   "structured_payload": {
+    "rule_reference": "5.07",
+    "rule_title": "Pitching",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.07"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.08",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_08",
+   "title": "Rule 5.08 — How a team scores",
+   "aliases": [
+    "5.08 How a team scores",
+    "How a team scores"
+   ],
+   "language": "en",
+   "summary": "A run scores when a runner legally advances to and touches home plate before the third out, subject to exceptions such as a force out or a batter-runner retired before reaching first.",
+   "structured_payload": {
+    "rule_reference": "5.08",
+    "rule_title": "How a team scores",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.08"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.09",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_09",
+   "title": "Rule 5.09 — Making an out",
+   "aliases": [
+    "5.09 Making an out",
+    "Making an out"
+   ],
+   "language": "en",
+   "summary": "Retiring the batter, retiring a runner, appeal plays, the effect of a preceding runner's failure to touch a base, and retiring the side.",
+   "structured_payload": {
+    "rule_reference": "5.09",
+    "rule_title": "Making an out",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.09"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.10",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_10",
+   "title": "Rule 5.10 — Substitutions and pitching changes",
+   "aliases": [
+    "5.10 Substitutions and pitching changes",
+    "Substitutions and pitching changes"
+   ],
+   "language": "en",
+   "summary": "Substitution rules, including visits to the mound, the three-batter minimum for relievers, and improper substitutions.",
+   "structured_payload": {
+    "rule_reference": "5.10",
+    "rule_title": "Substitutions and pitching changes",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.10"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.11",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_11",
+   "title": "Rule 5.11 — Designated hitter rule",
+   "aliases": [
+    "5.11 Designated hitter rule",
+    "Designated hitter rule"
+   ],
+   "language": "en",
+   "summary": "The designated hitter bats in place of the pitcher; the rule governs the DH's role and what happens if the DH enters the field.",
+   "structured_payload": {
+    "rule_reference": "5.11",
+    "rule_title": "Designated hitter rule",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.11"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:5.12",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_5_12",
+   "title": "Rule 5.12 — Calling time and dead balls",
+   "aliases": [
+    "5.12 Calling time and dead balls",
+    "Calling time and dead balls"
+   ],
+   "language": "en",
+   "summary": "When the umpire calls 'Time' and when the ball becomes dead, and the resulting base awards.",
+   "structured_payload": {
+    "rule_reference": "5.12",
+    "rule_title": "Calling time and dead balls",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:5.12"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:5"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:6.01",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_6_01",
+   "title": "Rule 6.01 — Interference, obstruction and catcher collisions",
+   "aliases": [
+    "6.01 Interference, obstruction and catcher collisions",
+    "Interference, obstruction and catcher collisions"
+   ],
+   "language": "en",
+   "summary": "Defines batter/runner interference, fielder right of way, catcher interference, unintentional interference, spectator interference, coach and umpire interference, interference with a squeeze play or steal of home, obstruction, collisions at home plate and sliding on double-play attempts.",
+   "structured_payload": {
+    "rule_reference": "6.01",
+    "rule_title": "Interference, obstruction and catcher collisions",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:6.01"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:6"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:6.02",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_6_02",
+   "title": "Rule 6.02 — Pitcher illegal action",
+   "aliases": [
+    "6.02 Pitcher illegal action",
+    "Pitcher illegal action"
+   ],
+   "language": "en",
+   "summary": "Balks, illegal pitches with bases unoccupied, and pitching prohibitions (such as a quick pitch or applying a foreign substance).",
+   "structured_payload": {
+    "rule_reference": "6.02",
+    "rule_title": "Pitcher illegal action",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:6.02"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:6"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:6.03",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_6_03",
+   "title": "Rule 6.03 — Batter illegal action",
+   "aliases": [
+    "6.03 Batter illegal action",
+    "Batter illegal action"
+   ],
+   "language": "en",
+   "summary": "When a batter is out for an illegal action, and the batting-out-of-turn rule and its remedies.",
+   "structured_payload": {
+    "rule_reference": "6.03",
+    "rule_title": "Batter illegal action",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:6.03"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:6"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:6.04",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_6_04",
+   "title": "Rule 6.04 — Unsportsmanlike conduct",
+   "aliases": [
+    "6.04 Unsportsmanlike conduct",
+    "Unsportsmanlike conduct"
+   ],
+   "language": "en",
+   "summary": "Prohibits unsporting acts and sets warnings, ejections and discipline.",
+   "structured_payload": {
+    "rule_reference": "6.04",
+    "rule_title": "Unsportsmanlike conduct",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:6.04"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:6"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:7.01",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_7_01",
+   "title": "Rule 7.01 — Regulation games",
+   "aliases": [
+    "7.01 Regulation games",
+    "Regulation games"
+   ],
+   "language": "en",
+   "summary": "A game is regulation once the losing team has had five turns at bat (or 4.5 innings with the home team ahead); the 2026 edition clarifies Commissioner authority to terminate play.",
+   "structured_payload": {
+    "rule_reference": "7.01",
+    "rule_title": "Regulation games",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:7.01"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:7"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:7.02",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_7_02",
+   "title": "Rule 7.02 — Suspended games",
+   "aliases": [
+    "7.02 Suspended games",
+    "Suspended games"
+   ],
+   "language": "en",
+   "summary": "A suspended game is resumed from the point of suspension under specified conditions.",
+   "structured_payload": {
+    "rule_reference": "7.02",
+    "rule_title": "Suspended games",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:7.02"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:7"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:7.03",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_7_03",
+   "title": "Rule 7.03 — Forfeited games",
+   "aliases": [
+    "7.03 Forfeited games",
+    "Forfeited games"
+   ],
+   "language": "en",
+   "summary": "A game may be forfeited for specified rule violations, with a 9-0 score recorded.",
+   "structured_payload": {
+    "rule_reference": "7.03",
+    "rule_title": "Forfeited games",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:7.03"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:7"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:7.04",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_7_04",
+   "title": "Rule 7.04 — Protesting games",
+   "aliases": [
+    "7.04 Protesting games",
+    "Protesting games"
+   ],
+   "language": "en",
+   "summary": "A manager may protest a game for a rule misinterpretation; the protest is decided by the league office.",
+   "structured_payload": {
+    "rule_reference": "7.04",
+    "rule_title": "Protesting games",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:7.04"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:7"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:8.01",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_8_01",
+   "title": "Rule 8.01 — Umpire qualifications and authority",
+   "aliases": [
+    "8.01 Umpire qualifications and authority",
+    "Umpire qualifications and authority"
+   ],
+   "language": "en",
+   "summary": "Umpires must be qualified and have authority to enforce the rules and maintain order.",
+   "structured_payload": {
+    "rule_reference": "8.01",
+    "rule_title": "Umpire qualifications and authority",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:8.01"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:8"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:8.02",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_8_02",
+   "title": "Rule 8.02 — Appeal of umpire decisions",
+   "aliases": [
+    "8.02 Appeal of umpire decisions",
+    "Appeal of umpire decisions"
+   ],
+   "language": "en",
+   "summary": "How a manager may appeal an umpire's decision, including arguing only on a rule interpretation, and the consequences of excessive argument.",
+   "structured_payload": {
+    "rule_reference": "8.02",
+    "rule_title": "Appeal of umpire decisions",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:8.02"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:8"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:8.03",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_8_03",
+   "title": "Rule 8.03 — Umpire position",
+   "aliases": [
+    "8.03 Umpire position",
+    "Umpire position"
+   ],
+   "language": "en",
+   "summary": "Specifies standard umpire positions with and without runners on base.",
+   "structured_payload": {
+    "rule_reference": "8.03",
+    "rule_title": "Umpire position",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:8.03"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:8"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:8.04",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_8_04",
+   "title": "Rule 8.04 — Reporting",
+   "aliases": [
+    "8.04 Reporting",
+    "Reporting"
+   ],
+   "language": "en",
+   "summary": "Umpires report ejections and incidents to the league office.",
+   "structured_payload": {
+    "rule_reference": "8.04",
+    "rule_title": "Reporting",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:8.04"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:8"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.01",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_01",
+   "title": "Rule 9.01 — Official scorer (general rules)",
+   "aliases": [
+    "9.01 Official scorer (general rules)",
+    "Official scorer (general rules)"
+   ],
+   "language": "en",
+   "summary": "The official scorer records the game, makes judgment calls on hits and errors, and may not be a member of either club.",
+   "structured_payload": {
+    "rule_reference": "9.01",
+    "rule_title": "Official scorer (general rules)",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.01"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.02",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_02",
+   "title": "Rule 9.02 — Official scorer report",
+   "aliases": [
+    "9.02 Official scorer report",
+    "Official scorer report"
+   ],
+   "language": "en",
+   "summary": "The scorer's report and the information it must contain.",
+   "structured_payload": {
+    "rule_reference": "9.02",
+    "rule_title": "Official scorer report",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.02"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.03",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_03",
+   "title": "Rule 9.03 — Official scorer report (additional rules)",
+   "aliases": [
+    "9.03 Official scorer report (additional rules)",
+    "Official scorer report (additional rules)"
+   ],
+   "language": "en",
+   "summary": "Additional reporting requirements and corrections.",
+   "structured_payload": {
+    "rule_reference": "9.03",
+    "rule_title": "Official scorer report (additional rules)",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.03"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.04",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_04",
+   "title": "Rule 9.04 — Runs batted in",
+   "aliases": [
+    "9.04 Runs batted in",
+    "Runs batted in"
+   ],
+   "language": "en",
+   "summary": "An RBI is credited for a run driven in by a base hit, sacrifice, groundout, force out or similar; not for a run scored on an error or a double play in specified cases.",
+   "structured_payload": {
+    "rule_reference": "9.04",
+    "rule_title": "Runs batted in",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.04"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.05",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_05",
+   "title": "Rule 9.05 — Base hits",
+   "aliases": [
+    "9.05 Base hits",
+    "Base hits"
+   ],
+   "language": "en",
+   "summary": "A base hit is credited when a batter reaches base safely on a fair ball that is not handled by a fielder, subject to the ordinary-effort standard.",
+   "structured_payload": {
+    "rule_reference": "9.05",
+    "rule_title": "Base hits",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.05"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.06",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_06",
+   "title": "Rule 9.06 — Determining value of base hits",
+   "aliases": [
+    "9.06 Determining value of base hits",
+    "Determining value of base hits"
+   ],
+   "language": "en",
+   "summary": "Classifies hits as one-base, two-base, three-base or home run, and governs scoring when a fielder mishandles the ball.",
+   "structured_payload": {
+    "rule_reference": "9.06",
+    "rule_title": "Determining value of base hits",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.06"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.07",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_07",
+   "title": "Rule 9.07 — Stolen bases and caught stealing",
+   "aliases": [
+    "9.07 Stolen bases and caught stealing",
+    "Stolen bases and caught stealing"
+   ],
+   "language": "en",
+   "summary": "Credits a stolen base when a runner advances on a pitch without a hit, out, error or other specified cause, and a caught stealing when put out.",
+   "structured_payload": {
+    "rule_reference": "9.07",
+    "rule_title": "Stolen bases and caught stealing",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.07"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.08",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_08",
+   "title": "Rule 9.08 — Sacrifices",
+   "aliases": [
+    "9.08 Sacrifices",
+    "Sacrifices"
+   ],
+   "language": "en",
+   "summary": "A sacrifice bunt advances a runner and puts the batter out; a sacrifice fly scores a runner. Neither counts as an at-bat.",
+   "structured_payload": {
+    "rule_reference": "9.08",
+    "rule_title": "Sacrifices",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.08"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.09",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_09",
+   "title": "Rule 9.09 — Putouts",
+   "aliases": [
+    "9.09 Putouts",
+    "Putouts"
+   ],
+   "language": "en",
+   "summary": "A putout is credited to the fielder who catches a fly ball or tags or forces a runner.",
+   "structured_payload": {
+    "rule_reference": "9.09",
+    "rule_title": "Putouts",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.09"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.10",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_10",
+   "title": "Rule 9.10 — Assists",
+   "aliases": [
+    "9.10 Assists",
+    "Assists"
+   ],
+   "language": "en",
+   "summary": "An assist is credited to a fielder who throws or deflects the ball in a way that leads to a putout.",
+   "structured_payload": {
+    "rule_reference": "9.10",
+    "rule_title": "Assists",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.10"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.11",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_11",
+   "title": "Rule 9.11 — Double and triple plays",
+   "aliases": [
+    "9.11 Double and triple plays",
+    "Double and triple plays"
+   ],
+   "language": "en",
+   "summary": "Credits a double play when two offensive players are put out by continuous action without an error between putouts, and a triple play for three.",
+   "structured_payload": {
+    "rule_reference": "9.11",
+    "rule_title": "Double and triple plays",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.11"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.12",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_12",
+   "title": "Rule 9.12 — Errors",
+   "aliases": [
+    "9.12 Errors",
+    "Errors"
+   ],
+   "language": "en",
+   "summary": "An error is charged when a fielder misplays a ball that an ordinary-effort fielder would have handled, allowing a runner to advance.",
+   "structured_payload": {
+    "rule_reference": "9.12",
+    "rule_title": "Errors",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.12"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.13",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_13",
+   "title": "Rule 9.13 — Wild pitches and passed balls",
+   "aliases": [
+    "9.13 Wild pitches and passed balls",
+    "Wild pitches and passed balls"
+   ],
+   "language": "en",
+   "summary": "A wild pitch is charged to the pitcher for a pitch too high, low or wide to be handled; a passed ball is charged to the catcher for a pitch the catcher should have handled.",
+   "structured_payload": {
+    "rule_reference": "9.13",
+    "rule_title": "Wild pitches and passed balls",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.13"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.14",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_14",
+   "title": "Rule 9.14 — Base on balls",
+   "aliases": [
+    "9.14 Base on balls",
+    "Base on balls"
+   ],
+   "language": "en",
+   "summary": "A walk is credited when a batter receives four pitches outside the strike zone; an intentional walk may be signalled without pitching.",
+   "structured_payload": {
+    "rule_reference": "9.14",
+    "rule_title": "Base on balls",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.14"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.15",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_15",
+   "title": "Rule 9.15 — Strikeouts",
+   "aliases": [
+    "9.15 Strikeouts",
+    "Strikeouts"
+   ],
+   "language": "en",
+   "summary": "A strikeout is credited to the pitcher for a third strike, whether swinging, looking or on a foul bunt.",
+   "structured_payload": {
+    "rule_reference": "9.15",
+    "rule_title": "Strikeouts",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.15"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.16",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_16",
+   "title": "Rule 9.16 — Earned runs and runs allowed",
+   "aliases": [
+    "9.16 Earned runs and runs allowed",
+    "Earned runs and runs allowed"
+   ],
+   "language": "en",
+   "summary": "An earned run is one that scores without the aid of an error or passed ball; the rule reconstructs the inning to determine earned runs.",
+   "structured_payload": {
+    "rule_reference": "9.16",
+    "rule_title": "Earned runs and runs allowed",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.16"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.17",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_17",
+   "title": "Rule 9.17 — Winning and losing pitcher",
+   "aliases": [
+    "9.17 Winning and losing pitcher",
+    "Winning and losing pitcher"
+   ],
+   "language": "en",
+   "summary": "Sets how the winning and losing pitchers are determined, including the starter's five-inning requirement.",
+   "structured_payload": {
+    "rule_reference": "9.17",
+    "rule_title": "Winning and losing pitcher",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.17"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.18",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_18",
+   "title": "Rule 9.18 — Shutouts",
+   "aliases": [
+    "9.18 Shutouts",
+    "Shutouts"
+   ],
+   "language": "en",
+   "summary": "A shutout is credited when a pitcher pitches a complete game without allowing a run.",
+   "structured_payload": {
+    "rule_reference": "9.18",
+    "rule_title": "Shutouts",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.18"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.19",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_19",
+   "title": "Rule 9.19 — Saves for relief pitchers",
+   "aliases": [
+    "9.19 Saves for relief pitchers",
+    "Saves for relief pitchers"
+   ],
+   "language": "en",
+   "summary": "A save is credited to a finishing reliever who protects a lead under the specified criteria.",
+   "structured_payload": {
+    "rule_reference": "9.19",
+    "rule_title": "Saves for relief pitchers",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.19"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.20",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_20",
+   "title": "Rule 9.20 — Statistics",
+   "aliases": [
+    "9.20 Statistics",
+    "Statistics"
+   ],
+   "language": "en",
+   "summary": "General requirements for compiling and reporting official statistics.",
+   "structured_payload": {
+    "rule_reference": "9.20",
+    "rule_title": "Statistics",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.20"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.21",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_21",
+   "title": "Rule 9.21 — Determining percentage records",
+   "aliases": [
+    "9.21 Determining percentage records",
+    "Determining percentage records"
+   ],
+   "language": "en",
+   "summary": "How batting, fielding, pitching and winning percentages are computed.",
+   "structured_payload": {
+    "rule_reference": "9.21",
+    "rule_title": "Determining percentage records",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.21"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.22",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_22",
+   "title": "Rule 9.22 — Minimum standards for individual championships",
+   "aliases": [
+    "9.22 Minimum standards for individual championships",
+    "Minimum standards for individual championships"
+   ],
+   "language": "en",
+   "summary": "Minimum plate appearances, innings pitched and games played required to qualify for season championships; typically 3.1 plate appearances per team game and 1 inning pitched per team game.",
+   "structured_payload": {
+    "rule_reference": "9.22",
+    "rule_title": "Minimum standards for individual championships",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.22"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE:9.23",
+   "knowledge_type": "RULE",
+   "canonical_key": "rule_9_23",
+   "title": "Rule 9.23 — Guidelines for cumulative performance records",
+   "aliases": [
+    "9.23 Guidelines for cumulative performance records",
+    "Guidelines for cumulative performance records"
+   ],
+   "language": "en",
+   "summary": "Guidelines for cumulative records and how plays are recorded.",
+   "structured_payload": {
+    "rule_reference": "9.23",
+    "rule_title": "Guidelines for cumulative performance records",
+    "key_points": [],
+    "level": "rule",
+    "edition": 2026
+   },
+   "entity_refs": [
+    "RULE:9.23"
+   ],
+   "tags": [
+    "obr",
+    "rule",
+    "rule_major:9"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:balk",
+   "knowledge_type": "RULE",
+   "canonical_key": "balk",
+   "title": "Balk",
+   "aliases": [
+    "balk",
+    "投手犯规"
+   ],
+   "language": "en",
+   "summary": "An illegal act by the pitcher with one or more runners on base; all runners advance one base. It is a delayed dead ball unless the pitcher's illegal act is also a pitch that the batter hits and all runners advance at least one base.",
+   "structured_payload": {
+    "rule_reference": "6.02(a); Definitions of Terms",
+    "definition": "An illegal act by the pitcher with one or more runners on base; all runners advance one base. It is a delayed dead ball unless the pitcher's illegal act is also a pitch that the batter hits and all runners advance at least one base.",
+    "conditions": [
+     "at least one runner on base",
+     "an illegal act by the pitcher during a delivery or while on the rubber"
+    ],
+    "exceptions": [
+     "if the batter reaches first and all runners advance at least one base, the balk is ignored"
+    ],
+    "common_misconceptions": [
+     "a balk is not automatically called when a pitcher merely fakes a throw; the specific act matters",
+     "a balk requires runners; with no runners, some violations become an illegal pitch instead"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:balk"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "pitching",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:infield_fly",
+   "knowledge_type": "RULE",
+   "canonical_key": "infield_fly",
+   "title": "Infield Fly",
+   "aliases": [
+    "infield fly rule",
+    "内野高飞球"
+   ],
+   "language": "en",
+   "summary": "A fair fly ball (not a line drive or bunt) that can be caught by an infielder with ordinary effort when first and second, or first, second and third, are occupied with fewer than two out. The batter is out and the ball remains live; runners may advance at their own risk.",
+   "structured_payload": {
+    "rule_reference": "Definitions of Terms (Infield Fly); Rule 5.09",
+    "definition": "A fair fly ball (not a line drive or bunt) that can be caught by an infielder with ordinary effort when first and second, or first, second and third, are occupied with fewer than two out. The batter is out and the ball remains live; runners may advance at their own risk.",
+    "conditions": [
+     "fair fly ball",
+     "ordinary effort by an infielder",
+     "first and second occupied (or bases loaded)",
+     "fewer than two outs"
+    ],
+    "exceptions": [
+     "a bunt or a line drive is never an infield fly"
+    ],
+    "common_misconceptions": [
+     "the infield fly is not triggered by the fielder's position alone; it is about ordinary effort",
+     "the ball stays live; runners are not automatically awarded bases"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:infield_fly"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "batting",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:dropped_third_strike",
+   "knowledge_type": "RULE",
+   "canonical_key": "dropped_third_strike",
+   "title": "Dropped Third Strike",
+   "aliases": [
+    "dropped third strike",
+    "third strike not caught",
+    "不死三振"
+   ],
+   "language": "en",
+   "summary": "When strike three is not caught by the catcher, the batter may attempt to reach first base, unless first base is occupied with fewer than two out or the batter was put out by the third strike. The pitcher still receives credit for the strikeout.",
+   "structured_payload": {
+    "rule_reference": "5.09(a); 9.15",
+    "definition": "When strike three is not caught by the catcher, the batter may attempt to reach first base, unless first base is occupied with fewer than two out or the batter was put out by the third strike. The pitcher still receives credit for the strikeout.",
+    "conditions": [
+     "third strike not caught cleanly",
+     "first base unoccupied or two outs"
+    ],
+    "exceptions": [
+     "first base occupied with fewer than two outs: the batter is out immediately"
+    ],
+    "common_misconceptions": [
+     "the batter may run only when the third strike is not caught; a caught third strike ends the at-bat",
+     "the pitcher is credited with a strikeout even if the batter reaches base"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:dropped_third_strike"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "batting"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:force_play",
+   "knowledge_type": "RULE",
+   "canonical_key": "force_play",
+   "title": "Force Play",
+   "aliases": [
+    "force",
+    "封杀"
+   ],
+   "language": "en",
+   "summary": "A play in which a runner legally loses the right to occupy a base because the batter becomes a runner. The force is removed when the batter-runner is put out or a preceding runner is retired.",
+   "structured_payload": {
+    "rule_reference": "Definitions of Terms (Force Play); Rule 5.09",
+    "definition": "A play in which a runner legally loses the right to occupy a base because the batter becomes a runner. The force is removed when the batter-runner is put out or a preceding runner is retired.",
+    "conditions": [
+     "a runner is forced to advance because the batter becomes a runner"
+    ],
+    "exceptions": [
+     "the force is removed once the batter-runner is put out or the following runner is retired on the play"
+    ],
+    "common_misconceptions": [
+     "a force out is not the same as a tag out; once the force is removed the runner must be tagged",
+     "runs can score before a tag out after the force is removed"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:force_play"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "baserunning",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:tag_play",
+   "knowledge_type": "RULE",
+   "canonical_key": "tag_play",
+   "title": "Tag Play",
+   "aliases": [
+    "tag out",
+    "触杀"
+   ],
+   "language": "en",
+   "summary": "A play in which a fielder retires a runner by touching the runner with the ball securely held in the fielder's hand or glove. A tag is also used to retire a runner who is not forced.",
+   "structured_payload": {
+    "rule_reference": "Rule 5.09; Definitions of Terms",
+    "definition": "A play in which a fielder retires a runner by touching the runner with the ball securely held in the fielder's hand or glove. A tag is also used to retire a runner who is not forced.",
+    "conditions": [
+     "the fielder has secure possession of the ball and touches the runner"
+    ],
+    "exceptions": [
+     "a forced runner may be retired by touching the base instead of tagging"
+    ],
+    "common_misconceptions": [
+     "a fielder does not need to tag the base on a tag play",
+     "the ball must be held after the tag"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:tag_play"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "baserunning"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:appeal_play",
+   "knowledge_type": "RULE",
+   "canonical_key": "appeal_play",
+   "title": "Appeal Play",
+   "aliases": [
+    "appeal",
+    "申诉"
+   ],
+   "language": "en",
+   "summary": "A play in which a team asks the umpire to rule on a violation that is not automatically called, such as a runner failing to touch a base or leaving too soon on a caught fly. The appeal must be made before the next pitch or play.",
+   "structured_payload": {
+    "rule_reference": "5.09(c)",
+    "definition": "A play in which a team asks the umpire to rule on a violation that is not automatically called, such as a runner failing to touch a base or leaving too soon on a caught fly. The appeal must be made before the next pitch or play.",
+    "conditions": [
+     "the defending team appeals before the next pitch, play or attempted play"
+    ],
+    "exceptions": [
+     "an appeal may be made by tagging the runner or the base, depending on the violation"
+    ],
+    "common_misconceptions": [
+     "umpires do not call these violations on their own; the defense must appeal",
+     "a runner is not automatically out for missing a base unless appealed"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:appeal_play"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "baserunning",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:interference",
+   "knowledge_type": "RULE",
+   "canonical_key": "interference",
+   "title": "Interference",
+   "aliases": [
+    "interference",
+    "妨碍"
+   ],
+   "language": "en",
+   "summary": "An act that illegally impedes a fielder's attempt to make a play. Offensive interference is by the team at bat; defensive interference (catcher's interference) hinders the batter; umpire and spectator interference are also defined. Penalties depend on the type.",
+   "structured_payload": {
+    "rule_reference": "6.01; Definitions of Terms (Interference)",
+    "definition": "An act that illegally impedes a fielder's attempt to make a play. Offensive interference is by the team at bat; defensive interference (catcher's interference) hinders the batter; umpire and spectator interference are also defined. Penalties depend on the type.",
+    "conditions": [
+     "the act hinders, impedes or confuses a fielder or batter"
+    ],
+    "exceptions": [
+     "contact that is incidental to a legitimate play is not necessarily interference"
+    ],
+    "common_misconceptions": [
+     "interference and obstruction are different: interference is by the offense or spectator, obstruction by a fielder without the ball",
+     "a runner need not intend to interfere"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:interference"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:obstruction",
+   "knowledge_type": "RULE",
+   "canonical_key": "obstruction",
+   "title": "Obstruction",
+   "aliases": [
+    "obstruction",
+    "阻挡"
+   ],
+   "language": "en",
+   "summary": "The act of a fielder who, while not in possession of the ball and not in the act of fielding it, impedes the progress of any runner. The penalty is a delayed dead ball and the umpire awards bases to nullify the obstruction.",
+   "structured_payload": {
+    "rule_reference": "6.01(h); Definitions of Terms (Obstruction)",
+    "definition": "The act of a fielder who, while not in possession of the ball and not in the act of fielding it, impedes the progress of any runner. The penalty is a delayed dead ball and the umpire awards bases to nullify the obstruction.",
+    "conditions": [
+     "a fielder without the ball impedes a runner"
+    ],
+    "exceptions": [
+     "a fielder in the act of fielding the ball is not obstructing"
+    ],
+    "common_misconceptions": [
+     "obstruction is not called only for contact; impeding the runner's path is enough",
+     "the ball is usually delayed dead, not immediately dead"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:obstruction"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:fielder_right_of_way",
+   "knowledge_type": "RULE",
+   "canonical_key": "fielder_right_of_way",
+   "title": "Fielder Right of Way",
+   "aliases": [
+    "right of way"
+   ],
+   "language": "en",
+   "summary": "Fielders have the right of way on a batted ball they are attempting to field; a runner who interferes with a fielder making a play may be called out.",
+   "structured_payload": {
+    "rule_reference": "6.01(b)",
+    "definition": "Fielders have the right of way on a batted ball they are attempting to field; a runner who interferes with a fielder making a play may be called out.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:fielder_right_of_way"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:catcher_interference",
+   "knowledge_type": "RULE",
+   "canonical_key": "catcher_interference",
+   "title": "Catcher's Interference",
+   "aliases": [
+    "catcher interference",
+    "捕手妨碍打击"
+   ],
+   "language": "en",
+   "summary": "Defensive interference by the catcher that hinders or prevents the batter from hitting a pitch. The batter is awarded first base and other runners advance if forced, unless the batter reaches base and the offense prefers the play.",
+   "structured_payload": {
+    "rule_reference": "6.01(c)",
+    "definition": "Defensive interference by the catcher that hinders or prevents the batter from hitting a pitch. The batter is awarded first base and other runners advance if forced, unless the batter reaches base and the offense prefers the play.",
+    "conditions": [
+     "the catcher hinders the batter's swing or contact"
+    ],
+    "exceptions": [
+     "the offense may decline the award if the play is more advantageous"
+    ],
+    "common_misconceptions": [
+     "catcher's interference is a form of defensive interference",
+     "it awards first base even on a swing"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:catcher_interference"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:spectator_interference",
+   "knowledge_type": "RULE",
+   "canonical_key": "spectator_interference",
+   "title": "Spectator Interference",
+   "aliases": [],
+   "language": "en",
+   "summary": "Interference by a spectator (or an object thrown by a spectator) that hinders a player's attempt to make a play on a live ball. The 2026 edition clarifies its application to batted, thrown or pitched balls.",
+   "structured_payload": {
+    "rule_reference": "6.01(e)",
+    "definition": "Interference by a spectator (or an object thrown by a spectator) that hinders a player's attempt to make a play on a live ball. The 2026 edition clarifies its application to batted, thrown or pitched balls.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:spectator_interference"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:collisions_at_home_plate",
+   "knowledge_type": "RULE",
+   "canonical_key": "collisions_at_home_plate",
+   "title": "Collisions at Home Plate",
+   "aliases": [],
+   "language": "en",
+   "summary": "A runner may not deviate from the path to initiate contact with the catcher; the catcher without the ball may not block the runner's path to the plate. The 2026 edition clarifies appropriate set-up positions for catchers without the ball.",
+   "structured_payload": {
+    "rule_reference": "6.01(i)",
+    "definition": "A runner may not deviate from the path to initiate contact with the catcher; the catcher without the ball may not block the runner's path to the plate. The 2026 edition clarifies appropriate set-up positions for catchers without the ball.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:collisions_at_home_plate"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "safety"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:sliding_double_play",
+   "knowledge_type": "RULE",
+   "canonical_key": "sliding_double_play",
+   "title": "Sliding to Bases on Double-Play Attempts",
+   "aliases": [],
+   "language": "en",
+   "summary": "A runner sliding into a base on a double-play attempt must make a bona fide effort to reach the base and may not make contact above the knee or with a rolling block. Interference may be called and the double play completed.",
+   "structured_payload": {
+    "rule_reference": "6.01(j)",
+    "definition": "A runner sliding into a base on a double-play attempt must make a bona fide effort to reach the base and may not make contact above the knee or with a rolling block. Interference may be called and the double play completed.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:sliding_double_play"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "safety"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:foul_ball",
+   "knowledge_type": "RULE",
+   "canonical_key": "foul_ball",
+   "title": "Foul Ball",
+   "aliases": [
+    "foul",
+    "界外球"
+   ],
+   "language": "en",
+   "summary": "A batted ball that settles on foul territory between home and first or third, bounds past first or third base on or over foul territory, first falls on foul territory beyond first or third, or while on or over foul territory touches an umpire, player or foreign object. A foul fly is judged by the ball's position relative to the foul line.",
+   "structured_payload": {
+    "rule_reference": "Definitions of Terms (Foul Ball)",
+    "definition": "A batted ball that settles on foul territory between home and first or third, bounds past first or third base on or over foul territory, first falls on foul territory beyond first or third, or while on or over foul territory touches an umpire, player or foreign object. A foul fly is judged by the ball's position relative to the foul line.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [
+     "a ball that lands fair and rolls foul past the base is a fair ball",
+     "the fielder's position does not determine fair/foul"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:foul_ball"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:fair_ball",
+   "knowledge_type": "RULE",
+   "canonical_key": "fair_ball",
+   "title": "Fair Ball",
+   "aliases": [
+    "fair",
+    "界内球"
+   ],
+   "language": "en",
+   "summary": "A batted ball that settles on fair ground between home and first or third, is on or over fair territory when bounding past first or third, touches first/second/third base, first falls on fair territory on or beyond first or third, or passes out of the playing field in flight over fair territory.",
+   "structured_payload": {
+    "rule_reference": "Definitions of Terms (Fair Ball)",
+    "definition": "A batted ball that settles on fair ground between home and first or third, is on or over fair territory when bounding past first or third, touches first/second/third base, first falls on fair territory on or beyond first or third, or passes out of the playing field in flight over fair territory.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:fair_ball"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:catch",
+   "knowledge_type": "RULE",
+   "canonical_key": "catch",
+   "title": "Catch",
+   "aliases": [
+    "catch",
+    "接杀"
+   ],
+   "language": "en",
+   "summary": "The act of a fielder securing possession of a ball in flight in the hand or glove and holding it firmly, without using the cap, protector, pocket or uniform. It is not a catch if the fielder collides with a player or wall or falls and drops the ball, or if the ball strikes a runner or umpire before another fielder catches it.",
+   "structured_payload": {
+    "rule_reference": "Definitions of Terms (Catch)",
+    "definition": "The act of a fielder securing possession of a ball in flight in the hand or glove and holding it firmly, without using the cap, protector, pocket or uniform. It is not a catch if the fielder collides with a player or wall or falls and drops the ball, or if the ball strikes a runner or umpire before another fielder catches it.",
+    "conditions": [
+     "secure possession",
+     "the ball is in flight",
+     "the fielder holds it after contact with the ground or a wall"
+    ],
+    "exceptions": [
+     "a ball held only briefly and dropped on transfer is not a catch in some scoring contexts"
+    ],
+    "common_misconceptions": [
+     "a catch requires control long enough to prove the fielder has the ball, not a fixed number of steps",
+     "a fielder who goes to the ground must hold the ball after landing"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:catch"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "fielding",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:check_swing",
+   "knowledge_type": "RULE",
+   "canonical_key": "check_swing",
+   "title": "Check Swing",
+   "aliases": [],
+   "language": "en",
+   "summary": "A batter's attempt to stop a swing. The plate umpire may ask a base umpire for help; the appeal is to the base umpire's judgment of whether the batter struck at the pitch. Rule 5.04 provides guidance for the official check-swing review.",
+   "structured_payload": {
+    "rule_reference": "5.04",
+    "definition": "A batter's attempt to stop a swing. The plate umpire may ask a base umpire for help; the appeal is to the base umpire's judgment of whether the batter struck at the pitch. Rule 5.04 provides guidance for the official check-swing review.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:check_swing"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "batting"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:dead_ball",
+   "knowledge_type": "RULE",
+   "canonical_key": "dead_ball",
+   "title": "Dead Ball",
+   "aliases": [
+    "dead ball",
+    "死球"
+   ],
+   "language": "en",
+   "summary": "A ball out of play because of a legally created temporary suspension of play. Runners may not advance, be put out or score while the ball is dead, and the umpire calls 'Time'.",
+   "structured_payload": {
+    "rule_reference": "5.12; Definitions of Terms (Dead Ball)",
+    "definition": "A ball out of play because of a legally created temporary suspension of play. Runners may not advance, be put out or score while the ball is dead, and the umpire calls 'Time'.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [
+     "a dead ball is not the same as a foul ball; fouls are one cause of a dead ball"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:dead_ball"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:live_ball",
+   "knowledge_type": "RULE",
+   "canonical_key": "live_ball",
+   "title": "Live Ball",
+   "aliases": [
+    "live ball",
+    "活球"
+   ],
+   "language": "en",
+   "summary": "A ball in play when the umpire has not called 'Time'. Runners may advance and be put out, and runs may score.",
+   "structured_payload": {
+    "rule_reference": "5.12",
+    "definition": "A ball in play when the umpire has not called 'Time'. Runners may advance and be put out, and runs may score.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:live_ball"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:base_award",
+   "knowledge_type": "RULE",
+   "canonical_key": "base_award",
+   "title": "Base Award",
+   "aliases": [],
+   "language": "en",
+   "summary": "The number of bases the umpire awards to runners and the batter when the ball goes out of play or when a play is nullified. Awards are generally one, two, three or four bases depending on the situation.",
+   "structured_payload": {
+    "rule_reference": "5.06; 5.09",
+    "definition": "The number of bases the umpire awards to runners and the batter when the ball goes out of play or when a play is nullified. Awards are generally one, two, three or four bases depending on the situation.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:base_award"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:runner_abandonment",
+   "knowledge_type": "RULE",
+   "canonical_key": "runner_abandonment",
+   "title": "Runner Abandonment",
+   "aliases": [
+    "abandonment"
+   ],
+   "language": "en",
+   "summary": "A runner who abandons the base path and does not attempt to advance or return may be called out when the ball is put back in play and the defense appeals.",
+   "structured_payload": {
+    "rule_reference": "5.09(b)",
+    "definition": "A runner who abandons the base path and does not attempt to advance or return may be called out when the ball is put back in play and the defense appeals.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:runner_abandonment"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "baserunning"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:batting_out_of_turn",
+   "knowledge_type": "RULE",
+   "canonical_key": "batting_out_of_turn",
+   "title": "Batting Out of Turn",
+   "aliases": [
+    "batting out of order",
+    "batting out of turn"
+   ],
+   "language": "en",
+   "summary": "When a player bats out of order, the opposing manager may appeal; the proper batter is out and the intervening action may be nullified depending on when the appeal is made.",
+   "structured_payload": {
+    "rule_reference": "6.03(b)",
+    "definition": "When a player bats out of order, the opposing manager may appeal; the proper batter is out and the intervening action may be nullified depending on when the appeal is made.",
+    "conditions": [
+     "the defense appeals before the improper batter's turn is completed and before a pitch to the next batter"
+    ],
+    "exceptions": [
+     "if the improper batter reaches base and no appeal is made before the next pitch, the improper batter becomes the proper batter"
+    ],
+    "common_misconceptions": [
+     "umpires do not call batting out of turn automatically; the defense must appeal",
+     "the wrong batter is not always the one called out; the proper batter is"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:batting_out_of_turn"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "batting",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:designated_hitter",
+   "knowledge_type": "RULE",
+   "canonical_key": "designated_hitter",
+   "title": "Designated Hitter",
+   "aliases": [
+    "DH",
+    "指定打击"
+   ],
+   "language": "en",
+   "summary": "A player who bats in place of the pitcher without playing a position. The DH is a starting player; if the DH enters the field to play defense, the team loses the DH and the pitcher must bat in that lineup spot.",
+   "structured_payload": {
+    "rule_reference": "5.11",
+    "definition": "A player who bats in place of the pitcher without playing a position. The DH is a starting player; if the DH enters the field to play defense, the team loses the DH and the pitcher must bat in that lineup spot.",
+    "conditions": [
+     "the DH is listed on the lineup card and bats for the pitcher"
+    ],
+    "exceptions": [
+     "a two-way player may be designated differently under league rules"
+    ],
+    "common_misconceptions": [
+     "the DH and the pitcher are not separate lineup slots once the DH is removed",
+     "the DH rule is now universal across both leagues"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:designated_hitter"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:pitch_timer",
+   "knowledge_type": "RULE",
+   "canonical_key": "pitch_timer",
+   "title": "Pitch Timer",
+   "aliases": [
+    "pitch clock",
+    "投球计时器"
+   ],
+   "language": "en",
+   "summary": "A competition rule requiring the pitcher to begin the delivery within a set time (15 seconds with the bases empty, 18 seconds with runners on) and the batter to be in the box on time, enforced by the umpire with balls or strikes.",
+   "structured_payload": {
+    "rule_reference": "MLB competition rule (playing rules adopted via the Competition Committee); see 5.07(c) for pitcher delays",
+    "definition": "A competition rule requiring the pitcher to begin the delivery within a set time (15 seconds with the bases empty, 18 seconds with runners on) and the batter to be in the box on time, enforced by the umpire with balls or strikes.",
+    "conditions": [
+     "the timer resets on specified events such as a pickoff attempt or a time-out"
+    ],
+    "exceptions": [],
+    "common_misconceptions": [
+     "the timer is not part of the historical rulebook numbering; it is a competition rule with effective dates"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:pitch_timer"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "competition",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:mound_visit",
+   "knowledge_type": "RULE",
+   "canonical_key": "mound_visit",
+   "title": "Mound Visit",
+   "aliases": [
+    "mound visits",
+    "投手丘访问"
+   ],
+   "language": "en",
+   "summary": "A visit by a manager, coach or player to the pitcher on the mound. Each team is allowed a limited number of visits through nine innings, with one additional visit for each extra inning; the 2026 edition updates the number allowed.",
+   "structured_payload": {
+    "rule_reference": "5.10",
+    "definition": "A visit by a manager, coach or player to the pitcher on the mound. Each team is allowed a limited number of visits through nine innings, with one additional visit for each extra inning; the 2026 edition updates the number allowed.",
+    "conditions": [
+     "a visit by a manager, coach or player to the mound"
+    ],
+    "exceptions": [
+     "a visit to replace a pitcher does not count against the limit in specified circumstances"
+    ],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:mound_visit"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:three_batter_minimum",
+   "knowledge_type": "RULE",
+   "canonical_key": "three_batter_minimum",
+   "title": "Three-Batter Minimum",
+   "aliases": [
+    "three-batter rule",
+    "三人打者规则"
+   ],
+   "language": "en",
+   "summary": "A relief pitcher must pitch to at least three batters or until the half-inning ends, unless injured or ill. The 2026 edition outlines the principles for determining whether the requirement has been met.",
+   "structured_payload": {
+    "rule_reference": "5.10(g)",
+    "definition": "A relief pitcher must pitch to at least three batters or until the half-inning ends, unless injured or ill. The 2026 edition outlines the principles for determining whether the requirement has been met.",
+    "conditions": [
+     "a reliever enters the game"
+    ],
+    "exceptions": [
+     "injury or illness",
+     "the half-inning ends before three batters"
+    ],
+    "common_misconceptions": [
+     "the rule counts batters faced, not outs recorded"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:three_batter_minimum"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:extra_inning_runner",
+   "knowledge_type": "RULE",
+   "canonical_key": "extra_inning_runner",
+   "title": "Extra-Inning Automatic Runner",
+   "aliases": [
+    "ghost runner",
+    "automatic runner",
+    "延长赛跑者"
+   ],
+   "language": "en",
+   "summary": "In regular-season extra innings, a runner (the player who made the last out of the previous inning, or a substitute) is placed on second base to begin each half-inning. This is a competition rule, not part of the numbered playing rules.",
+   "structured_payload": {
+    "rule_reference": "MLB competition rule; not in the numbered OBR playing rules",
+    "definition": "In regular-season extra innings, a runner (the player who made the last out of the previous inning, or a substitute) is placed on second base to begin each half-inning. This is a competition rule, not part of the numbered playing rules.",
+    "conditions": [
+     "regular-season game tied after nine innings"
+    ],
+    "exceptions": [
+     "the rule does not apply in the postseason, which plays standard extra innings"
+    ],
+    "common_misconceptions": [
+     "the automatic runner is not a 'ghost runner' and is charged as a real runner for scoring",
+     "the rule has an effective date and has changed since introduction"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:extra_inning_runner"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "competition",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:substitution",
+   "knowledge_type": "RULE",
+   "canonical_key": "substitution",
+   "title": "Substitution",
+   "aliases": [
+    "substitution",
+    "换人"
+   ],
+   "language": "en",
+   "summary": "A team may substitute players when the ball is dead. A substitute must report to the umpire and enter the game in the proper lineup position; an improper substitution may be penalised. The 2026 edition outlines specifics for improper substitutions.",
+   "structured_payload": {
+    "rule_reference": "5.10",
+    "definition": "A team may substitute players when the ball is dead. A substitute must report to the umpire and enter the game in the proper lineup position; an improper substitution may be penalised. The 2026 edition outlines specifics for improper substitutions.",
+    "conditions": [
+     "the ball is dead",
+     "the substitute reports to the umpire"
+    ],
+    "exceptions": [],
+    "common_misconceptions": [
+     "a player removed from the game generally may not re-enter"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:substitution"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:re_entry",
+   "knowledge_type": "RULE",
+   "canonical_key": "re_entry",
+   "title": "Re-Entry",
+   "aliases": [
+    "re-entry rule"
+   ],
+   "language": "en",
+   "summary": "Under MLB rules a player who has been removed from the game may not re-enter, with limited exceptions (such as a courtesy runner or a player returning from the injured list in a suspended game).",
+   "structured_payload": {
+    "rule_reference": "5.10",
+    "definition": "Under MLB rules a player who has been removed from the game may not re-enter, with limited exceptions (such as a courtesy runner or a player returning from the injured list in a suspended game).",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [
+     "MLB does not allow general re-entry; that is a feature of some amateur codes"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:re_entry"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:position_player_pitching",
+   "knowledge_type": "RULE",
+   "canonical_key": "position_player_pitching",
+   "title": "Position Player Pitching",
+   "aliases": [
+    "position player pitching",
+    "野手登板"
+   ],
+   "language": "en",
+   "summary": "A competition rule restricting when a position player may pitch. It was introduced in 2020 and tightened in 2023 to limit position-player pitching to games that are not close, with an exception for extra innings.",
+   "structured_payload": {
+    "rule_reference": "MLB competition rule (playing rules adopted via the Competition Committee)",
+    "definition": "A competition rule restricting when a position player may pitch. It was introduced in 2020 and tightened in 2023 to limit position-player pitching to games that are not close, with an exception for extra innings.",
+    "conditions": [
+     "typically allowed only when a team is trailing or leading by a large margin, or in extra innings"
+    ],
+    "exceptions": [],
+    "common_misconceptions": [
+     "this is a competition rule with effective dates, not a numbered playing rule"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:position_player_pitching"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "competition",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:illegal_pitch",
+   "knowledge_type": "RULE",
+   "canonical_key": "illegal_pitch",
+   "title": "Illegal Pitch",
+   "aliases": [
+    "illegal pitch",
+    "违规投球"
+   ],
+   "language": "en",
+   "summary": "A pitch delivered while the pitcher is not legally set or that violates a pitching prohibition, such as a quick pitch. With no runners, the penalty is a ball; with runners, it may be a balk.",
+   "structured_payload": {
+    "rule_reference": "6.02(b), 6.02(c)",
+    "definition": "A pitch delivered while the pitcher is not legally set or that violates a pitching prohibition, such as a quick pitch. With no runners, the penalty is a ball; with runners, it may be a balk.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:illegal_pitch"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:quick_pitch",
+   "knowledge_type": "RULE",
+   "canonical_key": "quick_pitch",
+   "title": "Quick Pitch",
+   "aliases": [
+    "quick pitch"
+   ],
+   "language": "en",
+   "summary": "A pitch delivered before the batter is reasonably set. It is a prohibited pitching action; the penalty is a ball with no runners and a balk with runners.",
+   "structured_payload": {
+    "rule_reference": "6.02(c)",
+    "definition": "A pitch delivered before the batter is reasonably set. It is a prohibited pitching action; the penalty is a ball with no runners and a balk with runners.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:quick_pitch"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:hit_by_pitch",
+   "knowledge_type": "RULE",
+   "canonical_key": "hit_by_pitch",
+   "title": "Hit by Pitch",
+   "aliases": [
+    "HBP",
+    "触身球"
+   ],
+   "language": "en",
+   "summary": "A batter is awarded first base when a pitch hits the batter, unless the batter swung, the ball is in the strike zone, or the batter did not attempt to avoid the pitch in the umpire's judgment.",
+   "structured_payload": {
+    "rule_reference": "5.05(b)",
+    "definition": "A batter is awarded first base when a pitch hits the batter, unless the batter swung, the ball is in the strike zone, or the batter did not attempt to avoid the pitch in the umpire's judgment.",
+    "conditions": [
+     "the pitch hits the batter",
+     "the batter attempts to avoid it"
+    ],
+    "exceptions": [
+     "the batter is not awarded first if the pitch is in the strike zone and the batter swings or offers"
+    ],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:hit_by_pitch"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "batting",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:intentional_walk",
+   "knowledge_type": "RULE",
+   "canonical_key": "intentional_walk",
+   "title": "Intentional Walk",
+   "aliases": [
+    "IBB",
+    "故意四坏球"
+   ],
+   "language": "en",
+   "summary": "A walk granted deliberately. Under current rules a team may signal an intentional walk and the batter is awarded first base without pitches being thrown; the official scorer still credits a base on balls.",
+   "structured_payload": {
+    "rule_reference": "5.05(b); 9.14(b)",
+    "definition": "A walk granted deliberately. Under current rules a team may signal an intentional walk and the batter is awarded first base without pitches being thrown; the official scorer still credits a base on balls.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:intentional_walk"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "batting"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:courtesy_runner",
+   "knowledge_type": "RULE",
+   "canonical_key": "courtesy_runner",
+   "title": "Courtesy Runner",
+   "aliases": [],
+   "language": "en",
+   "summary": "A runner who may be used in specified circumstances (for example for a catcher or pitcher) without counting as a substitution. Availability is limited and defined by rule.",
+   "structured_payload": {
+    "rule_reference": "5.10",
+    "definition": "A runner who may be used in specified circumstances (for example for a catcher or pitcher) without counting as a substitution. Availability is limited and defined by rule.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:courtesy_runner"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:suspended_game",
+   "knowledge_type": "RULE",
+   "canonical_key": "suspended_game",
+   "title": "Suspended Game",
+   "aliases": [
+    "suspended game",
+    "保留比赛"
+   ],
+   "language": "en",
+   "summary": "A game halted before it becomes regulation or in specified circumstances is suspended and resumed from the point of suspension, rather than being replayed from the start.",
+   "structured_payload": {
+    "rule_reference": "7.02",
+    "definition": "A game halted before it becomes regulation or in specified circumstances is suspended and resumed from the point of suspension, rather than being replayed from the start.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:suspended_game"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:protest",
+   "knowledge_type": "RULE",
+   "canonical_key": "protest",
+   "title": "Protested Game",
+   "aliases": [
+    "protest",
+    "抗议"
+   ],
+   "language": "en",
+   "summary": "A manager may protest a game when the manager believes the umpires misapplied a rule (not a judgment call). The protest is decided by the league office; play usually continues under protest.",
+   "structured_payload": {
+    "rule_reference": "7.04",
+    "definition": "A manager may protest a game when the manager believes the umpires misapplied a rule (not a judgment call). The protest is decided by the league office; play usually continues under protest.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:protest"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:forfeit",
+   "knowledge_type": "RULE",
+   "canonical_key": "forfeit",
+   "title": "Forfeited Game",
+   "aliases": [
+    "forfeit",
+    "没收比赛"
+   ],
+   "language": "en",
+   "summary": "A game awarded to the opposing team, recorded as 9-0, when a team violates specified rules such as refusing to play or failing to provide a full team.",
+   "structured_payload": {
+    "rule_reference": "7.03",
+    "definition": "A game awarded to the opposing team, recorded as 9-0, when a team violates specified rules such as refusing to play or failing to provide a full team.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:forfeit"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:regulation_game",
+   "knowledge_type": "RULE",
+   "canonical_key": "regulation_game",
+   "title": "Regulation Game",
+   "aliases": [
+    "regulation game"
+   ],
+   "language": "en",
+   "summary": "A game becomes regulation when the losing team has completed five turns at bat, or after four and a half innings if the home team is ahead. Rain-shortened regulation games can be official.",
+   "structured_payload": {
+    "rule_reference": "7.01",
+    "definition": "A game becomes regulation when the losing team has completed five turns at bat, or after four and a half innings if the home team is ahead. Rain-shortened regulation games can be official.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:regulation_game"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:walk_off",
+   "knowledge_type": "RULE",
+   "canonical_key": "walk_off",
+   "title": "Walk-Off",
+   "aliases": [
+    "walk-off",
+    "再见安打"
+   ],
+   "language": "en",
+   "summary": "A game-ending play in which the home team takes the lead in its final at-bat; the run counts immediately and the game ends. The term is descriptive, not a separate rule.",
+   "structured_payload": {
+    "rule_reference": "5.08; 7.01",
+    "definition": "A game-ending play in which the home team takes the lead in its final at-bat; the run counts immediately and the game ends. The term is descriptive, not a separate rule.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:walk_off"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:strike_zone",
+   "knowledge_type": "RULE",
+   "canonical_key": "strike_zone",
+   "title": "Strike Zone",
+   "aliases": [
+    "strike zone",
+    "好球带"
+   ],
+   "language": "en",
+   "summary": "The area over home plate the upper boundary of which is the midpoint between the top of the shoulders and the top of the uniform pants and the lower boundary is the hollow beneath the kneecap. It is defined in the Definitions of Terms and shown in Appendix 5.",
+   "structured_payload": {
+    "rule_reference": "Definitions of Terms (Strike Zone); Appendix 5",
+    "definition": "The area over home plate the upper boundary of which is the midpoint between the top of the shoulders and the top of the uniform pants and the lower boundary is the hollow beneath the kneecap. It is defined in the Definitions of Terms and shown in Appendix 5.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [
+     "the strike zone is not a fixed rectangle in inches; it is proportional to the batter",
+     "the ball is judged as it crosses the plate, not where it is caught"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:strike_zone"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "rules",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:illegal_bat",
+   "knowledge_type": "RULE",
+   "canonical_key": "illegal_bat",
+   "title": "Illegal Bat",
+   "aliases": [],
+   "language": "en",
+   "summary": "A bat that does not meet the rule's material, dimension or modification requirements. Using an illegal bat subjects the batter to being called out and possible ejection, and may nullify the play.",
+   "structured_payload": {
+    "rule_reference": "3.02",
+    "definition": "A bat that does not meet the rule's material, dimension or modification requirements. Using an illegal bat subjects the batter to being called out and possible ejection, and may nullify the play.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:illegal_bat"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "equipment"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:foreign_substance",
+   "knowledge_type": "RULE",
+   "canonical_key": "foreign_substance",
+   "title": "Foreign Substance / Pitching Prohibitions",
+   "aliases": [
+    "spitball",
+    "foreign substance"
+   ],
+   "language": "en",
+   "summary": "A pitcher may not apply a foreign substance to the ball or his person, deface the ball, or deliver a spitball. The 2026 edition groups these under pitching prohibitions, with ejection and suspension consequences.",
+   "structured_payload": {
+    "rule_reference": "6.02(c)",
+    "definition": "A pitcher may not apply a foreign substance to the ball or his person, deface the ball, or deliver a spitball. The 2026 edition groups these under pitching prohibitions, with ejection and suspension consequences.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:foreign_substance"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "pitching",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:appeal_of_umpire_decision",
+   "knowledge_type": "RULE",
+   "canonical_key": "appeal_of_umpire_decision",
+   "title": "Appeal of an Umpire Decision",
+   "aliases": [
+    "appeal"
+   ],
+   "language": "en",
+   "summary": "A manager may ask an umpire to reconsider a decision only on a question of rule interpretation, not on a judgment call. In the modern game, replay review handles most correctable errors; the rule governs the on-field appeal.",
+   "structured_payload": {
+    "rule_reference": "8.02",
+    "definition": "A manager may ask an umpire to reconsider a decision only on a question of rule interpretation, not on a judgment call. In the modern game, replay review handles most correctable errors; the rule governs the on-field appeal.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:appeal_of_umpire_decision"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "umpiring"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:replay_review",
+   "knowledge_type": "RULE",
+   "canonical_key": "replay_review",
+   "title": "Replay Review",
+   "aliases": [
+    "replay",
+    "回放"
+   ],
+   "language": "en",
+   "summary": "A manager may challenge specified reviewable calls, and umpires may initiate review of certain calls; the Replay Official in New York decides. This is an MLB replay rule rather than a numbered OBR playing rule.",
+   "structured_payload": {
+    "rule_reference": "MLB replay regulations; see Rule 8.02 for on-field appeals",
+    "definition": "A manager may challenge specified reviewable calls, and umpires may initiate review of certain calls; the Replay Official in New York decides. This is an MLB replay rule rather than a numbered OBR playing rule.",
+    "conditions": [
+     "limited number of manager challenges per game",
+     "reviewable call categories"
+    ],
+    "exceptions": [],
+    "common_misconceptions": [
+     "not every call is reviewable",
+     "judgment calls such as balls and strikes are generally not reviewable"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:replay_review"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "umpiring",
+    "competition"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "RULE_CONCEPT:official_scoring_decisions",
+   "knowledge_type": "RULE",
+   "canonical_key": "official_scoring_decisions",
+   "title": "Official Scoring Judgment Calls",
+   "aliases": [
+    "official scoring"
+   ],
+   "language": "en",
+   "summary": "The official scorer decides between a hit and an error, a wild pitch and a passed ball, and whether a run is earned, applying the ordinary-effort standard. These decisions affect individual statistics and are reviewable by the league.",
+   "structured_payload": {
+    "rule_reference": "9.01-9.23",
+    "definition": "The official scorer decides between a hit and an error, a wild pitch and a passed ball, and whether a run is earned, applying the ordinary-effort standard. These decisions affect individual statistics and are reviewable by the league.",
+    "conditions": [],
+    "exceptions": [],
+    "common_misconceptions": [
+     "the scorer's decisions do not change the outcome of the game, only the statistics"
+    ],
+    "level": "concept"
+   },
+   "entity_refs": [
+    "RULE_CONCEPT:official_scoring_decisions"
+   ],
+   "tags": [
+    "obr",
+    "rule_concept",
+    "scoring"
+   ],
+   "source_refs": [
+    "mlb_official_rules"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:active_roster",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "active_roster",
+   "title": "Active Roster",
+   "aliases": [],
+   "language": "en",
+   "summary": "The players eligible to play in a given game, normally 26 players during the regular season (13 pitchers maximum under the current limits). The active roster size and pitcher limits are competition rules with effective dates.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "The players eligible to play in a given game, normally 26 players during the regular season (13 pitchers maximum under the current limits). The active roster size and pitcher limits are competition rules with effective dates.",
+    "effective_from_note": "26-man active roster since 2021; pitcher limits tightened in 2022-2023",
+    "size": 26,
+    "effective_note": "26-man active roster since 2021; pitcher limits tightened in 2022-2023"
+   },
+   "entity_refs": [
+    "TXN:active_roster"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:forty_man_roster",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "forty_man_roster",
+   "title": "40-Man Roster",
+   "aliases": [],
+   "language": "en",
+   "summary": "The club's protected player list, up to 40 players, from which the active roster and injured-list assignments are drawn. A player must be on the 40-man roster to be called up or to be protected from the Rule 5 Draft.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "The club's protected player list, up to 40 players, from which the active roster and injured-list assignments are drawn. A player must be on the 40-man roster to be called up or to be protected from the Rule 5 Draft.",
+    "effective_from_note": "",
+    "size": 40
+   },
+   "entity_refs": [
+    "TXN:forty_man_roster"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:expanded_roster",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "expanded_roster",
+   "title": "September Roster Expansion",
+   "aliases": [],
+   "language": "en",
+   "summary": "A limited expansion of the active roster for the final month of the regular season. The size and timing have changed repeatedly; treat the current number as an effective-dated competition rule.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "A limited expansion of the active roster for the final month of the regular season. The size and timing have changed repeatedly; treat the current number as an effective-dated competition rule.",
+    "effective_from_note": "September active-roster expansion; verify the current number for the season",
+    "effective_note": "September active-roster expansion; verify the current number for the season"
+   },
+   "entity_refs": [
+    "TXN:expanded_roster"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:minor_league_option",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "minor_league_option",
+   "title": "Minor-League Option",
+   "aliases": [],
+   "language": "en",
+   "summary": "Assigning a player on the 40-man roster to the minors. A player has three option years; an option may be used once per season. A player who has used all three option years is 'out of options' and must clear waivers to be sent down.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "Assigning a player on the 40-man roster to the minors. A player has three option years; an option may be used once per season. A player who has used all three option years is 'out of options' and must clear waivers to be sent down.",
+    "effective_from_note": "",
+    "option_years": 3
+   },
+   "entity_refs": [
+    "TXN:minor_league_option"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa",
+    "cot_contracts"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:out_of_options",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "out_of_options",
+   "title": "Out of Options",
+   "aliases": [],
+   "language": "en",
+   "summary": "A player who has exhausted all three minor-league option years. The club cannot send the player to the minors without first exposing him to waivers.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "A player who has exhausted all three minor-league option years. The club cannot send the player to the minors without first exposing him to waivers.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:out_of_options"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "cot_contracts"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:designated_for_assignment",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "designated_for_assignment",
+   "title": "Designated for Assignment (DFA)",
+   "aliases": [
+    "DFA",
+    "指定让渡"
+   ],
+   "language": "en",
+   "summary": "A roster move that immediately removes a player from the 40-man roster. The club then has seven days to trade, release, or outright the player to the minors (if the player clears waivers). The player is no longer on the 40-man roster during that window.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "A roster move that immediately removes a player from the 40-man roster. The club then has seven days to trade, release, or outright the player to the minors (if the player clears waivers). The player is no longer on the 40-man roster during that window.",
+    "effective_from_note": "",
+    "window_days": 7
+   },
+   "entity_refs": [
+    "TXN:designated_for_assignment"
+   ],
+   "tags": [
+    "transaction_rule",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:waivers",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "waivers",
+   "title": "Waivers",
+   "aliases": [],
+   "language": "en",
+   "summary": "A procedure that exposes a player to other clubs, usually for the purpose of an optional assignment or an outright assignment. Claim priority is determined by reverse order of the standings, with league preference rules.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "A procedure that exposes a player to other clubs, usually for the purpose of an optional assignment or an outright assignment. Claim priority is determined by reverse order of the standings, with league preference rules.",
+    "effective_from_note": "",
+    "claim_priority": "reverse standings order with league preference"
+   },
+   "entity_refs": [
+    "TXN:waivers"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:outright_assignment",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "outright_assignment",
+   "title": "Outright Assignment",
+   "aliases": [],
+   "language": "en",
+   "summary": "Sending a player who has cleared waivers from the 40-man roster to the minor leagues. A player with three years of service time or who has been previously outrighted may elect free agency instead.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "Sending a player who has cleared waivers from the 40-man roster to the minor leagues. A player with three years of service time or who has been previously outrighted may elect free agency instead.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:outright_assignment"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:release",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "release",
+   "title": "Release",
+   "aliases": [],
+   "language": "en",
+   "summary": "Terminating a player's contract and removing the player from the roster. The club remains responsible for the guaranteed money owed unless the contract provides otherwise.",
+   "structured_payload": {
+    "category": "contract",
+    "definition": "Terminating a player's contract and removing the player from the roster. The club remains responsible for the guaranteed money owed unless the contract provides otherwise.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:release"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "cot_contracts"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:trade",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "trade",
+   "title": "Trade",
+   "aliases": [],
+   "language": "en",
+   "summary": "A transfer of player contracts between clubs, subject to league approval, player consent in specified cases (such as no-trade rights), and the trade deadline. Players may also be traded for cash considerations or players to be named later.",
+   "structured_payload": {
+    "category": "transaction",
+    "definition": "A transfer of player contracts between clubs, subject to league approval, player consent in specified cases (such as no-trade rights), and the trade deadline. Players may also be traded for cash considerations or players to be named later.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:trade"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:trade_deadline",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "trade_deadline",
+   "title": "Trade Deadline",
+   "aliases": [],
+   "language": "en",
+   "summary": "The date after which clubs may not trade players who are on a major-league roster (with limited exceptions). The deadline is set each season by the league.",
+   "structured_payload": {
+    "category": "transaction",
+    "definition": "The date after which clubs may not trade players who are on a major-league roster (with limited exceptions). The deadline is set each season by the league.",
+    "effective_from_note": "",
+    "verify": "the exact date changes each season"
+   },
+   "entity_refs": [
+    "TXN:trade_deadline"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:rule_5_draft",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "rule_5_draft",
+   "title": "Rule 5 Draft",
+   "aliases": [
+    "Rule 5",
+    "规则五选秀"
+   ],
+   "language": "en",
+   "summary": "A December draft in which clubs may select an unprotected player from another club's 40-man roster. The selecting club pays a fee and must keep the player on its active roster (or injured list) for the full following season or offer the player back to the original club.",
+   "structured_payload": {
+    "category": "draft",
+    "definition": "A December draft in which clubs may select an unprotected player from another club's 40-man roster. The selecting club pays a fee and must keep the player on its active roster (or injured list) for the full following season or offer the player back to the original club.",
+    "effective_from_note": "",
+    "season": "December",
+    "return_rule": true
+   },
+   "entity_refs": [
+    "TXN:rule_5_draft"
+   ],
+   "tags": [
+    "transaction_rule",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:service_time",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "service_time",
+   "title": "Service Time",
+   "aliases": [
+    "service time",
+    "服务时间"
+   ],
+   "language": "en",
+   "summary": "The time a player spends on an active roster or the injured list, measured in days. Service time determines salary arbitration eligibility, free-agency eligibility, and other rights; a full season is 172 days for service-time purposes.",
+   "structured_payload": {
+    "category": "contract",
+    "definition": "The time a player spends on an active roster or the injured list, measured in days. Service time determines salary arbitration eligibility, free-agency eligibility, and other rights; a full season is 172 days for service-time purposes.",
+    "effective_from_note": "",
+    "full_season_days": 172
+   },
+   "entity_refs": [
+    "TXN:service_time"
+   ],
+   "tags": [
+    "transaction_rule",
+    "common"
+   ],
+   "source_refs": [
+    "mlbpa",
+    "cot_contracts"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:arbitration",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "arbitration",
+   "title": "Salary Arbitration",
+   "aliases": [],
+   "language": "en",
+   "summary": "A process in which eligible players (generally after three years of service time, plus 'Super Two' players) have their salary determined by an arbitrator choosing between the club's and player's figures. Arbitration eligibility and the Super Two threshold are CBA-sensitive.",
+   "structured_payload": {
+    "category": "contract",
+    "definition": "A process in which eligible players (generally after three years of service time, plus 'Super Two' players) have their salary determined by an arbitrator choosing between the club's and player's figures. Arbitration eligibility and the Super Two threshold are CBA-sensitive.",
+    "effective_from_note": "",
+    "super_two_note": "top portion of players between two and three years of service"
+   },
+   "entity_refs": [
+    "TXN:arbitration"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlbpa",
+    "cot_contracts"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:free_agency",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "free_agency",
+   "title": "Free Agency",
+   "aliases": [],
+   "language": "en",
+   "summary": "A player with at least six years of major-league service time whose contract has expired may negotiate with any club. Free agency is governed by the CBA and has effective dates.",
+   "structured_payload": {
+    "category": "contract",
+    "definition": "A player with at least six years of major-league service time whose contract has expired may negotiate with any club. Free agency is governed by the CBA and has effective dates.",
+    "effective_from_note": "",
+    "service_years": 6
+   },
+   "entity_refs": [
+    "TXN:free_agency"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlbpa",
+    "cot_contracts"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:qualifying_offer",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "qualifying_offer",
+   "title": "Qualifying Offer",
+   "aliases": [],
+   "language": "en",
+   "summary": "A one-year offer at a CBA-determined value that a club may make to an eligible departing free agent. If the player declines, the signing club may owe draft-pick compensation to the former club.",
+   "structured_payload": {
+    "category": "contract",
+    "definition": "A one-year offer at a CBA-determined value that a club may make to an eligible departing free agent. If the player declines, the signing club may owe draft-pick compensation to the former club.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:qualifying_offer"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlbpa",
+    "cot_contracts"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:minimum_salary",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "minimum_salary",
+   "title": "Minimum Salary",
+   "aliases": [],
+   "language": "en",
+   "summary": "The CBA sets a minimum major-league salary that increases in steps over the life of the agreement. The value is effective-dated, so the current number must not be assumed from an older CBA.",
+   "structured_payload": {
+    "category": "contract",
+    "definition": "The CBA sets a minimum major-league salary that increases in steps over the life of the agreement. The value is effective-dated, so the current number must not be assumed from an older CBA.",
+    "effective_from_note": "value changes by CBA year",
+    "effective_note": "value changes by CBA year"
+   },
+   "entity_refs": [
+    "TXN:minimum_salary"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlbpa",
+    "cot_contracts"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:competitive_balance_tax",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "competitive_balance_tax",
+   "title": "Competitive Balance Tax (Luxury Tax)",
+   "aliases": [
+    "CBT",
+    "luxury tax",
+    "竞争平衡税"
+   ],
+   "language": "en",
+   "summary": "A payroll threshold above which clubs pay a tax on excess payroll, with escalating rates for repeat offenders and additional penalties such as draft-pick losses. Thresholds and rates are CBA-specific and effective-dated.",
+   "structured_payload": {
+    "category": "contract",
+    "definition": "A payroll threshold above which clubs pay a tax on excess payroll, with escalating rates for repeat offenders and additional penalties such as draft-pick losses. Thresholds and rates are CBA-specific and effective-dated.",
+    "effective_from_note": "thresholds and tiers are set per CBA year",
+    "effective_note": "thresholds and tiers are set per CBA year"
+   },
+   "entity_refs": [
+    "TXN:competitive_balance_tax"
+   ],
+   "tags": [
+    "transaction_rule",
+    "common"
+   ],
+   "source_refs": [
+    "mlbpa",
+    "cot_contracts",
+    "spotrac"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:injured_list",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "injured_list",
+   "title": "Injured List (IL)",
+   "aliases": [
+    "IL",
+    "伤兵名单"
+   ],
+   "language": "en",
+   "summary": "A list for players unable to play because of injury or illness. The 10-day and 15-day IL apply to position players and pitchers respectively under current rules, and the 60-day IL removes a player from the 40-man roster.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "A list for players unable to play because of injury or illness. The 10-day and 15-day IL apply to position players and pitchers respectively under current rules, and the 60-day IL removes a player from the 40-man roster.",
+    "effective_from_note": "",
+    "variants": [
+     "10-day",
+     "15-day",
+     "60-day"
+    ]
+   },
+   "entity_refs": [
+    "TXN:injured_list"
+   ],
+   "tags": [
+    "transaction_rule",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:sixty_day_il",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "sixty_day_il",
+   "title": "60-Day Injured List",
+   "aliases": [],
+   "language": "en",
+   "summary": "An injured-list assignment of at least 60 days that also removes the player from the 40-man roster, opening a 40-man spot. The player must be reinstated or moved when eligible.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "An injured-list assignment of at least 60 days that also removes the player from the 40-man roster, opening a 40-man spot. The player must be reinstated or moved when eligible.",
+    "effective_from_note": "",
+    "days": 60
+   },
+   "entity_refs": [
+    "TXN:sixty_day_il"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:bereavement_list",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "bereavement_list",
+   "title": "Bereavement / Family Emergency List",
+   "aliases": [],
+   "language": "en",
+   "summary": "A leave list allowing a player to be away for a family death or medical emergency without losing service time or a roster spot in the usual way. Duration is specified by rule.",
+   "structured_payload": {
+    "category": "leave",
+    "definition": "A leave list allowing a player to be away for a family death or medical emergency without losing service time or a roster spot in the usual way. Duration is specified by rule.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:bereavement_list"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:paternity_list",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "paternity_list",
+   "title": "Paternity List",
+   "aliases": [],
+   "language": "en",
+   "summary": "A leave list allowing a player to be absent for the birth or adoption of a child, typically up to three days, with a replacement added to the active roster.",
+   "structured_payload": {
+    "category": "leave",
+    "definition": "A leave list allowing a player to be absent for the birth or adoption of a child, typically up to three days, with a replacement added to the active roster.",
+    "effective_from_note": "",
+    "days": 3
+   },
+   "entity_refs": [
+    "TXN:paternity_list"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:restricted_list",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "restricted_list",
+   "title": "Restricted List",
+   "aliases": [],
+   "language": "en",
+   "summary": "A list for players who are unavailable for reasons other than injury, such as a legal matter or a suspension pending resolution. The player does not count against the active roster.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "A list for players who are unavailable for reasons other than injury, such as a legal matter or a suspension pending resolution. The player does not count against the active roster.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:restricted_list"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:suspended_list",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "suspended_list",
+   "title": "Suspended List",
+   "aliases": [],
+   "language": "en",
+   "summary": "A list for players serving a suspension. The player may not play and does not count against the active roster for the duration of the suspension.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "A list for players serving a suspension. The player may not play and does not count against the active roster for the duration of the suspension.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:suspended_list"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:two_way_player",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "two_way_player",
+   "title": "Two-Way Player Designation",
+   "aliases": [
+    "two-way player",
+    "二刀流"
+   ],
+   "language": "en",
+   "summary": "A designation that allows a player who both pitches and hits to be treated differently from a position player for roster and substitution purposes. A player must meet specified thresholds (such as 20 innings pitched and 20 games started as a position player) in the prior season.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "A designation that allows a player who both pitches and hits to be treated differently from a position player for roster and substitution purposes. A player must meet specified thresholds (such as 20 innings pitched and 20 games started as a position player) in the prior season.",
+    "effective_from_note": "",
+    "thresholds": {
+     "innings_pitched": 20,
+     "games_as_position_player": 20
+    }
+   },
+   "entity_refs": [
+    "TXN:two_way_player"
+   ],
+   "tags": [
+    "transaction_rule",
+    "common"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:postseason_roster",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "postseason_roster",
+   "title": "Postseason Roster Eligibility",
+   "aliases": [],
+   "language": "en",
+   "summary": "Players must generally be in the organization by a specified date (historically August 31, now earlier) to be eligible for the postseason roster, with injury-replacement exceptions. The exact rule is set by the league.",
+   "structured_payload": {
+    "category": "postseason",
+    "definition": "Players must generally be in the organization by a specified date (historically August 31, now earlier) to be eligible for the postseason roster, with injury-replacement exceptions. The exact rule is set by the league.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:postseason_roster"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:draft_basics",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "draft_basics",
+   "title": "First-Year Player Draft",
+   "aliases": [],
+   "language": "en",
+   "summary": "The amateur draft assigns amateur players to clubs in reverse order of the previous season's standings, with competitive-balance and compensation picks. Draft order, bonus pools and signing rules are CBA-sensitive.",
+   "structured_payload": {
+    "category": "draft",
+    "definition": "The amateur draft assigns amateur players to clubs in reverse order of the previous season's standings, with competitive-balance and compensation picks. Draft order, bonus pools and signing rules are CBA-sensitive.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:draft_basics"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_pipeline",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:international_signing",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "international_signing",
+   "title": "International Signing Period",
+   "aliases": [],
+   "language": "en",
+   "summary": "Clubs sign amateur players from outside the United States, Canada and Puerto Rico during an international signing period, subject to a bonus pool that varies by club and CBA year.",
+   "structured_payload": {
+    "category": "draft",
+    "definition": "Clubs sign amateur players from outside the United States, Canada and Puerto Rico during an international signing period, subject to a bonus pool that varies by club and CBA year.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:international_signing"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_pipeline",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:posting_system",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "posting_system",
+   "title": "Posting System (NPB/KBO to MLB)",
+   "aliases": [
+    "posting",
+    "入札制度"
+   ],
+   "language": "en",
+   "summary": "A system allowing a major-league club to negotiate with a player under contract to a foreign professional league (notably NPB) after the player's club posts him. The fee and negotiation window are governed by the agreement between MLB and that league.",
+   "structured_payload": {
+    "category": "transaction",
+    "definition": "A system allowing a major-league club to negotiate with a player under contract to a foreign professional league (notably NPB) after the player's club posts him. The fee and negotiation window are governed by the agreement between MLB and that league.",
+    "effective_from_note": "",
+    "international": true
+   },
+   "entity_refs": [
+    "TXN:posting_system"
+   ],
+   "tags": [
+    "transaction_rule",
+    "international"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:option_assignment_rehab",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "option_assignment_rehab",
+   "title": "Rehab Assignment",
+   "aliases": [],
+   "language": "en",
+   "summary": "An injured-list player may be assigned to the minor leagues on a rehab assignment for a limited period (typically up to 20 days for position players and 30 days for pitchers) before being reinstated.",
+   "structured_payload": {
+    "category": "roster",
+    "definition": "An injured-list player may be assigned to the minor leagues on a rehab assignment for a limited period (typically up to 20 days for position players and 30 days for pitchers) before being reinstated.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:option_assignment_rehab"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlbpa"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:prospect_designation",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "prospect_designation",
+   "title": "Prospect Designation",
+   "aliases": [],
+   "language": "en",
+   "summary": "A minor-league player not on the 40-man roster who is regarded as a future contributor. Prospect status is editorial (Pipeline, Baseball America, FanGraphs), not an official roster category.",
+   "structured_payload": {
+    "category": "development",
+    "definition": "A minor-league player not on the 40-man roster who is regarded as a future contributor. Prospect status is editorial (Pipeline, Baseball America, FanGraphs), not an official roster category.",
+    "effective_from_note": "",
+    "editorial": true
+   },
+   "entity_refs": [
+    "TXN:prospect_designation"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "baseball_america",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:minor_league_levels",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "minor_league_levels",
+   "title": "Minor-League Levels",
+   "aliases": [],
+   "language": "en",
+   "summary": "The development ladder below MLB: Triple-A, Double-A, High-A, Single-A and the Rookie/complex leagues. Players are assigned by level as part of their development and evaluation.",
+   "structured_payload": {
+    "category": "development",
+    "definition": "The development ladder below MLB: Triple-A, Double-A, High-A, Single-A and the Rookie/complex leagues. Players are assigned by level as part of their development and evaluation.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:minor_league_levels"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_pipeline"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:competitive_balance_picks",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "competitive_balance_picks",
+   "title": "Competitive Balance Picks",
+   "aliases": [],
+   "language": "en",
+   "summary": "Additional draft picks awarded to clubs that rank in the bottom ten in revenue and in the top ten in market size, as defined by the CBA. Eligibility formulae are CBA-specific.",
+   "structured_payload": {
+    "category": "draft",
+    "definition": "Additional draft picks awarded to clubs that rank in the bottom ten in revenue and in the top ten in market size, as defined by the CBA. Eligibility formulae are CBA-specific.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:competitive_balance_picks"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlbpa",
+    "cot_contracts"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TXN:cba_termination",
+   "knowledge_type": "TRANSACTION_RULE",
+   "canonical_key": "cba_termination",
+   "title": "CBA and Rule Changes",
+   "aliases": [],
+   "language": "en",
+   "summary": "The Collective Bargaining Agreement between MLB and the MLBPA sets the economic and roster rules. CBA rules are effective-dated; a rule that was true in one agreement must not be applied to a season under a different agreement. Playing rules adopted through the Competition Committee carry their own effective dates.",
+   "structured_payload": {
+    "category": "governance",
+    "definition": "The Collective Bargaining Agreement between MLB and the MLBPA sets the economic and roster rules. CBA rules are effective-dated; a rule that was true in one agreement must not be applied to a season under a different agreement. Playing rules adopted through the Competition Committee carry their own effective dates.",
+    "effective_from_note": ""
+   },
+   "entity_refs": [
+    "TXN:cba_termination"
+   ],
+   "tags": [
+    "transaction_rule"
+   ],
+   "source_refs": [
+    "mlbpa",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "effective_to": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  }
+ ],
+ "relations": []
+}

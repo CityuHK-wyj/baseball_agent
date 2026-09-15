@@ -1,0 +1,563 @@
+{
+ "domain": "context",
+ "items": [
+  {
+   "knowledge_id": "LEAGUE_STRUCTURE:regular_season_structure",
+   "knowledge_type": "LEAGUE_STRUCTURE",
+   "canonical_key": "regular_season_structure",
+   "title": "Regular Season Structure",
+   "aliases": [
+    "162-game season"
+   ],
+   "language": "en",
+   "summary": "The regular season is 162 games per club; each club plays a mix of divisional, intra-league and interleague opponents, mostly in three-game series. The schedule and any scheduling changes are set each season.",
+   "structured_payload": {
+    "games_per_club": 162,
+    "format": "unbalanced divisional + intra-league + interleague",
+    "verify_current": true
+   },
+   "entity_refs": [
+    "LEAGUE_STRUCTURE:regular_season_structure"
+   ],
+   "tags": [
+    "context",
+    "league_structure"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "LEAGUE_STRUCTURE:postseason_structure",
+   "knowledge_type": "LEAGUE_STRUCTURE",
+   "canonical_key": "postseason_structure",
+   "title": "Postseason Structure",
+   "aliases": [
+    "playoffs",
+    "postseason format"
+   ],
+   "language": "en",
+   "summary": "Twelve clubs reach the postseason, six per league: the three division winners and three wild cards. The Wild Card Series is best-of-three hosted by the higher seed, the Division Series is best-of-five, and the League Championship Series and World Series are best-of-seven. The top two seeds in each league receive a bye to the Division Series.",
+   "structured_payload": {
+    "teams": 12,
+    "wild_card_series": "best-of-3",
+    "division_series": "best-of-5",
+    "championship_series": "best-of-7",
+    "world_series": "best-of-7",
+    "byes": "top two seeds per league",
+    "wild_card_round": 3,
+    "verify_current": true
+   },
+   "entity_refs": [
+    "LEAGUE_STRUCTURE:postseason_structure"
+   ],
+   "tags": [
+    "context",
+    "postseason"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "LEAGUE_STRUCTURE:postseason_seeding",
+   "knowledge_type": "LEAGUE_STRUCTURE",
+   "canonical_key": "postseason_seeding",
+   "title": "Postseason Seeding",
+   "aliases": [],
+   "language": "en",
+   "summary": "Seeds 1-3 are the division winners ordered by record; seeds 4-6 are the wild cards ordered by record. The higher seed hosts the Wild Card Series and has home-field advantage in later rounds; the better regular-season record decides World Series home-field advantage.",
+   "structured_payload": {
+    "seeding": "division winners 1-3, wild cards 4-6, by record",
+    "home_field": "better record, including the World Series",
+    "verify_current": true
+   },
+   "entity_refs": [
+    "LEAGUE_STRUCTURE:postseason_seeding"
+   ],
+   "tags": [
+    "context",
+    "postseason"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "LEAGUE_STRUCTURE:all_star_game",
+   "knowledge_type": "LEAGUE_STRUCTURE",
+   "canonical_key": "all_star_game",
+   "title": "All-Star Game",
+   "aliases": [
+    "Midsummer Classic"
+   ],
+   "language": "en",
+   "summary": "An annual midseason exhibition between American League and National League All-Stars, with rosters selected by fans, players and the Commissioner's Office. Since 2017 the result no longer decides World Series home-field advantage.",
+   "structured_payload": {
+    "when": "mid-July",
+    "home_field_stake": false,
+    "verify_current": true
+   },
+   "entity_refs": [
+    "LEAGUE_STRUCTURE:all_star_game"
+   ],
+   "tags": [
+    "context",
+    "league_structure"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "LEAGUE_STRUCTURE:spring_training",
+   "knowledge_type": "LEAGUE_STRUCTURE",
+   "canonical_key": "spring_training",
+   "title": "Spring Training",
+   "aliases": [],
+   "language": "en",
+   "summary": "Preseason camps in Arizona (Cactus League) and Florida (Grapefruit League) where clubs prepare for the season; games do not count in the standings.",
+   "structured_payload": {
+    "months": "February-March",
+    "leagues": [
+     "Cactus League",
+     "Grapefruit League"
+    ]
+   },
+   "entity_refs": [
+    "LEAGUE_STRUCTURE:spring_training"
+   ],
+   "tags": [
+    "context",
+    "league_structure"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "LEAGUE_STRUCTURE:winter_meetings",
+   "knowledge_type": "LEAGUE_STRUCTURE",
+   "canonical_key": "winter_meetings",
+   "title": "Winter Meetings",
+   "aliases": [],
+   "language": "en",
+   "summary": "An annual December gathering of club and league officials, traditionally hosting the Rule 5 Draft and a large share of offseason transactions.",
+   "structured_payload": {
+    "month": "December",
+    "includes": [
+     "Rule 5 Draft",
+     "trade activity"
+    ]
+   },
+   "entity_refs": [
+    "LEAGUE_STRUCTURE:winter_meetings"
+   ],
+   "tags": [
+    "context",
+    "league_structure"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "LEAGUE_STRUCTURE:international_play",
+   "knowledge_type": "LEAGUE_STRUCTURE",
+   "canonical_key": "international_play",
+   "title": "International Play",
+   "aliases": [
+    "WBC"
+   ],
+   "language": "en",
+   "summary": "The World Baseball Classic is a national-team tournament held roughly every three to four years in March, with players representing their countries; MLB clubs release eligible players for it. This is separate from the MLB season.",
+   "structured_payload": {
+    "event": "World Baseball Classic",
+    "cadence": "every 3-4 years",
+    "verify_current": true
+   },
+   "entity_refs": [
+    "LEAGUE_STRUCTURE:international_play"
+   ],
+   "tags": [
+    "context",
+    "international"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "HISTORICAL_CONTEXT:dead_ball_era",
+   "knowledge_type": "HISTORICAL_CONTEXT",
+   "canonical_key": "dead_ball_era",
+   "title": "Dead-Ball Era",
+   "aliases": [],
+   "language": "en",
+   "summary": "The period before about 1920 when scoring was low, home runs were rare and strategy emphasised bunts, steals and the hit-and-run. Balls were reused and often scuffed, suppressing power.",
+   "structured_payload": {
+    "approximate_range": "1900-1919",
+    "characteristics": [
+     "low scoring",
+     "few home runs",
+     "inside baseball"
+    ]
+   },
+   "entity_refs": [
+    "HISTORICAL_CONTEXT:dead_ball_era"
+   ],
+   "tags": [
+    "context",
+    "history"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "HISTORICAL_CONTEXT:live_ball_era",
+   "knowledge_type": "HISTORICAL_CONTEXT",
+   "canonical_key": "live_ball_era",
+   "title": "Live-Ball Era",
+   "aliases": [],
+   "language": "en",
+   "summary": "From about 1920, when a livelier ball and rules against defacing it, plus stars such as Babe Ruth, shifted the game toward power and higher scoring.",
+   "structured_payload": {
+    "approximate_range": "1920-1941",
+    "characteristics": [
+     "more home runs",
+     "higher scoring"
+    ]
+   },
+   "entity_refs": [
+    "HISTORICAL_CONTEXT:live_ball_era"
+   ],
+   "tags": [
+    "context",
+    "history"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "HISTORICAL_CONTEXT:integration_era",
+   "knowledge_type": "HISTORICAL_CONTEXT",
+   "canonical_key": "integration_era",
+   "title": "Integration Era",
+   "aliases": [],
+   "language": "en",
+   "summary": "Beginning with Jackie Robinson in 1947, MLB clubs gradually integrated, ending the colour line that had confined Black players to the Negro Leagues.",
+   "structured_payload": {
+    "start": 1947,
+    "characteristics": [
+     "integration",
+     "end of the colour line"
+    ]
+   },
+   "entity_refs": [
+    "HISTORICAL_CONTEXT:integration_era"
+   ],
+   "tags": [
+    "context",
+    "history",
+    "negro_leagues"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "HISTORICAL_CONTEXT:expansion_era",
+   "knowledge_type": "HISTORICAL_CONTEXT",
+   "canonical_key": "expansion_era",
+   "title": "Expansion Era",
+   "aliases": [],
+   "language": "en",
+   "summary": "A period of rapid franchise expansion and relocation from 1961 onward, including new clubs and the move of several franchises to the West and South.",
+   "structured_payload": {
+    "approximate_range": "1961-1976",
+    "characteristics": [
+     "new franchises",
+     "relocations"
+    ]
+   },
+   "entity_refs": [
+    "HISTORICAL_CONTEXT:expansion_era"
+   ],
+   "tags": [
+    "context",
+    "history",
+    "franchise"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "HISTORICAL_CONTEXT:free_agency_era",
+   "knowledge_type": "HISTORICAL_CONTEXT",
+   "canonical_key": "free_agency_era",
+   "title": "Free-Agency Era",
+   "aliases": [],
+   "language": "en",
+   "summary": "From 1976, after arbitration established player movement rights, players could become free agents after six years of major-league service, transforming salaries and roster building.",
+   "structured_payload": {
+    "start": 1976,
+    "characteristics": [
+     "free agency",
+     "rising salaries"
+    ]
+   },
+   "entity_refs": [
+    "HISTORICAL_CONTEXT:free_agency_era"
+   ],
+   "tags": [
+    "context",
+    "history",
+    "cba"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "HISTORICAL_CONTEXT:steroid_era",
+   "knowledge_type": "HISTORICAL_CONTEXT",
+   "canonical_key": "steroid_era",
+   "title": "Steroid Era",
+   "aliases": [],
+   "language": "en",
+   "summary": "The 1990s and 2000s, when performance-enhancing drug use was widespread before testing and penalties were introduced; it is central to debates about records and Hall of Fame eligibility.",
+   "structured_payload": {
+    "approximate_range": "1990s-2000s",
+    "characteristics": [
+     "PED use",
+     "power surge",
+     "records debate"
+    ]
+   },
+   "entity_refs": [
+    "HISTORICAL_CONTEXT:steroid_era"
+   ],
+   "tags": [
+    "context",
+    "history"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "HISTORICAL_CONTEXT:statcast_era",
+   "knowledge_type": "HISTORICAL_CONTEXT",
+   "canonical_key": "statcast_era",
+   "title": "Statcast Era",
+   "aliases": [],
+   "language": "en",
+   "summary": "From 2015, when MLB's tracking system began measuring every pitch and batted ball, enabling exit velocity, launch angle, spin and expected-stat metrics that reshaped evaluation.",
+   "structured_payload": {
+    "start": 2015,
+    "characteristics": [
+     "pitch tracking",
+     "batted-ball tracking",
+     "expected statistics"
+    ]
+   },
+   "entity_refs": [
+    "HISTORICAL_CONTEXT:statcast_era"
+   ],
+   "tags": [
+    "context",
+    "history",
+    "statcast"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "SEASONAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "HISTORICAL_CONTEXT:universal_dh_era",
+   "knowledge_type": "HISTORICAL_CONTEXT",
+   "canonical_key": "universal_dh_era",
+   "title": "Universal Designated Hitter Era",
+   "aliases": [],
+   "language": "en",
+   "summary": "From 2022 the designated hitter is used in both leagues; before that the NL required pitchers to bat. Comparisons across the boundary must account for the ruleset change.",
+   "structured_payload": {
+    "start": 2022,
+    "previous": "DH only in the American League before 2022",
+    "rule_reference": "5.11"
+   },
+   "entity_refs": [
+    "HISTORICAL_CONTEXT:universal_dh_era"
+   ],
+   "tags": [
+    "context",
+    "history",
+    "rules"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "OFFICIAL_RULES",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "HISTORICAL_CONTEXT:pitch_clock_era",
+   "knowledge_type": "HISTORICAL_CONTEXT",
+   "canonical_key": "pitch_clock_era",
+   "title": "Pitch-Clock Era",
+   "aliases": [],
+   "language": "en",
+   "summary": "From 2023 MLB enforced a pitch timer, pickoff limits and a shift restriction, changing pace of play and batted-ball outcomes. These are competition rules with effective dates.",
+   "structured_payload": {
+    "start": 2023,
+    "changes": [
+     "pitch timer",
+     "disengagement limits",
+     "shift restrictions"
+    ],
+    "verify_current": true
+   },
+   "entity_refs": [
+    "HISTORICAL_CONTEXT:pitch_clock_era"
+   ],
+   "tags": [
+    "context",
+    "history",
+    "rules"
+   ],
+   "source_refs": [
+    "mlb_official",
+    "mlb_official_rules",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "CBA",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  }
+ ],
+ "relations": []
+}

@@ -15,7 +15,7 @@ Status values:
 This file is maintained as implementation proceeds. It is the evidence for
 "which blog designs are actually implemented", not a wish list.
 
-Last reviewed on `gpt56/runtime-audit-hardening` at `5e84f01`; 254 tests pass.
+Integration base: runtime hardening `b68ccf7` + Shared Knowledge `7d44ef4`.
 Live PostgreSQL, DuckDB/Parquet, and web-provider integrations remain UNVERIFIED_LIVE.
 
 ## A. Core domain contracts (O001, D005, D013, D014, D036)
@@ -151,10 +151,31 @@ Live PostgreSQL, DuckDB/Parquet, and web-provider integrations remain UNVERIFIED
 | Schema Registry | IMPLEMENTED | `app/semantic/schema_registry.py` | `tests/test_schema_registry.py` | |
 | System State ≠ LLM Context (D017) | IMPLEMENTED | `ContextService` projections | `tests/context/` | |
 | Run-scoped isolation | IMPLEMENTED | `scope_run`/`run_id` | `tests/context/test_registry_and_isolation.py` | |
-| Entity Dictionary | MISSING | — | — | |
-| League/Reference context (D039) | MISSING | — | — | |
-| RAG knowledge base | MISSING | `app/semantic/schema_rag.py` placeholder | — | |
-| Context ranking/freshness policy (O006) | PARTIAL | freshness_rank only | `tests/context/test_context_service.py` | |
+| Entity Dictionary | IMPLEMENTED | `app/knowledge/entities.py` projection of the knowledge store | `tests/knowledge/test_knowledge_domains.py` | Knowledge is the single identity authority |
+| League/Reference context (D039) | IMPLEMENTED | `knowledge/seed/reference.json`, `knowledge/seed/rules.json` | `tests/knowledge/test_knowledge_domains.py` | Teams, divisions, leagues, ballparks, league structure |
+| RAG knowledge base | PARTIAL | structured store + token retrieval now; embeddings/vector DEFERRED | `tests/knowledge/` | Structured knowledge first; RAG is optional and never the truth source |
+| Context ranking/freshness policy (O006) | IMPLEMENTED | `app/knowledge/freshness.py`, `app/knowledge/retrieval.py`, `app/context/knowledge_source.py` | `tests/knowledge/` | Authority, entity, token, temporal, freshness and language terms |
+
+## K2. Shared Knowledge base (persistent domain knowledge)
+
+| Requirement | Status | Implementation | Tests | Notes |
+| --- | --- | --- | --- | --- |
+| Context infrastructure | IMPLEMENTED | `app/context/service.py`, `app/context/knowledge_source.py` | `tests/context/`, `tests/knowledge/` | `KNOWLEDGE` kind wired into the Orchestrator |
+| Persistent Knowledge Store | IMPLEMENTED | `app/knowledge/store.py` (SQLite dev + PostgreSQL `knowledge` schema), versioned items, relations, snapshots | `tests/knowledge/test_knowledge_store.py` | Physically separate from analytics and runtime tables |
+| Source Registry + authority ladder | IMPLEMENTED | `app/knowledge/registry.py`, `knowledge/sources/*.json` | `tests/knowledge/` | OFFICIAL > AUTHORITATIVE_REFERENCE > TRUSTED_ANALYTICS > TRUSTED_MEDIA > COMMUNITY > UNVERIFIED |
+| Provenance + freshness/versioning | IMPLEMENTED | item fields + `app/knowledge/freshness.py`; `knowledge_versions` history | `tests/knowledge/` | Every item answers why/where/when verified |
+| Official MLB Rules coverage | IMPLEMENTED | 2026 OBR structure 1.00-9.00 + concepts in `knowledge/seed/rules.json` | `tests/knowledge/test_knowledge_domains.py` | Verified live from the official 2026 PDF; summaries, not full text |
+| Competition / transaction rules | IMPLEMENTED | 34 TRANSACTION_RULE items with effective dates | `tests/knowledge/` | CBA-sensitive items carry `freshness_policy=CBA` |
+| Bilingual glossary + metrics | IMPLEMENTED | 159 items in `knowledge/seed/glossary.json` | `tests/knowledge/` | EN canonical + commonly-used ZH; provider-specific WAR |
+| Statcast terminology + qualification | IMPLEMENTED | Statcast metrics, pitch types, plate discipline, qualification rules | `tests/knowledge/` | Availability years and provider caveats recorded |
+| Teams / ballparks / league structure | IMPLEMENTED | 30 teams + 30 ballparks + 6 divisions + 2 leagues + structure | `tests/knowledge/test_knowledge_domains.py` | Live-verified 2026-09-15 from the Stats API |
+| Notable players + entity aliases | IMPLEMENTED | 118 player profiles (80 active live-verified + 38 historical) + 13 community ALIAS items | `tests/knowledge/` | Active team affiliation is `as_of`-stamped |
+| Awards + Hall of Fame | IMPLEMENTED | 12 AWARD items + HOF election rules | `tests/knowledge/` | Winners are a data-plane query |
+| League/competition context + eras | IMPLEMENTED | `knowledge/seed/context.json` (postseason structure, seeding, All-Star, spring training, historical eras) | `tests/knowledge/test_knowledge_domains.py` | Items that can change carry `verify_current` |
+| Community source directory | IMPLEMENTED (partial verification) | 51 `COMMUNITY_CREATOR` items in `knowledge/seed/community.json` | `tests/knowledge/` | Network sweep verified a subset; unverified profiles stay `UNVERIFIED` |
+| Refresh pipeline | IMPLEMENTED | `app/knowledge/refresh.py`: live teams/ballparks/rules; seed reload for the rest | `tests/knowledge/test_knowledge_cli_and_refresh.py` | Fetch -> validate -> stage -> activate |
+| Retrieval | IMPLEMENTED | `app/knowledge/retrieval.py` (canonical/alias/filter/token/relations) | `tests/knowledge/test_knowledge_retrieval.py` | Deterministic ranking, no embeddings |
+| RAG / embeddings | DEFERRED | — | — | Only after structured retrieval proves insufficient; would be a rebuildable auxiliary index |
 
 ## L. Governance & Observability (§58, §59, O008)
 
@@ -200,7 +221,8 @@ Not yet implemented (next work, no decision change required):
 
 - Live SourceMapping/Feature and Web providers (the injected runtime seams are tested).
 - A metrics sink beyond `RunResult.metrics`.
-- A persistent Entity Dictionary and a RAG knowledge base source.
+- Full live verification of the community directory: the 2026-09-15 network sweep verified
+  a subset of creators; the rest are marked `UNVERIFIED` and need a recheck.
 - Cross-run context isolation asserted at the Orchestrator level (service-level tested).
 - Weighted objective coverage beyond the critical gate (O003).
 - `ConstraintRevisionRequest` / `PermissionRequest` escalation flows (clarification is
@@ -229,7 +251,7 @@ Explicitly deferred with reason:
 | O003 state update / sufficiency algorithm | PARTIAL — deterministic critical gate implemented; weighting DEFERRED |
 | O004 Planner/Router ↔ Registry/Context interfaces | RESOLVED — `PlannerContext`, `Router`, `SourceMappingResolver`, `MetricRegistry`, `SchemaRegistry` |
 | O005 persistence schema/version/retention | PARTIAL — schema + version RESOLVED (ADR 0007/0016); retention DEFERRED |
-| O006 context retrieval/projection policy | PARTIAL — deterministic retrieval + purpose projection RESOLVED; semantic/vector DEFERRED |
+| O006 context retrieval/projection policy | RESOLVED — deterministic knowledge retrieval + freshness/authority ranking (ADR 0019); semantic/vector DEFERRED |
 | O007 qualification/sample adequacy/league state | RESOLVED — ADR 0011 |
 | O008 permission/cost levels + escalation | PARTIAL — Router cost filter RESOLVED; escalation requests DEFERRED |
 | O009 LangGraph adoption | DEFERRED — deterministic state machine first |
@@ -239,6 +261,7 @@ Explicitly deferred with reason:
 Status: **IN_PROGRESS — stable checkpoint**, not `ARCHITECTURE_IMPLEMENTATION_COMPLETE`.
 All core domain contracts, the semantic→requirement→plan→route→execute→assess→state→
 response loop, source mapping execution, persistence, checkpoint/resume, shared context,
-LLM Protocol implementations, read-only safety, secret safety, docs, usage guide and E2E
-tests are present. Remaining before the completion claim: live source wiring and
-integration tests (UNVERIFIED_LIVE), RAG/web wiring, and the deferred items above.
+the persistent Shared Knowledge base, LLM Protocol implementations, read-only safety,
+secret safety, docs, usage guides and E2E tests are present. Remaining before the
+completion claim: live source wiring and integration tests (UNVERIFIED_LIVE), web wiring,
+the unverified portion of the community directory, and the deferred items above.

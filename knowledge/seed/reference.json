@@ -1,0 +1,4887 @@
+{
+ "domain": "reference",
+ "expected_team_keys": [
+  "ATH",
+  "ATL",
+  "AZ",
+  "BAL",
+  "BOS",
+  "CHC",
+  "CIN",
+  "CLE",
+  "COL",
+  "CWS",
+  "DET",
+  "HOU",
+  "KC",
+  "LAA",
+  "LAD",
+  "MIA",
+  "MIL",
+  "MIN",
+  "NYM",
+  "NYY",
+  "PHI",
+  "PIT",
+  "SD",
+  "SEA",
+  "SF",
+  "STL",
+  "TB",
+  "TEX",
+  "TOR",
+  "WSH"
+ ],
+ "items": [
+  {
+   "knowledge_id": "TEAM:ATH",
+   "knowledge_type": "TEAM",
+   "canonical_key": "ATH",
+   "title": "Athletics",
+   "aliases": [
+    "Sacramento Athletics",
+    "运动家",
+    "萨克拉门托运动家",
+    "A's",
+    "Oakland Athletics",
+    "OAK",
+    "ATH"
+   ],
+   "language": "en",
+   "summary": "Athletics is a American League club in the American League West, playing home games at Sutter Health Park. Temporary home in West Sacramento (Sutter Health Park) while a permanent ballpark is built; the club is branded simply 'Athletics'.",
+   "structured_payload": {
+    "official_name": "Athletics",
+    "official_name_status": "official_en",
+    "abbreviation": "ATH",
+    "provider_codes": [
+     "OAK",
+     "ATH"
+    ],
+    "league": "American League",
+    "division": "American League West",
+    "city": "Sacramento",
+    "market": "萨克拉门托",
+    "venue": "Sutter Health Park",
+    "venue_id": 2529,
+    "first_year": 1901,
+    "franchise_name": "Athletics",
+    "official_site": "https://www.mlb.com/ath",
+    "zh_name": "运动家",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "运动家",
+    "team_id_mlbam": 133,
+    "franchise_lineage": [
+     {
+      "name": "Philadelphia Athletics",
+      "from": 1901,
+      "to": 1954
+     },
+     {
+      "name": "Kansas City Athletics",
+      "from": 1955,
+      "to": 1967
+     },
+     {
+      "name": "Oakland Athletics",
+      "from": 1968,
+      "to": 2024
+     },
+     {
+      "name": "Athletics",
+      "from": 2025,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:ATH"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_west"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:ATH",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Sutter Health Park",
+   "title": "Sutter Health Park",
+   "aliases": [
+    "Columbia Park (1901-1908)",
+    "Shibe Park (1909-1954)",
+    "Municipal Stadium (Kansas City) (1955-1967)",
+    "Oakland Coliseum (1968-2024)"
+   ],
+   "language": "en",
+   "summary": "Sutter Health Park is the current home ballpark of the Athletics.",
+   "structured_payload": {
+    "official_name": "Sutter Health Park",
+    "common_name": "Sutter Health Park",
+    "team": "TEAM:ATH",
+    "city": "Sacramento",
+    "opened": 2000,
+    "roof_type": "open",
+    "former_names": [
+     "Columbia Park (1901-1908)",
+     "Shibe Park (1909-1954)",
+     "Municipal Stadium (Kansas City) (1955-1967)",
+     "Oakland Coliseum (1968-2024)"
+    ],
+    "venue_id": 2529,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:ATH",
+    "TEAM:ATH"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:ATL",
+   "knowledge_type": "TEAM",
+   "canonical_key": "ATL",
+   "title": "Atlanta Braves",
+   "aliases": [
+    "Braves",
+    "Atlanta",
+    "勇士",
+    "亚特兰大勇士",
+    "ATL"
+   ],
+   "language": "en",
+   "summary": "Atlanta Braves is a National League club in the National League East, playing home games at Truist Park.",
+   "structured_payload": {
+    "official_name": "Atlanta Braves",
+    "official_name_status": "official_en",
+    "abbreviation": "ATL",
+    "provider_codes": [
+     "ATL"
+    ],
+    "league": "National League",
+    "division": "National League East",
+    "city": "Atlanta",
+    "market": "亚特兰大",
+    "venue": "Truist Park",
+    "venue_id": 4705,
+    "first_year": 1871,
+    "franchise_name": "Atlanta",
+    "official_site": "https://www.mlb.com/atl",
+    "zh_name": "亚特兰大勇士",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "勇士",
+    "team_id_mlbam": 144,
+    "franchise_lineage": [
+     {
+      "name": "Boston Red Stockings",
+      "from": 1871,
+      "to": 1906
+     },
+     {
+      "name": "Boston Braves",
+      "from": 1912,
+      "to": 1952
+     },
+     {
+      "name": "Milwaukee Braves",
+      "from": 1953,
+      "to": 1965
+     },
+     {
+      "name": "Atlanta Braves",
+      "from": 1966,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:ATL"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_east"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:ATL",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Truist Park",
+   "title": "Truist Park",
+   "aliases": [
+    "Atlanta-Fulton County Stadium (1966-1996)",
+    "Turner Field (1997-2016)"
+   ],
+   "language": "en",
+   "summary": "Truist Park is the current home ballpark of the Atlanta Braves.",
+   "structured_payload": {
+    "official_name": "Truist Park",
+    "common_name": "Truist Park",
+    "team": "TEAM:ATL",
+    "city": "Atlanta",
+    "opened": 2017,
+    "roof_type": "open",
+    "former_names": [
+     "Atlanta-Fulton County Stadium (1966-1996)",
+     "Turner Field (1997-2016)"
+    ],
+    "venue_id": 4705,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:ATL",
+    "TEAM:ATL"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:AZ",
+   "knowledge_type": "TEAM",
+   "canonical_key": "AZ",
+   "title": "Arizona Diamondbacks",
+   "aliases": [
+    "D-backs",
+    "Arizona",
+    "Phoenix D-backs",
+    "响尾蛇",
+    "亚利桑那响尾蛇",
+    "凤凰城响尾蛇",
+    "Diamondbacks",
+    "ARI"
+   ],
+   "language": "en",
+   "summary": "Arizona Diamondbacks is a National League club in the National League West, playing home games at Chase Field.",
+   "structured_payload": {
+    "official_name": "Arizona Diamondbacks",
+    "official_name_status": "official_en",
+    "abbreviation": "AZ",
+    "provider_codes": [
+     "ARI"
+    ],
+    "league": "National League",
+    "division": "National League West",
+    "city": "Phoenix",
+    "market": "凤凰城",
+    "venue": "Chase Field",
+    "venue_id": 15,
+    "first_year": 1996,
+    "franchise_name": "Arizona",
+    "official_site": "https://www.mlb.com/ari",
+    "zh_name": "亚利桑那响尾蛇",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "响尾蛇",
+    "team_id_mlbam": 109,
+    "franchise_lineage": [
+     {
+      "name": "Arizona Diamondbacks",
+      "from": 1998,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:AZ"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_west"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:AZ",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Chase Field",
+   "title": "Chase Field",
+   "aliases": [
+    "Bank One Ballpark (1998-2005)"
+   ],
+   "language": "en",
+   "summary": "Chase Field is the current home ballpark of the Arizona Diamondbacks.",
+   "structured_payload": {
+    "official_name": "Chase Field",
+    "common_name": "Chase Field",
+    "team": "TEAM:AZ",
+    "city": "Phoenix",
+    "opened": 1998,
+    "roof_type": "retractable",
+    "former_names": [
+     "Bank One Ballpark (1998-2005)"
+    ],
+    "venue_id": 15,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:AZ",
+    "TEAM:AZ"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:retractable"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:BAL",
+   "knowledge_type": "TEAM",
+   "canonical_key": "BAL",
+   "title": "Baltimore Orioles",
+   "aliases": [
+    "Orioles",
+    "Baltimore",
+    "金莺",
+    "巴尔的摩金莺",
+    "BAL"
+   ],
+   "language": "en",
+   "summary": "Baltimore Orioles is a American League club in the American League East, playing home games at Oriole Park at Camden Yards.",
+   "structured_payload": {
+    "official_name": "Baltimore Orioles",
+    "official_name_status": "official_en",
+    "abbreviation": "BAL",
+    "provider_codes": [
+     "BAL"
+    ],
+    "league": "American League",
+    "division": "American League East",
+    "city": "Baltimore",
+    "market": "巴尔的摩",
+    "venue": "Oriole Park at Camden Yards",
+    "venue_id": 2,
+    "first_year": 1901,
+    "franchise_name": "Baltimore",
+    "official_site": "https://www.mlb.com/bal",
+    "zh_name": "巴尔的摩金莺",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "金莺",
+    "team_id_mlbam": 110,
+    "franchise_lineage": [
+     {
+      "name": "Milwaukee Brewers (AL)",
+      "from": 1901,
+      "to": 1901
+     },
+     {
+      "name": "St. Louis Browns",
+      "from": 1902,
+      "to": 1953
+     },
+     {
+      "name": "Baltimore Orioles",
+      "from": 1954,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:BAL"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_east"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:BAL",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Oriole Park at Camden Yards",
+   "title": "Oriole Park at Camden Yards",
+   "aliases": [
+    "Memorial Stadium (1954-1991)"
+   ],
+   "language": "en",
+   "summary": "Oriole Park at Camden Yards is the current home ballpark of the Baltimore Orioles.",
+   "structured_payload": {
+    "official_name": "Oriole Park at Camden Yards",
+    "common_name": "Oriole Park at Camden Yards",
+    "team": "TEAM:BAL",
+    "city": "Baltimore",
+    "opened": 1992,
+    "roof_type": "open",
+    "former_names": [
+     "Memorial Stadium (1954-1991)"
+    ],
+    "venue_id": 2,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:BAL",
+    "TEAM:BAL"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:BOS",
+   "knowledge_type": "TEAM",
+   "canonical_key": "BOS",
+   "title": "Boston Red Sox",
+   "aliases": [
+    "Red Sox",
+    "Boston",
+    "红袜",
+    "波士顿红袜",
+    "BOS"
+   ],
+   "language": "en",
+   "summary": "Boston Red Sox is a American League club in the American League East, playing home games at Fenway Park.",
+   "structured_payload": {
+    "official_name": "Boston Red Sox",
+    "official_name_status": "official_en",
+    "abbreviation": "BOS",
+    "provider_codes": [
+     "BOS"
+    ],
+    "league": "American League",
+    "division": "American League East",
+    "city": "Boston",
+    "market": "波士顿",
+    "venue": "Fenway Park",
+    "venue_id": 3,
+    "first_year": 1901,
+    "franchise_name": "Boston",
+    "official_site": "https://www.mlb.com/bos",
+    "zh_name": "波士顿红袜",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "红袜",
+    "team_id_mlbam": 111,
+    "franchise_lineage": [
+     {
+      "name": "Boston Americans",
+      "from": 1901,
+      "to": 1907
+     },
+     {
+      "name": "Boston Red Sox",
+      "from": 1908,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:BOS"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_east"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:BOS",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Fenway Park",
+   "title": "Fenway Park",
+   "aliases": [
+    "Huntington Avenue Grounds (1901-1911)"
+   ],
+   "language": "en",
+   "summary": "Fenway Park is the current home ballpark of the Boston Red Sox.",
+   "structured_payload": {
+    "official_name": "Fenway Park",
+    "common_name": "Fenway Park",
+    "team": "TEAM:BOS",
+    "city": "Boston",
+    "opened": 1912,
+    "roof_type": "open",
+    "former_names": [
+     "Huntington Avenue Grounds (1901-1911)"
+    ],
+    "venue_id": 3,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:BOS",
+    "TEAM:BOS"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:CHC",
+   "knowledge_type": "TEAM",
+   "canonical_key": "CHC",
+   "title": "Chicago Cubs",
+   "aliases": [
+    "Cubs",
+    "Chi Cubs",
+    "小熊",
+    "芝加哥小熊",
+    "CHC"
+   ],
+   "language": "en",
+   "summary": "Chicago Cubs is a National League club in the National League Central, playing home games at Wrigley Field.",
+   "structured_payload": {
+    "official_name": "Chicago Cubs",
+    "official_name_status": "official_en",
+    "abbreviation": "CHC",
+    "provider_codes": [
+     "CHC"
+    ],
+    "league": "National League",
+    "division": "National League Central",
+    "city": "Chicago",
+    "market": "芝加哥",
+    "venue": "Wrigley Field",
+    "venue_id": 17,
+    "first_year": 1874,
+    "franchise_name": "Chicago",
+    "official_site": "https://www.mlb.com/chn",
+    "zh_name": "芝加哥小熊",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "小熊",
+    "team_id_mlbam": 112,
+    "franchise_lineage": [
+     {
+      "name": "Chicago White Stockings",
+      "from": 1876,
+      "to": 1889
+     },
+     {
+      "name": "Chicago Colts",
+      "from": 1890,
+      "to": 1897
+     },
+     {
+      "name": "Chicago Orphans",
+      "from": 1898,
+      "to": 1902
+     },
+     {
+      "name": "Chicago Cubs",
+      "from": 1903,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:CHC"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_central"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:CHC",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Wrigley Field",
+   "title": "Wrigley Field",
+   "aliases": [
+    "West Side Park (1885-1915)"
+   ],
+   "language": "en",
+   "summary": "Wrigley Field is the current home ballpark of the Chicago Cubs.",
+   "structured_payload": {
+    "official_name": "Wrigley Field",
+    "common_name": "Wrigley Field",
+    "team": "TEAM:CHC",
+    "city": "Chicago",
+    "opened": 1914,
+    "roof_type": "open",
+    "former_names": [
+     "West Side Park (1885-1915)"
+    ],
+    "venue_id": 17,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:CHC",
+    "TEAM:CHC"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:CIN",
+   "knowledge_type": "TEAM",
+   "canonical_key": "CIN",
+   "title": "Cincinnati Reds",
+   "aliases": [
+    "Reds",
+    "Cincinnati",
+    "红人",
+    "辛辛那提红人",
+    "CIN"
+   ],
+   "language": "en",
+   "summary": "Cincinnati Reds is a National League club in the National League Central, playing home games at Great American Ball Park.",
+   "structured_payload": {
+    "official_name": "Cincinnati Reds",
+    "official_name_status": "official_en",
+    "abbreviation": "CIN",
+    "provider_codes": [
+     "CIN"
+    ],
+    "league": "National League",
+    "division": "National League Central",
+    "city": "Cincinnati",
+    "market": "辛辛那提",
+    "venue": "Great American Ball Park",
+    "venue_id": 2602,
+    "first_year": 1882,
+    "franchise_name": "Cincinnati",
+    "official_site": "https://www.mlb.com/cin",
+    "zh_name": "辛辛那提红人",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "红人",
+    "team_id_mlbam": 113,
+    "franchise_lineage": [
+     {
+      "name": "Cincinnati Red Stockings",
+      "from": 1882,
+      "to": 1889
+     },
+     {
+      "name": "Cincinnati Reds",
+      "from": 1890,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:CIN"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_central"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:CIN",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Great American Ball Park",
+   "title": "Great American Ball Park",
+   "aliases": [
+    "Riverfront Stadium (1970-2002)",
+    "Crosley Field (1912-1970)"
+   ],
+   "language": "en",
+   "summary": "Great American Ball Park is the current home ballpark of the Cincinnati Reds.",
+   "structured_payload": {
+    "official_name": "Great American Ball Park",
+    "common_name": "Great American Ball Park",
+    "team": "TEAM:CIN",
+    "city": "Cincinnati",
+    "opened": 2003,
+    "roof_type": "open",
+    "former_names": [
+     "Riverfront Stadium (1970-2002)",
+     "Crosley Field (1912-1970)"
+    ],
+    "venue_id": 2602,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:CIN",
+    "TEAM:CIN"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:CLE",
+   "knowledge_type": "TEAM",
+   "canonical_key": "CLE",
+   "title": "Cleveland Guardians",
+   "aliases": [
+    "Guardians",
+    "Cleveland",
+    "守护者",
+    "克利夫兰守护者",
+    "CLE"
+   ],
+   "language": "en",
+   "summary": "Cleveland Guardians is a American League club in the American League Central, playing home games at Progressive Field.",
+   "structured_payload": {
+    "official_name": "Cleveland Guardians",
+    "official_name_status": "official_en",
+    "abbreviation": "CLE",
+    "provider_codes": [
+     "CLE"
+    ],
+    "league": "American League",
+    "division": "American League Central",
+    "city": "Cleveland",
+    "market": "克利夫兰",
+    "venue": "Progressive Field",
+    "venue_id": 5,
+    "first_year": 1901,
+    "franchise_name": "Cleveland",
+    "official_site": "https://www.mlb.com/cle",
+    "zh_name": "克利夫兰守护者",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "守护者",
+    "team_id_mlbam": 114,
+    "franchise_lineage": [
+     {
+      "name": "Cleveland Blues",
+      "from": 1901,
+      "to": 1901
+     },
+     {
+      "name": "Cleveland Naps",
+      "from": 1903,
+      "to": 1914
+     },
+     {
+      "name": "Cleveland Indians",
+      "from": 1915,
+      "to": 2021
+     },
+     {
+      "name": "Cleveland Guardians",
+      "from": 2022,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:CLE"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_central"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:CLE",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Progressive Field",
+   "title": "Progressive Field",
+   "aliases": [
+    "Cleveland Stadium (1932-1993)",
+    "League Park (1901-1946)"
+   ],
+   "language": "en",
+   "summary": "Progressive Field is the current home ballpark of the Cleveland Guardians.",
+   "structured_payload": {
+    "official_name": "Progressive Field",
+    "common_name": "Progressive Field",
+    "team": "TEAM:CLE",
+    "city": "Cleveland",
+    "opened": 1994,
+    "roof_type": "open",
+    "former_names": [
+     "Cleveland Stadium (1932-1993)",
+     "League Park (1901-1946)"
+    ],
+    "venue_id": 5,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:CLE",
+    "TEAM:CLE"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:COL",
+   "knowledge_type": "TEAM",
+   "canonical_key": "COL",
+   "title": "Colorado Rockies",
+   "aliases": [
+    "Rockies",
+    "Colorado",
+    "Denver Rockies",
+    "洛矶",
+    "科罗拉多洛矶",
+    "丹佛洛矶",
+    "COL"
+   ],
+   "language": "en",
+   "summary": "Colorado Rockies is a National League club in the National League West, playing home games at Coors Field.",
+   "structured_payload": {
+    "official_name": "Colorado Rockies",
+    "official_name_status": "official_en",
+    "abbreviation": "COL",
+    "provider_codes": [
+     "COL"
+    ],
+    "league": "National League",
+    "division": "National League West",
+    "city": "Denver",
+    "market": "丹佛",
+    "venue": "Coors Field",
+    "venue_id": 19,
+    "first_year": 1992,
+    "franchise_name": "Colorado",
+    "official_site": "https://www.mlb.com/col",
+    "zh_name": "科罗拉多洛矶",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "洛矶",
+    "team_id_mlbam": 115,
+    "franchise_lineage": [
+     {
+      "name": "Colorado Rockies",
+      "from": 1993,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:COL"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_west"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:COL",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Coors Field",
+   "title": "Coors Field",
+   "aliases": [
+    "Mile High Stadium (1993-1994)"
+   ],
+   "language": "en",
+   "summary": "Coors Field is the current home ballpark of the Colorado Rockies.",
+   "structured_payload": {
+    "official_name": "Coors Field",
+    "common_name": "Coors Field",
+    "team": "TEAM:COL",
+    "city": "Denver",
+    "opened": 1995,
+    "roof_type": "open",
+    "former_names": [
+     "Mile High Stadium (1993-1994)"
+    ],
+    "venue_id": 19,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:COL",
+    "TEAM:COL"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:CWS",
+   "knowledge_type": "TEAM",
+   "canonical_key": "CWS",
+   "title": "Chicago White Sox",
+   "aliases": [
+    "White Sox",
+    "Chi White Sox",
+    "白袜",
+    "芝加哥白袜",
+    "CHW"
+   ],
+   "language": "en",
+   "summary": "Chicago White Sox is a American League club in the American League Central, playing home games at Rate Field.",
+   "structured_payload": {
+    "official_name": "Chicago White Sox",
+    "official_name_status": "official_en",
+    "abbreviation": "CWS",
+    "provider_codes": [
+     "CHW"
+    ],
+    "league": "American League",
+    "division": "American League Central",
+    "city": "Chicago",
+    "market": "芝加哥",
+    "venue": "Rate Field",
+    "venue_id": 4,
+    "first_year": 1901,
+    "franchise_name": "Chicago",
+    "official_site": "https://www.mlb.com/cha",
+    "zh_name": "芝加哥白袜",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "白袜",
+    "team_id_mlbam": 145,
+    "franchise_lineage": [
+     {
+      "name": "Chicago White Sox",
+      "from": 1901,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:CWS"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_central"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:CWS",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Rate Field",
+   "title": "Rate Field",
+   "aliases": [
+    "Comiskey Park (1910-1990)"
+   ],
+   "language": "en",
+   "summary": "Rate Field is the current home ballpark of the Chicago White Sox.",
+   "structured_payload": {
+    "official_name": "Rate Field",
+    "common_name": "Rate Field",
+    "team": "TEAM:CWS",
+    "city": "Chicago",
+    "opened": 1991,
+    "roof_type": "open",
+    "former_names": [
+     "Comiskey Park (1910-1990)"
+    ],
+    "venue_id": 4,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:CWS",
+    "TEAM:CWS"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:DET",
+   "knowledge_type": "TEAM",
+   "canonical_key": "DET",
+   "title": "Detroit Tigers",
+   "aliases": [
+    "Tigers",
+    "Detroit",
+    "老虎",
+    "底特律老虎",
+    "DET"
+   ],
+   "language": "en",
+   "summary": "Detroit Tigers is a American League club in the American League Central, playing home games at Comerica Park.",
+   "structured_payload": {
+    "official_name": "Detroit Tigers",
+    "official_name_status": "official_en",
+    "abbreviation": "DET",
+    "provider_codes": [
+     "DET"
+    ],
+    "league": "American League",
+    "division": "American League Central",
+    "city": "Detroit",
+    "market": "底特律",
+    "venue": "Comerica Park",
+    "venue_id": 2394,
+    "first_year": 1901,
+    "franchise_name": "Detroit",
+    "official_site": "https://www.mlb.com/det",
+    "zh_name": "底特律老虎",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "老虎",
+    "team_id_mlbam": 116,
+    "franchise_lineage": [
+     {
+      "name": "Detroit Tigers",
+      "from": 1901,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:DET"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_central"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:DET",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Comerica Park",
+   "title": "Comerica Park",
+   "aliases": [
+    "Tiger Stadium (1912-1999)"
+   ],
+   "language": "en",
+   "summary": "Comerica Park is the current home ballpark of the Detroit Tigers.",
+   "structured_payload": {
+    "official_name": "Comerica Park",
+    "common_name": "Comerica Park",
+    "team": "TEAM:DET",
+    "city": "Detroit",
+    "opened": 2000,
+    "roof_type": "open",
+    "former_names": [
+     "Tiger Stadium (1912-1999)"
+    ],
+    "venue_id": 2394,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:DET",
+    "TEAM:DET"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:HOU",
+   "knowledge_type": "TEAM",
+   "canonical_key": "HOU",
+   "title": "Houston Astros",
+   "aliases": [
+    "Astros",
+    "Houston",
+    "太空人",
+    "休斯敦太空人",
+    "HOU"
+   ],
+   "language": "en",
+   "summary": "Houston Astros is a American League club in the American League West, playing home games at Daikin Park.",
+   "structured_payload": {
+    "official_name": "Houston Astros",
+    "official_name_status": "official_en",
+    "abbreviation": "HOU",
+    "provider_codes": [
+     "HOU"
+    ],
+    "league": "American League",
+    "division": "American League West",
+    "city": "Houston",
+    "market": "休斯敦",
+    "venue": "Daikin Park",
+    "venue_id": 2392,
+    "first_year": 1962,
+    "franchise_name": "Houston",
+    "official_site": "https://www.mlb.com/hou",
+    "zh_name": "休斯敦太空人",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "太空人",
+    "team_id_mlbam": 117,
+    "franchise_lineage": [
+     {
+      "name": "Houston Colt .45s",
+      "from": 1962,
+      "to": 1964
+     },
+     {
+      "name": "Houston Astros",
+      "from": 1965,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:HOU"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_west"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:HOU",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Daikin Park",
+   "title": "Daikin Park",
+   "aliases": [
+    "Enron Field (2000-2001)",
+    "Minute Maid Park (2002-2024)"
+   ],
+   "language": "en",
+   "summary": "Daikin Park is the current home ballpark of the Houston Astros.",
+   "structured_payload": {
+    "official_name": "Daikin Park",
+    "common_name": "Daikin Park",
+    "team": "TEAM:HOU",
+    "city": "Houston",
+    "opened": 2000,
+    "roof_type": "retractable",
+    "former_names": [
+     "Enron Field (2000-2001)",
+     "Minute Maid Park (2002-2024)"
+    ],
+    "venue_id": 2392,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:HOU",
+    "TEAM:HOU"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:retractable"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:KC",
+   "knowledge_type": "TEAM",
+   "canonical_key": "KC",
+   "title": "Kansas City Royals",
+   "aliases": [
+    "Royals",
+    "Kansas City",
+    "皇家",
+    "堪萨斯城皇家",
+    "KCR"
+   ],
+   "language": "en",
+   "summary": "Kansas City Royals is a American League club in the American League Central, playing home games at Kauffman Stadium.",
+   "structured_payload": {
+    "official_name": "Kansas City Royals",
+    "official_name_status": "official_en",
+    "abbreviation": "KC",
+    "provider_codes": [
+     "KCR"
+    ],
+    "league": "American League",
+    "division": "American League Central",
+    "city": "Kansas City",
+    "market": "堪萨斯城",
+    "venue": "Kauffman Stadium",
+    "venue_id": 7,
+    "first_year": 1968,
+    "franchise_name": "Kansas City",
+    "official_site": "https://www.mlb.com/kca",
+    "zh_name": "堪萨斯城皇家",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "皇家",
+    "team_id_mlbam": 118,
+    "franchise_lineage": [
+     {
+      "name": "Kansas City Royals",
+      "from": 1969,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:KC"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_central"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:KC",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Kauffman Stadium",
+   "title": "Kauffman Stadium",
+   "aliases": [
+    "Municipal Stadium (1969-1972)"
+   ],
+   "language": "en",
+   "summary": "Kauffman Stadium is the current home ballpark of the Kansas City Royals.",
+   "structured_payload": {
+    "official_name": "Kauffman Stadium",
+    "common_name": "Kauffman Stadium",
+    "team": "TEAM:KC",
+    "city": "Kansas City",
+    "opened": 1973,
+    "roof_type": "open",
+    "former_names": [
+     "Municipal Stadium (1969-1972)"
+    ],
+    "venue_id": 7,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:KC",
+    "TEAM:KC"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:LAA",
+   "knowledge_type": "TEAM",
+   "canonical_key": "LAA",
+   "title": "Los Angeles Angels",
+   "aliases": [
+    "Angels",
+    "LA Angels",
+    "Anaheim Angels",
+    "天使",
+    "洛杉矶天使",
+    "阿纳海姆天使",
+    "ANA",
+    "LAA"
+   ],
+   "language": "en",
+   "summary": "Los Angeles Angels is a American League club in the American League West, playing home games at Angel Stadium.",
+   "structured_payload": {
+    "official_name": "Los Angeles Angels",
+    "official_name_status": "official_en",
+    "abbreviation": "LAA",
+    "provider_codes": [
+     "LAA"
+    ],
+    "league": "American League",
+    "division": "American League West",
+    "city": "Anaheim",
+    "market": "阿纳海姆",
+    "venue": "Angel Stadium",
+    "venue_id": 1,
+    "first_year": 1961,
+    "franchise_name": "Los Angeles",
+    "official_site": "https://www.mlb.com/ana",
+    "zh_name": "洛杉矶天使",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "天使",
+    "team_id_mlbam": 108,
+    "franchise_lineage": [
+     {
+      "name": "Los Angeles Angels",
+      "from": 1961,
+      "to": 1964
+     },
+     {
+      "name": "California Angels",
+      "from": 1965,
+      "to": 1996
+     },
+     {
+      "name": "Anaheim Angels",
+      "from": 1997,
+      "to": 2004
+     },
+     {
+      "name": "Los Angeles Angels of Anaheim",
+      "from": 2005,
+      "to": 2015
+     },
+     {
+      "name": "Los Angeles Angels",
+      "from": 2016,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:LAA"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_west"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:LAA",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Angel Stadium",
+   "title": "Angel Stadium",
+   "aliases": [
+    "Wrigley Field (Los Angeles) (1961)",
+    "Dodger Stadium (1962-1965)"
+   ],
+   "language": "en",
+   "summary": "Angel Stadium is the current home ballpark of the Los Angeles Angels.",
+   "structured_payload": {
+    "official_name": "Angel Stadium",
+    "common_name": "Angel Stadium",
+    "team": "TEAM:LAA",
+    "city": "Anaheim",
+    "opened": 1966,
+    "roof_type": "open",
+    "former_names": [
+     "Wrigley Field (Los Angeles) (1961)",
+     "Dodger Stadium (1962-1965)"
+    ],
+    "venue_id": 1,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:LAA",
+    "TEAM:LAA"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:LAD",
+   "knowledge_type": "TEAM",
+   "canonical_key": "LAD",
+   "title": "Los Angeles Dodgers",
+   "aliases": [
+    "Dodgers",
+    "LA Dodgers",
+    "道奇",
+    "洛杉矶道奇",
+    "LA",
+    "LAD"
+   ],
+   "language": "en",
+   "summary": "Los Angeles Dodgers is a National League club in the National League West, playing home games at UNIQLO Field at Dodger Stadium.",
+   "structured_payload": {
+    "official_name": "Los Angeles Dodgers",
+    "official_name_status": "official_en",
+    "abbreviation": "LAD",
+    "provider_codes": [
+     "LAD"
+    ],
+    "league": "National League",
+    "division": "National League West",
+    "city": "Los Angeles",
+    "market": "洛杉矶",
+    "venue": "UNIQLO Field at Dodger Stadium",
+    "venue_id": 22,
+    "first_year": 1884,
+    "franchise_name": "Los Angeles",
+    "official_site": "https://www.mlb.com/lan",
+    "zh_name": "洛杉矶道奇",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "道奇",
+    "team_id_mlbam": 119,
+    "franchise_lineage": [
+     {
+      "name": "Brooklyn Dodgers",
+      "from": 1884,
+      "to": 1957
+     },
+     {
+      "name": "Los Angeles Dodgers",
+      "from": 1958,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:LAD"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_west"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:LAD",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Dodger Stadium",
+   "title": "UNIQLO Field at Dodger Stadium",
+   "aliases": [
+    "Dodger Stadium",
+    "Ebbets Field (1913-1957)",
+    "Los Angeles Memorial Coliseum (1958-1961)"
+   ],
+   "language": "en",
+   "summary": "UNIQLO Field at Dodger Stadium is the current home ballpark of the Los Angeles Dodgers (common name: Dodger Stadium).",
+   "structured_payload": {
+    "official_name": "UNIQLO Field at Dodger Stadium",
+    "common_name": "Dodger Stadium",
+    "team": "TEAM:LAD",
+    "city": "Los Angeles",
+    "opened": 1962,
+    "roof_type": "open",
+    "former_names": [
+     "Ebbets Field (1913-1957)",
+     "Los Angeles Memorial Coliseum (1958-1961)"
+    ],
+    "venue_id": 22,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:LAD",
+    "TEAM:LAD"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:MIA",
+   "knowledge_type": "TEAM",
+   "canonical_key": "MIA",
+   "title": "Miami Marlins",
+   "aliases": [
+    "Marlins",
+    "Miami",
+    "马林鱼",
+    "迈阿密马林鱼",
+    "MIA"
+   ],
+   "language": "en",
+   "summary": "Miami Marlins is a National League club in the National League East, playing home games at loanDepot park.",
+   "structured_payload": {
+    "official_name": "Miami Marlins",
+    "official_name_status": "official_en",
+    "abbreviation": "MIA",
+    "provider_codes": [
+     "MIA"
+    ],
+    "league": "National League",
+    "division": "National League East",
+    "city": "Miami",
+    "market": "迈阿密",
+    "venue": "loanDepot park",
+    "venue_id": 4169,
+    "first_year": 1991,
+    "franchise_name": "Miami",
+    "official_site": "https://www.mlb.com/mia",
+    "zh_name": "迈阿密马林鱼",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "马林鱼",
+    "team_id_mlbam": 146,
+    "franchise_lineage": [
+     {
+      "name": "Florida Marlins",
+      "from": 1993,
+      "to": 2011
+     },
+     {
+      "name": "Miami Marlins",
+      "from": 2012,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:MIA"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_east"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:MIA",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "loanDepot park",
+   "title": "loanDepot park",
+   "aliases": [
+    "Sun Life Stadium (1993-2011)"
+   ],
+   "language": "en",
+   "summary": "loanDepot park is the current home ballpark of the Miami Marlins.",
+   "structured_payload": {
+    "official_name": "loanDepot park",
+    "common_name": "loanDepot park",
+    "team": "TEAM:MIA",
+    "city": "Miami",
+    "opened": 2012,
+    "roof_type": "retractable",
+    "former_names": [
+     "Sun Life Stadium (1993-2011)"
+    ],
+    "venue_id": 4169,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:MIA",
+    "TEAM:MIA"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:retractable"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:MIL",
+   "knowledge_type": "TEAM",
+   "canonical_key": "MIL",
+   "title": "Milwaukee Brewers",
+   "aliases": [
+    "Brewers",
+    "Milwaukee",
+    "酿酒人",
+    "密尔沃基酿酒人",
+    "MIL"
+   ],
+   "language": "en",
+   "summary": "Milwaukee Brewers is a National League club in the National League Central, playing home games at American Family Field.",
+   "structured_payload": {
+    "official_name": "Milwaukee Brewers",
+    "official_name_status": "official_en",
+    "abbreviation": "MIL",
+    "provider_codes": [
+     "MIL"
+    ],
+    "league": "National League",
+    "division": "National League Central",
+    "city": "Milwaukee",
+    "market": "密尔沃基",
+    "venue": "American Family Field",
+    "venue_id": 32,
+    "first_year": 1968,
+    "franchise_name": "Milwaukee",
+    "official_site": "https://www.mlb.com/mil",
+    "zh_name": "密尔沃基酿酒人",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "酿酒人",
+    "team_id_mlbam": 158,
+    "franchise_lineage": [
+     {
+      "name": "Seattle Pilots",
+      "from": 1969,
+      "to": 1969
+     },
+     {
+      "name": "Milwaukee Brewers",
+      "from": 1970,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:MIL"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_central"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:MIL",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "American Family Field",
+   "title": "American Family Field",
+   "aliases": [
+    "Milwaukee County Stadium (1970-2000)"
+   ],
+   "language": "en",
+   "summary": "American Family Field is the current home ballpark of the Milwaukee Brewers.",
+   "structured_payload": {
+    "official_name": "American Family Field",
+    "common_name": "American Family Field",
+    "team": "TEAM:MIL",
+    "city": "Milwaukee",
+    "opened": 2001,
+    "roof_type": "retractable",
+    "former_names": [
+     "Milwaukee County Stadium (1970-2000)"
+    ],
+    "venue_id": 32,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:MIL",
+    "TEAM:MIL"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:retractable"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:MIN",
+   "knowledge_type": "TEAM",
+   "canonical_key": "MIN",
+   "title": "Minnesota Twins",
+   "aliases": [
+    "Twins",
+    "Minnesota",
+    "Minneapolis Twins",
+    "双城",
+    "明尼苏达双城",
+    "明尼阿波利斯双城",
+    "MIN"
+   ],
+   "language": "en",
+   "summary": "Minnesota Twins is a American League club in the American League Central, playing home games at Target Field.",
+   "structured_payload": {
+    "official_name": "Minnesota Twins",
+    "official_name_status": "official_en",
+    "abbreviation": "MIN",
+    "provider_codes": [
+     "MIN"
+    ],
+    "league": "American League",
+    "division": "American League Central",
+    "city": "Minneapolis",
+    "market": "明尼阿波利斯",
+    "venue": "Target Field",
+    "venue_id": 3312,
+    "first_year": 1901,
+    "franchise_name": "Minnesota",
+    "official_site": "https://www.mlb.com/min",
+    "zh_name": "明尼苏达双城",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "双城",
+    "team_id_mlbam": 142,
+    "franchise_lineage": [
+     {
+      "name": "Washington Senators",
+      "from": 1901,
+      "to": 1960
+     },
+     {
+      "name": "Minnesota Twins",
+      "from": 1961,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:MIN"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_central"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:MIN",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Target Field",
+   "title": "Target Field",
+   "aliases": [
+    "Metropolitan Stadium (1961-1981)",
+    "Hubert H. Humphrey Metrodome (1982-2009)"
+   ],
+   "language": "en",
+   "summary": "Target Field is the current home ballpark of the Minnesota Twins.",
+   "structured_payload": {
+    "official_name": "Target Field",
+    "common_name": "Target Field",
+    "team": "TEAM:MIN",
+    "city": "Minneapolis",
+    "opened": 2010,
+    "roof_type": "open",
+    "former_names": [
+     "Metropolitan Stadium (1961-1981)",
+     "Hubert H. Humphrey Metrodome (1982-2009)"
+    ],
+    "venue_id": 3312,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:MIN",
+    "TEAM:MIN"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:NYM",
+   "knowledge_type": "TEAM",
+   "canonical_key": "NYM",
+   "title": "New York Mets",
+   "aliases": [
+    "Mets",
+    "NY Mets",
+    "Flushing Mets",
+    "大都会",
+    "纽约大都会",
+    "NYM"
+   ],
+   "language": "en",
+   "summary": "New York Mets is a National League club in the National League East, playing home games at Citi Field.",
+   "structured_payload": {
+    "official_name": "New York Mets",
+    "official_name_status": "official_en",
+    "abbreviation": "NYM",
+    "provider_codes": [
+     "NYM"
+    ],
+    "league": "National League",
+    "division": "National League East",
+    "city": "Flushing",
+    "market": "纽约",
+    "venue": "Citi Field",
+    "venue_id": 3289,
+    "first_year": 1962,
+    "franchise_name": "New York",
+    "official_site": "https://www.mlb.com/nyn",
+    "zh_name": "纽约大都会",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "大都会",
+    "team_id_mlbam": 121,
+    "franchise_lineage": [
+     {
+      "name": "New York Mets",
+      "from": 1962,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:NYM"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_east"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:NYM",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Citi Field",
+   "title": "Citi Field",
+   "aliases": [
+    "Shea Stadium (1964-2008)"
+   ],
+   "language": "en",
+   "summary": "Citi Field is the current home ballpark of the New York Mets.",
+   "structured_payload": {
+    "official_name": "Citi Field",
+    "common_name": "Citi Field",
+    "team": "TEAM:NYM",
+    "city": "Flushing",
+    "opened": 2009,
+    "roof_type": "open",
+    "former_names": [
+     "Shea Stadium (1964-2008)"
+    ],
+    "venue_id": 3289,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:NYM",
+    "TEAM:NYM"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:NYY",
+   "knowledge_type": "TEAM",
+   "canonical_key": "NYY",
+   "title": "New York Yankees",
+   "aliases": [
+    "Yankees",
+    "NY Yankees",
+    "Bronx Yankees",
+    "洋基",
+    "纽约洋基",
+    "NYY"
+   ],
+   "language": "en",
+   "summary": "New York Yankees is a American League club in the American League East, playing home games at Yankee Stadium.",
+   "structured_payload": {
+    "official_name": "New York Yankees",
+    "official_name_status": "official_en",
+    "abbreviation": "NYY",
+    "provider_codes": [
+     "NYY"
+    ],
+    "league": "American League",
+    "division": "American League East",
+    "city": "Bronx",
+    "market": "纽约",
+    "venue": "Yankee Stadium",
+    "venue_id": 3313,
+    "first_year": 1903,
+    "franchise_name": "New York",
+    "official_site": "https://www.mlb.com/nya",
+    "zh_name": "纽约洋基",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "洋基",
+    "team_id_mlbam": 147,
+    "franchise_lineage": [
+     {
+      "name": "Baltimore Orioles (AL)",
+      "from": 1901,
+      "to": 1902
+     },
+     {
+      "name": "New York Highlanders",
+      "from": 1903,
+      "to": 1912
+     },
+     {
+      "name": "New York Yankees",
+      "from": 1913,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:NYY"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_east"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:NYY",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Yankee Stadium",
+   "title": "Yankee Stadium",
+   "aliases": [
+    "Yankee Stadium I (1923-1973, 1976-2008)",
+    "Shea Stadium (1974-1975)"
+   ],
+   "language": "en",
+   "summary": "Yankee Stadium is the current home ballpark of the New York Yankees.",
+   "structured_payload": {
+    "official_name": "Yankee Stadium",
+    "common_name": "Yankee Stadium",
+    "team": "TEAM:NYY",
+    "city": "Bronx",
+    "opened": 2009,
+    "roof_type": "open",
+    "former_names": [
+     "Yankee Stadium I (1923-1973, 1976-2008)",
+     "Shea Stadium (1974-1975)"
+    ],
+    "venue_id": 3313,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:NYY",
+    "TEAM:NYY"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:PHI",
+   "knowledge_type": "TEAM",
+   "canonical_key": "PHI",
+   "title": "Philadelphia Phillies",
+   "aliases": [
+    "Phillies",
+    "Philadelphia",
+    "费城人",
+    "费城费城人",
+    "PHI"
+   ],
+   "language": "en",
+   "summary": "Philadelphia Phillies is a National League club in the National League East, playing home games at Citizens Bank Park.",
+   "structured_payload": {
+    "official_name": "Philadelphia Phillies",
+    "official_name_status": "official_en",
+    "abbreviation": "PHI",
+    "provider_codes": [
+     "PHI"
+    ],
+    "league": "National League",
+    "division": "National League East",
+    "city": "Philadelphia",
+    "market": "费城",
+    "venue": "Citizens Bank Park",
+    "venue_id": 2681,
+    "first_year": 1883,
+    "franchise_name": "Philadelphia",
+    "official_site": "https://www.mlb.com/phi",
+    "zh_name": "费城费城人",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "费城人",
+    "team_id_mlbam": 143,
+    "franchise_lineage": [
+     {
+      "name": "Philadelphia Quakers",
+      "from": 1883,
+      "to": 1889
+     },
+     {
+      "name": "Philadelphia Phillies",
+      "from": 1890,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:PHI"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_east"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:PHI",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Citizens Bank Park",
+   "title": "Citizens Bank Park",
+   "aliases": [
+    "Veterans Stadium (1971-2003)",
+    "Shibe Park (1909-1970)"
+   ],
+   "language": "en",
+   "summary": "Citizens Bank Park is the current home ballpark of the Philadelphia Phillies.",
+   "structured_payload": {
+    "official_name": "Citizens Bank Park",
+    "common_name": "Citizens Bank Park",
+    "team": "TEAM:PHI",
+    "city": "Philadelphia",
+    "opened": 2004,
+    "roof_type": "open",
+    "former_names": [
+     "Veterans Stadium (1971-2003)",
+     "Shibe Park (1909-1970)"
+    ],
+    "venue_id": 2681,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:PHI",
+    "TEAM:PHI"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:PIT",
+   "knowledge_type": "TEAM",
+   "canonical_key": "PIT",
+   "title": "Pittsburgh Pirates",
+   "aliases": [
+    "Pirates",
+    "Pittsburgh",
+    "海盗",
+    "匹兹堡海盗",
+    "PIT"
+   ],
+   "language": "en",
+   "summary": "Pittsburgh Pirates is a National League club in the National League Central, playing home games at PNC Park.",
+   "structured_payload": {
+    "official_name": "Pittsburgh Pirates",
+    "official_name_status": "official_en",
+    "abbreviation": "PIT",
+    "provider_codes": [
+     "PIT"
+    ],
+    "league": "National League",
+    "division": "National League Central",
+    "city": "Pittsburgh",
+    "market": "匹兹堡",
+    "venue": "PNC Park",
+    "venue_id": 31,
+    "first_year": 1882,
+    "franchise_name": "Pittsburgh",
+    "official_site": "https://www.mlb.com/pit",
+    "zh_name": "匹兹堡海盗",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "海盗",
+    "team_id_mlbam": 134,
+    "franchise_lineage": [
+     {
+      "name": "Pittsburgh Alleghenys",
+      "from": 1882,
+      "to": 1890
+     },
+     {
+      "name": "Pittsburgh Pirates",
+      "from": 1891,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:PIT"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_central"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:PIT",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "PNC Park",
+   "title": "PNC Park",
+   "aliases": [
+    "Three Rivers Stadium (1970-2000)",
+    "Forbes Field (1909-1970)"
+   ],
+   "language": "en",
+   "summary": "PNC Park is the current home ballpark of the Pittsburgh Pirates.",
+   "structured_payload": {
+    "official_name": "PNC Park",
+    "common_name": "PNC Park",
+    "team": "TEAM:PIT",
+    "city": "Pittsburgh",
+    "opened": 2001,
+    "roof_type": "open",
+    "former_names": [
+     "Three Rivers Stadium (1970-2000)",
+     "Forbes Field (1909-1970)"
+    ],
+    "venue_id": 31,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:PIT",
+    "TEAM:PIT"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:SD",
+   "knowledge_type": "TEAM",
+   "canonical_key": "SD",
+   "title": "San Diego Padres",
+   "aliases": [
+    "Padres",
+    "San Diego",
+    "教士",
+    "圣地亚哥教士",
+    "SDP"
+   ],
+   "language": "en",
+   "summary": "San Diego Padres is a National League club in the National League West, playing home games at Petco Park.",
+   "structured_payload": {
+    "official_name": "San Diego Padres",
+    "official_name_status": "official_en",
+    "abbreviation": "SD",
+    "provider_codes": [
+     "SDP"
+    ],
+    "league": "National League",
+    "division": "National League West",
+    "city": "San Diego",
+    "market": "圣地亚哥",
+    "venue": "Petco Park",
+    "venue_id": 2680,
+    "first_year": 1968,
+    "franchise_name": "San Diego",
+    "official_site": "https://www.mlb.com/sdn",
+    "zh_name": "圣地亚哥教士",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "教士",
+    "team_id_mlbam": 135,
+    "franchise_lineage": [
+     {
+      "name": "San Diego Padres",
+      "from": 1969,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:SD"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_west"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:SD",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Petco Park",
+   "title": "Petco Park",
+   "aliases": [
+    "Qualcomm Stadium (1969-2003)"
+   ],
+   "language": "en",
+   "summary": "Petco Park is the current home ballpark of the San Diego Padres.",
+   "structured_payload": {
+    "official_name": "Petco Park",
+    "common_name": "Petco Park",
+    "team": "TEAM:SD",
+    "city": "San Diego",
+    "opened": 2004,
+    "roof_type": "open",
+    "former_names": [
+     "Qualcomm Stadium (1969-2003)"
+    ],
+    "venue_id": 2680,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:SD",
+    "TEAM:SD"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:SEA",
+   "knowledge_type": "TEAM",
+   "canonical_key": "SEA",
+   "title": "Seattle Mariners",
+   "aliases": [
+    "Mariners",
+    "Seattle",
+    "水手",
+    "西雅图水手",
+    "SEA"
+   ],
+   "language": "en",
+   "summary": "Seattle Mariners is a American League club in the American League West, playing home games at T-Mobile Park.",
+   "structured_payload": {
+    "official_name": "Seattle Mariners",
+    "official_name_status": "official_en",
+    "abbreviation": "SEA",
+    "provider_codes": [
+     "SEA"
+    ],
+    "league": "American League",
+    "division": "American League West",
+    "city": "Seattle",
+    "market": "西雅图",
+    "venue": "T-Mobile Park",
+    "venue_id": 680,
+    "first_year": 1977,
+    "franchise_name": "Seattle",
+    "official_site": "https://www.mlb.com/sea",
+    "zh_name": "西雅图水手",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "水手",
+    "team_id_mlbam": 136,
+    "franchise_lineage": [
+     {
+      "name": "Seattle Mariners",
+      "from": 1977,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:SEA"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_west"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:SEA",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "T-Mobile Park",
+   "title": "T-Mobile Park",
+   "aliases": [
+    "Kingdome (1977-1999)"
+   ],
+   "language": "en",
+   "summary": "T-Mobile Park is the current home ballpark of the Seattle Mariners.",
+   "structured_payload": {
+    "official_name": "T-Mobile Park",
+    "common_name": "T-Mobile Park",
+    "team": "TEAM:SEA",
+    "city": "Seattle",
+    "opened": 1999,
+    "roof_type": "retractable",
+    "former_names": [
+     "Kingdome (1977-1999)"
+    ],
+    "venue_id": 680,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:SEA",
+    "TEAM:SEA"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:retractable"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:SF",
+   "knowledge_type": "TEAM",
+   "canonical_key": "SF",
+   "title": "San Francisco Giants",
+   "aliases": [
+    "Giants",
+    "San Francisco",
+    "巨人",
+    "旧金山巨人",
+    "SFG"
+   ],
+   "language": "en",
+   "summary": "San Francisco Giants is a National League club in the National League West, playing home games at Oracle Park.",
+   "structured_payload": {
+    "official_name": "San Francisco Giants",
+    "official_name_status": "official_en",
+    "abbreviation": "SF",
+    "provider_codes": [
+     "SFG"
+    ],
+    "league": "National League",
+    "division": "National League West",
+    "city": "San Francisco",
+    "market": "旧金山",
+    "venue": "Oracle Park",
+    "venue_id": 2395,
+    "first_year": 1883,
+    "franchise_name": "San Francisco",
+    "official_site": "https://www.mlb.com/sfn",
+    "zh_name": "旧金山巨人",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "巨人",
+    "team_id_mlbam": 137,
+    "franchise_lineage": [
+     {
+      "name": "New York Gothams",
+      "from": 1883,
+      "to": 1884
+     },
+     {
+      "name": "New York Giants",
+      "from": 1885,
+      "to": 1957
+     },
+     {
+      "name": "San Francisco Giants",
+      "from": 1958,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:SF"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_west"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:SF",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Oracle Park",
+   "title": "Oracle Park",
+   "aliases": [
+    "Polo Grounds (1883-1957)",
+    "Seals Stadium (1958-1959)",
+    "Candlestick Park (1960-1999)"
+   ],
+   "language": "en",
+   "summary": "Oracle Park is the current home ballpark of the San Francisco Giants.",
+   "structured_payload": {
+    "official_name": "Oracle Park",
+    "common_name": "Oracle Park",
+    "team": "TEAM:SF",
+    "city": "San Francisco",
+    "opened": 2000,
+    "roof_type": "open",
+    "former_names": [
+     "Polo Grounds (1883-1957)",
+     "Seals Stadium (1958-1959)",
+     "Candlestick Park (1960-1999)"
+    ],
+    "venue_id": 2395,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:SF",
+    "TEAM:SF"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:STL",
+   "knowledge_type": "TEAM",
+   "canonical_key": "STL",
+   "title": "St. Louis Cardinals",
+   "aliases": [
+    "Cardinals",
+    "St. Louis",
+    "红雀",
+    "圣路易斯红雀",
+    "STL"
+   ],
+   "language": "en",
+   "summary": "St. Louis Cardinals is a National League club in the National League Central, playing home games at Busch Stadium.",
+   "structured_payload": {
+    "official_name": "St. Louis Cardinals",
+    "official_name_status": "official_en",
+    "abbreviation": "STL",
+    "provider_codes": [
+     "STL"
+    ],
+    "league": "National League",
+    "division": "National League Central",
+    "city": "St. Louis",
+    "market": "圣路易斯",
+    "venue": "Busch Stadium",
+    "venue_id": 2889,
+    "first_year": 1892,
+    "franchise_name": "St. Louis",
+    "official_site": "https://www.mlb.com/sln",
+    "zh_name": "圣路易斯红雀",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "红雀",
+    "team_id_mlbam": 138,
+    "franchise_lineage": [
+     {
+      "name": "St. Louis Browns",
+      "from": 1882,
+      "to": 1898
+     },
+     {
+      "name": "St. Louis Perfectos",
+      "from": 1899,
+      "to": 1899
+     },
+     {
+      "name": "St. Louis Cardinals",
+      "from": 1900,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:STL"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_central"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:STL",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Busch Stadium",
+   "title": "Busch Stadium",
+   "aliases": [
+    "Sportsman's Park (1920-1966)",
+    "Busch Memorial Stadium (1966-2005)"
+   ],
+   "language": "en",
+   "summary": "Busch Stadium is the current home ballpark of the St. Louis Cardinals.",
+   "structured_payload": {
+    "official_name": "Busch Stadium",
+    "common_name": "Busch Stadium",
+    "team": "TEAM:STL",
+    "city": "St. Louis",
+    "opened": 2006,
+    "roof_type": "open",
+    "former_names": [
+     "Sportsman's Park (1920-1966)",
+     "Busch Memorial Stadium (1966-2005)"
+    ],
+    "venue_id": 2889,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:STL",
+    "TEAM:STL"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:TB",
+   "knowledge_type": "TEAM",
+   "canonical_key": "TB",
+   "title": "Tampa Bay Rays",
+   "aliases": [
+    "Rays",
+    "Tampa Bay",
+    "St. Petersburg Rays",
+    "光芒",
+    "坦帕湾光芒",
+    "圣彼得堡光芒",
+    "TBR"
+   ],
+   "language": "en",
+   "summary": "Tampa Bay Rays is a American League club in the American League East, playing home games at Tropicana Field.",
+   "structured_payload": {
+    "official_name": "Tampa Bay Rays",
+    "official_name_status": "official_en",
+    "abbreviation": "TB",
+    "provider_codes": [
+     "TBR"
+    ],
+    "league": "American League",
+    "division": "American League East",
+    "city": "St. Petersburg",
+    "market": "圣彼得堡",
+    "venue": "Tropicana Field",
+    "venue_id": 12,
+    "first_year": 1996,
+    "franchise_name": "Tampa Bay",
+    "official_site": "https://www.mlb.com/tba",
+    "zh_name": "坦帕湾光芒",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "光芒",
+    "team_id_mlbam": 139,
+    "franchise_lineage": [
+     {
+      "name": "Tampa Bay Devil Rays",
+      "from": 1998,
+      "to": 2007
+     },
+     {
+      "name": "Tampa Bay Rays",
+      "from": 2008,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:TB"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_east"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:TB",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Tropicana Field",
+   "title": "Tropicana Field",
+   "aliases": [
+    "Tropicana Field (1998-present)"
+   ],
+   "language": "en",
+   "summary": "Tropicana Field is the current home ballpark of the Tampa Bay Rays.",
+   "structured_payload": {
+    "official_name": "Tropicana Field",
+    "common_name": "Tropicana Field",
+    "team": "TEAM:TB",
+    "city": "St. Petersburg",
+    "opened": 1990,
+    "roof_type": "dome",
+    "former_names": [
+     "Tropicana Field (1998-present)"
+    ],
+    "venue_id": 12,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:TB",
+    "TEAM:TB"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:dome"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:TEX",
+   "knowledge_type": "TEAM",
+   "canonical_key": "TEX",
+   "title": "Texas Rangers",
+   "aliases": [
+    "Rangers",
+    "Texas",
+    "Arlington Rangers",
+    "游骑兵",
+    "德州游骑兵",
+    "阿灵顿游骑兵",
+    "TEX"
+   ],
+   "language": "en",
+   "summary": "Texas Rangers is a American League club in the American League West, playing home games at Globe Life Field.",
+   "structured_payload": {
+    "official_name": "Texas Rangers",
+    "official_name_status": "official_en",
+    "abbreviation": "TEX",
+    "provider_codes": [
+     "TEX"
+    ],
+    "league": "American League",
+    "division": "American League West",
+    "city": "Arlington",
+    "market": "阿灵顿",
+    "venue": "Globe Life Field",
+    "venue_id": 5325,
+    "first_year": 1961,
+    "franchise_name": "Texas",
+    "official_site": "https://www.mlb.com/tex",
+    "zh_name": "德州游骑兵",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "游骑兵",
+    "team_id_mlbam": 140,
+    "franchise_lineage": [
+     {
+      "name": "Washington Senators",
+      "from": 1961,
+      "to": 1971
+     },
+     {
+      "name": "Texas Rangers",
+      "from": 1972,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:TEX"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_west"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:TEX",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Globe Life Field",
+   "title": "Globe Life Field",
+   "aliases": [
+    "Arlington Stadium (1972-1993)",
+    "Globe Life Park in Arlington (1994-2019)"
+   ],
+   "language": "en",
+   "summary": "Globe Life Field is the current home ballpark of the Texas Rangers.",
+   "structured_payload": {
+    "official_name": "Globe Life Field",
+    "common_name": "Globe Life Field",
+    "team": "TEAM:TEX",
+    "city": "Arlington",
+    "opened": 2020,
+    "roof_type": "retractable",
+    "former_names": [
+     "Arlington Stadium (1972-1993)",
+     "Globe Life Park in Arlington (1994-2019)"
+    ],
+    "venue_id": 5325,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:TEX",
+    "TEAM:TEX"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:retractable"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:TOR",
+   "knowledge_type": "TEAM",
+   "canonical_key": "TOR",
+   "title": "Toronto Blue Jays",
+   "aliases": [
+    "Blue Jays",
+    "Toronto",
+    "蓝鸟",
+    "多伦多蓝鸟",
+    "TOR"
+   ],
+   "language": "en",
+   "summary": "Toronto Blue Jays is a American League club in the American League East, playing home games at Rogers Centre.",
+   "structured_payload": {
+    "official_name": "Toronto Blue Jays",
+    "official_name_status": "official_en",
+    "abbreviation": "TOR",
+    "provider_codes": [
+     "TOR"
+    ],
+    "league": "American League",
+    "division": "American League East",
+    "city": "Toronto",
+    "market": "多伦多",
+    "venue": "Rogers Centre",
+    "venue_id": 14,
+    "first_year": 1977,
+    "franchise_name": "Toronto",
+    "official_site": "https://www.mlb.com/tor",
+    "zh_name": "多伦多蓝鸟",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "蓝鸟",
+    "team_id_mlbam": 141,
+    "franchise_lineage": [
+     {
+      "name": "Toronto Blue Jays",
+      "from": 1977,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:TOR"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:american_league",
+    "division:american_league_east"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:TOR",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Rogers Centre",
+   "title": "Rogers Centre",
+   "aliases": [
+    "Exhibition Stadium (1977-1989)"
+   ],
+   "language": "en",
+   "summary": "Rogers Centre is the current home ballpark of the Toronto Blue Jays.",
+   "structured_payload": {
+    "official_name": "Rogers Centre",
+    "common_name": "Rogers Centre",
+    "team": "TEAM:TOR",
+    "city": "Toronto",
+    "opened": 1989,
+    "roof_type": "retractable",
+    "former_names": [
+     "Exhibition Stadium (1977-1989)"
+    ],
+    "venue_id": 14,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:TOR",
+    "TEAM:TOR"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:retractable"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TEAM:WSH",
+   "knowledge_type": "TEAM",
+   "canonical_key": "WSH",
+   "title": "Washington Nationals",
+   "aliases": [
+    "Nationals",
+    "Washington",
+    "国民",
+    "华盛顿国民",
+    "WSN"
+   ],
+   "language": "en",
+   "summary": "Washington Nationals is a National League club in the National League East, playing home games at Nationals Park.",
+   "structured_payload": {
+    "official_name": "Washington Nationals",
+    "official_name_status": "official_en",
+    "abbreviation": "WSH",
+    "provider_codes": [
+     "WSN"
+    ],
+    "league": "National League",
+    "division": "National League East",
+    "city": "Washington",
+    "market": "华盛顿",
+    "venue": "Nationals Park",
+    "venue_id": 3309,
+    "first_year": 1968,
+    "franchise_name": "Washington",
+    "official_site": "https://www.mlb.com/was",
+    "zh_name": "华盛顿国民",
+    "zh_name_status": "commonly_used",
+    "zh_nickname": "国民",
+    "team_id_mlbam": 120,
+    "franchise_lineage": [
+     {
+      "name": "Montreal Expos",
+      "from": 1969,
+      "to": 2004
+     },
+     {
+      "name": "Washington Nationals",
+      "from": 2005,
+      "to": "present"
+     }
+    ],
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "league": "mlb_statsapi",
+     "division": "mlb_statsapi",
+     "venue": "mlb_statsapi",
+     "zh_name": "community_zh_translation",
+     "franchise_lineage": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "TEAM:WSH"
+   ],
+   "tags": [
+    "mlb",
+    "team",
+    "league:national_league",
+    "division:national_league_east"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "PARK:WSH",
+   "knowledge_type": "BALLPARK",
+   "canonical_key": "Nationals Park",
+   "title": "Nationals Park",
+   "aliases": [
+    "Olympic Stadium (Montreal) (1969-2004)"
+   ],
+   "language": "en",
+   "summary": "Nationals Park is the current home ballpark of the Washington Nationals.",
+   "structured_payload": {
+    "official_name": "Nationals Park",
+    "common_name": "Nationals Park",
+    "team": "TEAM:WSH",
+    "city": "Washington",
+    "opened": 2008,
+    "roof_type": "open",
+    "former_names": [
+     "Olympic Stadium (Montreal) (1969-2004)"
+    ],
+    "venue_id": 3309,
+    "field_sources": {
+     "official_name": "mlb_statsapi",
+     "opened": "baseball_reference",
+     "roof_type": "baseball_reference",
+     "former_names": "baseball_reference"
+    }
+   },
+   "entity_refs": [
+    "PARK:WSH",
+    "TEAM:WSH"
+   ],
+   "tags": [
+    "mlb",
+    "ballpark",
+    "roof:open"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "baseball_reference"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "PERIODIC",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "DIV:ALE",
+   "knowledge_type": "DIVISION",
+   "canonical_key": "American League East",
+   "title": "American League East",
+   "aliases": [
+    "ALE",
+    "AL East"
+   ],
+   "language": "en",
+   "summary": "American League East is a division of the AL and contains 5 clubs.",
+   "structured_payload": {
+    "abbreviation": "ALE",
+    "league": "LEAGUE:AL",
+    "teams": [
+     "BAL",
+     "BOS",
+     "NYY",
+     "TB",
+     "TOR"
+    ]
+   },
+   "entity_refs": [
+    "DIV:ALE"
+   ],
+   "tags": [
+    "mlb",
+    "division",
+    "league:al"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "DIV:ALC",
+   "knowledge_type": "DIVISION",
+   "canonical_key": "American League Central",
+   "title": "American League Central",
+   "aliases": [
+    "ALC",
+    "AL Central"
+   ],
+   "language": "en",
+   "summary": "American League Central is a division of the AL and contains 5 clubs.",
+   "structured_payload": {
+    "abbreviation": "ALC",
+    "league": "LEAGUE:AL",
+    "teams": [
+     "CWS",
+     "CLE",
+     "DET",
+     "KC",
+     "MIN"
+    ]
+   },
+   "entity_refs": [
+    "DIV:ALC"
+   ],
+   "tags": [
+    "mlb",
+    "division",
+    "league:al"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "DIV:ALW",
+   "knowledge_type": "DIVISION",
+   "canonical_key": "American League West",
+   "title": "American League West",
+   "aliases": [
+    "ALW",
+    "AL West"
+   ],
+   "language": "en",
+   "summary": "American League West is a division of the AL and contains 5 clubs.",
+   "structured_payload": {
+    "abbreviation": "ALW",
+    "league": "LEAGUE:AL",
+    "teams": [
+     "ATH",
+     "HOU",
+     "LAA",
+     "SEA",
+     "TEX"
+    ]
+   },
+   "entity_refs": [
+    "DIV:ALW"
+   ],
+   "tags": [
+    "mlb",
+    "division",
+    "league:al"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "DIV:NLE",
+   "knowledge_type": "DIVISION",
+   "canonical_key": "National League East",
+   "title": "National League East",
+   "aliases": [
+    "NLE",
+    "NL East"
+   ],
+   "language": "en",
+   "summary": "National League East is a division of the NL and contains 5 clubs.",
+   "structured_payload": {
+    "abbreviation": "NLE",
+    "league": "LEAGUE:NL",
+    "teams": [
+     "ATL",
+     "MIA",
+     "NYM",
+     "PHI",
+     "WSH"
+    ]
+   },
+   "entity_refs": [
+    "DIV:NLE"
+   ],
+   "tags": [
+    "mlb",
+    "division",
+    "league:nl"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "DIV:NLC",
+   "knowledge_type": "DIVISION",
+   "canonical_key": "National League Central",
+   "title": "National League Central",
+   "aliases": [
+    "NLC",
+    "NL Central"
+   ],
+   "language": "en",
+   "summary": "National League Central is a division of the NL and contains 5 clubs.",
+   "structured_payload": {
+    "abbreviation": "NLC",
+    "league": "LEAGUE:NL",
+    "teams": [
+     "CHC",
+     "CIN",
+     "MIL",
+     "PIT",
+     "STL"
+    ]
+   },
+   "entity_refs": [
+    "DIV:NLC"
+   ],
+   "tags": [
+    "mlb",
+    "division",
+    "league:nl"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "DIV:NLW",
+   "knowledge_type": "DIVISION",
+   "canonical_key": "National League West",
+   "title": "National League West",
+   "aliases": [
+    "NLW",
+    "NL West"
+   ],
+   "language": "en",
+   "summary": "National League West is a division of the NL and contains 5 clubs.",
+   "structured_payload": {
+    "abbreviation": "NLW",
+    "league": "LEAGUE:NL",
+    "teams": [
+     "AZ",
+     "COL",
+     "LAD",
+     "SD",
+     "SF"
+    ]
+   },
+   "entity_refs": [
+    "DIV:NLW"
+   ],
+   "tags": [
+    "mlb",
+    "division",
+    "league:nl"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "LEAGUE:AL",
+   "knowledge_type": "LEAGUE",
+   "canonical_key": "American League",
+   "title": "American League",
+   "aliases": [
+    "AL"
+   ],
+   "language": "en",
+   "summary": "American League is one of the two leagues of Major League Baseball.",
+   "structured_payload": {
+    "abbreviation": "AL",
+    "divisions": [
+     "DIV:ALE",
+     "DIV:ALC",
+     "DIV:ALW"
+    ]
+   },
+   "entity_refs": [
+    "LEAGUE:AL"
+   ],
+   "tags": [
+    "mlb",
+    "league"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "LEAGUE:NL",
+   "knowledge_type": "LEAGUE",
+   "canonical_key": "National League",
+   "title": "National League",
+   "aliases": [
+    "NL"
+   ],
+   "language": "en",
+   "summary": "National League is one of the two leagues of Major League Baseball.",
+   "structured_payload": {
+    "abbreviation": "NL",
+    "divisions": [
+     "DIV:NLE",
+     "DIV:NLC",
+     "DIV:NLW"
+    ]
+   },
+   "entity_refs": [
+    "LEAGUE:NL"
+   ],
+   "tags": [
+    "mlb",
+    "league"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "LEAGUE_STRUCTURE:MLB",
+   "knowledge_type": "LEAGUE_STRUCTURE",
+   "canonical_key": "mlb_league_structure",
+   "title": "Major League Baseball structure (30 teams, 2 leagues, 6 divisions)",
+   "aliases": [
+    "MLB structure",
+    "league and division structure"
+   ],
+   "language": "en",
+   "summary": "MLB has 30 active franchises: 15 in the American League and 15 in the National League, each split into East, Central and West divisions of five clubs. Each club is a member of one division; division membership is fixed except for rare realignment.",
+   "structured_payload": {
+    "franchise_count": 30,
+    "league_count": 2,
+    "division_count": 6,
+    "leagues": {
+     "American League": [
+      "ALE",
+      "ALC",
+      "ALW"
+     ],
+     "National League": [
+      "NLE",
+      "NLC",
+      "NLW"
+     ]
+    }
+   },
+   "entity_refs": [
+    "LEAGUE:AL",
+    "LEAGUE:NL"
+   ],
+   "tags": [
+    "mlb",
+    "league_structure"
+   ],
+   "source_refs": [
+    "mlb_statsapi",
+    "mlb_official"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "ANNUAL",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  }
+ ],
+ "relations": [
+  {
+   "relation_id": "rel-team-div-ATH",
+   "from_key": "TEAM:ATH",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALW",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-ATH",
+   "from_key": "TEAM:ATH",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:ATH",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-ATL",
+   "from_key": "TEAM:ATL",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLE",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-ATL",
+   "from_key": "TEAM:ATL",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:ATL",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-AZ",
+   "from_key": "TEAM:AZ",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLW",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-AZ",
+   "from_key": "TEAM:AZ",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:AZ",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-BAL",
+   "from_key": "TEAM:BAL",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALE",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-BAL",
+   "from_key": "TEAM:BAL",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:BAL",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-BOS",
+   "from_key": "TEAM:BOS",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALE",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-BOS",
+   "from_key": "TEAM:BOS",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:BOS",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-CHC",
+   "from_key": "TEAM:CHC",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-CHC",
+   "from_key": "TEAM:CHC",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:CHC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-CIN",
+   "from_key": "TEAM:CIN",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-CIN",
+   "from_key": "TEAM:CIN",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:CIN",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-CLE",
+   "from_key": "TEAM:CLE",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-CLE",
+   "from_key": "TEAM:CLE",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:CLE",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-COL",
+   "from_key": "TEAM:COL",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLW",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-COL",
+   "from_key": "TEAM:COL",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:COL",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-CWS",
+   "from_key": "TEAM:CWS",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-CWS",
+   "from_key": "TEAM:CWS",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:CWS",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-DET",
+   "from_key": "TEAM:DET",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-DET",
+   "from_key": "TEAM:DET",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:DET",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-HOU",
+   "from_key": "TEAM:HOU",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALW",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-HOU",
+   "from_key": "TEAM:HOU",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:HOU",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-KC",
+   "from_key": "TEAM:KC",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-KC",
+   "from_key": "TEAM:KC",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:KC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-LAA",
+   "from_key": "TEAM:LAA",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALW",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-LAA",
+   "from_key": "TEAM:LAA",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:LAA",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-LAD",
+   "from_key": "TEAM:LAD",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLW",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-LAD",
+   "from_key": "TEAM:LAD",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:LAD",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-MIA",
+   "from_key": "TEAM:MIA",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLE",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-MIA",
+   "from_key": "TEAM:MIA",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:MIA",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-MIL",
+   "from_key": "TEAM:MIL",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-MIL",
+   "from_key": "TEAM:MIL",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:MIL",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-MIN",
+   "from_key": "TEAM:MIN",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-MIN",
+   "from_key": "TEAM:MIN",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:MIN",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-NYM",
+   "from_key": "TEAM:NYM",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLE",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-NYM",
+   "from_key": "TEAM:NYM",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:NYM",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-NYY",
+   "from_key": "TEAM:NYY",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALE",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-NYY",
+   "from_key": "TEAM:NYY",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:NYY",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-PHI",
+   "from_key": "TEAM:PHI",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLE",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-PHI",
+   "from_key": "TEAM:PHI",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:PHI",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-PIT",
+   "from_key": "TEAM:PIT",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-PIT",
+   "from_key": "TEAM:PIT",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:PIT",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-SD",
+   "from_key": "TEAM:SD",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLW",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-SD",
+   "from_key": "TEAM:SD",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:SD",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-SEA",
+   "from_key": "TEAM:SEA",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALW",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-SEA",
+   "from_key": "TEAM:SEA",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:SEA",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-SF",
+   "from_key": "TEAM:SF",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLW",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-SF",
+   "from_key": "TEAM:SF",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:SF",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-STL",
+   "from_key": "TEAM:STL",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLC",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-STL",
+   "from_key": "TEAM:STL",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:STL",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-TB",
+   "from_key": "TEAM:TB",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALE",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-TB",
+   "from_key": "TEAM:TB",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:TB",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-TEX",
+   "from_key": "TEAM:TEX",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALW",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-TEX",
+   "from_key": "TEAM:TEX",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:TEX",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-TOR",
+   "from_key": "TEAM:TOR",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:ALE",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-TOR",
+   "from_key": "TEAM:TOR",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:TOR",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-div-WSH",
+   "from_key": "TEAM:WSH",
+   "relation_type": "MEMBER_OF",
+   "to_key": "DIV:NLE",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-team-park-WSH",
+   "from_key": "TEAM:WSH",
+   "relation_type": "HOME_BALLPARK",
+   "to_key": "PARK:WSH",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-div-league-ALE",
+   "from_key": "DIV:ALE",
+   "relation_type": "PART_OF",
+   "to_key": "LEAGUE:AL",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-div-league-ALC",
+   "from_key": "DIV:ALC",
+   "relation_type": "PART_OF",
+   "to_key": "LEAGUE:AL",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-div-league-ALW",
+   "from_key": "DIV:ALW",
+   "relation_type": "PART_OF",
+   "to_key": "LEAGUE:AL",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-div-league-NLE",
+   "from_key": "DIV:NLE",
+   "relation_type": "PART_OF",
+   "to_key": "LEAGUE:NL",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-div-league-NLC",
+   "from_key": "DIV:NLC",
+   "relation_type": "PART_OF",
+   "to_key": "LEAGUE:NL",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-div-league-NLW",
+   "from_key": "DIV:NLW",
+   "relation_type": "PART_OF",
+   "to_key": "LEAGUE:NL",
+   "source_refs": [
+    "mlb_statsapi"
+   ],
+   "as_of": "2026-09-15"
+  },
+  {
+   "relation_id": "rel-mlb-leagues",
+   "from_key": "LEAGUE_STRUCTURE:MLB",
+   "relation_type": "PART_OF",
+   "to_key": "LEAGUE:AL",
+   "source_refs": [
+    "mlb_statsapi"
+   ]
+  },
+  {
+   "relation_id": "rel-mlb-leagues-nl",
+   "from_key": "LEAGUE_STRUCTURE:MLB",
+   "relation_type": "PART_OF",
+   "to_key": "LEAGUE:NL",
+   "source_refs": [
+    "mlb_statsapi"
+   ]
+  }
+ ]
+}

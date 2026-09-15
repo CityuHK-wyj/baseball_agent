@@ -35,7 +35,7 @@ from app.state.services import (derive_objective_state, derive_requirement_state
 # (attempts, routing, drafts, judge reasoning, rejected evidence, unused RAG) is never
 # a knowledge kind and is structurally excluded by ContextService.
 KNOWLEDGE_KINDS: tuple[str, ...] = ("METRIC", "SCHEMA", "SOURCE_MAPPING", "REFERENCE",
-                                    "COMPLETION_REPORT")
+                                    "KNOWLEDGE", "COMPLETION_REPORT")
 MAX_CONTEXT_ITEMS = 8
 
 

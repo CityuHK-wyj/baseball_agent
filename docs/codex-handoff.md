@@ -19,20 +19,47 @@ This file lets the next agent continue without the prior chat. Read it after
 
 ## Repository State
 
-- branch: `agent/deepseek-implementation-safe` (history-reconstructed; the old
-  `agent/deepseek-implementation` must not be pushed)
-- root commit: clean import of the verified-safe milestone-1 tree (`6ccb2ad`)
-- tests: `python3 -m unittest discover -s tests -v` → 242 passing
-- secret scan: current tree exit 0; all commits reachable from the safe branch have
-  0 real findings (verified by scanning every blob)
-- remote: `https://github.com/CityuHK-wyj/baseball_agent.git`; published as
-  `origin/agent/deepseek-implementation-safe`
-- latest pushed commit: `01fe20cf799c2ccbf627d018180ce0d3028a587d`; `main` is untouched and
-  the old `agent/deepseek-implementation` branch is never pushed
+- branch: `agent/shared-knowledge` (branched from `agent/deepseek-implementation-safe`);
+  the baseline branch remains intact and is not overwritten
+- note: an uncommitted SQL-hardening WIP on local `codex/review-hardening` (1 failing test)
+  was preserved via `git stash push -u` (stash@{0}) and is not part of this branch
+- tests: `python3 -m unittest discover -s tests -v` → 299 passing
+- secret scan: current tree exit 0
+- remote: `https://github.com/CityuHK-wyj/baseball_agent.git`
 
-## What DeepSeek Implemented
+## What This Session Implemented
 
-Milestone 15 (this session) — Web evidence extraction (ADR 0018):
+Milestone 17 — persistent Shared Knowledge base (ADR 0019):
+
+- `app/models/knowledge.py`: `KnowledgeSource`, `KnowledgeItem`, `KnowledgeRelation`,
+  `KnowledgeSnapshot`, `KnowledgeQuery`, `KnowledgeMatch`, `KnowledgeDiff` with authority,
+  status, effective dates, `as_of`, freshness policy, verification status and version.
+- `app/knowledge/store.py`: versioned `KnowledgeStore` — SQLite dev tables plus a
+  `PostgresKnowledgeStore` that writes a dedicated `knowledge` schema (never
+  `baseball_analytics`). Item history, relations and snapshots included.
+- `app/knowledge/{freshness,registry,retrieval,ingestion,refresh,fetch,loader,service,entities}.py`:
+  freshness policies, source registry with an authority ladder, deterministic retrieval,
+  validate → stage `COLLECTED` → activate with supersession, live refresh from the MLB
+  Stats API and the official OBR PDF, a `KnowledgeBase` facade, and entity/metric projections.
+- `app/context/knowledge_source.py`: `KnowledgeContextSource` behind the existing
+  `ContextSource` seam; `KNOWLEDGE` added to `Orchestrator.KNOWLEDGE_KINDS`.
+- `app/cli.py`: `knowledge status|sources|search|show|refresh|validate`.
+- `knowledge/sources/*.json` + `knowledge/seed/*.json`: committed source manifests and
+  packs — reference (30 teams, 30 ballparks, divisions, leagues), rules (2026 OBR structure
+  + concepts + transaction rules), glossary (metrics/Statcast/pitch/discipline/scouting),
+  players (118 profiles + awards), context (postseason structure + historical eras) and
+  community (51 creators).
+- Tests: `tests/knowledge/` (store, retrieval, ingestion, domains, CLI + refresh).
+- Docs: `docs/adr/0019-shared-knowledge-base.md`, `docs/development/shared-knowledge.md`,
+  `docs/usage/knowledge-base.md`, README section, matrix section K2.
+
+Live verification performed 2026-09-15: MLB Stats API (30 teams, divisions, venues) and
+`2026-official-baseball-rules.pdf`. A community reachability sweep verified a subset of
+sources; the rest are marked `UNVERIFIED`.
+
+## Prior Session (DeepSeek)
+
+Milestone 15 — Web evidence extraction (ADR 0018):
 
 - `app/models/evidence.py`, `app/semantic/evidence.py` (deterministic extractor +
   `evidence_to_artifact`), `app/llm/evidence.py` (+ `EVIDENCE_PROMPT`).
