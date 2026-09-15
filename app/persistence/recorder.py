@@ -11,6 +11,7 @@ from uuid import uuid4
 from app.models.artifacts import Artifact, ArtifactAssessment
 from app.models.checkpoint import Checkpoint, RecoveryPosition
 from app.models.contracts import ObjectiveState, RequirementState
+from app.models.interaction import InteractionRecord
 from app.models.planning import TaskAttempt, TaskExecution
 from app.models.reports import CompletionReport, ResponsePackage
 from app.persistence.artifacts import ArtifactStorage, StoredArtifact
@@ -62,6 +63,14 @@ class RunRecorder:
 
     def record_response_package(self, run_id: str, package: ResponsePackage) -> None:
         self._store.save_object("response_package", package.run_id, run_id, package.model_dump(mode="json"))
+
+    def record_interaction(self, interaction: InteractionRecord) -> None:
+        self._store.save_object("interaction", interaction.run_id, interaction.run_id,
+                                interaction.model_dump(mode="json"))
+
+    def load_interaction(self, run_id: str) -> InteractionRecord | None:
+        record = self._store.get_object("interaction", run_id)
+        return InteractionRecord.model_validate(record.payload) if record else None
 
     def checkpoint(self, run_id: str, position: RecoveryPosition, *,
                    active_work_refs: Iterable[str] = (),

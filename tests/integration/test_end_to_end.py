@@ -15,6 +15,7 @@ from app.assessment.judge import RuleBasedJudge
 from app.assessment.service import AssessmentService
 from app.llm.response import DeterministicResponseComposer
 from app.models.entities import CanonicalEntity
+from app.models.clarification import ClarificationAnswer
 from app.persistence.artifacts import LocalFilesystemArtifactStorage
 from app.persistence.recorder import RunRecorder
 from app.persistence.resume import ResumeService
@@ -75,6 +76,44 @@ class EndToEndTests(unittest.TestCase):
         self.assertTrue(result.needs_clarification)
         self.assertTrue(result.clarifications[0].options)
         self.assertEqual(result.objective_statuses, ())
+
+    def test_clarification_is_checkpointed_and_resumes_the_same_run(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            store = SqliteOperationalStore(root / "operational.db")
+            recorder = RunRecorder(store, LocalFilesystemArtifactStorage(root / "payloads"))
+            try:
+                subject = pipeline(ambiguous_dictionary(), recorder=recorder)
+                waiting = subject.analyze("How did Hernandez perform?", run_id="clarify-run")
+
+                self.assertTrue(waiting.needs_clarification)
+                self.assertEqual(waiting.run_ids, ("clarify-run",))
+                self.assertEqual(store.latest_checkpoint("clarify-run").recovery_position,
+                                 "WAITING_FOR_USER")
+                self.assertEqual(store.list_objects("execution", "clarify-run"), ())
+
+                option = waiting.clarifications[0].options[1]
+                resumed = subject.resume_clarification(
+                    "clarify-run", ClarificationAnswer(
+                        clarification_ref=waiting.clarifications[0].clarification_id,
+                        chosen_option_id=option.option_id))
+
+                self.assertEqual(resumed.run_ids, ("clarify-run",))
+                self.assertEqual(resumed.objective_statuses, ("COMPLETE",))
+                self.assertEqual(len(store.list_objects("execution", "clarify-run")), 1)
+                interaction = store.get_object("interaction", "clarify-run").payload
+                self.assertEqual(interaction["status"], "CONFIRMED")
+                confirmed = interaction["confirmed_constraints"][0]
+                self.assertEqual(confirmed["origin"], "USER_CONFIRMED")
+                self.assertEqual(confirmed["authority"], "USER_CONSTRAINT")
+                with self.assertRaises(ValueError):
+                    subject.resume_clarification(
+                        "clarify-run", ClarificationAnswer(
+                            clarification_ref=waiting.clarifications[0].clarification_id,
+                            chosen_option_id=option.option_id))
+                self.assertEqual(len(store.list_objects("execution", "clarify-run")), 1)
+            finally:
+                store.close()
 
     def test_multi_objective_run_scopes_response_per_objective(self):
         result = pipeline(judge_dictionary()).analyze("Analyse Judge injury and salary value")

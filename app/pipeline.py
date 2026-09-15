@@ -17,8 +17,10 @@ from app.assessment.service import AssessmentService
 from app.context.service import ContextService
 from app.llm.response import DeterministicResponseComposer, ResponseComposer
 from app.models.artifacts import ArtifactContract
-from app.models.clarification import ClarificationRequest
-from app.models.contracts import AnalysisObjective, ArtifactRequirement, Constraint
+from app.models.clarification import ClarificationAnswer, ClarificationRequest
+from app.models.contracts import (AnalysisObjective, ArtifactRequirement, CategoryConstraint,
+                                  Constraint, Entity)
+from app.models.interaction import InteractionRecord
 from app.models.reports import ResponsePackage
 from app.persistence.recorder import RunRecorder
 from app.semantic.normalizer import SemanticNormalizer
@@ -72,14 +74,52 @@ class AnalysisPipeline:
                 constraints: tuple[Constraint, ...] = (), run_id: str | None = None) -> PipelineResult:
         semantic = self._semantic.normalize(raw_query, constraints=constraints, mentions=mentions)
         if semantic.needs_clarification:
+            effective_run_id = run_id or "run-1"
+            if self._recorder is not None:
+                request = semantic.clarifications[0]
+                self._recorder.record_interaction(InteractionRecord(
+                    run_id=effective_run_id, raw_query=raw_query, objectives=semantic.objectives,
+                    clarification=request))
+                self._recorder.checkpoint(effective_run_id, "WAITING_FOR_USER",
+                                          pending_request_refs=(request.clarification_id,))
             return PipelineResult(raw_query=raw_query, needs_clarification=True,
                                   clarifications=semantic.clarifications,
-                                  objectives=semantic.objectives)
+                                  objectives=semantic.objectives, run_ids=(effective_run_id,))
         if not semantic.objectives:
             return PipelineResult(raw_query=raw_query)
 
+        return self._run_objectives(raw_query, semantic.objectives, run_id)
+
+    def resume_clarification(self, run_id: str, answer: ClarificationAnswer) -> PipelineResult:
+        if self._recorder is None:
+            raise RuntimeError("Clarification resume requires a persistent RunRecorder")
+        interaction = self._recorder.load_interaction(run_id)
+        if interaction is None or interaction.status != "WAITING_FOR_USER":
+            raise ValueError(f"Run {run_id!r} has no pending clarification")
+        if answer.clarification_ref != interaction.clarification.clarification_id:
+            raise ValueError("Clarification answer does not match the pending request")
+        option = interaction.clarification.chosen(answer.chosen_option_id)
+        if option is None:
+            raise ValueError("Clarification answer selected an unknown option")
+        canonical = self._semantic.entity_for_key(option.value)
+        namespace, _, identifier = canonical.entity_key.partition(":")
+        entity = Entity(namespace=namespace or "LOCAL", entity_type=canonical.entity_type,
+                        identifier=identifier or canonical.entity_key)
+        confirmed = CategoryConstraint(key="entity_key", values=(option.value,),
+                                       origin="USER_CONFIRMED", authority="USER_CONSTRAINT")
+        objectives = tuple(item.model_copy(update={
+            "entities": tuple((*item.entities, entity)),
+            "constraints": tuple((*item.constraints, confirmed)),
+        }) for item in interaction.objectives)
+        self._recorder.record_interaction(interaction.model_copy(update={
+            "status": "CONFIRMED", "objectives": objectives,
+            "confirmed_constraints": (confirmed,)}))
+        return self._run_objectives(interaction.raw_query, objectives, run_id)
+
+    def _run_objectives(self, raw_query: str, objectives: tuple[AnalysisObjective, ...],
+                        run_id: str | None) -> PipelineResult:
         requirements: list[ArtifactRequirement] = []
-        for objective in semantic.objectives:
+        for objective in objectives:
             requirements.extend(self._decomposer.decompose(objective))
         all_requirements = tuple(requirements)
 
@@ -91,7 +131,7 @@ class AnalysisPipeline:
         responses: list[str] = []
         packages: list[ResponsePackage] = []
         runs: list[RunResult] = []
-        for index, objective in enumerate(semantic.objectives):
+        for index, objective in enumerate(objectives):
             objective_requirements = tuple(
                 item for item in all_requirements if item.objective_ref == objective.objective_id)
             effective_run_id = run_id or f"run-{index + 1}"
@@ -107,7 +147,7 @@ class AnalysisPipeline:
             responses.append(self._response_composer.compose(result.response_package))
             runs.append(result)
 
-        return PipelineResult(raw_query=raw_query, objectives=semantic.objectives,
+        return PipelineResult(raw_query=raw_query, objectives=objectives,
                               run_ids=tuple(run_ids), objective_statuses=tuple(statuses),
                               responses=tuple(responses), response_packages=tuple(packages),
                               runs=tuple(runs))

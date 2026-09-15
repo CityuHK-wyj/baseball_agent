@@ -6,7 +6,8 @@ Runtime audit update (2026-09-15, `gpt56/runtime-audit-hardening`): 254 tests pa
 The audit wired SourceMapping, Web Evidence and Orchestrator metrics; fixed cross-objective
 evidence leakage, DuckDB path bypasses, LLM evidence/planner validation, physical mapped-tool
 routing, and persisted planner-terminal reopening on a new permission. Live data sources remain
-UNVERIFIED_LIVE; clarification persistence and permission/constraint-revision workflows remain open.
+UNVERIFIED_LIVE; clarification persistence is delivered, while permission/constraint-revision
+workflows remain open.
 
 Last updated by: DeepSeek Implementation Engineer session (milestone 3 — guarded tool
 execution). Milestones 1–2 delivered earlier and preserved.

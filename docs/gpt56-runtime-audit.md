@@ -33,6 +33,7 @@ Ground truth (2026-09-15, Python 3.14.4):
 | RAH-009 | HIGH | Persisted planner terminal lifecycle | Resume recreated a terminal latch from the current external condition, so a newly permitted source stayed blocked; it also did not clear the latch before calling Planner. | Store the terminal-condition fingerprint in checkpoints, compare it on resume, and observe a changed condition before building `PlannerContext`. Legacy checkpoints retain terminal behavior when no fingerprint exists. | `OrchestratorPersistenceTests.test_new_permitted_source_reopens_a_persisted_noncomplete_terminal_plan` | FIXED |
 | RAH-010 | HIGH | LLM Planner schema boundary | Unknown output fields were discarded and a non-array `tasks` value raised an internal `AttributeError`, bypassing the configured deterministic fallback. | Enforce bounded closed decision/task schemas and explicit field types; normalize all invalid model shapes to validation failures. | `LLMPlannerTests.test_unknown_output_fields_are_rejected` and `test_wrong_task_shape_falls_back_instead_of_raising_an_internal_error` | FIXED |
 | RAH-011 | HIGH | SourceMapping physical capability | Router enforced only the mapped source kind; a Planner preference could select a different tool within that same source kind. | Treat `ExecutionRoute.tool` as a hard mapping constraint and block all other tools before applying Planner preference or optimization. | `RouterSourceMappingTests.test_direct_route_enforces_the_mapped_tool_within_a_source_kind` | FIXED |
+| RAH-012 | HIGH | Clarification runtime lifecycle | Ambiguous semantic output returned directly to the caller, with no run id, durable request, checkpoint, confirmation path, or replay protection. | Persist a small interaction record and `WAITING_FOR_USER` checkpoint; resume the same objective id after a validated answer, attach a `USER_CONFIRMED`/`USER_CONSTRAINT` entity constraint, and reject replayed answers before execution. | `EndToEndTests.test_clarification_is_checkpointed_and_resumes_the_same_run` | FIXED |
 
 ## Open audit areas
 
@@ -43,5 +44,5 @@ Ground truth (2026-09-15, Python 3.14.4):
 - SQL/DuckDB parser and filesystem bypass battery.
 - LLM output schema, size, partial-response and hallucination guards for judge and
   response composition.
-- Clarification/permission/constraint-revision workflows.
+- Permission and constraint-revision workflows.
 - Realistic baseball E2E and CLI/documentation truthfulness.

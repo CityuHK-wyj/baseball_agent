@@ -65,6 +65,9 @@ class SemanticNormalizer:
                     found.append(surface)
         return tuple(found)
 
+    def entity_for_key(self, entity_key: str) -> CanonicalEntity:
+        return self._dictionary.get(entity_key)
+
 
 def _to_entity(canonical: CanonicalEntity) -> Entity:
     namespace, _, identifier = canonical.entity_key.partition(":")
