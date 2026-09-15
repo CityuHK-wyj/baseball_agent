@@ -78,6 +78,9 @@ class RuleBasedRequirementDecomposer:
     def decompose(self, objective: AnalysisObjective,
                   context: DecompositionContext | None = None) -> tuple[ArtifactRequirement, ...]:
         specs = _SPECS.get(objective.objective_type, _SPECS["PERFORMANCE"])
+        if objective.subtype == "knowledge":
+            specs = (_RequirementSpec(objective.raw_query, "EVIDENCE", ("knowledge_statement",),
+                                      "reference", "EXISTENCE"),)
         population_scope = "player" if any(
             entity.entity_type == "PLAYER" for entity in objective.entities) else "league"
         requirements: list[ArtifactRequirement] = []

@@ -12,7 +12,7 @@ from pydantic import Field
 from app.models.artifacts import ArtifactContract
 from app.models.contracts import Name
 
-ContextPurpose = Literal["PLANNER", "RESPONSE"]
+ContextPurpose = Literal["PLANNER", "JUDGE", "RESPONSE"]
 
 # History that must never be projected into a downstream consumer.
 _ALWAYS_EXCLUDED = frozenset({"ATTEMPT", "ROUTING_DECISION", "PLANNER_DRAFT", "JUDGE_REASONING",

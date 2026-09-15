@@ -36,15 +36,19 @@ class RuleBasedObjectiveExtractor:
     def extract(self, raw_query: str, entities: tuple[Entity, ...] = (),
                 constraints: tuple[Constraint, ...] = ()) -> tuple[AnalysisObjective, ...]:
         lowered = raw_query.casefold()
+        knowledge_question = any(cue in lowered for cue in (
+            "是什么意思", "是什么", "哪个分区", "规则", "what is ", "what does ", "which division"))
         matched = [objective_type for objective_type, cues in _TYPE_CUES
                    if any(cue in lowered for cue in cues)]
         if not matched:
             matched = ["PERFORMANCE"]
+        if knowledge_question:
+            matched = ["CONTEXT"]
         return tuple(
             AnalysisObjective(
                 objective_id=self._id_factory("objective"), raw_query=raw_query,
                 description=raw_query, objective_type=objective_type,
-                subtype=objective_type.casefold(), entities=entities, constraints=constraints,
+                subtype="knowledge" if knowledge_question else objective_type.casefold(), entities=entities, constraints=constraints,
                 base_priority=_BASE_PRIORITY[objective_type])
             for objective_type in matched
         )

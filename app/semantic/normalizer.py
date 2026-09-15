@@ -6,6 +6,7 @@ ClarificationRequest instead of being silently decided (D045).
 """
 
 from collections.abc import Callable, Iterable
+import re
 
 from app.models.clarification import ClarificationRequest
 from app.models.contracts import Constraint, Entity
@@ -61,7 +62,8 @@ class SemanticNormalizer:
         for entity in self._dictionary.entities():
             surfaces = (entity.display_name, *entity.aliases)
             for surface in surfaces:
-                if len(surface) >= 3 and surface.casefold() in lowered and surface not in found:
+                min_length = 2 if re.search(r"[\u4e00-\u9fff]", surface) else 3
+                if len(surface) >= min_length and surface.casefold() in lowered and surface not in found:
                     found.append(surface)
         return tuple(found)
 

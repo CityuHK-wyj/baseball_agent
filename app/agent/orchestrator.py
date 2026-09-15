@@ -162,11 +162,12 @@ class Orchestrator:
             unmet = unmet_core_requirements(requirements, states)
             recoverable = tuple(
                 item.requirement_id for item in unmet
-                if self._router.eligible_sources(item.descriptor.artifact_type, self._permitted_sources))
+                if self._router.eligible_sources(item.descriptor.artifact_type, self._permitted_sources,
+                                                 item.descriptor.data_keys))
             policy_blocked = tuple(
                 item.requirement_id for item in unmet
                 if item.requirement_id not in recoverable
-                and self._router.candidate_sources(item.descriptor.artifact_type))
+                and self._router.candidate_sources(item.descriptor.artifact_type, item.descriptor.data_keys))
             scoped_assessments = tuple(item for item in self._assessment_service.all_assessments()
                                        if item.requirement_ref in by_id
                                        and item.objective_ref in (None, objective.objective_id))
@@ -213,12 +214,13 @@ class Orchestrator:
                     break
                 requirement = by_id[task.requirement_refs[0]]
                 execution_route = None
-                if self._source_mapping_resolver is not None:
+                if self._source_mapping_resolver is not None and requirement.descriptor.artifact_type != "EVIDENCE":
                     execution_route = self._source_mapping_resolver.resolve(
                         task.task_id, requirement.descriptor.data_keys)
                 routing = self._router.route(task, requirement.descriptor.artifact_type,
                                              self._permitted_sources,
-                                             execution_route=execution_route)
+                                             execution_route=execution_route,
+                                             data_keys=requirement.descriptor.data_keys)
                 routings.append(routing)
                 metrics.record("ROUTE", subject_ref=routing.decision_id, agent="ROUTER",
                                status="SELECTED" if routing.selected_tool else "BLOCKED",
@@ -253,7 +255,11 @@ class Orchestrator:
                         self._recorder.record_artifact(run_id, outcome.artifact, outcome.payload,
                                                        outcome.payload_content_type)
                     assessment = self._assessment_service.assess(
-                        outcome.artifact.artifact_id, requirement, objective.objective_id)
+                        outcome.artifact.artifact_id, requirement, objective.objective_id,
+                        context_items=self._retrieve_context(ContextRequest(
+                            request_id=f"judge-{run_id}-{requirement.requirement_id}", purpose="JUDGE",
+                            query=objective.raw_query, kinds=KNOWLEDGE_KINDS,
+                            max_items=MAX_CONTEXT_ITEMS, run_id=run_id)))
                     round_assessments.append(assessment)
                     metrics.record("ASSESSMENT", subject_ref=assessment.assessment_id, agent="JUDGE",
                                    status=assessment.final_level, message=assessment.assessment_summary)

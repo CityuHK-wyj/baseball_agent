@@ -34,48 +34,15 @@ from app.semantic.normalizer import SemanticNormalizer
 from app.semantic.objective_extractor import RuleBasedObjectiveExtractor
 from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
 
-DEFAULT_ENTITIES = (
-    CanonicalEntity(entity_key="MLBAM:592450", entity_type="PLAYER", display_name="Aaron Judge",
-                    aliases=("Judge", "交通指挥员")),
-    CanonicalEntity(entity_key="MLBAM:660271", entity_type="PLAYER", display_name="Shohei Ohtani",
-                    aliases=("Ohtani",)),
-)
-
-
 def _id_factory():
     def factory(prefix: str) -> str:
         return f"{prefix}-{uuid4().hex[:12]}"
     return factory
 
 
-def build_pipeline(*, persist: bool = False, empty: bool = False,
+def build_pipeline(*, persist: bool = False, empty: bool = False, demo: bool = False,
                    knowledge: KnowledgeBase | None = None) -> AnalysisPipeline:
-    ids = _id_factory()
-    knowledge = knowledge or _open_knowledge()
-    dictionary = entity_dictionary_from_knowledge(knowledge.store)
-    if not dictionary.entities():
-        dictionary = EntityDictionary(DEFAULT_ENTITIES)
-    resolver = EntityResolver(dictionary, id_factory=ids)
-    semantic = SemanticNormalizer(RuleBasedObjectiveExtractor(id_factory=ids), resolver,
-                                  dictionary, id_factory=ids)
-    router = Router((ToolCapability(tool="synthetic", source_kind="SYNTHETIC",
-                                    supported_artifact_types=("TABLE", "EVIDENCE", "FEATURE")),),
-                    id_factory=ids)
-    registry = ArtifactRegistry()
-    assessment = AssessmentService(registry, RuleBasedJudge(), id_factory=ids)
-    context_service = ContextService((KnowledgeContextSource(knowledge),))
-    recorder = None
-    if persist:
-        settings.operational_store_path.parent.mkdir(parents=True, exist_ok=True)
-        recorder = RunRecorder(SqliteOperationalStore(settings.operational_store_path),
-                               LocalFilesystemArtifactStorage(settings.artifact_storage_path),
-                               id_factory=ids)
-    return AnalysisPipeline(
-        semantic, RuleBasedRequirementDecomposer(id_factory=ids),
-        RuleBasedPlanner(id_factory=ids, max_rounds=3), router, assessment, registry,
-        tool_factory=default_tool_factory(0 if empty else 1200), recorder=recorder,
-        context_service=context_service,
-        max_rounds=3, budget=10, id_factory=ids)
+    return AnalysisPipeline.default(persist=persist, empty=empty, demo=demo or empty, knowledge=knowledge)
 
 
 def _open_store() -> SqliteOperationalStore:
@@ -88,16 +55,22 @@ def _print_result(result, as_json: bool) -> int:
         print(json.dumps({"needs_clarification": result.needs_clarification,
                           "objective_statuses": list(result.objective_statuses),
                           "responses": list(result.responses),
+                          "clarifications": [item.model_dump(mode="json") for item in result.clarifications],
+                          "permissions": [item.model_dump(mode="json") for item in result.permissions],
+                          "constraint_revisions": [item.model_dump(mode="json") for item in result.constraint_revisions],
                           "run_ids": list(result.run_ids)}, indent=2, ensure_ascii=False))
         return 0
     if result.needs_clarification:
+        print(f"run_id={result.run_ids[0]}")
         print("Clarification required:")
         for request in result.clarifications:
-            print(f"  Q: {request.question}  (reason: {request.reason})")
+            print(f"  request_id={request.clarification_id} Q: {request.question}  (reason: {request.reason})")
             for option in request.options:
                 marker = "*" if option.option_id == request.recommended_option_id else " "
                 print(f"   {marker} [{option.option_id}] {option.label} -> {option.value}")
         return 0
+    for request in (*result.permissions, *result.constraint_revisions):
+        print(f"run_id={result.run_ids[0]} WAITING_FOR_USER {request.model_dump_json()}")
     for status, response in zip(result.objective_statuses, result.responses):
         print(f"=== {status} ===")
         print(response)
@@ -105,9 +78,31 @@ def _print_result(result, as_json: bool) -> int:
 
 
 def command_ask(args) -> int:
-    pipeline = build_pipeline(persist=args.persist, empty=args.empty)
-    result = pipeline.analyze(args.query, mentions=tuple(args.mention) if args.mention else None)
-    return _print_result(result, args.json)
+    pipeline = build_pipeline(persist=args.persist, empty=args.empty, demo=args.demo)
+    try:
+        result = pipeline.analyze(args.query, mentions=tuple(args.mention) if args.mention else None)
+        return _print_result(result, args.json)
+    finally:
+        pipeline.close()
+
+
+def command_answer(args) -> int:
+    from app.models.clarification import ClarificationAnswer
+    from app.models.interaction import PermissionAnswer, ConstraintRevisionAnswer
+    pipeline = build_pipeline(persist=True, demo=args.demo)
+    try:
+        if args.choice is not None:
+            result = pipeline.resume_clarification(args.run_id, ClarificationAnswer(
+                clarification_ref=args.request_id, chosen_option_id=args.choice))
+        elif args.permission is not None:
+            result = pipeline.resume_permission(args.run_id, PermissionAnswer(
+                permission_ref=args.request_id, approved=args.permission == "approve"))
+        else:
+            result = pipeline.resume_constraint_revision(args.run_id, ConstraintRevisionAnswer(
+                revision_ref=args.request_id, accepted=args.revision == "accept"))
+        return _print_result(result, args.json)
+    finally:
+        pipeline.close()
 
 
 def command_resume(args) -> int:
@@ -313,9 +308,21 @@ def build_parser() -> argparse.ArgumentParser:
     ask.add_argument("query")
     ask.add_argument("--mention", action="append", help="explicit entity mention (repeatable)")
     ask.add_argument("--empty", action="store_true", help="simulate a source returning no rows")
+    ask.add_argument("--demo", action="store_true", help="explicitly enable synthetic analytics")
     ask.add_argument("--persist", action="store_true", help="persist to the operational store")
     ask.add_argument("--json", action="store_true")
     ask.set_defaults(func=command_ask)
+
+    answer = sub.add_parser("answer", help="answer a persisted request and resume the same run")
+    answer.add_argument("--run-id", required=True)
+    answer.add_argument("--request-id", required=True)
+    choices = answer.add_mutually_exclusive_group(required=True)
+    choices.add_argument("--choice")
+    choices.add_argument("--permission", choices=("approve", "reject"))
+    choices.add_argument("--revision", choices=("accept", "reject"))
+    answer.add_argument("--demo", action="store_true")
+    answer.add_argument("--json", action="store_true")
+    answer.set_defaults(func=command_answer)
 
     resume = sub.add_parser("resume", help="inspect resume state for a run")
     resume.add_argument("--run-id", required=True)

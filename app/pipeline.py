@@ -8,12 +8,14 @@ intent and never bypasses the accepted-product boundary.
 
 from collections.abc import Callable
 from datetime import datetime, timezone
+from uuid import uuid4
 
 from app.agent.executor import Executor, Tool
 from app.agent.orchestrator import Orchestrator, RunResult
 from app.agent.planner import Planner
 from app.agent.registry import ArtifactRegistry
 from app.agent.routing import Router
+from app.agent.source_mapping import SourceMappingResolver
 from app.assessment.service import AssessmentService
 from app.context.service import ContextService
 from app.llm.response import DeterministicResponseComposer, ResponseComposer
@@ -61,13 +63,25 @@ def default_tool_factory(row_count: int = 1200) -> ToolFactory:
 
 
 class AnalysisPipeline:
+    @classmethod
+    def default(cls, **options) -> "AnalysisPipeline":
+        """Compose the local runtime; injectable providers remain optional."""
+        from app.runtime import build_pipeline
+        return build_pipeline(**options)
+
+    def close(self) -> None:
+        for resource in getattr(self, "_owned_resources", ()):
+            resource.close()
+        self._owned_resources = ()
+
     def __init__(self, semantic: SemanticNormalizer, decomposer: RequirementDecomposer,
                  planner: Planner, router: Router, assessment_service: AssessmentService,
                  registry: ArtifactRegistry, tool_factory: ToolFactory | None = None,
                  context_service: ContextService | None = None, recorder: RunRecorder | None = None,
                  response_composer: ResponseComposer | None = None,
                  max_rounds: int = 3, budget: int = 10,
-                 id_factory: Callable[[str], str] | None = None) -> None:
+                 id_factory: Callable[[str], str] | None = None,
+                 source_mapping_resolver: SourceMappingResolver | None = None) -> None:
         self._semantic = semantic
         self._decomposer = decomposer
         self._planner = planner
@@ -77,17 +91,17 @@ class AnalysisPipeline:
         self._tool_factory = tool_factory or default_tool_factory()
         self._context_service = context_service
         self._recorder = recorder
+        self._source_mapping_resolver = source_mapping_resolver
         self._response_composer = response_composer or DeterministicResponseComposer()
         self._max_rounds = max_rounds
         self._budget = budget
-        counter = iter(range(1, 100_000))
-        self._id_factory = id_factory or (lambda prefix: f"{prefix}-{next(counter)}")
+        self._id_factory = id_factory or (lambda prefix: f"{prefix}-{uuid4().hex}")
 
     def analyze(self, raw_query: str, mentions: tuple[str, ...] | None = None,
                 constraints: tuple[Constraint, ...] = (), run_id: str | None = None) -> PipelineResult:
         semantic = self._semantic.normalize(raw_query, constraints=constraints, mentions=mentions)
         if semantic.needs_clarification:
-            effective_run_id = run_id or "run-1"
+            effective_run_id = run_id or self._id_factory("run")
             if self._recorder is not None:
                 request = semantic.clarifications[0]
                 self._recorder.record_interaction(InteractionRecord(
@@ -111,9 +125,9 @@ class AnalysisPipeline:
                 if requirement.base_criticality != "CORE" or not sources:
                     continue
                 kind = requirement.descriptor.artifact_type
-                if self._router.eligible_sources(kind, sources):
+                if self._router.eligible_sources(kind, sources, requirement.descriptor.data_keys):
                     continue
-                alternatives = self._router.eligible_sources(kind)
+                alternatives = self._router.eligible_sources(kind, data_keys=requirement.descriptor.data_keys)
                 for original in objective.constraints:
                     if not (isinstance(original, CategoryConstraint) and
                             original.key in ("source", "source_kind") and
@@ -124,7 +138,7 @@ class AnalysisPipeline:
                                                                "origin": "USER_CONFIRMED"})
                         revised = objective.model_copy(update={"constraints": tuple(
                             proposed if item == original else item for item in objective.constraints)})
-                        if not self._router.eligible_sources(kind, hard_sources(revised)):
+                        if not self._router.eligible_sources(kind, hard_sources(revised), requirement.descriptor.data_keys):
                             continue
                         request = ConstraintRevisionRequest(
                             revision_id=self._id_factory("revision"), objective_ref=objective.objective_id,
@@ -142,11 +156,11 @@ class AnalysisPipeline:
 
         for objective in objectives:
             requirements = self._decomposer.decompose(objective)
-            if any(not self._router.eligible_sources(item.descriptor.artifact_type, hard_sources(objective))
+            if any(not self._router.eligible_sources(item.descriptor.artifact_type, hard_sources(objective), item.descriptor.data_keys)
                    for item in requirements):
-                candidates = next((self._router.permission_candidates(item.descriptor.artifact_type)
+                candidates = next((self._router.permission_candidates(item.descriptor.artifact_type, item.descriptor.data_keys)
                                    for item in requirements
-                                   if self._router.permission_candidates(item.descriptor.artifact_type)), ())
+                                   if self._router.permission_candidates(item.descriptor.artifact_type, item.descriptor.data_keys)), ())
                 if candidates:
                     candidates = tuple(item for item in candidates if not hard_sources(objective)
                                        or item.source_kind in hard_sources(objective))
@@ -157,7 +171,7 @@ class AnalysisPipeline:
                                                 objective_ref=objective.objective_id,
                                                 tool=capability.tool, source_kind=capability.source_kind,
                                                 cost=capability.cost, reason="Source requires user consent")
-                    effective_run_id = run_id or "run-1"
+                    effective_run_id = run_id or self._id_factory("run")
                     if self._recorder is not None:
                         self._recorder.record_interaction(InteractionRecord(
                             run_id=effective_run_id, raw_query=raw_query,
@@ -224,7 +238,7 @@ class AnalysisPipeline:
                            if objective.objective_id == request.objective_ref
                            for requirement in self._decomposer.decompose(objective)
                            for capability in self._router.permission_candidates(
-                               requirement.descriptor.artifact_type))
+                               requirement.descriptor.artifact_type, requirement.descriptor.data_keys))
         if not any((item.tool, item.source_kind, item.cost) ==
                    (request.tool, request.source_kind, request.cost) for item in candidates):
             raise ValueError("Permission scope is stale or forbidden by system policy")
@@ -268,7 +282,8 @@ class AnalysisPipeline:
         all_requirements = tuple(requirements)
 
         tool = self._tool_factory(all_requirements)
-        executor = Executor({tool.name: tool}, max_retries=0, id_factory=self._id_factory)
+        executor = Executor(tool if isinstance(tool, dict) else {tool.name: tool},
+                            max_retries=0, id_factory=self._id_factory)
 
         run_ids: list[str] = []
         statuses: list[str] = []
@@ -278,7 +293,7 @@ class AnalysisPipeline:
         for index, objective in enumerate(objectives):
             objective_requirements = tuple(
                 item for item in all_requirements if item.objective_ref == objective.objective_id)
-            effective_run_id = run_id or f"run-{index + 1}"
+            effective_run_id = run_id or self._id_factory("run")
             orchestrator = Orchestrator(
                 self._planner, router if router is not None and
                 objective.objective_id == authorized_objective else self._router,
@@ -286,6 +301,7 @@ class AnalysisPipeline:
                 max_rounds=self._max_rounds, budget=self._budget, id_factory=self._id_factory,
                 context_service=self._context_service, recorder=self._recorder,
                 permitted_sources=hard_sources(objective),
+                source_mapping_resolver=self._source_mapping_resolver,
                 run_id=effective_run_id)
             result = orchestrator.run(objective, objective_requirements, confirmed_intent=raw_query)
             run_ids.append(result.run_id)

@@ -6,12 +6,22 @@ provenance. It is still a capability, not a retrieval agent.
 """
 
 from datetime import date
+import re
 from typing import Callable
 
 from app.context.service import ContextItem, ContextRequest
 from app.knowledge.freshness import freshness_rank
 from app.knowledge.service import KnowledgeBase
 from app.models.knowledge import KnowledgeQuery, KnowledgeType
+
+
+def query_date(query: str) -> date:
+    """An explicit date wins; a single named season uses July 1 of that season."""
+    exact = re.search(r"\b(\d{4}-\d{2}-\d{2})\b", query)
+    if exact:
+        return date.fromisoformat(exact.group(1))
+    years = set(re.findall(r"(?<!\d)((?:19|20)\d{2})(?!\d)", query))
+    return date(int(next(iter(years))), 7, 1) if len(years) == 1 else date.today()
 
 
 class KnowledgeContextSource:
@@ -31,7 +41,7 @@ class KnowledgeContextSource:
     def retrieve(self, request: ContextRequest) -> tuple[ContextItem, ...]:
         query = KnowledgeQuery(
             query=request.query, knowledge_types=self._types,
-            entity_refs=request.entity_refs, as_of=request.as_of or self._as_of or self._today(),
+            entity_refs=request.entity_refs, as_of=request.as_of or self._as_of or query_date(request.query),
             authority_floor=self._authority_floor, max_items=request.max_items)
         matches = self._knowledge.retriever.retrieve(query)
         return tuple(

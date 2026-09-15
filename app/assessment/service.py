@@ -21,10 +21,13 @@ class AssessmentService:
 
     def assess(self, artifact_id: str, requirement: ArtifactRequirement,
                objective_ref: str | None = None,
-               league_state: LeagueStateSnapshot | None = None) -> ArtifactAssessment:
+               league_state: LeagueStateSnapshot | None = None,
+               context_items: tuple = ()) -> ArtifactAssessment:
         artifact = self._registry.get(artifact_id)
         deterministic = validate_artifact(artifact, requirement, league_state)
-        judge_result = self._judge.assess(artifact, requirement, deterministic)
+        contextual = getattr(self._judge, "assess_with_context", None)
+        judge_result = (contextual(artifact, requirement, deterministic, context_items)
+                        if contextual is not None else self._judge.assess(artifact, requirement, deterministic))
         # Hard veto is enforced here as well as in the contract.
         final_level = "REJECT" if not deterministic.passed else judge_result.level
         limitations = tuple(signal.detail for signal in deterministic.soft_signals)

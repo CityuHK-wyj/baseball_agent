@@ -67,3 +67,16 @@ freshness metadata. RunMetrics events persist individually to OperationalStore a
 
 Remaining: default pipeline composition, runtime date extraction, live verification,
 and crash recovery after interaction consumption.
+
+Default composition now lives in `app/runtime.py`, exposed as `AnalysisPipeline.default()`.
+Knowledge is the canonical source for entity and metric projections. A bounded stored-web
+knowledge evidence tool answers definitions without synthetic analytics; synthetic execution
+requires `--demo`. The Router checks supported data keys, so knowledge definitions cannot
+mask a paid injury/news source. Context is projected to contextual Judges with the hard veto
+unchanged. Explicit dates and single-season years filter runtime knowledge; a bare year uses
+July 1 and multi-year historical comparison remains unfinished.
+
+Live probe: local 2023 Parquet bounded reads pass. High-zone query lacks `sz_bot/sz_top`.
+MLB StatsAPI returned 30 teams on one attempt, then timed out on a repeat; this verifies
+transport once, not the WebEvidenceTool end-to-end. PostgreSQL localhost:5433 refused the
+connection; no Operational PostgreSQL connection is configured.

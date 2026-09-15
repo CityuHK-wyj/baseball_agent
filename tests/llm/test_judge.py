@@ -8,6 +8,19 @@ from tests.factories import artifact, requirement
 
 
 class LLMJudgeTests(unittest.TestCase):
+    def test_judge_receives_projected_knowledge_without_relaxing_hard_veto(self):
+        from app.context.service import ContextItem
+        provider = FakeModelProvider(['{"level":"STRONG","rationale":"grounded"}'])
+        knowledge = (ContextItem(item_id="qualified", kind="TERM", title="Qualified hitter",
+                                 content="3.1 PA per team game", source="official"),)
+        subject = LLMJudge(provider, "m")
+        subject.assess_with_context(artifact(), requirement(), DeterministicResult(), knowledge)
+        self.assertIn("3.1 PA", provider.calls[0][1])
+        result = subject.assess_with_context(artifact(), requirement(), DeterministicResult(
+            hard_failures=(HardFailure(code="TYPE_MISMATCH", detail="x"),)), knowledge)
+        self.assertEqual(result.level, "REJECT")
+        self.assertEqual(len(provider.calls), 1)
+
     def test_hard_failure_is_rejected_without_calling_the_provider(self):
         provider = FakeModelProvider(['{"level":"STRONG","rationale":"ignore the problem"}'])
         deterministic = DeterministicResult(hard_failures=(HardFailure(code="TYPE_MISMATCH", detail="x"),))
