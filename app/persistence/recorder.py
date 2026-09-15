@@ -25,6 +25,10 @@ class RunRecorder:
         self._storage = artifact_storage
         self._id_factory = id_factory or (lambda prefix: f"{prefix}-{uuid4().hex}")
 
+    def record_metric(self, event) -> None:
+        self._store.save_object("run_event", self._id_factory("event"), event.run_id,
+                                event.model_dump(mode="json"))
+
     def record_artifact(self, run_id: str, artifact: Artifact, payload: bytes | None = None,
                         content_type: str = "application/json") -> StoredArtifact | None:
         """Persist the payload before the metadata that points at it.

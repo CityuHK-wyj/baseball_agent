@@ -59,5 +59,11 @@ Source `USER_CONSTRAINT` revisions are checkpointed before execution; acceptance
 System source policy cannot be revised. Clarification resume now passes through the same
 constraint and permission checks.
 
-Remaining: default pipeline composition, query/date-aware knowledge runtime retrieval,
-durable metrics, live verification, and crash recovery after interaction consumption.
+Next checkpoint: 324 tests passing. Planner indexes and assessment summaries now exclude
+other objectives/runs; only accepted artifacts enter the Planner index. Natural bilingual
+questions retrieve embedded knowledge aliases. Context requests accept historical dates;
+ResponsePackage now carries bounded knowledge content with authority, verification and
+freshness metadata. RunMetrics events persist individually to OperationalStore after redaction.
+
+Remaining: default pipeline composition, runtime date extraction, live verification,
+and crash recovery after interaction consumption.

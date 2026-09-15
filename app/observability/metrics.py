@@ -5,6 +5,7 @@ credential cannot reach a log or metric sink.
 """
 
 from typing import Literal
+from collections.abc import Callable
 
 from pydantic import Field
 
@@ -35,10 +36,12 @@ class RunEvent(ArtifactContract):
 class RunMetrics:
     """Collects redacted events for one run. Not an agent; pure bookkeeping."""
 
-    def __init__(self, run_id: str, secrets: tuple[str, ...] = ()) -> None:
+    def __init__(self, run_id: str, secrets: tuple[str, ...] = (),
+                 sink: Callable[[RunEvent], None] | None = None) -> None:
         self._secrets = tuple(secrets)
         self._run_id = redact_secrets(run_id, self._secrets)
         self._events: list[RunEvent] = []
+        self._sink = sink
 
     def record(self, event_type: EventType, message: str = "", **fields) -> RunEvent:
         safe_fields = {
@@ -48,6 +51,8 @@ class RunMetrics:
         event = RunEvent(run_id=self._run_id, event_type=event_type,
                          message=redact_secrets(message, self._secrets), **safe_fields)
         self._events.append(event)
+        if self._sink is not None:
+            self._sink(event)
         return event
 
     def events(self) -> tuple[RunEvent, ...]:

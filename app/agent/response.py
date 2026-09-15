@@ -42,6 +42,7 @@ def build_response_package(run_id: str, objective_state: ObjectiveState,
         run_id=run_id, objective_ref=objective_state.objective_ref,
         objective_status=objective_state.status, accepted_evidence=tuple(evidence),
         critical_shared_knowledge=tuple(f"{entry.kind}:{entry.item_id}" for entry in context_items),
+        knowledge_context=context_items,
         objective_result="", limitations=limitations,
         optional_gaps=optional_gaps(requirements, requirement_states),
         unresolved_items=unresolved)

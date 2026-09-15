@@ -5,6 +5,7 @@ rejected history is excluded by default and always for the Response purpose.
 """
 
 from typing import Literal, Protocol
+from datetime import date
 
 from pydantic import Field
 
@@ -41,6 +42,7 @@ class ContextRequest(ArtifactContract):
     entity_refs: tuple[Name, ...] = ()
     max_items: int = Field(default=10, ge=1)
     run_id: str = ""
+    as_of: date | None = None
 
 
 class ContextPackage(ArtifactContract):

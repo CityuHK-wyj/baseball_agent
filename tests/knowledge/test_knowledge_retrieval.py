@@ -52,6 +52,25 @@ class RetrieverTests(unittest.TestCase):
         self.assertEqual([entry.knowledge_id for entry in self.retriever.match_alias("指定让渡")], ["TERM:DFA"])
         self.assertIsNone(self.retriever.lookup("no-such-thing"))
 
+    def test_natural_bilingual_question_finds_embedded_alias(self):
+        matches = self.retriever.retrieve(KnowledgeQuery(query="道奇属于哪个分区？"))
+        self.assertEqual(matches[0].item.knowledge_id, "TEAM:LAD")
+        matches = self.retriever.retrieve(KnowledgeQuery(query="DFA是什么意思？"))
+        self.assertEqual(matches[0].item.knowledge_id, "TERM:DFA")
+
+    def test_runtime_context_respects_requested_historical_date(self):
+        from app.context.knowledge_source import KnowledgeContextSource
+        from app.context.service import ContextRequest, ContextService
+        from app.knowledge.service import KnowledgeBase
+        self.store.upsert_item(item("RULE:OLD", "old_rule", knowledge_type="RULE",
+            aliases=("special rule",), effective_to=date(2021, 12, 31)))
+        self.store.upsert_item(item("RULE:NEW", "new_rule", knowledge_type="RULE",
+            aliases=("special rule",), effective_from=date(2022, 1, 1)))
+        service = ContextService((KnowledgeContextSource(KnowledgeBase(self.store)),))
+        package = service.retrieve(ContextRequest(request_id="past", query="special rule",
+                                                  as_of=date(2021, 6, 1)))
+        self.assertEqual([entry.item_id for entry in package.items], ["RULE:OLD"])
+
     def test_free_text_prefers_official_over_community(self):
         matches = self.retriever.retrieve(KnowledgeQuery(query="sentiment", max_items=5))
         official_rank = {match.item.knowledge_id: match.score for match in matches}

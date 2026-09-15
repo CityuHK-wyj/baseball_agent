@@ -34,6 +34,13 @@ def _ordered_tokens(text: str) -> tuple[str, ...]:
     return tuple(dict.fromkeys(_TOKEN.findall(text.casefold())))
 
 
+def _mentions(surface: str, query: str) -> bool:
+    surface = surface.casefold().strip()
+    if len(surface) < 2:
+        return False
+    return bool(re.search(r"(?<![a-z0-9])" + re.escape(surface) + r"(?![a-z0-9])", query.casefold()))
+
+
 class KnowledgeRetriever:
     def __init__(self, store, today: Callable[[], date] = date.today) -> None:
         self._store = store
@@ -75,6 +82,10 @@ class KnowledgeRetriever:
             return self._store.list_items()
         needle = query.query.strip()
         candidates = list(self._store.search_items(needle))
+        seen = {item.knowledge_id for item in candidates}
+        for item in self._store.list_items():
+            if item.knowledge_id not in seen and any(_mentions(name, needle) for name in item.names()):
+                candidates.append(item)
         # An exact id/canonical key must be a candidate even if the LIKE filter missed it.
         exact = self._store.get_item(needle) or self._store.get_by_canonical_key(needle)
         if exact is not None and all(entry.knowledge_id != exact.knowledge_id for entry in candidates):
@@ -115,6 +126,9 @@ class KnowledgeRetriever:
             elif needle in surfaces:
                 score += 5.0
                 reasons.append("ALIAS_MATCH")
+            elif any(_mentions(surface, needle) for surface in surfaces):
+                score += 4.0
+                reasons.append("MENTION_MATCH")
 
             wanted = _tokens(query.query)
             if wanted:

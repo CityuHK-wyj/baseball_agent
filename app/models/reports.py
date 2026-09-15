@@ -13,6 +13,7 @@ from pydantic import Field
 from app.models.artifacts import ArtifactContract, QualityLevel, utcnow
 from app.models.contracts import Name
 from app.models.planning import StopReason
+from app.context.service import ContextItem
 
 
 class RequirementCompletion(ArtifactContract):
@@ -67,6 +68,7 @@ class ResponsePackage(ArtifactContract):
     objective_status: Literal["PENDING", "IN_PROGRESS", "COMPLETE", "LIMITED", "FAILED"]
     accepted_evidence: tuple[AcceptedEvidence, ...] = ()
     critical_shared_knowledge: tuple[Name, ...] = ()
+    knowledge_context: tuple[ContextItem, ...] = ()
     objective_result: str = ""
     limitations: tuple[Name, ...] = ()
     optional_gaps: tuple[Name, ...] = ()

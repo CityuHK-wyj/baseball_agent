@@ -79,7 +79,8 @@ class Orchestrator:
         self._recorder = recorder
         self._context_service = context_service
         self._source_mapping_resolver = source_mapping_resolver
-        self._metrics_factory = metrics_factory or RunMetrics
+        self._metrics_factory = metrics_factory or (
+            lambda run_id: RunMetrics(run_id, sink=recorder.record_metric if recorder else None))
         self._fixed_run_id = run_id
         counter = iter(range(1, 10_000))
         self._id_factory = id_factory or (lambda prefix: f"{prefix}-{next(counter)}")
@@ -166,16 +167,24 @@ class Orchestrator:
                 item.requirement_id for item in unmet
                 if item.requirement_id not in recoverable
                 and self._router.candidate_sources(item.descriptor.artifact_type))
+            scoped_assessments = tuple(item for item in self._assessment_service.all_assessments()
+                                       if item.requirement_ref in by_id
+                                       and item.objective_ref in (None, objective.objective_id))
+            accepted_refs = {item.artifact_ref for item in scoped_assessments if item.accepted}
+            assessment_refs = {item.assessment_id for item in scoped_assessments}
             context = PlannerContext(
                 objective=objective, requirements=requirements,
-                requirement_states=tuple(states.values()), artifact_index=self._registry.index(),
-                assessment_summaries=self._assessment_service.summaries(), round=round_index,
+                requirement_states=tuple(states.values()), artifact_index=tuple(
+                    item for item in self._registry.index() if item.artifact_ref in accepted_refs),
+                assessment_summaries=tuple(item for item in self._assessment_service.summaries()
+                                           if item.assessment_ref in assessment_refs), round=round_index,
                 max_rounds=self._max_rounds, budget_remaining=budget,
                 recoverable_gaps=recoverable, policy_blocked_gaps=policy_blocked,
                 execution_summary=self._execution_summary(executions, round_index,
                                                          tasks_planned, budget),
                 context_items=self._retrieve_context(ContextRequest(
                     request_id=f"planner-{run_id}-{round_index}", purpose="PLANNER",
+                    query=objective.raw_query,
                     kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS, run_id=run_id)),
                 prior_plan_count=len(decisions), planner_terminal=self._latch.latched)
             decision = self._planner.decide(context)
@@ -305,6 +314,7 @@ class Orchestrator:
             self._assessment_service, self._registry,
             context_items=self._retrieve_context(ContextRequest(
                 request_id=f"response-{run_id}", purpose="RESPONSE",
+                query=objective.raw_query,
                 kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS, run_id=run_id)))
         if self._recorder is not None:
             self._recorder.record_objective_state(run_id, objective_state)
@@ -322,7 +332,7 @@ class Orchestrator:
             objective_state=objective_state, requirement_states=tuple(states.values()),
             assessments=run_assessments, planning_decisions=tuple(decisions),
             routing_decisions=tuple(routings), executions=tuple(executions),
-            retrieved_artifacts=tuple(item.artifact_id for item in self._registry.artifacts()),
+            retrieved_artifacts=tuple(dict.fromkeys(item.artifact_ref for item in run_assessments)),
             metrics=metrics.events())
 
 

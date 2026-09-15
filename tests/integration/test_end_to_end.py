@@ -31,7 +31,8 @@ from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
 
 
 def pipeline(dictionary: EntityDictionary, *, row_count: int = 1200,
-             recorder: RunRecorder | None = None, router: Router | None = None) -> AnalysisPipeline:
+             recorder: RunRecorder | None = None, router: Router | None = None,
+             planner=None) -> AnalysisPipeline:
     counter = iter(range(1, 100_000))
     ids = lambda prefix: f"{prefix}-{next(counter)}"
     resolver = EntityResolver(dictionary, id_factory=ids)
@@ -44,7 +45,7 @@ def pipeline(dictionary: EntityDictionary, *, row_count: int = 1200,
                               id_factory=ids)
     return AnalysisPipeline(
         semantic, RuleBasedRequirementDecomposer(id_factory=ids),
-        RuleBasedPlanner(id_factory=ids, max_rounds=3), router, assessment, registry,
+        planner or RuleBasedPlanner(id_factory=ids, max_rounds=3), router, assessment, registry,
         tool_factory=default_tool_factory(row_count), recorder=recorder,
         response_composer=DeterministicResponseComposer(), max_rounds=3, budget=10, id_factory=ids)
 
@@ -64,6 +65,20 @@ def ambiguous_dictionary() -> EntityDictionary:
 
 
 class EndToEndTests(unittest.TestCase):
+    def test_planner_never_receives_previous_runs_artifacts(self):
+        from tests.context.test_context_wiring import CapturingPlanner
+        counter = iter(range(1000))
+        planner = CapturingPlanner(id_factory=lambda prefix: f"{prefix}-{next(counter)}")
+        subject = pipeline(judge_dictionary(), planner=planner)
+        first = subject.analyze("Judge performance", run_id="first")
+        previous = {item.artifact_ref for item in first.response_packages[0].accepted_evidence}
+        planner.contexts.clear()
+        second = subject.analyze("Judge performance", run_id="second")
+        for context in planner.contexts:
+            self.assertFalse(previous & {item.artifact_ref for item in context.artifact_index})
+            self.assertFalse(previous & {item.artifact_ref for item in context.assessment_summaries})
+        self.assertFalse(previous & set(second.runs[0].retrieved_artifacts))
+
     def test_complete_flow_returns_a_sourced_response(self):
         result = pipeline(judge_dictionary()).analyze("How did Aaron Judge perform at the plate?")
         self.assertFalse(result.needs_clarification)
@@ -234,6 +249,20 @@ class EndToEndTests(unittest.TestCase):
             self.assertEqual(blocked.permissions, ())
             self.assertEqual(store.list_objects("execution", "policy"), ())
 
+    def test_runtime_response_receives_relevant_bounded_knowledge_content(self):
+        from app.cli import build_pipeline
+        from app.knowledge.store import SqliteKnowledgeStore
+        from app.knowledge.service import KnowledgeBase
+        from app.models.knowledge import KnowledgeItem
+        store = SqliteKnowledgeStore()
+        self.addCleanup(store.close)
+        store.upsert_item(KnowledgeItem(knowledge_id="TERM:DFA", canonical_key="dfa",
+            knowledge_type="TERM", title="Designated for Assignment", aliases=("DFA",),
+            summary="Removed from the 40-man roster.", source_authority="OFFICIAL"))
+        result = build_pipeline(knowledge=KnowledgeBase(store)).analyze("DFA是什么意思？")
+        self.assertIn("40-man roster", result.responses[0])
+        self.assertEqual(len(result.response_packages[0].knowledge_context), 1)
+
     def test_multi_objective_run_scopes_response_per_objective(self):
         result = pipeline(judge_dictionary()).analyze("Analyse Judge injury and salary value")
         self.assertEqual(len(result.objective_statuses), 2)
@@ -263,6 +292,9 @@ class EndToEndTests(unittest.TestCase):
                 plan = ResumeService(store).build_plan("run-e2e")
                 self.assertTrue(plan.planner_terminal)
                 self.assertTrue(plan.reusable_artifact_refs)
+                persisted_metrics = store.list_objects("run_event", "run-e2e")
+                self.assertEqual(len(persisted_metrics), len(result.runs[0].metrics))
+                self.assertEqual(persisted_metrics[-1].payload["event_type"], "FINALIZATION")
             finally:
                 store.close()
 

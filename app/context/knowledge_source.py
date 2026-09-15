@@ -31,7 +31,7 @@ class KnowledgeContextSource:
     def retrieve(self, request: ContextRequest) -> tuple[ContextItem, ...]:
         query = KnowledgeQuery(
             query=request.query, knowledge_types=self._types,
-            entity_refs=request.entity_refs, as_of=self._as_of,
+            entity_refs=request.entity_refs, as_of=request.as_of or self._as_of or self._today(),
             authority_floor=self._authority_floor, max_items=request.max_items)
         matches = self._knowledge.retriever.retrieve(query)
         return tuple(
@@ -39,10 +39,13 @@ class KnowledgeContextSource:
                 item_id=match.item.knowledge_id,
                 kind=match.item.knowledge_type,
                 title=match.item.title,
-                content=match.item.summary,
+                content=(match.item.summary + f" [authority={match.item.source_authority}; "
+                         f"effective={match.item.effective_from}..{match.item.effective_to}; "
+                         f"verified={match.item.verification_status}; "
+                         f"freshness={','.join(match.reasons)}; sources={','.join(match.item.source_refs)}]"),
                 source=f"knowledge:{match.item.source_authority.lower()}",
                 entity_ref=match.item.entity_refs[0] if match.item.entity_refs else "",
-                freshness_rank=freshness_rank(match.item, self._as_of or self._today()),
+                freshness_rank=freshness_rank(match.item, self._today()),
                 provenance_ref=f"knowledge:{match.item.knowledge_id}",
                 scope_run=self._scope_run)
             for match in matches)
