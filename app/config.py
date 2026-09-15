@@ -32,6 +32,16 @@ class Settings:
     operational_store_path: Path = field(default_factory=lambda: Path(
         os.getenv("OPERATIONAL_STORE_PATH", str(PROJECT_ROOT / ".runtime" / "operational.db"))
     ))
+    # Shared Knowledge: a separate logical store, never the analytics or runtime tables.
+    knowledge_store_path: Path = field(default_factory=lambda: Path(
+        os.getenv("KNOWLEDGE_STORE_PATH", str(PROJECT_ROOT / ".runtime" / "knowledge.db"))
+    ))
+    knowledge_seed_path: Path = field(default_factory=lambda: Path(
+        os.getenv("KNOWLEDGE_SEED_PATH", str(PROJECT_ROOT / "knowledge" / "seed"))
+    ))
+    knowledge_source_path: Path = field(default_factory=lambda: Path(
+        os.getenv("KNOWLEDGE_SOURCE_PATH", str(PROJECT_ROOT / "knowledge" / "sources"))
+    ))
 
 
 settings = Settings()
