@@ -15,6 +15,7 @@ from app.agent.planner import Planner, PlannerContext, PlannerTerminalLatch
 from app.agent.registry import ArtifactRegistry
 from app.agent.response import build_response_package
 from app.agent.routing import Router
+from app.agent.source_mapping import SourceMappingResolver
 from app.assessment.service import AssessmentService
 from app.context.service import ContextRequest, ContextService
 from app.models.artifacts import ArtifactAssessment, ArtifactContract
@@ -59,6 +60,7 @@ class Orchestrator:
                  permitted_sources: tuple[str, ...] = (),
                  recorder: RunRecorder | None = None,
                  context_service: ContextService | None = None,
+                 source_mapping_resolver: SourceMappingResolver | None = None,
                  run_id: str | None = None) -> None:
         if max_rounds < 1 or budget < 1:
             raise ValueError("max_rounds and budget must be positive")
@@ -72,6 +74,7 @@ class Orchestrator:
         self._permitted_sources = permitted_sources
         self._recorder = recorder
         self._context_service = context_service
+        self._source_mapping_resolver = source_mapping_resolver
         self._fixed_run_id = run_id
         counter = iter(range(1, 10_000))
         self._id_factory = id_factory or (lambda prefix: f"{prefix}-{next(counter)}")
@@ -178,8 +181,13 @@ class Orchestrator:
                 if budget <= 0:
                     break
                 requirement = by_id[task.requirement_refs[0]]
+                execution_route = None
+                if self._source_mapping_resolver is not None:
+                    execution_route = self._source_mapping_resolver.resolve(
+                        task.task_id, requirement.descriptor.data_keys)
                 routing = self._router.route(task, requirement.descriptor.artifact_type,
-                                             self._permitted_sources)
+                                             self._permitted_sources,
+                                             execution_route=execution_route)
                 routings.append(routing)
                 outcome = self._executor.run(task, routing)
                 executions.append(outcome)

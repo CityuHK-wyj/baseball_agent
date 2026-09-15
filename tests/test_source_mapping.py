@@ -1,10 +1,17 @@
 import unittest
 
+from app.agent.executor import Executor, ToolResult
+from app.agent.orchestrator import Orchestrator
+from app.agent.planner import RuleBasedPlanner
+from app.agent.registry import ArtifactRegistry
 from app.agent.routing import Router, ToolCapability
 from app.agent.source_mapping import SourceMappingResolver
+from app.assessment.judge import RuleBasedJudge
+from app.assessment.service import AssessmentService
 from app.models.metrics import MetricDefinition, SourceMapping
 from app.models.planning import AgentTask
 from app.semantic.metric_registry import MetricRegistry
+from tests.factories import artifact, objective, requirement
 
 
 def registry() -> MetricRegistry:
@@ -69,6 +76,53 @@ class RouterSourceMappingTests(unittest.TestCase):
         decision = self.router.route(task(), "TABLE", execution_route=route)
         self.assertIsNone(decision.selected_tool)
         self.assertIn("blocked", decision.rationale)
+
+
+class OrchestratorSourceMappingTests(unittest.TestCase):
+    class RecordingTool:
+        def __init__(self, name: str):
+            self.name = name
+            self.calls = 0
+
+        def execute(self, task):
+            self.calls += 1
+            return ToolResult(status="OK", artifact=artifact())
+
+    def _run(self, metric_registry: MetricRegistry):
+        ids_iter = iter(f"id-{index}" for index in range(1000))
+        ids = lambda _prefix: next(ids_iter)
+        hot = self.RecordingTool("hot")
+        wrong = self.RecordingTool("wrong")
+        registry_ = ArtifactRegistry()
+        assessment = AssessmentService(registry_, RuleBasedJudge(), id_factory=ids)
+        router = Router((
+            ToolCapability(tool="wrong", source_kind="PARQUET",
+                           supported_artifact_types=("TABLE",)),
+            ToolCapability(tool="hot", source_kind="POSTGRES",
+                           supported_artifact_types=("TABLE",)),
+        ), id_factory=ids)
+        executor = Executor({"hot": hot, "wrong": wrong}, max_retries=0, id_factory=ids)
+        resolver = SourceMappingResolver(metric_registry, {"POSTGRES": "hot"})
+        orchestrator = Orchestrator(
+            RuleBasedPlanner(id_factory=ids), router, executor, assessment, registry_,
+            id_factory=ids, source_mapping_resolver=resolver)
+        return orchestrator.run(objective(), (requirement(),)), hot, wrong
+
+    def test_direct_mapping_controls_actual_orchestrator_routing(self):
+        result, hot, wrong = self._run(registry())
+
+        self.assertEqual(hot.calls, 1)
+        self.assertEqual(wrong.calls, 0)
+        self.assertEqual(result.routing_decisions[0].selected_tool, "hot")
+
+    def test_no_mapping_never_reaches_execution(self):
+        definitions = (MetricDefinition(metric_key="known", display_name="Known",
+                                        description="Known"),)
+        result, hot, wrong = self._run(MetricRegistry(definitions=definitions))
+
+        self.assertEqual(hot.calls + wrong.calls, 0)
+        self.assertIsNone(result.routing_decisions[0].selected_tool)
+        self.assertEqual(result.executions[0].execution.status, "BLOCKED")
 
 
 if __name__ == "__main__":
