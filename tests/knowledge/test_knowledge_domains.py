@@ -201,6 +201,20 @@ class KnowledgeDomainTests(unittest.TestCase):
         self.assertTrue(all(is_stale(c, TODAY) for c in unverified))
         self.assertTrue(all(c.verification_status == "UNVERIFIED" for c in unverified))
 
+    def test_league_and_postseason_context_is_present(self):
+        postseason = self.kb.get("postseason structure")
+        self.assertEqual(postseason.structured_payload["teams"], 12)
+        self.assertEqual(postseason.structured_payload["world_series"], "best-of-7")
+        regular = self.kb.get("regular_season_structure")
+        self.assertEqual(regular.structured_payload["games_per_club"], 162)
+
+    def test_historical_eras_carry_effective_context(self):
+        dh = self.kb.get("universal_dh_era")
+        self.assertEqual(dh.knowledge_type, "HISTORICAL_CONTEXT")
+        self.assertEqual(dh.structured_payload["start"], 2022)
+        statcast = self.kb.get("statcast_era")
+        self.assertEqual(statcast.structured_payload["start"], 2015)
+
     def test_temporal_validity_filtering(self):
         matches = self.kb.retriever.retrieve(KnowledgeQuery(query="balk", as_of=date(2019, 6, 1)))
         self.assertTrue(matches)  # rules have no effective_from and remain valid

@@ -15,7 +15,7 @@ Status values:
 This file is maintained as implementation proceeds. It is the evidence for
 "which blog designs are actually implemented", not a wish list.
 
-Last reviewed at commit `6675ddd` plus the Shared Knowledge work; 297 tests pass. Status legend below.
+Last reviewed at commit `6675ddd` plus the Shared Knowledge work; 299 tests pass. Status legend below.
 
 ## A. Core domain contracts (O001, D005, D013, D014, D036)
 
@@ -170,6 +170,7 @@ Last reviewed at commit `6675ddd` plus the Shared Knowledge work; 297 tests pass
 | Teams / ballparks / league structure | IMPLEMENTED | 30 teams + 30 ballparks + 6 divisions + 2 leagues + structure | `tests/knowledge/test_knowledge_domains.py` | Live-verified 2026-09-15 from the Stats API |
 | Notable players + entity aliases | IMPLEMENTED | 118 player profiles (80 active live-verified + 38 historical) + 13 community ALIAS items | `tests/knowledge/` | Active team affiliation is `as_of`-stamped |
 | Awards + Hall of Fame | IMPLEMENTED | 12 AWARD items + HOF election rules | `tests/knowledge/` | Winners are a data-plane query |
+| League/competition context + eras | IMPLEMENTED | `knowledge/seed/context.json` (postseason structure, seeding, All-Star, spring training, historical eras) | `tests/knowledge/test_knowledge_domains.py` | Items that can change carry `verify_current` |
 | Community source directory | IMPLEMENTED (partial verification) | 51 `COMMUNITY_CREATOR` items in `knowledge/seed/community.json` | `tests/knowledge/` | Network sweep verified a subset; unverified profiles stay `UNVERIFIED` |
 | Refresh pipeline | IMPLEMENTED | `app/knowledge/refresh.py`: live teams/ballparks/rules; seed reload for the rest | `tests/knowledge/test_knowledge_cli_and_refresh.py` | Fetch -> validate -> stage -> activate |
 | Retrieval | IMPLEMENTED | `app/knowledge/retrieval.py` (canonical/alias/filter/token/relations) | `tests/knowledge/test_knowledge_retrieval.py` | Deterministic ranking, no embeddings |

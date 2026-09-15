@@ -237,7 +237,7 @@ def refresh_domain(store, domain: str, *, seed_dir, source_dir) -> KnowledgeDiff
         return refresh_reference(store)
     if domain == "rules":
         return refresh_rules(store)
-    if domain in ("glossary", "players", "community"):
+    if domain in ("glossary", "players", "community", "context"):
         pack = _load_seed_pack(seed_dir, domain)
         diff = store_ingest(store, pack)
         return diff.model_copy(update={

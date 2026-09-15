@@ -80,6 +80,9 @@ curated and reloaded from seed.
   leagues, ballparks (sponsorship name plus common name and former names), franchise
   lineage and notable player profiles (active identities verified live from the Stats API,
   plus historical figures).
+- **League context** — regular-season and postseason structure, seeding, the All-Star Game,
+  spring training, winter meetings, international play, and historical eras (dead-ball,
+  integration, expansion, free agency, steroid, Statcast, universal DH, pitch clock).
 - **Sources** — an authority-ranked registry (`OFFICIAL > AUTHORITATIVE_REFERENCE >
   TRUSTED_ANALYTICS > TRUSTED_MEDIA > COMMUNITY > UNVERIFIED`) and a community directory
   recording platform, topics, language, activity status and last verification.

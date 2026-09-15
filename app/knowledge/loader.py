@@ -11,7 +11,8 @@ from app.knowledge.ingestion import KnowledgePack, KnowledgeIngester, load_pack
 from app.models.knowledge import KnowledgeDiff, KnowledgeSource
 
 SOURCE_MANIFESTS = ("official.json", "reference.json", "community.json")
-SEED_PACKS = ("reference.json", "rules.json", "glossary.json", "players.json", "community.json")
+SEED_PACKS = ("reference.json", "rules.json", "glossary.json", "players.json",
+              "context.json", "community.json")
 
 
 def load_sources(source_dir: str | Path) -> tuple[KnowledgeSource, ...]:

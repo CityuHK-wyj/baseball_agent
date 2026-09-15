@@ -361,7 +361,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     krefresh = ksub.add_parser("refresh", help="refresh a knowledge domain")
     krefresh.add_argument("domain", choices=("reference", "teams", "ballparks", "rules",
-                                              "glossary", "players", "community", "all"))
+                                              "glossary", "players", "community", "context", "all"))
     krefresh.set_defaults(func=command_knowledge_refresh)
 
     kvalidate = ksub.add_parser("validate", help="validate committed seed packs")

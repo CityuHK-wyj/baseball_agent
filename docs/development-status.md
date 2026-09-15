@@ -84,7 +84,7 @@ activate ingestion with supersession; deterministic retrieval (canonical/alias/f
 token/relations) with authority/freshness/temporal ranking; live refresh from the MLB Stats
 API and the official OBR PDF; `KnowledgeContextSource` wired into the Orchestrator; entity
 dictionary and metric registry projections; a `knowledge` CLI; and committed seed packs for
-reference data, rules, glossary, players and community. ADR 0019.
+reference data, rules, glossary, players, league/competition context and community. ADR 0019.
 
 Next phase: live DB/web wiring (UNVERIFIED_LIVE), a recheck of the unverified community
 profiles, and a final architecture-compliance review by Codex.
@@ -219,7 +219,7 @@ with `git stash push -u` (stash@{0}) and is not part of this branch.
 
 ## Tests passing
 
-297 tests, all passing (`Ran 297 tests ... OK`). Milestone 17 adds `tests/knowledge/`:
+299 tests, all passing (`Ran 299 tests ... OK`). Milestone 17 adds `tests/knowledge/`:
 store (11), retrieval (8), ingestion (6), domains (48), CLI + refresh (7).
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).

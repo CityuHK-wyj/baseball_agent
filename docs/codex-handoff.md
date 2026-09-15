@@ -9,7 +9,7 @@ This file lets the next agent continue without the prior chat. Read it after
   the baseline branch remains intact and is not overwritten
 - note: an uncommitted SQL-hardening WIP on local `codex/review-hardening` (1 failing test)
   was preserved via `git stash push -u` (stash@{0}) and is not part of this branch
-- tests: `python3 -m unittest discover -s tests -v` → 297 passing
+- tests: `python3 -m unittest discover -s tests -v` → 299 passing
 - secret scan: current tree exit 0
 - remote: `https://github.com/CityuHK-wyj/baseball_agent.git`
 
@@ -33,7 +33,8 @@ Milestone 17 — persistent Shared Knowledge base (ADR 0019):
 - `knowledge/sources/*.json` + `knowledge/seed/*.json`: committed source manifests and
   packs — reference (30 teams, 30 ballparks, divisions, leagues), rules (2026 OBR structure
   + concepts + transaction rules), glossary (metrics/Statcast/pitch/discipline/scouting),
-  players (118 profiles + awards) and community (51 creators).
+  players (118 profiles + awards), context (postseason structure + historical eras) and
+  community (51 creators).
 - Tests: `tests/knowledge/` (store, retrieval, ingestion, domains, CLI + refresh).
 - Docs: `docs/adr/0019-shared-knowledge-base.md`, `docs/development/shared-knowledge.md`,
   `docs/usage/knowledge-base.md`, README section, matrix section K2.
