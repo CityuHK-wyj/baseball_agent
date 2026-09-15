@@ -221,6 +221,10 @@ class Orchestrator:
                     metrics.record("ATTEMPT", subject_ref=attempt.attempt_id, agent="EXECUTOR",
                                    status=attempt.status, retry_count=attempt_index,
                                    tool=attempt.tool, message=attempt.safe_error_summary)
+                for supporting_artifact in outcome.supporting_artifacts:
+                    self._registry.register(supporting_artifact)
+                    if self._recorder is not None:
+                        self._recorder.record_artifact(run_id, supporting_artifact)
                 if outcome.artifact is not None:
                     if outcome.artifact.artifact_id not in self._registry:
                         new_artifact_ids.append(outcome.artifact.artifact_id)

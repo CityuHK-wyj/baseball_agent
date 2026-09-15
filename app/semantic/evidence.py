@@ -54,10 +54,11 @@ def _first_year(text: str) -> str:
     return match.group(0) if match else ""
 
 
-def evidence_to_artifact(evidence: Evidence, raw_artifact_id: str) -> Artifact:
+def evidence_to_artifact(evidence: Evidence, raw_artifact_id: str,
+                         descriptor: ArtifactDescriptor | None = None) -> Artifact:
     """Wrap structured evidence as a unified EVIDENCE artifact with lineage to the raw result."""
-    descriptor = ArtifactDescriptor(artifact_type="EVIDENCE", data_keys=("claim",),
-                                    granularity="claim", population_scope="web")
+    descriptor = descriptor or ArtifactDescriptor(artifact_type="EVIDENCE", data_keys=("claim",),
+                                                  granularity="claim", population_scope="web")
     return Artifact(
         artifact_id=evidence.evidence_id, descriptor=descriptor,
         payload_ref=f"evidence://{evidence.evidence_id}",
