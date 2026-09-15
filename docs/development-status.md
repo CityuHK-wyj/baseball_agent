@@ -2,6 +2,12 @@
 
 Status: IN_PROGRESS
 
+Runtime audit update (2026-09-15, `gpt56/runtime-audit-hardening`): 254 tests pass.
+The audit wired SourceMapping, Web Evidence and Orchestrator metrics; fixed cross-objective
+evidence leakage, DuckDB path bypasses, LLM evidence/planner validation, physical mapped-tool
+routing, and persisted planner-terminal reopening on a new permission. Live data sources remain
+UNVERIFIED_LIVE; clarification persistence and permission/constraint-revision workflows remain open.
+
 Last updated by: DeepSeek Implementation Engineer session (milestone 3 — guarded tool
 execution). Milestones 1–2 delivered earlier and preserved.
 
@@ -220,7 +226,7 @@ decomposer 5) and `tests/test_adequacy.py` 5. Milestone 9: `tests/test_feature_e
 Milestone 12: `tests/observability/` 7. Milestone 13: `tests/persistence/test_postgres_store.py` 7.
 Milestone 14: `tests/integration/test_end_to_end.py` 5. Milestone 15: `tests/test_evidence.py` 4
 and `tests/llm/test_evidence.py` 4. Milestone 16: `tests/security/test_adversarial.py` 8.
-Total now 242.
+Historical milestone total: 242. Runtime audit branch total: 254.
 
 `python3 -m compileall` passes. `python3 scripts/secret_scan.py` passes (exit 0).
 
@@ -234,8 +240,8 @@ None.
   database or real Parquet. Marked UNVERIFIED_LIVE.
 - `sqlglot` emits a parse warning for `LOAD` before classifying it as a forbidden
   `Command`; behavior is correct but the warning is noisy.
-- `AnalysisPipeline` does not yet wire `SourceMappingResolver` per task; the Router still
-  selects by capability. Source Mapping is tested in isolation.
+- `AnalysisPipeline` does not yet inject a MetricRegistry/SourceMappingResolver in its
+  default offline composition; `Orchestrator` wiring is verified when the resolver is supplied.
 - Fixed in milestone 14: `ResponsePackage`/`CompletionReport` leaked another objective's
   accepted evidence when services were shared; now scoped by `objective_ref`.
 
@@ -244,11 +250,10 @@ None.
 - No live-source integration; the loop is proven only with deterministic tools and fakes.
 - `RuleBasedPlanner` and `RuleBasedJudge` remain intentionally simple.
 - `Router` optimizes only by cost; coverage/freshness are not scored.
-- `RunMetrics` is not yet emitted by the Orchestrator, and there is no metrics sink.
+- RunMetrics is emitted by the Orchestrator into `RunResult`; there is no durable metrics sink.
 - LIMIT wrapping changes the executed SQL for unbounded reads; verify against a real
   engine and decide whether to require an explicit LIMIT instead.
-- `SourceMappingResolver` is not wired into the Orchestrator per task.
-- A live Web tool is not wired through the Evidence Extractor.
+- The default `AnalysisPipeline` does not configure a SourceMappingResolver or live Web provider.
 - No RAG knowledge base, persistent Entity Dictionary, or pgvector (all deferred).
 
 ## Architecture deviations
@@ -302,14 +307,11 @@ written or modified. The verified read-only executor is wired but not live-teste
 
 Milestone 17 — wire the remaining stages into the runtime, TDD.
 
-1. Wire `SourceMappingResolver` into the `Orchestrator`: per task, resolve the
-   requirement's `data_keys` to an `ExecutionRoute` and pass it to `Router.route(...)` as
-   `execution_route`. Test DIRECT/CALCULATED/NO_MAPPING end to end through the Orchestrator.
-2. Wire the Web tool through the Evidence Extractor: a `WebEvidenceTool` that fetches (or is
-   fed) a `RawWebResult`, extracts `Evidence`, and returns an `EVIDENCE` artifact. Test with
-   a fake fetcher; no network.
-3. Emit `RunMetrics`/`RunSummary` from the Orchestrator loop (plan, route, task, attempt,
-   artifact, assessment events) and expose them through the `RunResult`.
+1. Add a checkpointed clarification/confirmation resume flow and permission/constraint-revision
+   contracts; do not silently violate a hard user constraint.
+2. Inject SourceMapping and a Web provider in a real configured pipeline, then test the live
+   providers only against approved read-only targets.
+3. Add a durable metrics sink only when a consumer exists.
 4. Then attempt a live read-only PostgreSQL/DuckDB integration test; if no database is
    available, keep it marked UNVERIFIED_LIVE and provide a documented manual procedure.
 

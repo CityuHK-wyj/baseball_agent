@@ -15,7 +15,8 @@ Status values:
 This file is maintained as implementation proceeds. It is the evidence for
 "which blog designs are actually implemented", not a wish list.
 
-Last reviewed at commit `7e96929`; 242 tests pass. Status legend below.
+Last reviewed on `gpt56/runtime-audit-hardening` at `5e84f01`; 254 tests pass.
+Live PostgreSQL, DuckDB/Parquet, and web-provider integrations remain UNVERIFIED_LIVE.
 
 ## A. Core domain contracts (O001, D005, D013, D014, D036)
 
@@ -45,7 +46,7 @@ Last reviewed at commit `7e96929`; 242 tests pass. Status legend below.
 | Implicit constraint marked as inferred (D026) | IMPLEMENTED | `app/models/contracts.py` origin/authority | `tests/semantic/test_constraints.py` | CONTEXT_INFERRED → INFERRED_DEFAULT |
 | Clarification with options when ambiguous (D045) | IMPLEMENTED | `app/models/clarification.py`, `app/semantic/entity_resolver.py` | `tests/semantic/test_entity_resolver.py` | Recommendation, never silent choice |
 | Entity resolution + alias/nickname (D004) | IMPLEMENTED | `app/semantic/entity_resolver.py` | `tests/semantic/test_entity_resolver.py` | In-memory dictionary; persistent dictionary pending |
-| Evidence/Artifact/Metric transformation (post 09 §1) | PARTIAL | `app/semantic/evidence.py`, `app/features/metrics.py` | `tests/test_evidence.py`, `tests/test_feature_engine.py` | Extraction + Feature Engine done; web source unwired |
+| Evidence/Artifact/Metric transformation (post 09 §1) | IMPLEMENTED | `app/semantic/evidence.py`, `app/tools/web_evidence.py`, `app/features/metrics.py` | `tests/test_evidence.py`, `tests/test_web_evidence_tool.py`, `tests/test_feature_engine.py` | Injected Web Tool → RawWebResult → Evidence → EVIDENCE Artifact runtime chain; live provider unverified |
 
 ## C. Requirement Decomposer (D034, D062)
 
@@ -77,7 +78,7 @@ Last reviewed at commit `7e96929`; 242 tests pass. Status legend below.
 | Narrow routing, precedence (D040) | IMPLEMENTED | `app/agent/routing.py` | `tests/test_routing.py` | |
 | Source preference is soft | IMPLEMENTED | `app/agent/routing.py` | `tests/test_routing.py` | |
 | `MetricDefinition` + `SourceMapping` (D020, D021) | IMPLEMENTED | `app/models/metrics.py`, `app/semantic/metric_registry.py` | `tests/test_metrics.py` | DIRECT/CALCULATED modeled and consumed by the resolver |
-| Source Mapping execution (§21) | IMPLEMENTED | `app/agent/source_mapping.py`, `Router.route(execution_route=...)` | `tests/test_source_mapping.py` | Orchestrator wiring pending |
+| Source Mapping execution (§21) | IMPLEMENTED | `app/agent/source_mapping.py`, `Orchestrator`, `Router.route(execution_route=...)` | `tests/test_source_mapping.py` | DIRECT / CALCULATED / NO_MAPPING and mapped physical tool constraint tested through runtime |
 | Schema Registry semantic→physical (D015) | PARTIAL | `app/semantic/schema_registry.py` | `tests/test_schema_registry.py` | Lookup only; no planner/tool consumption |
 
 ## F. Data & Tool layer (D002, D009, D016, D047)
@@ -88,7 +89,7 @@ Last reviewed at commit `7e96929`; 242 tests pass. Status legend below.
 | Read-only analytics (D047) | IMPLEMENTED | `app/tools/execution.py` | `tests/test_tool_execution.py` | Guard-before-connect, read-only txn |
 | 0 rows vs tool failure (D009) | IMPLEMENTED | `app/tools/results.py` | `tests/test_tool_execution.py` | |
 | retryable vs recoverable (D011) | IMPLEMENTED | `app/tools/results.py`, `Executor` | `tests/test_executor.py` | |
-| RawWebResult → Evidence extraction (D016, P004) | PARTIAL | `app/models/evidence.py`, `app/semantic/evidence.py`, `app/llm/evidence.py` | `tests/test_evidence.py`, `tests/llm/test_evidence.py` | Extractor done; not wired to a live web tool |
+| RawWebResult → Evidence extraction (D016, P004) | IMPLEMENTED | `app/models/evidence.py`, `app/semantic/evidence.py`, `app/llm/evidence.py`, `app/tools/web_evidence.py` | `tests/test_evidence.py`, `tests/llm/test_evidence.py`, `tests/test_web_evidence_tool.py` | Runtime-wired with injected fetcher; live web provider UNVERIFIED_LIVE |
 | Feature Engine → Metric Artifact with lineage (D037) | IMPLEMENTED | `app/features/metrics.py` | `tests/test_feature_engine.py` | Deterministic computations; FEATURE artifact with lineage |
 | Coverage manifest for Router (§02) | MISSING | — | — | |
 
@@ -163,7 +164,7 @@ Last reviewed at commit `7e96929`; 242 tests pass. Status legend below.
 | Secret scanning (D060 scope) | IMPLEMENTED | `scripts/secret_scan.py` | `tests/test_secret_scan.py` | |
 | Permission/cost policy levels (O008) | PARTIAL | Router cost filter | `tests/test_routing.py` | |
 | Clarification/permission escalation (§42-43) | MISSING | — | — | |
-| Observability structured metrics (§58) | IMPLEMENTED | `app/observability/metrics.py` | `tests/observability/test_metrics.py` | Every message redacted at the boundary |
+| Observability structured metrics (§58) | IMPLEMENTED | `app/observability/metrics.py`, `app/agent/orchestrator.py` | `tests/observability/test_metrics.py`, `tests/test_orchestrator.py` | Orchestrator emits redacted lifecycle events into `RunResult` |
 | Evaluation metrics (§59) | IMPLEMENTED | `app/observability/evaluation.py` | `tests/observability/test_evaluation.py` | Completion/replan/retry/failure rates, steps |
 | Prompt versioning (§57) | IMPLEMENTED | `app/llm/prompts.py` | `tests/llm/test_provider_and_prompts.py` | `PromptTemplate` id + version |
 | Provider-agnostic config (§56) | IMPLEMENTED | `app/config.py`, `app/llm/openai_provider.py` | `tests/llm/test_openai_provider.py` | Per-agent `*_MODEL`; keys env-only |
@@ -197,10 +198,8 @@ Last reviewed at commit `7e96929`; 242 tests pass. Status legend below.
 
 Not yet implemented (next work, no decision change required):
 
-- Wiring `SourceMappingResolver` into the `Orchestrator` per task (Source Mapping is
-  tested in isolation; the Router still selects by capability).
-- Wiring a live Web tool through `EvidenceExtractor` and the Orchestrator.
-- Wiring `RunMetrics`/`RunSummary` emission into the Orchestrator loop and a metrics sink.
+- Live SourceMapping/Feature and Web providers (the injected runtime seams are tested).
+- A metrics sink beyond `RunResult.metrics`.
 - A persistent Entity Dictionary and a RAG knowledge base source.
 - Cross-run context isolation asserted at the Orchestrator level (service-level tested).
 - Weighted objective coverage beyond the critical gate (O003).

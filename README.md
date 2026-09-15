@@ -37,7 +37,7 @@ exactly which blog decisions are implemented.
 - **Read-only safety** — an AST-based SQL guard validated before any connection, a
   read-only PostgreSQL transaction, a DuckDB path sandbox, and a redacted result contract.
 
-Not yet implemented: live PostgreSQL/Parquet integration tests, the Web evidence extractor,
+Not yet implemented: live PostgreSQL/Parquet integration tests, a live web provider,
 RAG knowledge base, and pgvector. These are marked in the matrix and the handoff.
 
 ## Architecture
@@ -116,7 +116,7 @@ See [docs/usage/quickstart.md](docs/usage/quickstart.md) and
 ## Test
 
 ```bash
-python3 -m unittest discover -s tests -v   # 226 tests
+python3 -m unittest discover -s tests -v   # 254 tests (audit branch, 2026-09-15)
 python3 scripts/secret_scan.py             # credential tripwire (exit 0 = clean)
 python3 -m compileall app                  # byte-compile check
 ```

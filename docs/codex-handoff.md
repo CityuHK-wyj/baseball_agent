@@ -1,5 +1,16 @@
 # Codex Handoff
 
+## Runtime audit update (2026-09-15)
+
+- audit branch: `gpt56/runtime-audit-hardening`, latest pushed audit checkpoint `5e84f01`
+- verification: 254 tests passing; `compileall app` and current-tree secret scan pass
+- fixed findings: SourceMapping runtime and mapped-tool enforcement, cross-objective evidence
+  isolation, web evidence runtime seam, all-field metric redaction and emission, DuckDB path
+  bypasses, grounded LLM evidence, closed LLM Planner output schema, and persisted terminal
+  reopening after a new permitted source.
+- remaining: live integrations are UNVERIFIED_LIVE; clarification persistence, permission and
+  constraint-renegotiation workflows are not implemented. See `docs/gpt56-runtime-audit.md`.
+
 This file lets the next agent continue without the prior chat. Read it after
 `AGENTS.md`, `CONTEXT.md`, `docs/development-status.md` and the ADRs.
 
