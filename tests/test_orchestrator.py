@@ -141,6 +141,19 @@ class OrchestratorEndToEndTests(unittest.TestCase):
         self.assertEqual(result.response_package.accepted_evidence[0].artifact_ref, "a2")
         self.assertEqual(len(result.completion_report.final_artifact_refs), 1)
 
+    def test_run_emits_metrics_for_the_full_runtime_lifecycle(self):
+        orchestrator, _, _ = build({"r1": artifact("a1")})
+
+        result = orchestrator.run(objective(), (requirement(),))
+
+        event_types = {event.event_type for event in result.metrics}
+        self.assertTrue({"OBJECTIVE", "PLAN", "ROUTE", "TASK", "ATTEMPT",
+                         "ARTIFACT", "ASSESSMENT", "FINALIZATION"} <= event_types)
+        finalization = [event for event in result.metrics if event.event_type == "FINALIZATION"]
+        self.assertEqual(finalization[-1].status, "COMPLETE")
+        self.assertIsNotNone(finalization[-1].duration_ms)
+        self.assertEqual([event.tool for event in result.metrics if event.event_type == "ROUTE"], ["tool"])
+
 
 if __name__ == "__main__":
     unittest.main()

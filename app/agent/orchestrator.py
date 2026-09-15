@@ -9,6 +9,7 @@ checkpoint) so that no state ever references an artifact that failed to persist.
 """
 
 from collections.abc import Callable
+from time import monotonic
 
 from app.agent.executor import ExecutionOutcome, Executor
 from app.agent.planner import Planner, PlannerContext, PlannerTerminalLatch
@@ -24,6 +25,7 @@ from app.models.contracts import (AnalysisObjective, ArtifactRequirement, Object
 from app.models.planning import PlanningDecision, RoutingDecision
 from app.models.reports import (CompletionReport, ExecutionSummary, RequirementCompletion,
                                 ResponsePackage)
+from app.observability.metrics import RunEvent, RunMetrics
 from app.persistence.recorder import RunRecorder
 from app.persistence.resume import RestoredRun
 from app.state.services import (derive_objective_state, derive_requirement_state,
@@ -50,6 +52,7 @@ class RunResult(ArtifactContract):
     routing_decisions: tuple[RoutingDecision, ...] = ()
     executions: tuple[ExecutionOutcome, ...] = ()
     retrieved_artifacts: tuple[str, ...] = ()
+    metrics: tuple[RunEvent, ...] = ()
 
 
 class Orchestrator:
@@ -61,6 +64,7 @@ class Orchestrator:
                  recorder: RunRecorder | None = None,
                  context_service: ContextService | None = None,
                  source_mapping_resolver: SourceMappingResolver | None = None,
+                 metrics_factory: Callable[[str], RunMetrics] | None = None,
                  run_id: str | None = None) -> None:
         if max_rounds < 1 or budget < 1:
             raise ValueError("max_rounds and budget must be positive")
@@ -75,6 +79,7 @@ class Orchestrator:
         self._recorder = recorder
         self._context_service = context_service
         self._source_mapping_resolver = source_mapping_resolver
+        self._metrics_factory = metrics_factory or RunMetrics
         self._fixed_run_id = run_id
         counter = iter(range(1, 10_000))
         self._id_factory = id_factory or (lambda prefix: f"{prefix}-{next(counter)}")
@@ -125,9 +130,17 @@ class Orchestrator:
         by_id = {item.requirement_id: item for item in requirements}
 
         run_id = self._fixed_run_id or self._id_factory("run")
+        metrics = self._metrics_factory(run_id)
+        started_at = monotonic()
+        metrics.record("OBJECTIVE", subject_ref=objective.objective_id, agent="ORCHESTRATOR",
+                       status="STARTED")
         self._latch = PlannerTerminalLatch()
         if restored is not None:
             self._apply_restored(restored, states)
+            for artifact in restored.artifacts:
+                metrics.record("ARTIFACT", subject_ref=artifact.artifact_id, agent="ORCHESTRATOR",
+                               status="REUSED", source=artifact.provenance.source,
+                               message="reused persisted artifact")
         decisions: list[PlanningDecision] = []
         routings: list[RoutingDecision] = []
         executions: list[ExecutionOutcome] = []
@@ -163,6 +176,10 @@ class Orchestrator:
                 prior_plan_count=len(decisions), planner_terminal=self._latch.latched)
             decision = self._planner.decide(context)
             decisions.append(decision)
+            metrics.record("PLAN", subject_ref=decision.decision_id, agent="PLANNER",
+                           status=decision.kind,
+                           replan_count=sum(1 for item in decisions if item.kind == "REPLAN"),
+                           message=decision.rationale)
             if decision.planner_terminal:
                 self._latch.latch(decision.terminal_reason, condition)
                 stop_reason = decision.terminal_reason
@@ -189,14 +206,29 @@ class Orchestrator:
                                              self._permitted_sources,
                                              execution_route=execution_route)
                 routings.append(routing)
+                metrics.record("ROUTE", subject_ref=routing.decision_id, agent="ROUTER",
+                               status="SELECTED" if routing.selected_tool else "BLOCKED",
+                               tool=routing.selected_tool or "", message=routing.rationale)
                 outcome = self._executor.run(task, routing)
                 executions.append(outcome)
                 round_executions.append((outcome,))
                 budget -= 1
+                metrics.record("TASK", subject_ref=task.task_id, agent="EXECUTOR",
+                               status=outcome.execution.status,
+                               retry_count=max(len(outcome.attempts) - 1, 0),
+                               tool=routing.selected_tool or "")
+                for attempt_index, attempt in enumerate(outcome.attempts):
+                    metrics.record("ATTEMPT", subject_ref=attempt.attempt_id, agent="EXECUTOR",
+                                   status=attempt.status, retry_count=attempt_index,
+                                   tool=attempt.tool, message=attempt.safe_error_summary)
                 if outcome.artifact is not None:
                     if outcome.artifact.artifact_id not in self._registry:
                         new_artifact_ids.append(outcome.artifact.artifact_id)
                     self._registry.register(outcome.artifact)
+                    metrics.record("ARTIFACT", subject_ref=outcome.artifact.artifact_id,
+                                   agent="EXECUTOR", status="CREATED",
+                                   source=outcome.artifact.provenance.source,
+                                   tool=routing.selected_tool or "")
                     # Payload and artifact metadata are persisted before any state or
                     # assessment that references them. A failure here aborts the round.
                     if self._recorder is not None:
@@ -205,6 +237,8 @@ class Orchestrator:
                     assessment = self._assessment_service.assess(
                         outcome.artifact.artifact_id, requirement, objective.objective_id)
                     round_assessments.append(assessment)
+                    metrics.record("ASSESSMENT", subject_ref=assessment.assessment_id, agent="JUDGE",
+                                   status=assessment.final_level, message=assessment.assessment_summary)
 
             for item in requirements:
                 states[item.requirement_id] = derive_requirement_state(
@@ -268,12 +302,18 @@ class Orchestrator:
             self._recorder.record_completion_report(run_id, completion)
             self._recorder.record_response_package(run_id, response)
             self._recorder.checkpoint(run_id, "FINALIZATION")
+        metrics.record("FINALIZATION", subject_ref=objective.objective_id, agent="ORCHESTRATOR",
+                       status=objective_state.status,
+                       duration_ms=round((monotonic() - started_at) * 1000),
+                       replan_count=completion.plan_revisions,
+                       message=completion.stop_reason)
         return RunResult(
             run_id=run_id, completion_report=completion, response_package=response,
             objective_state=objective_state, requirement_states=tuple(states.values()),
             assessments=run_assessments, planning_decisions=tuple(decisions),
             routing_decisions=tuple(routings), executions=tuple(executions),
-            retrieved_artifacts=tuple(item.artifact_id for item in self._registry.artifacts()))
+            retrieved_artifacts=tuple(item.artifact_id for item in self._registry.artifacts()),
+            metrics=metrics.events())
 
 
 def run_all_channel_baseball_agent(user_prompt: str, config: object = None) -> str:
