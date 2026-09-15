@@ -23,6 +23,7 @@ Ground truth (2026-09-15, Python 3.14.4):
 | ID | Severity | Area | Evidence / failing test | Fix | Regression test | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | RAH-001 | HIGH | Source Mapping wiring | `Orchestrator.__init__` rejected a resolver and `run` called `Router.route` without an `ExecutionRoute`; Orchestrator-level DIRECT and NO_MAPPING tests failed. | Inject `SourceMappingResolver`, resolve each task from its Requirement data keys, and pass the route into the Router. | `OrchestratorSourceMappingTests` | FIXED |
+| RAH-002 | HIGH | Persistence run isolation | Saving the same `(kind, object_id)` for Run B silently overwrote Run A because the operational schema uses that pair as its global identity. | Reject cross-run identity reassignment before the upsert; same-run idempotent/versioned saves remain valid. | `OperationalStoreTests.test_object_identity_cannot_be_reassigned_to_another_run` | FIXED |
 
 ## Open audit areas
 
@@ -35,4 +36,3 @@ Ground truth (2026-09-15, Python 3.14.4):
 - LLM output schema, size, partial-response and hallucination guards.
 - Clarification/permission/constraint-revision workflows.
 - Realistic baseball E2E and CLI/documentation truthfulness.
-

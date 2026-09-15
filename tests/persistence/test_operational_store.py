@@ -42,6 +42,18 @@ class OperationalStoreTests(unittest.TestCase):
         self.assertEqual(len(self.store.list_objects("artifact")), 2)
         self.assertEqual(len(self.store.list_objects("assessment", "run-1")), 1)
 
+    def test_object_identity_cannot_be_reassigned_to_another_run(self):
+        self.store.save_object("artifact", "shared-id", "run-a", {"x": 1})
+
+        with self.assertRaisesRegex(ValueError, "another run"):
+            self.store.save_object("artifact", "shared-id", "run-b", {"x": 1})
+
+        self.assertEqual(
+            [item.object_id for item in self.store.list_objects("artifact", "run-a")],
+            ["shared-id"],
+        )
+        self.assertEqual(self.store.list_objects("artifact", "run-b"), ())
+
     def test_checkpoints_are_append_only_and_latest_wins(self):
         self.store.save_checkpoint(checkpoint("c1", position="RUN_STARTED"))
         self.store.save_checkpoint(checkpoint("c2", position="PLAN_ACCEPTED"))

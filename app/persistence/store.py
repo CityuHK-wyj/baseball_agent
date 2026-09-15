@@ -97,6 +97,9 @@ class SqlOperationalStore:
     # -- objects ---------------------------------------------------------------
     def save_object(self, kind: str, object_id: str, run_id: str, payload: dict) -> StoredObject:
         existing = self.get_object(kind, object_id)
+        if existing is not None and existing.run_id != run_id:
+            raise ValueError(
+                f"Object identity ({kind}, {object_id}) already belongs to another run")
         if existing is not None and existing.payload == payload and existing.run_id == run_id:
             return existing
         version = existing.version + 1 if existing is not None else 0
