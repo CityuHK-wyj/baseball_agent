@@ -233,9 +233,11 @@ class Orchestrator:
         objective_state = derive_objective_state(
             objective.objective_id, requirements, states, planner_terminal=True)
         # Scope to this objective: services may be shared across objectives in a run.
+        requirement_ids = {item.requirement_id for item in requirements}
         run_assessments = tuple(
             item for item in self._assessment_service.all_assessments()
-            if item.objective_ref in (None, objective.objective_id))
+            if item.requirement_ref in requirement_ids
+            and item.objective_ref in (None, objective.objective_id))
         execution_summary = self._execution_summary(executions, round_index, tasks_planned, budget)
         accepted_ids = tuple(
             dict.fromkeys(item.artifact_ref for item in run_assessments if item.accepted))

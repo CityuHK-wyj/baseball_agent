@@ -100,6 +100,40 @@ class RejectedEvidenceExclusionTests(unittest.TestCase):
         self.assertTrue(any(item.final_level == "REJECT" for item in result.assessments))
 
 
+class CrossObjectiveEvidenceIsolationTests(unittest.TestCase):
+    def test_unscoped_assessment_for_another_requirement_never_reaches_response(self):
+        registry = ArtifactRegistry()
+        ids_iter = iter(f"id-{index}" for index in range(1000))
+        ids = lambda _prefix: next(ids_iter)
+        assessment = AssessmentService(registry, RuleBasedJudge(), id_factory=ids)
+
+        requirement_a = requirement("requirement-a", objective_ref="objective-a")
+        artifact_a = artifact("artifact-a")
+        registry.register(artifact_a)
+        assessment.assess(artifact_a.artifact_id, requirement_a, objective_ref=None)
+
+        class EmptyTool:
+            name = "tool"
+
+            def execute(self, task):
+                return ToolResult(status="EMPTY")
+
+        router = Router((ToolCapability(tool="tool", source_kind="SYNTHETIC",
+                                        supported_artifact_types=("TABLE",)),), id_factory=ids)
+        orchestrator = Orchestrator(
+            RuleBasedPlanner(id_factory=ids), router,
+            Executor({"tool": EmptyTool()}, max_retries=0, id_factory=ids),
+            assessment, registry, id_factory=ids)
+        objective_b = objective("objective-b")
+        requirement_b = requirement("requirement-b", objective_ref="objective-b")
+
+        result = orchestrator.run(objective_b, (requirement_b,))
+
+        self.assertEqual(result.completion_report.final_artifact_refs, ())
+        self.assertEqual(result.response_package.accepted_evidence, ())
+        self.assertEqual(result.assessments, ())
+
+
 class ResumeIntegrityTests(unittest.TestCase):
     def test_checkpoint_with_a_missing_artifact_does_not_invent_one(self):
         with tempfile.TemporaryDirectory() as directory:
