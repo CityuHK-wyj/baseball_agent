@@ -21,6 +21,7 @@ class ToolCapability(ArtifactContract):
     supported_artifact_types: tuple[Literal["TABLE", "EVIDENCE", "FEATURE"], ...] = Field(min_length=1)
     cost: Cost = "FREE"
     available: bool = True
+    system_permitted: bool = True
     coverage: str = ""
 
 
@@ -36,11 +37,27 @@ class Router:
         """Capabilities that can produce this artifact type, before policy and constraints."""
         return tuple(c for c in self._capabilities if artifact_type in c.supported_artifact_types)
 
+    def permission_candidates(self, artifact_type: str) -> tuple[ToolCapability, ...]:
+        """Consent-gated capabilities; system-forbidden capabilities are excluded."""
+        return tuple(c for c in self._capabilities if c.system_permitted and c.available
+                     and c.cost in ("PAID", "HIGH")
+                     and c.cost not in self._permitted_costs
+                     and artifact_type in c.supported_artifact_types)
+
+    def authorized_for(self, costs: tuple[Cost, ...], tools: tuple[str, ...] = ()) -> "Router":
+        capabilities = tuple(
+            item.model_copy(update={"available": False})
+            if item.cost in costs and tools and item.tool not in tools else item
+            for item in self._capabilities)
+        return Router(capabilities, id_factory=self._id_factory,
+                      permitted_costs=tuple(dict.fromkeys((*self._permitted_costs, *costs))))
+
     def eligible_sources(self, artifact_type: str, user_hard_sources: tuple[str, ...] = ()) -> tuple[ToolCapability, ...]:
         """Capabilities that satisfy policy, user constraints and required artifact type."""
         return tuple(
             capability for capability in self._capabilities
-            if capability.available
+            if capability.system_permitted
+            and capability.available
             and capability.cost in self._permitted_costs
             and artifact_type in capability.supported_artifact_types
             and (not user_hard_sources or capability.source_kind in user_hard_sources)
@@ -74,6 +91,9 @@ class Router:
         for capability in self._capabilities:
             if not capability.available:
                 notes.append(f"{capability.tool}: unavailable")
+                continue
+            if not capability.system_permitted:
+                notes.append(f"{capability.tool}: forbidden by system policy")
                 continue
             if capability.cost not in self._permitted_costs:
                 notes.append(f"{capability.tool}: {capability.cost} source not permitted")

@@ -7,7 +7,8 @@ The audit wired SourceMapping, Web Evidence and Orchestrator metrics; fixed cros
 evidence leakage, DuckDB path bypasses, LLM evidence/planner validation, physical mapped-tool
 routing, and persisted planner-terminal reopening on a new permission. Live data sources remain
 UNVERIFIED_LIVE; clarification persistence is delivered, while permission/constraint-revision
-workflows remain open.
+workflows are now partially delivered: scoped paid/high-cost permission is checkpointed and
+single-use; constraint revision remains open.
 
 Last updated by: DeepSeek Implementation Engineer session (milestone 3 — guarded tool
 execution). Milestones 1–2 delivered earlier and preserved.

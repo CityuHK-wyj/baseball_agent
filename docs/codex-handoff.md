@@ -10,7 +10,9 @@
   reopening after a new permitted source. Clarification now persists a `WAITING_FOR_USER`
   interaction and resumes the same run with a `USER_CONFIRMED` constraint.
 - remaining: live integrations are UNVERIFIED_LIVE; permission and constraint-renegotiation
-  workflows are not implemented. See `docs/gpt56-runtime-audit.md`.
+  workflows are not fully implemented. Paid/high-cost permission is now checkpointed, scoped
+  to one tool, and cannot override system policy; constraint renegotiation remains open. See
+  `docs/gpt56-runtime-audit.md`.
 
 This file lets the next agent continue without the prior chat. Read it after
 `AGENTS.md`, `CONTEXT.md`, `docs/development-status.md` and the ADRs.

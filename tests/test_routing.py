@@ -56,6 +56,22 @@ class RouterTests(unittest.TestCase):
     def test_eligible_sources_respects_policy(self):
         self.assertEqual([item.tool for item in self.router.eligible_sources("TABLE")], ["hot", "cold"])
 
+    def test_user_cost_approval_cannot_enable_a_system_forbidden_tool(self):
+        router = Router((ToolCapability(tool="forbidden", source_kind="WEB",
+                                        supported_artifact_types=("TABLE",), cost="PAID",
+                                        system_permitted=False),))
+        self.assertEqual(router.permission_candidates("TABLE"), ())
+        self.assertIsNone(router.authorized_for(("PAID",)).route(task(), "TABLE").selected_tool)
+
+    def test_permission_scope_does_not_enable_another_paid_tool(self):
+        router = Router((
+            ToolCapability(tool="approved", source_kind="WEB", supported_artifact_types=("TABLE",), cost="PAID"),
+            ToolCapability(tool="other", source_kind="POSTGRES", supported_artifact_types=("TABLE",), cost="PAID"),
+        ))
+        decision = router.authorized_for(("PAID",), ("approved",)).route(
+            task(source_preference="other"), "TABLE")
+        self.assertEqual(decision.selected_tool, "approved")
+
 
 if __name__ == "__main__":
     unittest.main()

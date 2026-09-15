@@ -16,6 +16,7 @@ from app.assessment.service import AssessmentService
 from app.llm.response import DeterministicResponseComposer
 from app.models.entities import CanonicalEntity
 from app.models.clarification import ClarificationAnswer
+from app.models.interaction import PermissionAnswer
 from app.persistence.artifacts import LocalFilesystemArtifactStorage
 from app.persistence.recorder import RunRecorder
 from app.persistence.resume import ResumeService
@@ -28,7 +29,7 @@ from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
 
 
 def pipeline(dictionary: EntityDictionary, *, row_count: int = 1200,
-             recorder: RunRecorder | None = None) -> AnalysisPipeline:
+             recorder: RunRecorder | None = None, router: Router | None = None) -> AnalysisPipeline:
     counter = iter(range(1, 100_000))
     ids = lambda prefix: f"{prefix}-{next(counter)}"
     resolver = EntityResolver(dictionary, id_factory=ids)
@@ -36,9 +37,9 @@ def pipeline(dictionary: EntityDictionary, *, row_count: int = 1200,
                                   dictionary, id_factory=ids)
     registry = ArtifactRegistry()
     assessment = AssessmentService(registry, RuleBasedJudge(), id_factory=ids)
-    router = Router((ToolCapability(tool="synthetic", source_kind="SYNTHETIC",
-                                    supported_artifact_types=("TABLE", "EVIDENCE", "FEATURE")),),
-                    id_factory=ids)
+    router = router or Router((ToolCapability(tool="synthetic", source_kind="SYNTHETIC",
+                                               supported_artifact_types=("TABLE", "EVIDENCE", "FEATURE")),),
+                              id_factory=ids)
     return AnalysisPipeline(
         semantic, RuleBasedRequirementDecomposer(id_factory=ids),
         RuleBasedPlanner(id_factory=ids, max_rounds=3), router, assessment, registry,
@@ -112,6 +113,31 @@ class EndToEndTests(unittest.TestCase):
                             clarification_ref=waiting.clarifications[0].clarification_id,
                             chosen_option_id=option.option_id))
                 self.assertEqual(len(store.list_objects("execution", "clarify-run")), 1)
+            finally:
+                store.close()
+
+    def test_paid_source_permission_is_checkpointed_scoped_and_single_use(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            store = SqliteOperationalStore(root / "operational.db")
+            recorder = RunRecorder(store, LocalFilesystemArtifactStorage(root / "payloads"))
+            paid_router = Router((ToolCapability(tool="synthetic", source_kind="SYNTHETIC",
+                                                  supported_artifact_types=("TABLE",), cost="PAID"),))
+            try:
+                subject = pipeline(judge_dictionary(), recorder=recorder, router=paid_router)
+                waiting = subject.analyze("How did Judge perform?", run_id="paid-run")
+                self.assertEqual(len(waiting.permissions), 1)
+                self.assertEqual(store.latest_checkpoint("paid-run").recovery_position, "WAITING_FOR_USER")
+                self.assertEqual(store.list_objects("execution", "paid-run"), ())
+                request = waiting.permissions[0]
+                done = subject.resume_permission("paid-run", PermissionAnswer(
+                    permission_ref=request.permission_id, approved=True))
+                self.assertEqual(done.objective_statuses, ("COMPLETE",))
+                self.assertEqual(len(store.list_objects("execution", "paid-run")), 1)
+                self.assertEqual(store.get_object("interaction", "paid-run").payload["status"], "APPROVED")
+                with self.assertRaises(ValueError):
+                    subject.resume_permission("paid-run", PermissionAnswer(
+                        permission_ref=request.permission_id, approved=True))
             finally:
                 store.close()
 
