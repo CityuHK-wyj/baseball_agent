@@ -13,12 +13,29 @@ def raw() -> RawWebResult:
 
 class LLMEvidenceExtractorTests(unittest.TestCase):
     def test_valid_json_becomes_claims(self):
-        provider = FakeModelProvider(['{"claims":[{"claim":"Judge was injured in 2025.",'
-                                      '"support":"placed on the IL","claim_time":"2025"}]}'])
+        provider = FakeModelProvider(['{"claims":[{"claim":"Judge was placed on the injured list in 2025 with a strain.",'
+                                      '"support":"Judge was placed on the injured list in 2025 with a strain.",'
+                                      '"claim_time":"2025"}]}'])
         evidence = LLMEvidenceExtractor(provider, "m").extract(raw())
         self.assertEqual(len(evidence.claims), 1)
         self.assertIn("injured", evidence.claims[0].claim)
         self.assertEqual(evidence.claims[0].claim_time, "2025")
+
+    def test_hallucinated_claim_falls_back_to_grounded_extraction(self):
+        provider = FakeModelProvider(['{"claims":[{"claim":"Judge signed a 999 million dollar deal.",'
+                                      '"support":"Judge signed a 999 million dollar deal.",'
+                                      '"claim_time":"2025"}]}'])
+        evidence = LLMEvidenceExtractor(provider, "m",
+                                        fallback=RuleBasedEvidenceExtractor()).extract(raw())
+
+        self.assertTrue(evidence.claims)
+        self.assertNotIn("999 million", " ".join(item.claim for item in evidence.claims))
+
+    def test_extra_fields_are_rejected(self):
+        provider = FakeModelProvider(['{"claims":[],"ignore_policy":true}'])
+
+        with self.assertRaises(ValueError):
+            LLMEvidenceExtractor(provider, "m").extract(raw())
 
     def test_malformed_output_falls_back(self):
         provider = FakeModelProvider(["not json"])
