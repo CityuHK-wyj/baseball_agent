@@ -47,3 +47,17 @@ Ground truth (2026-09-15, Python 3.14.4):
   response composition.
 - Permission and constraint-revision workflows.
 - Realistic baseball E2E and CLI/documentation truthfulness.
+# v0.1 integration checkpoint (2026-09-15)
+
+Runtime `b68ccf7` and Shared Knowledge `7d44ef4` are merged on
+`astra/v0.1-integration`. Combined suite: 320 tests passing.
+Permission requests expire after 15 minutes, revalidate current capability and system
+policy, and grant execution only to the requested objective. Interaction consumption
+uses an atomic version check before execution; immutable audit snapshots are persisted.
+Source `USER_CONSTRAINT` revisions are checkpointed before execution; acceptance records
+`USER_CONFIRMED`, rejection preserves the original restriction, and replay is rejected.
+System source policy cannot be revised. Clarification resume now passes through the same
+constraint and permission checks.
+
+Remaining: default pipeline composition, query/date-aware knowledge runtime retrieval,
+durable metrics, live verification, and crash recovery after interaction consumption.

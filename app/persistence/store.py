@@ -54,6 +54,8 @@ class StoredObject(ArtifactContract):
 
 
 class OperationalStore(Protocol):
+    def replace_object(self, expected: StoredObject, payload: dict) -> bool: ...
+
     def save_object(self, kind: str, object_id: str, run_id: str, payload: dict) -> StoredObject: ...
 
     def get_object(self, kind: str, object_id: str) -> StoredObject | None: ...
@@ -95,6 +97,17 @@ class SqlOperationalStore:
                             version=row[3], payload=json.loads(row[4]))
 
     # -- objects ---------------------------------------------------------------
+    def replace_object(self, expected: StoredObject, payload: dict) -> bool:
+        """Atomically claim a version; only one competing resume may execute."""
+        p = self.placeholder
+        cursor = self._execute(
+            f"UPDATE objects SET payload={p}, version=version+1, created_at={p} "
+            f"WHERE kind={p} AND object_id={p} AND run_id={p} AND version={p}",
+            (json.dumps(payload), _now(), expected.kind, expected.object_id,
+             expected.run_id, expected.version))
+        self._connection.commit()
+        return cursor.rowcount == 1
+
     def save_object(self, kind: str, object_id: str, run_id: str, payload: dict) -> StoredObject:
         existing = self.get_object(kind, object_id)
         if existing is not None and existing.run_id != run_id:

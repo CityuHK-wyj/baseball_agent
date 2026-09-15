@@ -7,6 +7,7 @@ intent and never bypasses the accepted-product boundary.
 """
 
 from collections.abc import Callable
+from datetime import datetime, timezone
 
 from app.agent.executor import Executor, Tool
 from app.agent.orchestrator import Orchestrator, RunResult
@@ -20,7 +21,8 @@ from app.models.artifacts import ArtifactContract
 from app.models.clarification import ClarificationAnswer, ClarificationRequest
 from app.models.contracts import (AnalysisObjective, ArtifactRequirement, CategoryConstraint,
                                   Constraint, Entity)
-from app.models.interaction import InteractionRecord, PermissionAnswer, PermissionRequest
+from app.models.interaction import (InteractionRecord, PermissionAnswer, PermissionRequest,
+                                    ConstraintRevisionRequest, ConstraintRevisionAnswer)
 from app.models.reports import ResponsePackage
 from app.persistence.recorder import RunRecorder
 from app.semantic.normalizer import SemanticNormalizer
@@ -33,6 +35,7 @@ class PipelineResult(ArtifactContract):
     needs_clarification: bool = False
     clarifications: tuple[ClarificationRequest, ...] = ()
     permissions: tuple[PermissionRequest, ...] = ()
+    constraint_revisions: tuple[ConstraintRevisionRequest, ...] = ()
     objectives: tuple[AnalysisObjective, ...] = ()
     run_ids: tuple[str, ...] = ()
     objective_statuses: tuple[str, ...] = ()
@@ -42,6 +45,15 @@ class PipelineResult(ArtifactContract):
 
 
 ToolFactory = Callable[[tuple[ArtifactRequirement, ...]], Tool]
+
+
+def hard_sources(objective: AnalysisObjective) -> tuple[str, ...]:
+    groups = [set(item.values) for item in objective.constraints
+              if isinstance(item, CategoryConstraint) and item.key in ("source", "source_kind")
+              and item.authority in ("SYSTEM_POLICY", "USER_CONSTRAINT")]
+    if not groups:
+        return ()
+    return tuple(sorted(set.intersection(*groups))) or ("__NO_SOURCE__",)
 
 
 def default_tool_factory(row_count: int = 1200) -> ToolFactory:
@@ -89,14 +101,57 @@ class AnalysisPipeline:
         if not semantic.objectives:
             return PipelineResult(raw_query=raw_query)
 
-        for objective in semantic.objectives:
+        return self._prepare_objectives(raw_query, semantic.objectives, run_id)
+
+    def _prepare_objectives(self, raw_query: str, objectives: tuple[AnalysisObjective, ...],
+                            run_id: str | None) -> PipelineResult:
+        for objective in objectives:
+            sources = hard_sources(objective)
+            for requirement in self._decomposer.decompose(objective):
+                if requirement.base_criticality != "CORE" or not sources:
+                    continue
+                kind = requirement.descriptor.artifact_type
+                if self._router.eligible_sources(kind, sources):
+                    continue
+                alternatives = self._router.eligible_sources(kind)
+                for original in objective.constraints:
+                    if not (isinstance(original, CategoryConstraint) and
+                            original.key in ("source", "source_kind") and
+                            original.authority == "USER_CONSTRAINT"):
+                        continue
+                    for candidate in alternatives:
+                        proposed = original.model_copy(update={"values": (candidate.source_kind,),
+                                                               "origin": "USER_CONFIRMED"})
+                        revised = objective.model_copy(update={"constraints": tuple(
+                            proposed if item == original else item for item in objective.constraints)})
+                        if not self._router.eligible_sources(kind, hard_sources(revised)):
+                            continue
+                        request = ConstraintRevisionRequest(
+                            revision_id=self._id_factory("revision"), objective_ref=objective.objective_id,
+                            original=original, proposed=proposed,
+                            reason="The requested source is unavailable; this source can satisfy the requirement")
+                        effective_run_id = run_id or self._id_factory("run")
+                        if self._recorder is not None:
+                            self._recorder.record_interaction(InteractionRecord(
+                                run_id=effective_run_id, raw_query=raw_query, objectives=objectives,
+                                constraint_revision=request))
+                            self._recorder.checkpoint(effective_run_id, "WAITING_FOR_USER",
+                                                      pending_request_refs=(request.revision_id,))
+                        return PipelineResult(raw_query=raw_query, objectives=objectives,
+                            run_ids=(effective_run_id,), constraint_revisions=(request,))
+
+        for objective in objectives:
             requirements = self._decomposer.decompose(objective)
-            if any(not self._router.eligible_sources(item.descriptor.artifact_type)
+            if any(not self._router.eligible_sources(item.descriptor.artifact_type, hard_sources(objective))
                    for item in requirements):
                 candidates = next((self._router.permission_candidates(item.descriptor.artifact_type)
                                    for item in requirements
                                    if self._router.permission_candidates(item.descriptor.artifact_type)), ())
                 if candidates:
+                    candidates = tuple(item for item in candidates if not hard_sources(objective)
+                                       or item.source_kind in hard_sources(objective))
+                    if not candidates:
+                        continue
                     capability = candidates[0]
                     request = PermissionRequest(permission_id=self._id_factory("permission"),
                                                 objective_ref=objective.objective_id,
@@ -106,13 +161,45 @@ class AnalysisPipeline:
                     if self._recorder is not None:
                         self._recorder.record_interaction(InteractionRecord(
                             run_id=effective_run_id, raw_query=raw_query,
-                            objectives=semantic.objectives, permission=request))
+                            objectives=objectives, permission=request))
                         self._recorder.checkpoint(effective_run_id, "WAITING_FOR_USER",
                                                   pending_request_refs=(request.permission_id,))
-                    return PipelineResult(raw_query=raw_query, objectives=semantic.objectives,
+                    return PipelineResult(raw_query=raw_query, objectives=objectives,
                                           run_ids=(effective_run_id,), permissions=(request,))
 
-        return self._run_objectives(raw_query, semantic.objectives, run_id)
+        return self._run_objectives(raw_query, objectives, run_id)
+
+    def resume_constraint_revision(self, run_id: str, answer: ConstraintRevisionAnswer) -> PipelineResult:
+        if self._recorder is None:
+            raise RuntimeError("Constraint revision resume requires a persistent RunRecorder")
+        interaction = self._recorder.load_interaction(run_id)
+        if interaction is None or interaction.status != "WAITING_FOR_USER" or interaction.constraint_revision is None:
+            raise ValueError("No pending constraint revision")
+        request = interaction.constraint_revision
+        if answer.revision_ref != request.revision_id:
+            raise ValueError("Constraint revision answer does not match the pending request")
+        if datetime.now(timezone.utc) >= request.expires_at:
+            self._recorder.consume_interaction(interaction, interaction.model_copy(update={"status": "EXPIRED"}))
+            raise ValueError("Constraint revision expired")
+        targets = [item for item in interaction.objectives if item.objective_id == request.objective_ref]
+        if (len(targets) != 1 or request.original not in targets[0].constraints or
+                request.original.authority != "USER_CONSTRAINT" or
+                request.proposed.authority != "USER_CONSTRAINT" or
+                request.proposed.origin != "USER_CONFIRMED" or
+                request.proposed.key != request.original.key):
+            raise ValueError("Constraint revision scope is stale or invalid")
+        objectives = interaction.objectives
+        if answer.accepted:
+            objectives = tuple(item.model_copy(update={"constraints": tuple(
+                request.proposed if constraint == request.original else constraint
+                for constraint in item.constraints)}) if item.objective_id == request.objective_ref
+                else item for item in objectives)
+        self._recorder.consume_interaction(interaction, interaction.model_copy(update={
+            "status": "CONFIRMED" if answer.accepted else "REJECTED", "objectives": objectives,
+            "confirmed_constraints": (request.proposed,) if answer.accepted else ()}))
+        if answer.accepted:
+            return self._prepare_objectives(interaction.raw_query, objectives, run_id)
+        return self._run_objectives(interaction.raw_query, objectives, run_id)
 
     def resume_permission(self, run_id: str, answer: PermissionAnswer) -> PipelineResult:
         if self._recorder is None:
@@ -123,20 +210,34 @@ class AnalysisPipeline:
         request = interaction.permission
         if answer.permission_ref != request.permission_id:
             raise ValueError("Permission answer does not match the pending request")
+        if datetime.now(timezone.utc) >= request.expires_at:
+            self._recorder.consume_interaction(interaction, interaction.model_copy(update={"status": "EXPIRED"}))
+            raise ValueError("Permission request expired")
         if not answer.approved:
-            self._recorder.record_interaction(interaction.model_copy(update={"status": "REJECTED"}))
+            self._recorder.consume_interaction(interaction, interaction.model_copy(update={"status": "REJECTED"}))
             return PipelineResult(raw_query=interaction.raw_query, objectives=interaction.objectives,
                                   run_ids=(run_id,))
+        if request.action != "EXECUTE" or not any(
+                objective.objective_id == request.objective_ref for objective in interaction.objectives):
+            raise ValueError("Permission scope does not match the objective or action")
+        candidates = tuple(capability for objective in interaction.objectives
+                           if objective.objective_id == request.objective_ref
+                           for requirement in self._decomposer.decompose(objective)
+                           for capability in self._router.permission_candidates(
+                               requirement.descriptor.artifact_type))
+        if not any((item.tool, item.source_kind, item.cost) ==
+                   (request.tool, request.source_kind, request.cost) for item in candidates):
+            raise ValueError("Permission scope is stale or forbidden by system policy")
         authorized = self._router.authorized_for((request.cost,), (request.tool,))
-        self._recorder.record_interaction(interaction.model_copy(update={"status": "APPROVED"}))
+        self._recorder.consume_interaction(interaction, interaction.model_copy(update={"status": "APPROVED"}))
         return self._run_objectives(interaction.raw_query, interaction.objectives, run_id,
-                                    router=authorized)
+                                    router=authorized, authorized_objective=request.objective_ref)
 
     def resume_clarification(self, run_id: str, answer: ClarificationAnswer) -> PipelineResult:
         if self._recorder is None:
             raise RuntimeError("Clarification resume requires a persistent RunRecorder")
         interaction = self._recorder.load_interaction(run_id)
-        if interaction is None or interaction.status != "WAITING_FOR_USER":
+        if interaction is None or interaction.status != "WAITING_FOR_USER" or interaction.clarification is None:
             raise ValueError(f"Run {run_id!r} has no pending clarification")
         if answer.clarification_ref != interaction.clarification.clarification_id:
             raise ValueError("Clarification answer does not match the pending request")
@@ -153,13 +254,14 @@ class AnalysisPipeline:
             "entities": tuple((*item.entities, entity)),
             "constraints": tuple((*item.constraints, confirmed)),
         }) for item in interaction.objectives)
-        self._recorder.record_interaction(interaction.model_copy(update={
+        self._recorder.consume_interaction(interaction, interaction.model_copy(update={
             "status": "CONFIRMED", "objectives": objectives,
             "confirmed_constraints": (confirmed,)}))
-        return self._run_objectives(interaction.raw_query, objectives, run_id)
+        return self._prepare_objectives(interaction.raw_query, objectives, run_id)
 
     def _run_objectives(self, raw_query: str, objectives: tuple[AnalysisObjective, ...],
-                        run_id: str | None, router: Router | None = None) -> PipelineResult:
+                        run_id: str | None, router: Router | None = None,
+                        authorized_objective: str | None = None) -> PipelineResult:
         requirements: list[ArtifactRequirement] = []
         for objective in objectives:
             requirements.extend(self._decomposer.decompose(objective))
@@ -178,9 +280,12 @@ class AnalysisPipeline:
                 item for item in all_requirements if item.objective_ref == objective.objective_id)
             effective_run_id = run_id or f"run-{index + 1}"
             orchestrator = Orchestrator(
-                self._planner, router or self._router, executor, self._assessment_service, self._registry,
+                self._planner, router if router is not None and
+                objective.objective_id == authorized_objective else self._router,
+                executor, self._assessment_service, self._registry,
                 max_rounds=self._max_rounds, budget=self._budget, id_factory=self._id_factory,
                 context_service=self._context_service, recorder=self._recorder,
+                permitted_sources=hard_sources(objective),
                 run_id=effective_run_id)
             result = orchestrator.run(objective, objective_requirements, confirmed_intent=raw_query)
             run_ids.append(result.run_id)

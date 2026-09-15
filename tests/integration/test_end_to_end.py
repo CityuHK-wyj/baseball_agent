@@ -6,6 +6,7 @@ Offline: a synthetic tool stands in for real sources. No database or network.
 
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from app.agent.planner import RuleBasedPlanner
@@ -17,6 +18,7 @@ from app.llm.response import DeterministicResponseComposer
 from app.models.entities import CanonicalEntity
 from app.models.clarification import ClarificationAnswer
 from app.models.interaction import PermissionAnswer
+from app.models.contracts import CategoryConstraint
 from app.persistence.artifacts import LocalFilesystemArtifactStorage
 from app.persistence.recorder import RunRecorder
 from app.persistence.resume import ResumeService
@@ -140,6 +142,97 @@ class EndToEndTests(unittest.TestCase):
                         permission_ref=request.permission_id, approved=True))
             finally:
                 store.close()
+
+    def test_expired_permission_never_executes_and_is_audited(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SqliteOperationalStore()
+            self.addCleanup(store.close)
+            recorder = RunRecorder(store, LocalFilesystemArtifactStorage(Path(directory)))
+            subject = pipeline(judge_dictionary(), recorder=recorder, router=Router((
+                ToolCapability(tool="synthetic", source_kind="SYNTHETIC",
+                               supported_artifact_types=("TABLE",), cost="PAID"),)))
+            waiting = subject.analyze("Judge performance", run_id="expired")
+            record = recorder.load_interaction("expired")
+            expired = record.permission.model_copy(update={
+                "expires_at": datetime.now(timezone.utc) - timedelta(seconds=1)})
+            recorder.record_interaction(record.model_copy(update={"permission": expired}))
+            with self.assertRaisesRegex(ValueError, "expired"):
+                subject.resume_permission("expired", PermissionAnswer(
+                    permission_ref=waiting.permissions[0].permission_id, approved=True))
+            self.assertEqual(store.list_objects("execution", "expired"), ())
+            self.assertEqual(recorder.load_interaction("expired").status, "EXPIRED")
+            self.assertTrue(store.list_objects("interaction_audit", "expired"))
+
+    def test_permission_is_scoped_to_one_objective_and_current_capability(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SqliteOperationalStore()
+            self.addCleanup(store.close)
+            recorder = RunRecorder(store, LocalFilesystemArtifactStorage(Path(directory)))
+            paid = Router((ToolCapability(tool="synthetic", source_kind="SYNTHETIC",
+                supported_artifact_types=("TABLE", "EVIDENCE"), cost="PAID"),))
+            subject = pipeline(judge_dictionary(), recorder=recorder, router=paid)
+            waiting = subject.analyze("Judge injury and salary value", run_id="scoped")
+            result = subject.resume_permission("scoped", PermissionAnswer(
+                permission_ref=waiting.permissions[0].permission_id, approved=True))
+            self.assertEqual(result.objective_statuses.count("COMPLETE"), 1)
+            self.assertEqual(len(store.list_objects("execution", "scoped")), 1)
+
+    def test_blocked_source_constraint_can_be_revised_once_in_same_run(self):
+        from app.models.interaction import ConstraintRevisionAnswer
+        with tempfile.TemporaryDirectory() as directory:
+            store = SqliteOperationalStore()
+            self.addCleanup(store.close)
+            recorder = RunRecorder(store, LocalFilesystemArtifactStorage(Path(directory)))
+            subject = pipeline(judge_dictionary(), recorder=recorder)
+            original = CategoryConstraint(key="source", values=("POSTGRES",), origin="USER_EXPLICIT")
+            waiting = subject.analyze("Judge performance", constraints=(original,), run_id="revision")
+            request = waiting.constraint_revisions[0]
+            self.assertEqual(store.latest_checkpoint("revision").recovery_position, "WAITING_FOR_USER")
+            self.assertEqual(store.list_objects("execution", "revision"), ())
+            answer = ConstraintRevisionAnswer(revision_ref=request.revision_id, accepted=True)
+            done = subject.resume_constraint_revision("revision", answer)
+            self.assertEqual(done.run_ids, ("revision",))
+            self.assertEqual(done.objective_statuses, ("COMPLETE",))
+            self.assertEqual(done.objectives[0].constraints[0].origin, "USER_CONFIRMED")
+            self.assertEqual(original.values, ("POSTGRES",))
+            with self.assertRaises(ValueError):
+                subject.resume_constraint_revision("revision", answer)
+
+    def test_persisted_interaction_can_only_be_consumed_once(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SqliteOperationalStore()
+            self.addCleanup(store.close)
+            recorder = RunRecorder(store, LocalFilesystemArtifactStorage(Path(directory)))
+            subject = pipeline(ambiguous_dictionary(), recorder=recorder)
+            subject.analyze("Hernandez performance", run_id="claim")
+            pending = recorder.load_interaction("claim")
+            confirmed = pending.model_copy(update={"status": "CONFIRMED"})
+            recorder.consume_interaction(pending, confirmed)
+            with self.assertRaises(ValueError):
+                recorder.consume_interaction(pending, confirmed)
+
+    def test_revision_rejection_wrong_run_and_system_policy_preserve_constraints(self):
+        from app.models.interaction import ConstraintRevisionAnswer
+        with tempfile.TemporaryDirectory() as directory:
+            store = SqliteOperationalStore()
+            self.addCleanup(store.close)
+            recorder = RunRecorder(store, LocalFilesystemArtifactStorage(Path(directory)))
+            subject = pipeline(judge_dictionary(), recorder=recorder)
+            original = CategoryConstraint(key="source", values=("POSTGRES",), origin="USER_EXPLICIT")
+            waiting = subject.analyze("Judge performance", constraints=(original,), run_id="reject")
+            answer = ConstraintRevisionAnswer(revision_ref=waiting.constraint_revisions[0].revision_id,
+                                              accepted=False)
+            with self.assertRaises(ValueError):
+                subject.resume_constraint_revision("wrong-run", answer)
+            done = subject.resume_constraint_revision("reject", answer)
+            self.assertEqual(done.objectives[0].constraints, (original,))
+            self.assertEqual(store.list_objects("execution", "reject"), ())
+            self.assertEqual(recorder.load_interaction("reject").status, "REJECTED")
+            policy = original.model_copy(update={"authority": "SYSTEM_POLICY"})
+            blocked = subject.analyze("Judge performance", constraints=(policy,), run_id="policy")
+            self.assertEqual(blocked.constraint_revisions, ())
+            self.assertEqual(blocked.permissions, ())
+            self.assertEqual(store.list_objects("execution", "policy"), ())
 
     def test_multi_objective_run_scopes_response_per_objective(self):
         result = pipeline(judge_dictionary()).analyze("Analyse Judge injury and salary value")

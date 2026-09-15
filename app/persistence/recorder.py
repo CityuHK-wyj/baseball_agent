@@ -65,12 +65,25 @@ class RunRecorder:
         self._store.save_object("response_package", package.run_id, run_id, package.model_dump(mode="json"))
 
     def record_interaction(self, interaction: InteractionRecord) -> None:
+        self._store.save_object("interaction_audit", self._id_factory("interaction-event"),
+                                interaction.run_id, interaction.model_dump(mode="json"))
         self._store.save_object("interaction", interaction.run_id, interaction.run_id,
                                 interaction.model_dump(mode="json"))
 
     def load_interaction(self, run_id: str) -> InteractionRecord | None:
         record = self._store.get_object("interaction", run_id)
         return InteractionRecord.model_validate(record.payload) if record else None
+
+    def consume_interaction(self, pending: InteractionRecord, result: InteractionRecord) -> None:
+        record = self._store.get_object("interaction", pending.run_id)
+        if (record is None or record.payload != pending.model_dump(mode="json") or
+                pending.status != "WAITING_FOR_USER" or result.run_id != pending.run_id or
+                result.status == "WAITING_FOR_USER"):
+            raise ValueError("Interaction is stale or already consumed")
+        if not self._store.replace_object(record, result.model_dump(mode="json")):
+            raise ValueError("Interaction is stale or already consumed")
+        self._store.save_object("interaction_audit", self._id_factory("interaction-event"),
+                                result.run_id, result.model_dump(mode="json"))
 
     def checkpoint(self, run_id: str, position: RecoveryPosition, *,
                    active_work_refs: Iterable[str] = (),
