@@ -54,6 +54,7 @@ class Router:
         notes: list[str] = []
         user_sources = tuple(user_hard_sources)
         mapped_kind = ""
+        mapped_tool = ""
         if execution_route is not None:
             mode = getattr(execution_route, "mode", "")
             if mode == "NO_MAPPING":
@@ -65,6 +66,9 @@ class Router:
             mapped_kind = getattr(execution_route, "required_source_kind", "")
             if mapped_kind:
                 notes.append(f"source mapping requires {mapped_kind}")
+            mapped_tool = getattr(execution_route, "tool", "") or ""
+            if mapped_tool:
+                notes.append(f"source mapping requires tool {mapped_tool}")
 
         eligible: list[ToolCapability] = []
         for capability in self._capabilities:
@@ -82,6 +86,9 @@ class Router:
                 continue
             if mapped_kind and capability.source_kind != mapped_kind:
                 notes.append(f"{capability.tool}: violates the source mapping")
+                continue
+            if mapped_tool and capability.tool != mapped_tool:
+                notes.append(f"{capability.tool}: violates the mapped tool")
                 continue
             eligible.append(capability)
 

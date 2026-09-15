@@ -66,6 +66,17 @@ class RouterSourceMappingTests(unittest.TestCase):
         decision = self.router.route(task(preference="features"), "TABLE", execution_route=route)
         self.assertEqual(decision.selected_tool, "hot")
 
+    def test_direct_route_enforces_the_mapped_tool_within_a_source_kind(self):
+        router = Router(
+            (ToolCapability(tool="hot", source_kind="POSTGRES", supported_artifact_types=("TABLE",)),
+             ToolCapability(tool="stale", source_kind="POSTGRES", supported_artifact_types=("TABLE",))),
+            id_factory=lambda _p: "routing")
+        route = self.resolver.resolve("t1", ("exit_velocity",))
+
+        decision = router.route(task(preference="stale"), "TABLE", execution_route=route)
+
+        self.assertEqual(decision.selected_tool, "hot")
+
     def test_calculated_route_selects_the_feature_source_despite_preference(self):
         route = self.resolver.resolve("t1", ("wrc_plus",))
         decision = self.router.route(task(preference="hot"), "TABLE", execution_route=route)
