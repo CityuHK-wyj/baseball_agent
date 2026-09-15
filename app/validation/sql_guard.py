@@ -54,6 +54,10 @@ _SELECT_ROOTS = (exp.Select, exp.Union, exp.Intersect, exp.Except, exp.Subquery)
 
 def resolve_within_root(path: str, root: str | Path) -> bool:
     """True only if a (possibly glob) path stays inside an explicit root."""
+    # A URI is external state, not a relative path below the archive root.  In
+    # particular, treating ``https://...`` as a Path would make it look relative.
+    if "://" in path or path.casefold().startswith("file:"):
+        return False
     root_path = Path(root).resolve()
     candidate = Path(path)
     if ".." in candidate.parts:
@@ -84,6 +88,29 @@ def _function_args(node: exp.Expression) -> list[exp.Expression]:
 def _string_literals(node: exp.Expression) -> list[str]:
     return [item.this for item in _function_args(node)
             if isinstance(item, exp.Literal) and item.is_string]
+
+
+def _file_paths(node: exp.Expression) -> tuple[str, ...] | None:
+    """Extract only statically-known file arguments from a reader call.
+
+    A file reader may take one literal path or a literal list of paths.  Dynamic SQL
+    expressions cannot be proven to stay in the sandbox, so they are rejected rather
+    than deferred to DuckDB.
+    """
+    paths: list[str] = []
+
+    def collect(item: exp.Expression) -> bool:
+        if isinstance(item, exp.Literal) and item.is_string:
+            paths.append(item.this)
+            return True
+        if isinstance(item, exp.Array):
+            return bool(item.expressions) and all(collect(child) for child in item.expressions)
+        return False
+
+    arguments = _function_args(node)
+    if not arguments or not all(collect(item) for item in arguments):
+        return None
+    return tuple(paths)
 
 
 def _referenced_tables(tree: exp.Expression) -> tuple[str, ...]:
@@ -136,10 +163,22 @@ def guard_read_only_sql(sql: str, *, dialect: str = "postgres",
             paths = _string_literals(node)
             if file_root is None:
                 return GuardResult(False, f"Function {name} requires an explicit file root.")
+            paths = _file_paths(node)
+            if paths is None:
+                return GuardResult(False, f"Function {name} requires literal sandboxed file paths.")
             for candidate in paths:
                 if not resolve_within_root(candidate, file_root):
                     return GuardResult(False, f"Path escapes the permitted root: {candidate}")
                 file_paths.append(candidate)
+
+    # DuckDB accepts a quoted table expression as a file scan (for example
+    # ``FROM '/tmp/data.parquet'``). It is not represented as a file-reading
+    # function in sqlglot, so reject it before opening the connection.
+    if dialect == "duckdb":
+        for table in tree.find_all(exp.Table):
+            identifier = table.this
+            if isinstance(identifier, exp.Identifier) and identifier.args.get("quoted"):
+                return GuardResult(False, "Quoted DuckDB table expressions are not permitted.")
 
     tables = _referenced_tables(tree)
     if allowed_tables is not None:

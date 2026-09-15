@@ -208,7 +208,12 @@ class DuckDBGuardTests(unittest.TestCase):
     def test_paths_outside_the_root_are_rejected_before_connect(self):
         for sql in ("SELECT * FROM read_parquet('/etc/passwd')",
                     "SELECT * FROM read_parquet('/data/parquet/../../etc/passwd')",
-                    "SELECT * FROM read_parquet('/data/other/x.parquet')"):
+                    "SELECT * FROM read_parquet('/data/other/x.parquet')",
+                    "SELECT * FROM read_parquet(['/etc/passwd'])",
+                    "SELECT * FROM read_parquet('https://example.test/x.parquet')",
+                    "SELECT * FROM read_parquet((SELECT '/etc/passwd'))",
+                    "SELECT * FROM read_csv_auto('file:///etc/passwd')",
+                    "SELECT * FROM '/etc/passwd'"):
             with self.subTest(sql=sql):
                 connect = ExplodingConnect()
                 result = duckdb_executor(connect).execute(sql)
