@@ -13,13 +13,29 @@ from pybaseball import cache
 # 屏蔽高级 Python 3.14 环境下的 Pandas 迁移提示
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+# Canonical pitch-level columns retained from the upstream Statcast export. Order is the
+# positional INSERT order for statcast_pitches (DataFrame 'pitcher'/'batter' map to the
+# DDL columns pitcher_id/batter_id). This is a maintenance loader run as baseball_admin;
+# the Agent runtime stays read-only and never imports this module.
+PITCH_COLUMNS = [
+    'game_date', 'game_pk', 'release_speed', 'release_spin_rate', 'pitch_type',
+    'player_name', 'pitcher', 'batter', 'events', 'description', 'plate_x', 'plate_z',
+    'sz_top', 'sz_bot', 'p_throws', 'stand', 'balls', 'strikes', 'zone', 'inning',
+    'launch_speed', 'launch_angle', 'hit_distance_sc',
+    'estimated_ba_using_speedangle', 'estimated_woba_using_speedangle'
+]
+
+
+def _require_admin_credentials() -> None:
+    if not os.environ.get("POSTGRES_ADMIN_PASSWORD"):
+        raise RuntimeError("Maintenance loader requires POSTGRES_ADMIN_PASSWORD (baseball_admin)")
+
 
 def sync_player_dictionary(cursor, batter_ids):
     """
     动态维表同步：联网反查新打者 ID 对应的人类姓名，并注册到本地字典表
     """
-    from app.validation.policy import deny_analytics_write
-    deny_analytics_write()
+    _require_admin_credentials()
     if not batter_ids:
         return
 
@@ -56,8 +72,7 @@ def fetch_and_append_mlb_data(start_date, end_date):
     """
     一键双层数据灌录：同步更新 Pitch流水表、Player字典表，并自动衍生出 Agent 专用的 Event核心事件表
     """
-    from app.validation.policy import deny_analytics_write
-    deny_analytics_write()
+    _require_admin_credentials()
     print(f"📡 正在从 MLB Statcast 抓取数据 [{start_date} 至 {end_date}]...")
 
     try:
@@ -72,14 +87,7 @@ def fetch_and_append_mlb_data(start_date, end_date):
 
     print(f"📊 成功从网络抓取到 {len(df)} 条原始投球数据！")
 
-    # 🚨 核心改动 1：根据你的建议，疯狂扩充 Agent 高频使用的高阶物理和博弈字段
-    pitch_columns = [
-        'game_date', 'game_pk', 'release_speed', 'release_spin_rate', 'pitch_type',
-        'player_name', 'pitcher', 'batter', 'events', 'description', 'plate_x', 'plate_z',
-        'stand', 'balls', 'strikes', 'zone', 'inning',
-        'launch_speed', 'launch_angle', 'hit_distance_sc',
-        'estimated_ba_using_speedangle', 'estimated_woba_using_speedangle'
-    ]
+    pitch_columns = PITCH_COLUMNS
 
     # 清洗：剔除坐标缺失的流水记录（保障绘图），并做类型硬转换
     available_cols = [c for c in pitch_columns if c in df.columns]
@@ -101,7 +109,7 @@ def fetch_and_append_mlb_data(start_date, end_date):
     print("🔌 正在连接 PostgreSQL 数据库...")
     conn = psycopg2.connect(
         host="127.0.0.1", database="baseball_analytics",
-        user="baseball_admin", password=os.environ["POSTGRES_PASSWORD"], port="5433"
+        user="baseball_admin", password=os.environ["POSTGRES_ADMIN_PASSWORD"], port="5433"
     )
     cursor = conn.cursor()
 
@@ -115,10 +123,18 @@ def fetch_and_append_mlb_data(start_date, end_date):
         CREATE TABLE IF NOT EXISTS statcast_pitches (
             game_date DATE, game_pk BIGINT, release_speed FLOAT, release_spin_rate FLOAT, pitch_type VARCHAR(10),
             player_name VARCHAR(100), pitcher_id INT, batter_id INT, events VARCHAR(100), description VARCHAR(255),
-            plate_x FLOAT, plate_z FLOAT, stand VARCHAR(5), balls INT, strikes INT, zone INT, inning INT,
+            plate_x FLOAT, plate_z FLOAT, sz_top FLOAT, sz_bot FLOAT, p_throws VARCHAR(5),
+            stand VARCHAR(5), balls INT, strikes INT, zone INT, inning INT,
             launch_speed FLOAT, launch_angle FLOAT, hit_distance_sc FLOAT,
             estimated_ba_using_speedangle FLOAT, estimated_woba_using_speedangle FLOAT
         );
+    """)
+    # Idempotent migration for databases created before sz_top/sz_bot/p_throws existed.
+    cursor.execute("""
+        ALTER TABLE statcast_pitches
+        ADD COLUMN IF NOT EXISTS sz_top FLOAT,
+        ADD COLUMN IF NOT EXISTS sz_bot FLOAT,
+        ADD COLUMN IF NOT EXISTS p_throws VARCHAR(5);
     """)
     # 3. 🚨 核心改动 2：为你量身定制的 Agent 战力事件表 (At-Bat / Event Level)
     cursor.execute("""
@@ -139,18 +155,23 @@ def fetch_and_append_mlb_data(start_date, end_date):
     cursor.execute("DELETE FROM batting_events WHERE game_date >= %s AND game_date <= %s;", (start_date, end_date))
 
     # ========================== 1. 注入 Pitch 流水大表 ==========================
-    sql_ordered_pitch = [
-        'game_date', 'game_pk', 'release_speed', 'release_spin_rate', 'pitch_type',
-        'player_name', 'pitcher', 'batter', 'events', 'description', 'plate_x', 'plate_z',
-        'stand', 'balls', 'strikes', 'zone', 'inning',
-        'launch_speed', 'launch_angle', 'hit_distance_sc',
-        'estimated_ba_using_speedangle', 'estimated_woba_using_speedangle'
-    ]
+    sql_ordered_pitch = PITCH_COLUMNS
     df_pitch_ordered = df_pitch[sql_ordered_pitch]
     pitch_tuples = [tuple(x) for x in df_pitch_ordered.values]
 
+    # Column names (not positions) keep the INSERT correct even after ALTER appends.
+    pitch_target_columns = (
+        'game_date', 'game_pk', 'release_speed', 'release_spin_rate', 'pitch_type',
+        'player_name', 'pitcher_id', 'batter_id', 'events', 'description', 'plate_x',
+        'plate_z', 'sz_top', 'sz_bot', 'p_throws', 'stand', 'balls', 'strikes', 'zone',
+        'inning', 'launch_speed', 'launch_angle', 'hit_distance_sc',
+        'estimated_ba_using_speedangle', 'estimated_woba_using_speedangle'
+    )
+
     print(f"📥 正在向流水大表(statcast_pitches)灌入 {len(pitch_tuples)} 条一球一记记录...")
-    insert_pitch_query = f"INSERT INTO statcast_pitches VALUES %s"
+    insert_pitch_query = (
+        f"INSERT INTO statcast_pitches ({', '.join(pitch_target_columns)}) VALUES %s"
+    )
     execute_values(cursor, insert_pitch_query, pitch_tuples)
 
     # ========================== 2. 🚨 核心改动 3：动态衍生事件表 (Event Level) ==========================
@@ -174,9 +195,17 @@ def fetch_and_append_mlb_data(start_date, end_date):
         df_event_ordered = df_event[sql_ordered_event].astype(object).where(pd.notnull(df_event[sql_ordered_event]),
                                                                             None)
         event_tuples = [tuple(x) for x in df_event_ordered.values]
+        event_target_columns = (
+            'game_date', 'game_pk', 'batter_id', 'batter_name', 'pitcher_id',
+            'pitcher_name', 'inning', 'events', 'launch_speed', 'launch_angle',
+            'hit_distance_sc', 'stand', 'pitch_type', 'estimated_ba_using_speedangle',
+            'estimated_woba_using_speedangle'
+        )
 
         print(f"💥 完美派生！正在向事件大表(batting_events)灌入 {len(event_tuples)} 条一打席一记的核心博弈事件...")
-        insert_event_query = f"INSERT INTO batting_events VALUES %s"
+        insert_event_query = (
+            f"INSERT INTO batting_events ({', '.join(event_target_columns)}) VALUES %s"
+        )
         execute_values(cursor, insert_event_query, event_tuples)
     else:
         print("⚠️ 提示：本次抓取的时间段内，没有产生任何出局、上垒等终结事件（events全是空值）。")

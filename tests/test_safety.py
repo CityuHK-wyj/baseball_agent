@@ -7,22 +7,40 @@ from unittest.mock import patch
 
 class SafetyTests(unittest.TestCase):
     def test_legacy_analytics_writers_are_blocked_before_io(self):
-        calls = [
+        # The Agent runtime writers stay fail-closed.
+        runtime_writers = [
             ("app.data", "ensure_hot_schema", (None,)),
             ("app.data", "sync_player_dictionary", (None, [1])),
             ("app.data", "fetch_and_append_mlb_data", ("2025-01-01", "2025-01-02")),
             ("app.data", "archive_mlb_history", ()),
             ("app.features.engine", "build_batting_snapshot", ("2025-01-01", "2025-01-02")),
-            ("data_loader.fetch_and_load", "fetch_and_append_mlb_data", ("2025-01-01", "2025-01-02")),
-            ("data_loader.fetch_and_load", "sync_player_dictionary", (None, [1])),
-            ("data_loader.fetch_batting_stats", "build_batting_snapshot", ("2025-01-01", "2025-01-02")),
-            ("data_loader.archive_history_to_parquet", "archive_mlb_history", ()),
         ]
-        for module, name, args in calls:
+        for module, name, args in runtime_writers:
             with self.subTest(module=module, name=name):
                 function = getattr(importlib.import_module(module), name)
                 with self.assertRaisesRegex(PermissionError, "read-only"):
                     function(*args)
+
+    def test_maintenance_loaders_require_explicit_admin_opt_in(self):
+        # data_loader is the maintenance ingestion path: it must refuse to run without
+        # explicit admin credentials (or archive opt-in), never fall through to readonly.
+        loaders = [
+            ("data_loader.fetch_and_load", "fetch_and_append_mlb_data",
+             ("2025-01-01", "2025-01-02"), "POSTGRES_ADMIN_PASSWORD"),
+            ("data_loader.fetch_and_load", "sync_player_dictionary",
+             (None, [1]), "POSTGRES_ADMIN_PASSWORD"),
+            ("data_loader.fetch_batting_stats", "build_batting_snapshot",
+             ("2025-01-01", "2025-01-02"), "POSTGRES_ADMIN_PASSWORD"),
+            ("data_loader.archive_history_to_parquet", "archive_mlb_history",
+             (), "STATCAST_ARCHIVE_ENABLED"),
+        ]
+        with patch.dict("os.environ", {"POSTGRES_ADMIN_PASSWORD": "",
+                                         "STATCAST_ARCHIVE_ENABLED": ""}):
+            for module, name, args, required in loaders:
+                with self.subTest(module=module, name=name):
+                    function = getattr(importlib.import_module(module), name)
+                    with self.assertRaisesRegex(RuntimeError, required):
+                        function(*args)
 
     def test_legacy_llm_loop_is_disabled_before_any_paid_call(self):
         from app.agent.orchestrator import run_all_channel_baseball_agent
