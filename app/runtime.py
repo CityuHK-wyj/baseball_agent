@@ -1,5 +1,6 @@
 """Default composition root. External data adapters stay explicitly injectable."""
 
+from datetime import date
 from pathlib import Path
 from uuid import uuid4
 
@@ -25,8 +26,8 @@ from app.semantic.entity_resolver import EntityResolver
 from app.semantic.normalizer import SemanticNormalizer
 from app.semantic.objective_extractor import RuleBasedObjectiveExtractor
 from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
-from app.semantic.field_mapping import (ZONE_ABOVE_UPPER_EDGE, ZONE_UPPER_THIRD,
-                                        FieldMappingRegistry)
+from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, ZONE_ABOVE_UPPER_EDGE,
+                                        ZONE_UPPER_THIRD, FieldMappingRegistry)
 from app.semantic.schema_registry import SchemaRegistry, statcast_schema_registry
 from app.tools.execution import DuckDBReadOnlyExecutor, PostgresReadOnlyExecutor
 from app.tools.knowledge import KnowledgeTool
@@ -79,7 +80,8 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
                                            "ranking",
                                            f"pitch_location:{ZONE_UPPER_THIRD}",
                                            f"pitch_location:{ZONE_ABOVE_UPPER_EDGE}"),
-                coverage="2015-2023 Parquet archive"),
+                coverage="2015-04-05..2023-11-01 Parquet archive",
+                coverage_start=date(2015, 4, 5), coverage_end=date(2023, 11, 1)),
             ToolCapability(
                 tool="statcast-postgres", source_kind="POSTGRES",
                 supported_artifact_types=("TABLE",),
@@ -88,8 +90,10 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
                 supported_constraint_keys=("count", "pitch_velocity", "pitch_type",
                                            "ranking",
                                            f"pitch_location:{ZONE_UPPER_THIRD}",
-                                           f"pitch_location:{ZONE_ABOVE_UPPER_EDGE}"),
-                coverage="2024-03-15..2026-06-18 PostgreSQL",
+                                           f"pitch_location:{ZONE_ABOVE_UPPER_EDGE}",
+                                           f"pitch_location:{BATTER_RELATIVE_UPPER_EDGE}"),
+                coverage="2024-03-15..2026-09-14 PostgreSQL",
+                coverage_start=date(2024, 3, 15), coverage_end=date(2026, 9, 14),
                 available=bool(settings.postgres_password)),
         ]
     all_capabilities = (knowledge_capability, *analytics_capabilities, *capabilities)

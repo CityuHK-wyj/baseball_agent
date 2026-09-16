@@ -127,9 +127,11 @@ class AnalysisPipeline:
                 if requirement.base_criticality != "CORE" or not sources:
                     continue
                 kind = requirement.descriptor.artifact_type
-                if self._router.eligible_sources(kind, sources, requirement.descriptor.data_keys):
+                if self._router.eligible_sources(kind, sources, requirement.descriptor.data_keys,
+                                                 time_range=requirement.descriptor.time_range):
                     continue
-                alternatives = self._router.eligible_sources(kind, data_keys=requirement.descriptor.data_keys)
+                alternatives = self._router.eligible_sources(kind, data_keys=requirement.descriptor.data_keys,
+                                                             time_range=requirement.descriptor.time_range)
                 for original in objective.constraints:
                     if not (isinstance(original, CategoryConstraint) and
                             original.key in ("source", "source_kind") and
@@ -140,7 +142,8 @@ class AnalysisPipeline:
                                                                "origin": "USER_CONFIRMED"})
                         revised = objective.model_copy(update={"constraints": tuple(
                             proposed if item == original else item for item in objective.constraints)})
-                        if not self._router.eligible_sources(kind, hard_sources(revised), requirement.descriptor.data_keys):
+                        if not self._router.eligible_sources(kind, hard_sources(revised), requirement.descriptor.data_keys,
+                                                             time_range=requirement.descriptor.time_range):
                             continue
                         request = ConstraintRevisionRequest(
                             revision_id=self._id_factory("revision"), objective_ref=objective.objective_id,
@@ -158,11 +161,15 @@ class AnalysisPipeline:
 
         for objective in objectives:
             requirements = self._decomposer.decompose(objective)
-            if any(not self._router.eligible_sources(item.descriptor.artifact_type, hard_sources(objective), item.descriptor.data_keys)
+            if any(not self._router.eligible_sources(item.descriptor.artifact_type, hard_sources(objective),
+                                                     item.descriptor.data_keys,
+                                                     time_range=item.descriptor.time_range)
                    for item in requirements):
-                candidates = next((self._router.permission_candidates(item.descriptor.artifact_type, item.descriptor.data_keys)
+                candidates = next((self._router.permission_candidates(item.descriptor.artifact_type, item.descriptor.data_keys,
+                                                                      time_range=item.descriptor.time_range)
                                    for item in requirements
-                                   if self._router.permission_candidates(item.descriptor.artifact_type, item.descriptor.data_keys)), ())
+                                   if self._router.permission_candidates(item.descriptor.artifact_type, item.descriptor.data_keys,
+                                                                          time_range=item.descriptor.time_range)), ())
                 if candidates:
                     candidates = tuple(item for item in candidates if not hard_sources(objective)
                                        or item.source_kind in hard_sources(objective))
@@ -240,7 +247,8 @@ class AnalysisPipeline:
                            if objective.objective_id == request.objective_ref
                            for requirement in self._decomposer.decompose(objective)
                            for capability in self._router.permission_candidates(
-                               requirement.descriptor.artifact_type, requirement.descriptor.data_keys))
+                               requirement.descriptor.artifact_type, requirement.descriptor.data_keys,
+                               time_range=requirement.descriptor.time_range))
         if not any((item.tool, item.source_kind, item.cost) ==
                    (request.tool, request.source_kind, request.cost) for item in candidates):
             raise ValueError("Permission scope is stale or forbidden by system policy")
@@ -309,7 +317,8 @@ class AnalysisPipeline:
                     if objective.objective_id == request.objective_ref
                     for requirement in self._decomposer.decompose(objective)
                     for item in self._router.permission_candidates(requirement.descriptor.artifact_type,
-                                                                    requirement.descriptor.data_keys))
+                                                                    requirement.descriptor.data_keys,
+                                                                    time_range=requirement.descriptor.time_range))
                 if request.action != "EXECUTE" or not any(
                     (item.tool, item.source_kind, item.cost) == (request.tool, request.source_kind, request.cost)
                     for item in candidates):

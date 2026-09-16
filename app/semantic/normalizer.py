@@ -37,35 +37,8 @@ class SemanticNormalizer:
                   mentions: Iterable[str] | None = None) -> SemanticResult:
         supplied = tuple(constraints)
         inferred = ()
-        # Freeze relative dates before any interaction or execution can suspend the run.
-        if not any(c.key == "date_range" for c in supplied):
-            recent = re.search(r"(?:近|过去|過去)\s*(\d+)\s*天|\blast\s+(\d+)\s+days\b",
-                               raw_query, re.IGNORECASE)
-            dates = re.findall(r"(?<!\d)\d{4}-\d{2}-\d{2}(?!\d)", raw_query)
-            years = set(re.findall(r"(?<!\d)(?:19|20)\d{2}(?!\d)", raw_query))
-            window = None
-            if dates:
-                if recent or len(dates) > 2:
-                    raise ValueError("Ambiguous date windows require clarification")
-                window = TimeRange(start=dates[0], end=dates[-1])
-            elif years:
-                if recent or len(years) != 1:
-                    raise ValueError("Multiple date windows require clarification")
-                year = int(next(iter(years)))
-                window = TimeRange(start=date(year, 1, 1), end=date(year, 12, 31))
-            if recent:
-                days = int(recent.group(1) or recent.group(2))
-                if not 1 <= days <= 36600:
-                    raise ValueError("Recent date window must be between 1 and 36600 days")
-                end = self._today()
-                start = end - timedelta(days=days - 1)
-                window = TimeRange(start=start, end=end)
-            if window is not None:
-                inferred = (CategoryConstraint(key="date_range",
-                    values=(window.start.isoformat(), window.end.isoformat()),
-                    origin="SYSTEM_INFERRED"),)
+        windows = self._date_windows(raw_query, supplied)
         analytics = extract_analytical_constraints(raw_query)
-        normalized = normalize_constraints((*supplied, *inferred, *analytics.constraints))
         surface_mentions = tuple(mentions) if mentions is not None else self._scan_mentions(raw_query)
 
         entities: list[Entity] = []
@@ -83,7 +56,7 @@ class SemanticNormalizer:
                 clarifications.append(request)
 
         if analytics.location_wording_requested and not any(
-                c.kind == "LOCATION" for c in normalized):
+                c.kind == "LOCATION" for c in (*supplied, *analytics.constraints)):
             options = tuple(
                 ClarificationOption(option_id=f"loc-{index}", label=label, value=value,
                                     rationale=rationale)
@@ -97,13 +70,81 @@ class SemanticNormalizer:
                 options=options, recommended_option_id=options[0].option_id,
                 affected_ref="pitch_location"))
 
-        objectives = self._extractor.extract(raw_query, entities=tuple(entities),
-                                             constraints=normalized)
+        objectives = self._build_objectives(raw_query, supplied, analytics.constraints,
+                                            entities, windows)
         if clarifications:
             notes.append("Objectives are provisional until clarifications are answered.")
         return SemanticResult(raw_query=raw_query, objectives=tuple(objectives),
                               clarifications=tuple(clarifications),
                               unresolved_mentions=tuple(unresolved), notes=tuple(notes))
+
+    def _date_windows(self, raw_query: str, supplied: tuple[Constraint, ...]) -> tuple[TimeRange, ...]:
+        """Freeze zero, one or two deterministic date windows.
+
+        Explicit comparisons (``2023 vs 2024``, ``last 30 days vs previous 30 days``) yield
+        two windows; a single window yields one; genuinely ambiguous multi-window text
+        still fails closed.
+        """
+        if any(c.key == "date_range" for c in supplied):
+            return ()
+        lowered = raw_query.casefold()
+        recent = re.search(r"(?:近|过去|過去)\s*(\d+)\s*天|\blast\s+(\d+)\s+days\b",
+                           raw_query, re.IGNORECASE)
+        dates = re.findall(r"(?<!\d)\d{4}-\d{2}-\d{2}(?!\d)", raw_query)
+        years = sorted({int(y) for y in re.findall(r"(?<!\d)(?:19|20)\d{2}(?!\d)", raw_query)})
+        comparison = re.search(r"\bvs\.?\b|\bversus\b|\bcompared\s+to\b", lowered)
+
+        if comparison and len(years) == 2 and not recent and not dates:
+            return (TimeRange(start=date(years[0], 1, 1), end=date(years[0], 12, 31)),
+                    TimeRange(start=date(years[1], 1, 1), end=date(years[1], 12, 31)))
+        if recent and (comparison or re.search(r"\bprevious\b|\bprior\b", lowered)):
+            days = int(recent.group(1) or recent.group(2))
+            if not 1 <= days <= 36600:
+                raise ValueError("Recent date window must be between 1 and 36600 days")
+            end = self._today()
+            start = end - timedelta(days=days - 1)
+            return (TimeRange(start=start, end=end),
+                    TimeRange(start=start - timedelta(days=days), end=start - timedelta(days=1)))
+
+        window: TimeRange | None = None
+        if dates:
+            if recent or len(dates) > 2:
+                raise ValueError("Ambiguous date windows require clarification")
+            window = TimeRange(start=dates[0], end=dates[-1])
+        elif years:
+            if recent or len(years) != 1:
+                raise ValueError("Multiple date windows require clarification")
+            window = TimeRange(start=date(years[0], 1, 1), end=date(years[0], 12, 31))
+        if recent:
+            days = int(recent.group(1) or recent.group(2))
+            if not 1 <= days <= 36600:
+                raise ValueError("Recent date window must be between 1 and 36600 days")
+            end = self._today()
+            start = end - timedelta(days=days - 1)
+            window = TimeRange(start=start, end=end)
+        return (window,) if window is not None else ()
+
+    def _build_objectives(self, raw_query: str, supplied: tuple[Constraint, ...],
+                          analytics: tuple[Constraint, ...], entities: list[Entity],
+                          windows: tuple[TimeRange, ...]) -> list:
+        if not windows:
+            normalized = normalize_constraints((*supplied, *analytics))
+            return list(self._extractor.extract(raw_query, entities=tuple(entities),
+                                                constraints=normalized))
+        objectives: list = []
+        for window in windows:
+            window_constraint = CategoryConstraint(
+                key="date_range", values=(window.start.isoformat(), window.end.isoformat()),
+                origin="SYSTEM_INFERRED")
+            normalized = normalize_constraints((*supplied, window_constraint, *analytics))
+            label = f"{window.start.isoformat()}..{window.end.isoformat()}"
+            for objective in self._extractor.extract(raw_query, entities=tuple(entities),
+                                                     constraints=normalized):
+                objectives.append(objective.model_copy(update={
+                    "objective_id": self._id_factory(f"objective-{label}"),
+                    "description": f"{objective.description} ({label})",
+                }))
+        return objectives
 
     def _scan_mentions(self, raw_query: str) -> tuple[str, ...]:
         """Find known entity surfaces that literally occur in the query."""

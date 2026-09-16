@@ -206,12 +206,14 @@ class Orchestrator:
                 item.requirement_id for item in unmet
                 if self._router.eligible_sources(item.descriptor.artifact_type, self._permitted_sources,
                                                  item.descriptor.data_keys,
-                                                 constraint_keys=self._constraint_keys(item)))
+                                                 constraint_keys=self._constraint_keys(item),
+                                                 time_range=item.descriptor.time_range))
             policy_blocked = tuple(
                 item.requirement_id for item in unmet
                 if item.requirement_id not in recoverable
                 and self._router.candidate_sources(item.descriptor.artifact_type, item.descriptor.data_keys,
-                                                   constraint_keys=self._constraint_keys(item)))
+                                                   constraint_keys=self._constraint_keys(item),
+                                                   time_range=item.descriptor.time_range))
             scoped_assessments = tuple(item for item in self._assessment_service.all_assessments()
                                        if item.requirement_ref in by_id
                                        and item.objective_ref in (None, objective.objective_id))
@@ -267,7 +269,8 @@ class Orchestrator:
                                              self._permitted_sources,
                                              execution_route=execution_route,
                                              data_keys=requirement.descriptor.data_keys,
-                                             constraint_keys=self._constraint_keys(requirement))
+                                             constraint_keys=self._constraint_keys(requirement),
+                                             time_range=requirement.descriptor.time_range)
                 routings.append(routing)
                 metrics.record("ROUTE", subject_ref=routing.decision_id, agent="ROUTER",
                                status="SELECTED" if routing.selected_tool else "BLOCKED",

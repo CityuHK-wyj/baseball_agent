@@ -22,7 +22,10 @@ class DefaultPipelineTests(unittest.TestCase):
                 requirements = RuleBasedRequirementDecomposer().decompose(result.objectives[0])
                 self.assertEqual(requirements[0].descriptor.time_range.model_dump(mode="json"),
                                  {"start": start, "end": end})
-            for query in ("Judge 2023 vs 2024", "Judge近0天", "Judge 2024-03-01 to 2024-02-28"):
+            # "Judge 2023 vs 2024" is now a deterministic two-window comparison.
+            comparison = subject.analyze("Judge 2023 vs 2024")
+            self.assertEqual(len(comparison.objectives), 2)
+            for query in ("Judge近0天", "Judge 2024-03-01 to 2024-02-28"):
                 with self.assertRaises(ValueError):
                     subject.analyze(query)
 

@@ -8,9 +8,12 @@ from typing import Callable, Literal
 
 from pydantic import Field
 
+from datetime import date
+
 from app.models.artifacts import ArtifactContract
 from app.models.contracts import (Constraint, CountConstraint, LocationConstraint, Name,
-                                  NumericConstraint, PitchTypeConstraint, RankingConstraint)
+                                  NumericConstraint, PitchTypeConstraint, RankingConstraint,
+                                  TimeRange)
 from app.models.planning import AgentTask, RoutingDecision
 
 Cost = Literal["FREE", "PAID", "HIGH"]
@@ -48,16 +51,27 @@ class ToolCapability(ArtifactContract):
     available: bool = True
     system_permitted: bool = True
     coverage: str = ""
+    coverage_start: date | None = None
+    coverage_end: date | None = None
     supported_data_keys: tuple[str, ...] = ()
     supported_constraint_keys: tuple[str, ...] = ()
 
+    def covers(self, time_range: TimeRange | None) -> bool:
+        """True when the declared coverage overlaps the requested window at all."""
+        if time_range is None or (self.coverage_start is None and self.coverage_end is None):
+            return True
+        start_ok = self.coverage_end is None or time_range.start <= self.coverage_end
+        end_ok = self.coverage_start is None or time_range.end >= self.coverage_start
+        return start_ok and end_ok
+
     def supports(self, artifact_type: str, data_keys: tuple[str, ...] = (),
-                 constraint_keys: tuple[str, ...] = ()) -> bool:
+                 constraint_keys: tuple[str, ...] = (),
+                 time_range: TimeRange | None = None) -> bool:
         data_ok = artifact_type in self.supported_artifact_types and (
             not self.supported_data_keys or set(data_keys) <= set(self.supported_data_keys))
         constraint_ok = (not constraint_keys
                          or set(constraint_keys) <= set(self.supported_constraint_keys))
-        return data_ok and constraint_ok
+        return data_ok and constraint_ok and self.covers(time_range)
 
 
 class Router:
@@ -69,17 +83,20 @@ class Router:
         self._permitted_costs = permitted_costs
 
     def candidate_sources(self, artifact_type: str, data_keys: tuple[str, ...] = (),
-                          constraint_keys: tuple[str, ...] = ()) -> tuple[ToolCapability, ...]:
+                          constraint_keys: tuple[str, ...] = (),
+                          time_range: TimeRange | None = None) -> tuple[ToolCapability, ...]:
         """Capabilities that can produce this artifact type, before policy and constraints."""
-        return tuple(c for c in self._capabilities if c.supports(artifact_type, data_keys, constraint_keys))
+        return tuple(c for c in self._capabilities if c.supports(artifact_type, data_keys,
+                                                                 constraint_keys, time_range))
 
     def permission_candidates(self, artifact_type: str, data_keys: tuple[str, ...] = (),
-                              constraint_keys: tuple[str, ...] = ()) -> tuple[ToolCapability, ...]:
+                              constraint_keys: tuple[str, ...] = (),
+                              time_range: TimeRange | None = None) -> tuple[ToolCapability, ...]:
         """Consent-gated capabilities; system-forbidden capabilities are excluded."""
         return tuple(c for c in self._capabilities if c.system_permitted and c.available
                      and c.cost in ("PAID", "HIGH")
                      and c.cost not in self._permitted_costs
-                     and c.supports(artifact_type, data_keys, constraint_keys))
+                     and c.supports(artifact_type, data_keys, constraint_keys, time_range))
 
     def authorized_for(self, costs: tuple[Cost, ...], tools: tuple[str, ...] = ()) -> "Router":
         capabilities = tuple(
@@ -91,21 +108,23 @@ class Router:
 
     def eligible_sources(self, artifact_type: str, user_hard_sources: tuple[str, ...] = (),
                          data_keys: tuple[str, ...] = (),
-                         constraint_keys: tuple[str, ...] = ()) -> tuple[ToolCapability, ...]:
+                         constraint_keys: tuple[str, ...] = (),
+                         time_range: TimeRange | None = None) -> tuple[ToolCapability, ...]:
         """Capabilities that satisfy policy, user constraints and required artifact type."""
         return tuple(
             capability for capability in self._capabilities
             if capability.system_permitted
             and capability.available
             and capability.cost in self._permitted_costs
-            and capability.supports(artifact_type, data_keys, constraint_keys)
+            and capability.supports(artifact_type, data_keys, constraint_keys, time_range)
             and (not user_hard_sources or capability.source_kind in user_hard_sources)
         )
 
     def route(self, task: AgentTask, artifact_type: str,
               user_hard_sources: tuple[str, ...] = (),
               execution_route: object | None = None, data_keys: tuple[str, ...] = (),
-              constraint_keys: tuple[str, ...] = ()) -> RoutingDecision:
+              constraint_keys: tuple[str, ...] = (),
+              time_range: TimeRange | None = None) -> RoutingDecision:
         """Pick a tool. ``execution_route`` (from SourceMappingResolver) acts as a
         system-derived capability constraint above Planner preference."""
         notes: list[str] = []
@@ -138,7 +157,7 @@ class Router:
             if capability.cost not in self._permitted_costs:
                 notes.append(f"{capability.tool}: {capability.cost} source not permitted")
                 continue
-            if not capability.supports(artifact_type, data_keys, constraint_keys):
+            if not capability.supports(artifact_type, data_keys, constraint_keys, time_range):
                 notes.append(f"{capability.tool}: cannot provide {artifact_type}")
                 continue
             if user_sources and capability.source_kind not in user_sources:

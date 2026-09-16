@@ -69,6 +69,33 @@ class SemanticNormalizerTests(unittest.TestCase):
         result = normalizer().normalize("Tell me about the player", mentions=("Judge",))
         self.assertEqual(result.objectives[0].entities[0].identifier, "592450")
 
+    def test_year_versus_year_produces_two_frozen_windows(self):
+        subject = normalizer()
+        result = subject.normalize("top 5 by exit velocity in 2023 vs 2024")
+        self.assertEqual(len(result.objectives), 2)
+        windows = [next(c.values for c in obj.constraints if c.key == "date_range")
+                   for obj in result.objectives]
+        self.assertEqual(windows, [("2023-01-01", "2023-12-31"), ("2024-01-01", "2024-12-31")])
+        self.assertEqual(len({obj.objective_id for obj in result.objectives}), 2)
+
+    def test_recent_versus_previous_produces_two_windows(self):
+        from datetime import date
+        dict_ = dictionary()
+        counter = iter(f"id-{index}" for index in range(100))
+        ids = lambda prefix: f"{prefix}-{next(counter)}"
+        subject = SemanticNormalizer(RuleBasedObjectiveExtractor(id_factory=ids),
+                                     EntityResolver(dict_, id_factory=ids), dict_, id_factory=ids,
+                                     today=lambda: date(2026, 9, 16))
+        result = subject.normalize("top 5 by exit velocity over the last 30 days vs previous 30 days")
+        self.assertEqual(len(result.objectives), 2)
+        windows = [next(c.values for c in obj.constraints if c.key == "date_range")
+                   for obj in result.objectives]
+        self.assertEqual(windows, [("2026-08-18", "2026-09-16"), ("2026-07-19", "2026-08-17")])
+
+    def test_ambiguous_multiple_years_still_fail_closed(self):
+        with self.assertRaises(ValueError):
+            normalizer().normalize("Judge 2023 and 2024 performance")
+
 
 if __name__ == "__main__":
     unittest.main()

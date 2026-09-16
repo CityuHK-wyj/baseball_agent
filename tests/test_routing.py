@@ -1,6 +1,8 @@
 import unittest
+from datetime import date
 
 from app.agent.routing import Router, ToolCapability
+from app.models.contracts import TimeRange
 from app.models.planning import AgentTask
 
 
@@ -71,6 +73,18 @@ class RouterTests(unittest.TestCase):
         decision = router.authorized_for(("PAID",), ("approved",)).route(
             task(source_preference="other"), "TABLE")
         self.assertEqual(decision.selected_tool, "approved")
+
+    def test_coverage_filters_sources_by_requested_window(self):
+        router = Router((
+            ToolCapability(tool="cold", source_kind="PARQUET", supported_artifact_types=("TABLE",),
+                           coverage_start=date(2015, 1, 1), coverage_end=date(2023, 12, 31)),
+            ToolCapability(tool="hot", source_kind="POSTGRES", supported_artifact_types=("TABLE",),
+                           coverage_start=date(2024, 1, 1), coverage_end=date(2026, 12, 31)),
+        ))
+        self.assertEqual([c.tool for c in router.eligible_sources(
+            "TABLE", time_range=TimeRange(start=date(2023, 1, 1), end=date(2023, 12, 31)))], ["cold"])
+        self.assertEqual([c.tool for c in router.eligible_sources(
+            "TABLE", time_range=TimeRange(start=date(2025, 1, 1), end=date(2025, 12, 31)))], ["hot"])
 
 
 if __name__ == "__main__":

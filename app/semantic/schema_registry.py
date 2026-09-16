@@ -52,9 +52,9 @@ _PARQUET_STATCAST_COLUMNS = (
 _POSTGRES_STATCAST_COLUMNS = (
     "game_date", "game_pk", "release_speed", "release_spin_rate", "pitch_type",
     "player_name", "pitcher_id", "batter_id", "events", "description", "plate_x",
-    "plate_z", "stand", "balls", "strikes", "zone", "inning", "launch_speed",
-    "launch_angle", "hit_distance_sc", "estimated_ba_using_speedangle",
-    "estimated_woba_using_speedangle",
+    "plate_z", "sz_top", "sz_bot", "p_throws", "stand", "balls", "strikes",
+    "zone", "inning", "launch_speed", "launch_angle", "hit_distance_sc",
+    "estimated_ba_using_speedangle", "estimated_woba_using_speedangle",
 )
 
 _POSTGRES_BATTING_EVENTS_COLUMNS = (
@@ -75,7 +75,7 @@ def statcast_schema_registry() -> SchemaRegistry:
             columns=_PARQUET_STATCAST_COLUMNS),
         SchemaTable(
             table_name="statcast_pitches", source_kind="POSTGRES",
-            description="Hot Statcast 2024-03-15..2026-06-18 pitch-level table (1.86M rows); lacks sz_top/sz_bot",
+            description="Hot Statcast pitch-level table (2024-2026); has sz_top/sz_bot/p_throws for batter-relative location",
             columns=_POSTGRES_STATCAST_COLUMNS),
         SchemaTable(
             table_name="batting_events", source_kind="POSTGRES",
