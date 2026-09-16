@@ -86,6 +86,7 @@ class StatcastAnalyticsTool:
                 + ", ".join(sorted(missing)), retryable=False,
                 error_code="MISSING_PHYSICAL_FIELDS")
         min_batted_balls = self._qualification_threshold(requirement)
+        population = self._population(requirement)
 
         rows = self._query(self._main_sql(requirement, where, metric_field, batter_field,
                                           ranking, min_batted_balls))
@@ -98,8 +99,8 @@ class StatcastAnalyticsTool:
         names = dict(self._player_names)
         names.update(self._resolve_names([int(row[0]) for row in rows]))
 
-        columns = ("batter", "batter_name", "batted_balls", "avg_exit_velocity_mph",
-                   "max_exit_velocity_mph")
+        columns = ("batter", "batter_name", "batted_balls",
+                   f"avg_{ranking.metric_key}_mph", f"max_{ranking.metric_key}_mph")
         projected = []
         for batter_id, count, avg_ev, max_ev in rows:
             batter_id_text = str(int(batter_id))
@@ -115,7 +116,7 @@ class StatcastAnalyticsTool:
             "rows": projected,
             "applied_constraints": [item.model_dump(mode="json") for item in requirement.descriptor.constraints],
             "min_batted_balls": min_batted_balls,
-            "population": self._population(requirement).model_dump(mode="json"),
+            "population": population.model_dump(mode="json") if population else None,
             "observed_time_range": observed_range.model_dump(mode="json") if observed_range else None,
             "source_kind": self.source_kind,
         }, ensure_ascii=False).encode()
@@ -147,11 +148,11 @@ class StatcastAnalyticsTool:
             return int(rule.min_batted_balls)
         return DEFAULT_MIN_BATTED_BALLS
 
-    def _population(self, requirement: ArtifactRequirement) -> PopulationConstraint:
+    def _population(self, requirement: ArtifactRequirement) -> PopulationConstraint | None:
         for constraint in requirement.descriptor.constraints:
             if isinstance(constraint, PopulationConstraint):
                 return constraint
-        return PopulationConstraint()
+        return None
 
     def _resolve_names(self, batter_ids: list[int]) -> dict[str, str]:
         """Optional source-specific batter-name resolution. Base sources return {}."""
