@@ -13,9 +13,8 @@ import unittest
 from pathlib import Path
 
 from app.config import settings
-from app.semantic.field_mapping import (FieldMappingRegistry, ZONE_ABOVE_UPPER_EDGE,
-                                        ZONE_LOWER_THIRD, ZONE_UPPER_OUTSIDE,
-                                        ZONE_UPPER_THIRD)
+from app.semantic.field_mapping import (FieldMappingRegistry, ZONE_LOWER_THIRD,
+                                        ZONE_UPPER_OUTSIDE, ZONE_UPPER_THIRD)
 
 _UPPER = (1, 2, 3)
 _MIDDLE = (4, 5, 6)
@@ -28,7 +27,7 @@ class ZoneOrientationTests(unittest.TestCase):
     def test_semantic_definitions_point_to_the_correct_zones(self):
         registry = FieldMappingRegistry()
         self.assertEqual(registry.location(ZONE_UPPER_THIRD).zone_codes, _UPPER)
-        self.assertEqual(registry.location(ZONE_ABOVE_UPPER_EDGE).zone_codes, _ABOVE)
+        self.assertEqual(registry.location(ZONE_UPPER_OUTSIDE).zone_codes, _ABOVE)
         self.assertEqual(ZONE_LOWER_THIRD, _LOWER)
         # Upper third must never equal the lower third (the inversion regression).
         self.assertNotEqual(_UPPER, _LOWER)
@@ -43,10 +42,8 @@ class ZoneOrientationTests(unittest.TestCase):
         self.assertEqual(definition.predicate, "ZONE_SET")
         self.assertIn("outside", definition.description.casefold())
         self.assertNotIn("just above the strike zone", definition.description.casefold())
-        # The legacy alias must resolve to the corrected definition, never a separate one.
-        self.assertIs(ZONE_ABOVE_UPPER_EDGE, ZONE_UPPER_OUTSIDE)
-        self.assertEqual(registry.location(ZONE_ABOVE_UPPER_EDGE).definition,
-                         ZONE_UPPER_OUTSIDE)
+        # There must be no separate "above the zone" definition to confuse with zones 11-12.
+        self.assertIsNone(registry.location("ZONE_ABOVE_UPPER_EDGE"))
 
     @unittest.skipUnless(
         any(settings.parquet_archive_path.glob("mlb_statcast_*.parquet")),

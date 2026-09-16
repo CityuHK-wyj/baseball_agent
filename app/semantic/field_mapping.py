@@ -20,10 +20,6 @@ ZONE_UPPER_THIRD = "ZONE_UPPER_THIRD"
 # name prevents conflating the zone approximation with the batter-relative predicate.
 ZONE_UPPER_OUTSIDE = "ZONE_UPPER_OUTSIDE"
 
-# Backwards-compatible import alias. New code must use ZONE_UPPER_OUTSIDE; the old name
-# implied a strict above-the-zone predicate that zones 11-12 do not implement.
-ZONE_ABOVE_UPPER_EDGE = ZONE_UPPER_OUTSIDE
-
 # Verified against plate_z (the physical vertical coordinate) in both PostgreSQL and the
 # Parquet archive: zones 1-3 sit highest inside the zone, 7-9 lowest, 11-12 are the upper
 # outside quadrants and 13-14 the lower outside quadrants. This is the canonical Statcast
