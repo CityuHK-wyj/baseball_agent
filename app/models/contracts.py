@@ -86,7 +86,75 @@ class CategoryConstraint(_Constraint):
     authority: ConstraintAuthority = "USER_CONSTRAINT"
 
 
-Constraint = Annotated[NumericConstraint | CategoryConstraint, Field(discriminator="kind")]
+class CountConstraint(_Constraint):
+    """A typed two-strike (or other count) situation.
+
+    ``strikes`` is the required strike count and ``balls`` is the set of allowed ball
+    counts. The target "after reaching two strikes" is represented as ``strikes=2``,
+    never as an opaque "two strikes" string once it reaches execution planning.
+    """
+
+    kind: Literal["COUNT"] = "COUNT"
+    key: Name = "count"
+    strikes: int = Field(ge=0, le=2)
+    balls: tuple[int, ...] = Field(default=(0, 1, 2, 3))
+    origin: ConstraintOrigin = "USER_CONFIRMED"
+    authority: ConstraintAuthority = "USER_CONSTRAINT"
+
+    @model_validator(mode="after")
+    def balls_in_range(self):
+        if any(ball < 0 or ball > 3 for ball in self.balls):
+            raise ValueError("Ball counts must be between 0 and 3")
+        return self
+
+
+class PitchTypeConstraint(_Constraint):
+    """A typed pitch-family constraint.
+
+    ``family`` is the semantic family (for example "fastball"). The provider-specific
+    pitch-code set is resolved by the semantic/source mapping layer, never silently
+    assumed here.
+    """
+
+    kind: Literal["PITCH_TYPE"] = "PITCH_TYPE"
+    key: Name = "pitch_type"
+    family: Name
+    origin: ConstraintOrigin = "USER_CONFIRMED"
+    authority: ConstraintAuthority = "USER_CONSTRAINT"
+
+
+class LocationConstraint(_Constraint):
+    """A typed pitch-location constraint.
+
+    ``definition`` names an explicit semantic definition (for example
+    ``BATTER_RELATIVE_UPPER_EDGE`` or ``ZONE_UPPER_THIRD``). The physical fields needed
+    for each definition live in the SchemaRegistry / SourceMapping layer; the Planner
+    never hard-codes physical columns and never silently redefines the user's request.
+    """
+
+    kind: Literal["LOCATION"] = "LOCATION"
+    key: Name = "pitch_location"
+    definition: Name
+    origin: ConstraintOrigin = "USER_CONFIRMED"
+    authority: ConstraintAuthority = "USER_CONSTRAINT"
+
+
+class RankingConstraint(_Constraint):
+    """Explicit ranking intent: metric, direction and limit."""
+
+    kind: Literal["RANKING"] = "RANKING"
+    key: Name = "ranking"
+    metric_key: Name
+    direction: Literal["ASC", "DESC"] = "DESC"
+    limit: int = Field(ge=1)
+    origin: ConstraintOrigin = "USER_CONFIRMED"
+    authority: ConstraintAuthority = "USER_CONSTRAINT"
+
+
+Constraint = Annotated[
+    NumericConstraint | CategoryConstraint | CountConstraint | PitchTypeConstraint |
+    LocationConstraint | RankingConstraint,
+    Field(discriminator="kind")]
 
 
 class ArtifactDescriptor(Contract):

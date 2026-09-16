@@ -9,10 +9,12 @@ from collections.abc import Callable, Iterable
 from datetime import date, timedelta
 import re
 
-from app.models.clarification import ClarificationRequest
+from app.models.clarification import ClarificationOption, ClarificationRequest
 from app.models.contracts import CategoryConstraint, Constraint, Entity, TimeRange
 from app.models.entities import CanonicalEntity
 from app.models.semantic import SemanticResult
+from app.semantic.analytics_intent import (extract_analytical_constraints,
+                                           location_clarification_options)
 from app.semantic.constraints import normalize_constraints
 from app.semantic.entity_resolver import EntityDictionary, EntityResolver
 from app.semantic.objective_extractor import ObjectiveExtractor
@@ -62,7 +64,8 @@ class SemanticNormalizer:
                 inferred = (CategoryConstraint(key="date_range",
                     values=(window.start.isoformat(), window.end.isoformat()),
                     origin="SYSTEM_INFERRED"),)
-        normalized = normalize_constraints((*supplied, *inferred))
+        analytics = extract_analytical_constraints(raw_query)
+        normalized = normalize_constraints((*supplied, *inferred, *analytics.constraints))
         surface_mentions = tuple(mentions) if mentions is not None else self._scan_mentions(raw_query)
 
         entities: list[Entity] = []
@@ -78,6 +81,21 @@ class SemanticNormalizer:
             request = self._resolver.propose_clarification(resolution)
             if request is not None:
                 clarifications.append(request)
+
+        if analytics.location_wording_requested and not any(
+                c.kind == "LOCATION" for c in normalized):
+            options = tuple(
+                ClarificationOption(option_id=f"loc-{index}", label=label, value=value,
+                                    rationale=rationale)
+                for index, (value, label, rationale) in enumerate(location_clarification_options()))
+            clarifications.append(ClarificationRequest(
+                clarification_id=self._id_factory("clarification"), kind="CONSTRAINT",
+                question="Which upper-zone definition should the pitch-location filter use?",
+                reason="'Near the upper edge of the strike zone' has several defensible "
+                       "definitions, and the exact batter-relative one needs fields the "
+                       "local archive may not provide.",
+                options=options, recommended_option_id=options[0].option_id,
+                affected_ref="pitch_location"))
 
         objectives = self._extractor.extract(raw_query, entities=tuple(entities),
                                              constraints=normalized)

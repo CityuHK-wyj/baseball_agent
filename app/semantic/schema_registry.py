@@ -37,3 +37,36 @@ class SchemaRegistry:
             if tokens & set(_TOKEN.findall(haystack)):
                 matches.append(item)
         return tuple(matches)
+
+
+# Verified against the real archive (2015-2023 Parquet) and the loader DDL (PostgreSQL).
+# Neither local source carries ``sz_top`` / ``sz_bot``, so the exact batter-relative
+# upper-edge definition is deliberately not advertised as physically available.
+_PARQUET_STATCAST_COLUMNS = (
+    "game_date", "game_pk", "release_speed", "release_spin_rate", "pitch_type",
+    "player_name", "pitcher", "batter", "events", "description", "plate_x", "plate_z",
+    "stand", "balls", "strikes", "zone", "inning", "launch_speed", "launch_angle",
+    "hit_distance_sc", "estimated_ba_using_speedangle", "estimated_woba_using_speedangle",
+)
+
+_POSTGRES_STATCAST_COLUMNS = (
+    "game_date", "game_pk", "release_speed", "release_spin_rate", "pitch_type",
+    "player_name", "pitcher_id", "batter_id", "events", "description", "plate_x",
+    "plate_z", "stand", "balls", "strikes", "zone", "inning", "launch_speed",
+    "launch_angle", "hit_distance_sc", "estimated_ba_using_speedangle",
+    "estimated_woba_using_speedangle",
+)
+
+
+def statcast_schema_registry() -> SchemaRegistry:
+    """Deterministic schema registry built from verified source inspection."""
+    return SchemaRegistry((
+        SchemaTable(
+            table_name="mlb_statcast_archive", source_kind="PARQUET",
+            description="Historical Statcast 2015-2023 pitch-level archive; lacks sz_top/sz_bot",
+            columns=_PARQUET_STATCAST_COLUMNS),
+        SchemaTable(
+            table_name="statcast_pitches", source_kind="POSTGRES",
+            description="Hot Statcast 2024-2026 pitch-level table; lacks sz_top/sz_bot",
+            columns=_POSTGRES_STATCAST_COLUMNS),
+    ))

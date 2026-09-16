@@ -11,7 +11,9 @@ from typing import Protocol
 
 from app.models.artifacts import ArtifactContract
 from app.models.contracts import (AnalysisObjective, ArtifactDescriptor, ArtifactRequirement,
-                                  LeagueStateSnapshot, QualificationRule, SampleAdequacyRule, TimeRange)
+                                  CountConstraint, LeagueStateSnapshot, LocationConstraint,
+                                  PitchTypeConstraint, QualificationRule, RankingConstraint,
+                                  SampleAdequacyRule, TimeRange)
 from app.models.metrics import MetricDefinition
 from app.models.schema import SchemaTable
 
@@ -71,12 +73,19 @@ class RequirementDecomposer(Protocol):
                   context: DecompositionContext | None = None) -> tuple[ArtifactRequirement, ...]: ...
 
 
+def _is_analytics_objective(objective: AnalysisObjective) -> bool:
+    return any(isinstance(item, (CountConstraint, PitchTypeConstraint, LocationConstraint,
+                                 RankingConstraint)) for item in objective.constraints)
+
+
 class RuleBasedRequirementDecomposer:
     def __init__(self, id_factory: Callable[[str], str] | None = None) -> None:
         self._id_factory = id_factory or (lambda prefix: f"{prefix}-{abs(hash(prefix))}")
 
     def decompose(self, objective: AnalysisObjective,
                   context: DecompositionContext | None = None) -> tuple[ArtifactRequirement, ...]:
+        if _is_analytics_objective(objective):
+            return self._analytics_requirements(objective)
         specs = _SPECS.get(objective.objective_type, _SPECS["PERFORMANCE"])
         if objective.subtype == "knowledge":
             specs = (_RequirementSpec(objective.raw_query, "EVIDENCE", ("knowledge_statement",),
@@ -106,3 +115,47 @@ class RuleBasedRequirementDecomposer:
                 base_criticality=spec.criticality, evidence_purpose=spec.purpose,
                 sample_adequacy_rule=spec.sample_adequacy, qualification_rule=spec.qualification))
         return tuple(requirements)
+
+    def _analytics_requirements(self, objective: AnalysisObjective) -> tuple[ArtifactRequirement, ...]:
+        """One semantic-atomic ranking requirement over filtered Statcast pitches.
+
+        The output keys are semantic (exit velocity plus the batter identity); the filter
+        concepts stay typed constraints. Physical columns are resolved later by the
+        adapter, never by the Planner or this decomposer.
+        """
+        ranking = next((item for item in objective.constraints if isinstance(item, RankingConstraint)), None)
+        location = next((item for item in objective.constraints if isinstance(item, LocationConstraint)), None)
+        pitch_type = next((item for item in objective.constraints if isinstance(item, PitchTypeConstraint)), None)
+        count = next((item for item in objective.constraints if isinstance(item, CountConstraint)), None)
+
+        parts = ["ranked exit velocity"]
+        if count is not None:
+            parts.append(f"with {count.strikes} strike(s)")
+        if pitch_type is not None:
+            parts.append(f"against {pitch_type.family}")
+        if location is not None:
+            parts.append(f"in {location.definition.casefold()}")
+        description = " ".join(parts)
+
+        date_constraints = [c for c in objective.constraints if c.key == "date_range"]
+        windows = [TimeRange(start=c.values[0], end=c.values[1]) for c in date_constraints
+                   if c.kind == "CATEGORY" and len(c.values) == 2]
+        if any(w != windows[0] for w in windows):
+            raise ValueError("Conflicting date ranges require clarification")
+        time_range = windows[0] if windows else None
+        population_scope = "player" if any(
+            entity.entity_type == "PLAYER" for entity in objective.entities) else "league"
+        descriptor = ArtifactDescriptor(
+            artifact_type="TABLE",
+            entities=objective.entities,
+            data_keys=("exit_velocity", "batter"),
+            constraints=objective.constraints,
+            granularity="player_rank",
+            time_range=time_range,
+            population_scope=population_scope)
+        requirement = ArtifactRequirement(
+            requirement_id=self._id_factory("requirement"), objective_ref=objective.objective_id,
+            description=description, descriptor=descriptor, origin="INITIAL",
+            base_criticality="CORE", evidence_purpose="DESCRIPTIVE",
+            min_row_count=ranking.limit if ranking is not None else None)
+        return (requirement,)
