@@ -45,8 +45,9 @@ class SchemaRegistry:
 _PARQUET_STATCAST_COLUMNS = (
     "game_date", "game_pk", "release_speed", "release_spin_rate", "pitch_type",
     "player_name", "pitcher", "batter", "events", "description", "plate_x", "plate_z",
-    "stand", "balls", "strikes", "zone", "inning", "launch_speed", "launch_angle",
-    "hit_distance_sc", "estimated_ba_using_speedangle", "estimated_woba_using_speedangle",
+    "sz_top", "sz_bot", "p_throws", "stand", "balls", "strikes", "zone", "inning",
+    "launch_speed", "launch_angle", "hit_distance_sc",
+    "estimated_ba_using_speedangle", "estimated_woba_using_speedangle",
 )
 
 _POSTGRES_STATCAST_COLUMNS = (
@@ -71,7 +72,7 @@ def statcast_schema_registry() -> SchemaRegistry:
     return SchemaRegistry((
         SchemaTable(
             table_name="mlb_statcast_archive", source_kind="PARQUET",
-            description="Historical Statcast 2015-2023 pitch-level archive; lacks sz_top/sz_bot",
+            description="Historical Statcast 2015-2023 pitch-level archive; has sz_top/sz_bot/p_throws",
             columns=_PARQUET_STATCAST_COLUMNS),
         SchemaTable(
             table_name="statcast_pitches", source_kind="POSTGRES",

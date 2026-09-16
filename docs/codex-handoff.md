@@ -1,20 +1,19 @@
 # Codex Handoff
 
-## Real data layer checkpoint — 2026-09-16 (post-migration)
+## Real data layer checkpoint — 2026-09-16 (post-migration + Parquet rebuild)
 
-Branch `pi/analytics-integration`; 379 tests pass, compileall and secret scan pass.
-The ingestion gap is resolved for PostgreSQL: `sz_top`/`sz_bot`/`p_throws` are retained,
-the schema migrated, and 2024–2026 reloaded (2,196,186 rows, 2024-03-15..2026-09-14).
-`player_dictionary` backfilled to 100% batter-name coverage via the MLB StatsAPI.
-Zone orientation corrected (upper third = zones 1-3). Batter-relative upper edge is
-`EXACTLY_SUPPORTED` on PostgreSQL (`plate_z >= sz_top - 0.25 ft`); Parquet keeps the
-zone-based mapping until its archive is rebuilt (loader already updated). Routing is
-coverage-aware, ranking aggregation (AVG/MAX) is explicit, and year-vs-year /
-recent-vs-previous windows run as separate frozen objectives.
+Branch `pi/analytics-integration`; 380 tests pass, compileall and secret scan pass.
+The ingestion gap is resolved for BOTH sources: `sz_top`/`sz_bot`/`p_throws` are retained.
+PostgreSQL 2024–2026 reloaded (2,196,186 rows, 2024-03-15..2026-09-14) and the historical
+Parquet archive rebuilt (6,168,817 rows, 2015-04-05..2023-11-01). Batter-relative upper
+edge (`plate_z >= sz_top - 0.25 ft`) is `EXACTLY_SUPPORTED` on both; historical
+batter-relative E2E is `LIVE_VERIFIED`. `player_dictionary` backfilled to 100% batter-name
+coverage. Zone orientation corrected (upper third = zones 1-3). Routing is coverage-aware,
+ranking aggregation (AVG/MAX) explicit, and year-vs-year / recent-vs-previous windows run
+as separate frozen objectives. `baseball_readonly` remains strictly read-only.
 
-Exact next task: rebuild the historical Parquet archive (loader is ready, gated behind
-`STATCAST_ARCHIVE_ENABLED=1`) to bring batter-relative location to historical ranges;
-then the final Codex review. `baseball_readonly` remains strictly read-only.
+Deferred (by scope freeze): `current period vs same period last year` multi-window,
+generalized temporal NLP, and any non-analytics product features.
 
 ## Date planning checkpoint — 2026-09-16
 

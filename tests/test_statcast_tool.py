@@ -102,14 +102,27 @@ class StatcastToolTests(unittest.TestCase):
         main = executor.statements[0]
         self.assertIn("pitch_type IN ('FF', 'SI', 'FC', 'FA')", main)
 
-    def test_exact_batter_relative_definition_cannot_silently_degrade(self):
+    def test_source_without_sz_fields_cannot_silently_degrade(self):
         requirement_ = RuleBasedRequirementDecomposer(id_factory=lambda p: f"{p}-1").decompose(
             analytics_objective(definition=BATTER_RELATIVE_UPPER_EDGE))[0]
-        tool = ParquetStatcastTool([requirement_], FieldMappingRegistry(), RecordingExecutor())
+
+        class OldSchemaParquetTool(ParquetStatcastTool):
+            _COLUMNS = frozenset(ParquetStatcastTool._COLUMNS) - {"sz_top", "sz_bot", "p_throws"}
+
+        tool = OldSchemaParquetTool([requirement_], FieldMappingRegistry(), RecordingExecutor())
         result = tool.execute(task())
         self.assertEqual(result.status, "ERROR")
         self.assertEqual(result.error_code, "MISSING_PHYSICAL_FIELDS")
         self.assertIn("sz_top", result.safe_error_summary)
+
+    def test_parquet_batter_relative_edge_emits_physical_band(self):
+        requirement_ = RuleBasedRequirementDecomposer(id_factory=lambda p: f"{p}-1").decompose(
+            analytics_objective(definition=BATTER_RELATIVE_UPPER_EDGE))[0]
+        executor = RecordingExecutor(rows=[(592450, 9, 101.8, 115.5)])
+        tool = ParquetStatcastTool([requirement_], FieldMappingRegistry(), executor)
+        result = tool.execute(task())
+        self.assertEqual(result.status, "OK")
+        self.assertIn("plate_z >= sz_top - 0.25", executor.statements[0])
 
     def test_artifact_carries_provenance_and_matches_requirement(self):
         executor = RecordingExecutor(rows=[(592450, 12, 95.4, 108.1), (660271, 9, 94.0, 107.0)])

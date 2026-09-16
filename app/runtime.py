@@ -79,7 +79,8 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
                 supported_constraint_keys=("count", "pitch_velocity", "pitch_type",
                                            "ranking",
                                            f"pitch_location:{ZONE_UPPER_THIRD}",
-                                           f"pitch_location:{ZONE_ABOVE_UPPER_EDGE}"),
+                                           f"pitch_location:{ZONE_ABOVE_UPPER_EDGE}",
+                                           f"pitch_location:{BATTER_RELATIVE_UPPER_EDGE}"),
                 coverage="2015-04-05..2023-11-01 Parquet archive",
                 coverage_start=date(2015, 4, 5), coverage_end=date(2023, 11, 1)),
             ToolCapability(

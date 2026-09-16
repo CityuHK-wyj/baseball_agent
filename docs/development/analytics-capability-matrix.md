@@ -18,7 +18,7 @@ non-destructive migration that retained `sz_top`/`sz_bot`/`p_throws`.
 
 | File set | Grain | Coverage | Rows | Notes |
 | --- | --- | --- | --- | --- |
-| `mlb_statcast_*.parquet` | pitch | 2015-04-05 .. 2023-11-01 | 6,168,809 | `release_speed`, `pitch_type`, `plate_z`, `zone`, `balls`, `strikes`, `launch_speed`, `batter`, `pitcher`, `game_date` present; `player_name` is the **pitcher** name; **no `sz_top` / `sz_bot` / `p_throws`**; exit velocity is `launch_speed` |
+| `mlb_statcast_*.parquet` | pitch | 2015-04-05 .. 2023-11-01 | 6,168,817 | `release_speed`, `pitch_type`, `plate_z`, `zone`, `balls`, `strikes`, `launch_speed`, `batter`, `pitcher`, `game_date`, **`sz_top`, `sz_bot`, `p_throws`** present (new fields 100% non-null); `player_name` is the **pitcher** name; exit velocity is `launch_speed` |
 
 ## Semantic capability matrix
 
@@ -29,7 +29,7 @@ non-destructive migration that retained `sz_top`/`sz_bot`/`p_throws`.
 | `pitch_type` fastball family | `pitch_type` → FF/SI/FC/FA | `pitch_type` → FF/SI/FC/FA | **EXACTLY_SUPPORTED** (both; codes explicit in `FieldMappingRegistry`) |
 | `count` two-strike | `balls` / `strikes` | `balls` / `strikes` | **EXACTLY_SUPPORTED** (both) |
 | `pitch_location` zone-based (upper third 1-3; above-zone 11-12) | `zone` | `zone` | **EXACTLY_SUPPORTED** (both) |
-| `pitch_location` batter-relative upper edge | `plate_z` + `sz_top`/`sz_bot` (predicate `plate_z >= sz_top - 0.25 ft`) | **missing `sz_top`/`sz_bot`** | **EXACTLY_SUPPORTED** (PostgreSQL); **UNSUPPORTED** (Parquet, until rebuilt) |
+| `pitch_location` batter-relative upper edge | `plate_z` + `sz_top`/`sz_bot` (predicate `plate_z >= sz_top - 0.25 ft`) | `plate_z` + `sz_top`/`sz_bot` (predicate `plate_z >= sz_top - 0.25 ft`) | **EXACTLY_SUPPORTED** (both) |
 | `ranking` (metric + direction + limit) | aggregation | aggregation | **EXACTLY_SUPPORTED** (both) |
 | `batter` identity | `batter_id` + `player_dictionary` (100% name coverage) | `batter` (id only; no name) | **EXACTLY_SUPPORTED** for id + name (Postgres); **EXACTLY_SUPPORTED** for id, **UNSUPPORTED** for name (Parquet) |
 | `pitcher` identity | `pitcher_id` (name only in `batting_events`) | `pitcher` + `player_name` (pitcher name) | **APPROXIMATELY_SUPPORTED** (both, differently) |
@@ -60,6 +60,6 @@ gap**, not a source limitation.
 `statcast_pitches` schema was migrated (idempotent `ALTER ... ADD COLUMN IF NOT EXISTS`),
 and the 2024–2026 range was reloaded (2,196,186 rows, new fields 100% non-null).
 
-**Pending** for Parquet: the historical loader (`archive_history_to_parquet.py`) now
-retains the fields for future rebuilds, but the existing 2015–2023 archive was not
-rebuilt, so Parquet batter-relative location remains `UNSUPPORTED` until a rebuild.
+**Resolved** for Parquet: the 2015–2023 archive was rebuilt with the updated loader
+(6,168,817 rows, `sz_top`/`sz_bot`/`p_throws` 100% non-null), so historical
+batter-relative location is now `EXACTLY_SUPPORTED`.

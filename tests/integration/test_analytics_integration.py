@@ -67,15 +67,17 @@ class RealAnalyticsSliceTests(unittest.TestCase):
                          if getattr(c, "kind", "") == "LOCATION"]
             self.assertEqual(locations[0].definition, ZONE_UPPER_THIRD)
 
-    def test_exact_batter_relative_definition_never_silently_degrades(self):
+    def test_batter_relative_upper_edge_completes_on_rebuilt_parquet(self):
         with tempfile.TemporaryDirectory() as directory:
             subject = self._pipeline(Path(directory))
             self.addCleanup(subject.close)
             # Option 2 is the exact batter-relative upper edge (needs sz_top/sz_bot).
+            # The rebuilt historical archive now provides those fields.
             result = self._run_target(subject, "exact-upper", option_index=2)
-            self.assertEqual(result.objective_statuses, ("FAILED",))
-            self.assertEqual(result.response_packages[0].accepted_evidence, ())
+            self.assertEqual(result.objective_statuses, ("COMPLETE",))
+            self.assertEqual(result.response_packages[0].accepted_evidence[0].source_kind, "PARQUET")
             self.assertNotIn("synthetic", result.responses[0])
+            self.assertIn("Result:", result.responses[0])
 
     def test_date_window_survives_restart_in_real_mode(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -264,8 +264,9 @@ class ParquetStatcastTool(StatcastAnalyticsTool):
     _COLUMNS = frozenset({
         "game_date", "game_pk", "release_speed", "release_spin_rate", "pitch_type",
         "player_name", "pitcher", "batter", "events", "description", "plate_x", "plate_z",
-        "stand", "balls", "strikes", "zone", "inning", "launch_speed", "launch_angle",
-        "hit_distance_sc", "estimated_ba_using_speedangle", "estimated_woba_using_speedangle",
+        "sz_top", "sz_bot", "p_throws", "stand", "balls", "strikes", "zone", "inning",
+        "launch_speed", "launch_angle", "hit_distance_sc",
+        "estimated_ba_using_speedangle", "estimated_woba_using_speedangle",
     })
 
     def __init__(self, requirements, field_mapping: FieldMappingRegistry,

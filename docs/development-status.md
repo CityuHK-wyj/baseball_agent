@@ -2,19 +2,19 @@
 
 Status: IN_PROGRESS — stable checkpoint
 
-## Real data layer checkpoint — 2026-09-16 (post-migration)
+## Real data layer checkpoint — 2026-09-16 (post-migration + Parquet rebuild)
 
-Branch: `pi/analytics-integration`. 379 tests pass; compileall and secret scan pass.
+Branch: `pi/analytics-integration`. 380 tests pass; compileall and secret scan pass.
 
 Migration delivered: the loader now retains `sz_top`/`sz_bot`/`p_throws`; PostgreSQL
 `statcast_pitches` was migrated (idempotent `ALTER`) and reloaded to **2,196,186 rows**
 covering **2024-03-15..2026-09-14**, with the new fields 100% non-null. `player_dictionary`
 was backfilled from the MLB StatsAPI to **3,726** players, resolving **100%** of the 2,050
 distinct batters. Zone orientation was corrected (upper third = zones 1-3, verified by
-`plate_z`). Batter-relative upper edge is `EXACTLY_SUPPORTED` on PostgreSQL
-(`plate_z >= sz_top - 0.25 ft`); Parquet keeps the corrected zone-based mapping until its
-archive is rebuilt. Routing is now coverage-aware, and deterministic year-vs-year and
-recent-vs-previous windows run as separate frozen objectives.
+`plate_z`). Batter-relative upper edge is `EXACTLY_SUPPORTED` on both sources
+(`plate_z >= sz_top - 0.25 ft`). The historical Parquet archive was rebuilt (6,168,817 rows,
+2015-04-05..2023-11-01, new fields 100% non-null). Routing is coverage-aware, and
+deterministic year-vs-year and recent-vs-previous windows run as separate frozen objectives.
 
 `baseball_readonly` remains strictly read-only after migration (SELECT succeeds; CREATE /
 INSERT / UPDATE / DELETE / DROP all fail). See

@@ -8,7 +8,7 @@ Status: **IN_PROGRESS — stable checkpoint**, 2026-09-16.
 | --- | --- | --- |
 | Shared Knowledge | `.runtime/knowledge.db` | 605 seed items, provenance, versions, aliases; rebuilt from `knowledge/seed` and `knowledge/sources` |
 | Analytics PostgreSQL | `127.0.0.1:5433/baseball_analytics` | Read-only recent Statcast (`baseball_readonly`); 2024-03-15..2026-09-14, 2.196M rows, `sz_top`/`sz_bot`/`p_throws` retained; LIVE_VERIFIED for SELECT, writes denied |
-| Analytics Parquet | `data_loader/parquet_archive` | Read-only historical files, 2015–2023 present |
+| Analytics Parquet | `data_loader/parquet_archive` | Read-only historical files, 2015–2023 rebuilt with `sz_top`/`sz_bot`/`p_throws` |
 | Operational store | `.runtime/operational.db` | Checkpoints, interactions, audit snapshots, reports, redacted `run_event` metrics |
 | Artifact payloads | `.runtime/artifacts` | Persisted accepted-product payloads |
 
@@ -68,7 +68,7 @@ expiry fail closed.
 | --- | --- |
 | DuckDB guarded read of `mlb_statcast_2023.parquet` | `VERIFIED_LIVE`: five rows returned |
 | Real analytics slice (two-strike, fastball >95 mph, upper zone, top-5 EV) | `LIVE_VERIFIED`: end-to-end over the Parquet archive with provenance, no synthetic fallback |
-| High-zone exact batter-relative upper edge | `LIVE_VERIFIED` on PostgreSQL (`plate_z >= sz_top - 0.25 ft`); `UNSUPPORTED` on Parquet until its archive is rebuilt |
+| High-zone exact batter-relative upper edge | `LIVE_VERIFIED` on both PostgreSQL and rebuilt Parquet (`plate_z >= sz_top - 0.25 ft`) |
 | Analytics PostgreSQL | `LIVE_VERIFIED`: read-only SELECT works; CREATE/INSERT/UPDATE/DELETE/DROP all denied |
 | MLB StatsAPI transport | Returned 30 teams once; subsequent attempts failed; transport verification does not prove live Web evidence extraction |
 | Live WebEvidenceTool flow | `UNVERIFIED_LIVE`; default pipeline tested with an injected document fixture |
