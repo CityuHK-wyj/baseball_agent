@@ -74,7 +74,8 @@ class ResumeService:
             planner_terminal=checkpoint.recovery_position in TERMINAL_POSITIONS,
             terminal_condition=checkpoint.terminal_condition)
 
-    def rehydrate(self, run_id: str) -> RestoredRun | None:
+    def rehydrate(self, run_id: str, *, objective_ref: str | None = None,
+                  requirement_refs: tuple[str, ...] = ()) -> RestoredRun | None:
         """Load persisted domains for a resumed run, without merging them into one blob."""
         plan = self.build_plan(run_id)
         if plan.status == "NO_CHECKPOINT":
@@ -89,10 +90,35 @@ class ResumeService:
             RequirementState.model_validate(record.payload)
             for record in self._store.list_objects("requirement_state", run_id))
         objective_records = self._store.list_objects("objective_state", run_id)
+        if objective_ref is not None:
+            objective_records = tuple(record for record in objective_records
+                                      if record.payload["objective_ref"] == objective_ref)
+            assessments = tuple(item for item in assessments if item.objective_ref == objective_ref
+                                and (not requirement_refs or item.requirement_ref in requirement_refs))
+            requirement_states = tuple(item for item in requirement_states
+                                       if item.requirement_ref in requirement_refs)
+            wanted = {item.artifact_ref for item in assessments}
+            by_id = {item.artifact_id: item for item in artifacts}
+            pending = list(wanted)
+            while pending:
+                artifact = by_id.get(pending.pop())
+                if artifact is not None:
+                    for parent in artifact.lineage:
+                        if parent not in wanted:
+                            wanted.add(parent)
+                            pending.append(parent)
+            artifacts = tuple(item for item in artifacts if item.artifact_id in wanted)
+        elif len(objective_records) > 1:
+            raise ValueError("Multi-objective recovery requires an objective_ref")
         objective_state = (ObjectiveState.model_validate(objective_records[0].payload)
                            if objective_records else None)
+        terminal = plan.planner_terminal
+        condition = plan.terminal_condition
+        if objective_ref is not None:
+            terminal = objective_state is not None and objective_state.status == "COMPLETE"
+            condition = None
         return RestoredRun(
             run_id=run_id, recovery_position=plan.recovery_position,
-            planner_terminal=plan.planner_terminal, artifacts=artifacts,
+            planner_terminal=terminal, artifacts=artifacts,
             assessments=assessments, requirement_states=requirement_states,
-            objective_state=objective_state, terminal_condition=plan.terminal_condition)
+            objective_state=objective_state, terminal_condition=condition)

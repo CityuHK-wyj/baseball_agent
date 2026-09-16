@@ -1,6 +1,20 @@
 # Codex Handoff
 
-## Current checkpoint — 2026-09-16
+## Crash recovery checkpoint — 2026-09-16
+
+341 tests pass, including actual process exit/restart. `resume_run` / CLI `resume --execute`
+recover persisted intent, reuse durable executions and restore objective-scoped assessments
+and state. Immutable run/initial definitions survive redecomposition and restart. Atomic
+execution claims prevent duplicate tool calls; uncertain in-flight calls fail closed with
+`EXECUTION_UNCERTAIN`. These cannot be safely retried without external reconciliation.
+Compileall, secret scan and the updated separate-process CLI workflow pass.
+
+Exact next task: analytics/date planning and configured read-only data execution. Keep
+PostgreSQL, complete high-zone analytics and current Web evidence UNVERIFIED_LIVE until
+the requested ordered live probes actually succeed. Architecture and protected branches
+remain unchanged. The previous missing post-consumption recovery path is now implemented.
+
+## Prior integration checkpoint — 2026-09-16
 
 - Active branch: `astra/v0.1-integration`, based on runtime `b68ccf7`, merged knowledge
   `7d44ef44ec88113a9306aab03881197dc7a115cf`; no main merge.

@@ -47,7 +47,15 @@ Ground truth (2026-09-15, Python 3.14.4):
   response composition.
 - Permission and constraint-revision workflows.
 - Realistic baseball E2E and CLI/documentation truthfulness.
-# Latest v0.1 checkpoint (2026-09-16)
+# Crash recovery checkpoint (2026-09-16)
+
+341 tests pass. Added persisted immutable definitions, atomic execution intent, reference-only
+outcomes, completed execution/artifact reuse, objective-scoped rehydration and CLI execution
+resume. Adversarial coverage includes actual process exit and fresh-process restart, consumed
+permission/revision/clarification, missing outcome index and uncertain external execution.
+Uncertain calls are never automatically retried. Analytics/date planning remains next.
+
+# Earlier v0.1 checkpoint (2026-09-16)
 
 335 tests pass; compileall, secret scan and separate-process CLI workflows pass.
 Additional regressions fixed: reused run IDs overwrite prior work, multi-objective report

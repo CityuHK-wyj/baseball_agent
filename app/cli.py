@@ -106,6 +106,12 @@ def command_answer(args) -> int:
 
 
 def command_resume(args) -> int:
+    if args.execute:
+        pipeline = build_pipeline(persist=True, demo=args.demo)
+        try:
+            return _print_result(pipeline.resume_run(args.run_id), args.json)
+        finally:
+            pipeline.close()
     store = _open_store()
     try:
         service = ResumeService(store)
@@ -326,6 +332,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     resume = sub.add_parser("resume", help="inspect resume state for a run")
     resume.add_argument("--run-id", required=True)
+    resume.add_argument("--execute", action="store_true", help="recover durable run intent")
+    resume.add_argument("--demo", action="store_true")
+    resume.add_argument("--json", action="store_true")
     resume.set_defaults(func=command_resume)
 
     inspect = sub.add_parser("inspect", help="list checkpoints and stored objects for a run")

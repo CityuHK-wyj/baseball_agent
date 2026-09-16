@@ -275,12 +275,64 @@ class AnalysisPipeline:
             "confirmed_constraints": (confirmed,)}))
         return self._prepare_objectives(interaction.raw_query, objectives, run_id)
 
+    def resume_run(self, run_id: str) -> PipelineResult:
+        """Continue durable confirmed intent without consuming an answer again."""
+        if self._recorder is None:
+            raise RuntimeError("Run recovery requires a persistent RunRecorder")
+        interaction = self._recorder.load_interaction(run_id)
+        definitions = self._recorder.initial_definitions(run_id)
+        if interaction is not None:
+            if interaction.status in ("WAITING_FOR_USER", "EXPIRED"):
+                raise ValueError("Run requires a valid user answer before recovery")
+            if interaction.permission is not None:
+                if interaction.status != "APPROVED":
+                    return PipelineResult(raw_query=interaction.raw_query, objectives=interaction.objectives,
+                                          run_ids=(run_id,))
+                request = interaction.permission
+                if datetime.now(timezone.utc) >= request.expires_at:
+                    raise ValueError("Permission expired before recovery")
+                candidates = tuple(item for objective in interaction.objectives
+                    if objective.objective_id == request.objective_ref
+                    for requirement in self._decomposer.decompose(objective)
+                    for item in self._router.permission_candidates(requirement.descriptor.artifact_type,
+                                                                    requirement.descriptor.data_keys))
+                if request.action != "EXECUTE" or not any(
+                    (item.tool, item.source_kind, item.cost) == (request.tool, request.source_kind, request.cost)
+                    for item in candidates):
+                    raise ValueError("Recovered permission scope is stale or forbidden")
+                return self._run_objectives(interaction.raw_query, interaction.objectives, run_id,
+                    router=self._router.authorized_for((request.cost,), (request.tool,)),
+                    authorized_objective=request.objective_ref)
+            if definitions or interaction.status == "REJECTED":
+                return self._run_objectives(interaction.raw_query, interaction.objectives, run_id)
+            return self._prepare_objectives(interaction.raw_query, interaction.objectives, run_id)
+        run_definition = self._recorder.run_definition(run_id)
+        if run_definition is not None:
+            return self._run_objectives(*run_definition, run_id)
+        if not definitions:
+            raise ValueError("No persisted run definitions")
+        objectives = tuple(item[0] for item in definitions)
+        return self._run_objectives(objectives[0].raw_query, objectives, run_id)
+
     def _run_objectives(self, raw_query: str, objectives: tuple[AnalysisObjective, ...],
                         run_id: str | None, router: Router | None = None,
                         authorized_objective: str | None = None) -> PipelineResult:
         requirements: list[ArtifactRequirement] = []
+        effective_run_id = run_id or self._id_factory("run")
+        if self._recorder:
+            self._recorder.record_run_definition(effective_run_id, raw_query, objectives)
+        saved = dict((item.objective_id, (item, needs)) for item, needs in
+                     self._recorder.initial_definitions(effective_run_id)) if self._recorder else {}
         for objective in objectives:
-            requirements.extend(self._decomposer.decompose(objective))
+            if objective.objective_id in saved:
+                previous, needs = saved[objective.objective_id]
+                if previous != objective:
+                    raise ValueError("Persisted initial objective cannot be changed")
+            else:
+                needs = self._decomposer.decompose(objective)
+                if self._recorder:
+                    needs = self._recorder.record_initial_definition(effective_run_id, objective, needs)
+            requirements.extend(needs)
         all_requirements = tuple(requirements)
 
         tool = self._tool_factory(all_requirements)
@@ -295,7 +347,6 @@ class AnalysisPipeline:
         for index, objective in enumerate(objectives):
             objective_requirements = tuple(
                 item for item in all_requirements if item.objective_ref == objective.objective_id)
-            effective_run_id = run_id or self._id_factory("run")
             orchestrator = Orchestrator(
                 self._planner, router if router is not None and
                 objective.objective_id == authorized_objective else self._router,
@@ -305,7 +356,10 @@ class AnalysisPipeline:
                 permitted_sources=hard_sources(objective),
                 source_mapping_resolver=self._source_mapping_resolver,
                 run_id=effective_run_id)
-            result = orchestrator.run(objective, objective_requirements, confirmed_intent=raw_query)
+            restored = self._recorder.restore_objective(effective_run_id, objective.objective_id,
+                tuple(item.requirement_id for item in objective_requirements)) if self._recorder else None
+            result = orchestrator.run(objective, objective_requirements, confirmed_intent=raw_query,
+                                      restored=restored)
             run_ids.append(result.run_id)
             statuses.append(result.objective_state.status)
             packages.append(result.response_package)

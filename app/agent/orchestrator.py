@@ -225,7 +225,8 @@ class Orchestrator:
                 metrics.record("ROUTE", subject_ref=routing.decision_id, agent="ROUTER",
                                status="SELECTED" if routing.selected_tool else "BLOCKED",
                                tool=routing.selected_tool or "", message=routing.rationale)
-                outcome = self._executor.run(task, routing)
+                outcome = (self._recorder.execute_once(run_id, task, routing, self._executor)
+                           if self._recorder else self._executor.run(task, routing))
                 executions.append(outcome)
                 round_executions.append((outcome,))
                 budget -= 1

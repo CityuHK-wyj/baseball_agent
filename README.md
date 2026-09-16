@@ -202,6 +202,7 @@ docs/
 `IN_PROGRESS — stable checkpoint`. Local Parquet reads were verified. MLB StatsAPI
 returned 30 teams once; later network attempts failed. PostgreSQL, current-data analytics,
 the complete high-zone query and live Web evidence remain `UNVERIFIED_LIVE`.
-Interaction answers are consumed atomically, but recovery from a crash after consumption
-still needs completion. RAG and pgvector remain deferred. See
+Consumed interactions can resume with `resume --execute`; durable executions are reused.
+Uncertain in-flight tool calls stop without automatic retry. Analytics/date planning still
+needs completion. RAG and pgvector remain deferred. See
 [docs/development-status.md](docs/development-status.md).

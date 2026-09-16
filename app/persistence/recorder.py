@@ -7,10 +7,12 @@ any state references them.
 
 from collections.abc import Callable, Iterable
 from uuid import uuid4
+import hashlib
+import json
 
 from app.models.artifacts import Artifact, ArtifactAssessment
 from app.models.checkpoint import Checkpoint, RecoveryPosition
-from app.models.contracts import ObjectiveState, RequirementState
+from app.models.contracts import AnalysisObjective, ArtifactRequirement, ObjectiveState, RequirementState
 from app.models.interaction import InteractionRecord
 from app.models.planning import TaskAttempt, TaskExecution
 from app.models.reports import CompletionReport, ResponsePackage
@@ -28,6 +30,62 @@ class RunRecorder:
     def record_metric(self, event) -> None:
         self._store.save_object("run_event", self._id_factory("event"), event.run_id,
                                 event.model_dump(mode="json"))
+
+    def execute_once(self, run_id, task, routing, executor):
+        """Journal a semantic work intent before any external execution.
+
+        An uncompleted intent is uncertain, never an instruction to retry. Payloads
+        remain in artifact storage; the durable outcome holds references only.
+        """
+        from app.agent.executor import ExecutionOutcome
+        identity = json.dumps([run_id, task.objective_ref, sorted(task.requirement_refs)])
+        key = hashlib.sha256(identity.encode()).hexdigest()
+        intent = {"task": task.model_dump(mode="json"), "routing": routing.model_dump(mode="json")}
+        if routing.selected_tool is None:
+            return executor.run(task, routing)
+        if not self._store.create_object("execution_intent", key, run_id, intent):
+            original = self._store.get_object("execution_intent", key)
+            if original.run_id != run_id or original.payload["routing"]["selected_tool"] != routing.selected_tool:
+                raise ValueError("Persisted execution scope differs from current routing")
+            record = self._store.get_object("execution_outcome", key)
+            payload = record.payload if record else None
+            if payload is None:
+                completed = [item.payload for item in self._store.list_objects("execution", run_id)
+                             if item.payload.get("intent_ref") == key and
+                             item.payload["execution"]["status"] in ("SUCCEEDED", "EMPTY", "FAILED", "BLOCKED")]
+                if len(completed) != 1:
+                    raise RuntimeError("EXECUTION_UNCERTAIN: persisted intent has no durable outcome; automatic retry prohibited")
+                payload = dict(completed[0], supporting_refs=[])
+                if payload["artifact_ref"]:
+                    stored = self._store.get_object("artifact", payload["artifact_ref"])
+                    if stored is None or stored.run_id != run_id:
+                        raise RuntimeError("Durable execution artifact is missing")
+                    payload["supporting_refs"] = stored.payload.get("lineage", [])
+            def artifact(reference):
+                stored = self._store.get_object("artifact", reference)
+                if stored is None or stored.run_id != run_id:
+                    raise RuntimeError("Execution references a missing or foreign artifact")
+                return Artifact.model_validate(stored.payload)
+            return ExecutionOutcome(
+                execution=TaskExecution.model_validate(payload["execution"]),
+                attempts=tuple(TaskAttempt.model_validate(item) for item in payload["attempts"]),
+                artifact=artifact(payload["artifact_ref"]) if payload["artifact_ref"] else None,
+                supporting_artifacts=tuple(artifact(reference) for reference in payload["supporting_refs"]))
+        outcome = executor.run(task, routing)
+        for supporting in outcome.supporting_artifacts:
+            self.record_artifact(run_id, supporting)
+        artifact = outcome.artifact
+        if artifact is not None:
+            stored = self.record_artifact(run_id, artifact, outcome.payload, outcome.payload_content_type)
+            if stored:
+                artifact = artifact.model_copy(update={"payload_ref": stored.location})
+        self.record_execution(run_id, outcome.execution, outcome.attempts, artifact, intent_ref=key)
+        self._store.save_object("execution_outcome", key, run_id, {
+            "execution": outcome.execution.model_dump(mode="json"),
+            "attempts": [item.model_dump(mode="json") for item in outcome.attempts],
+            "artifact_ref": artifact.artifact_id if artifact else None,
+            "supporting_refs": [item.artifact_id for item in outcome.supporting_artifacts]})
+        return outcome.model_copy(update={"artifact": artifact, "payload": None})
 
     def record_artifact(self, run_id: str, artifact: Artifact, payload: bytes | None = None,
                         content_type: str = "application/json") -> StoredArtifact | None:
@@ -56,10 +114,14 @@ class RunRecorder:
         self._store.save_object("objective_state", state.objective_ref, run_id, state.model_dump(mode="json"))
 
     def record_execution(self, run_id: str, execution: TaskExecution,
-                         attempts: Iterable[TaskAttempt] = (), artifact: Artifact | None = None) -> None:
+                         attempts: Iterable[TaskAttempt] = (), artifact: Artifact | None = None,
+                         intent_ref: str | None = None) -> None:
+        existing = self._store.get_object("execution", execution.execution_id)
+        intent_ref = intent_ref or (existing.payload.get("intent_ref") if existing else None)
         payload = {"execution": execution.model_dump(mode="json"),
                    "attempts": [attempt.model_dump(mode="json") for attempt in attempts],
-                   "artifact_ref": artifact.artifact_id if artifact else None}
+                   "artifact_ref": artifact.artifact_id if artifact else None,
+                   "intent_ref": intent_ref}
         self._store.save_object("execution", execution.execution_id, run_id, payload)
 
     def record_completion_report(self, run_id: str, report: CompletionReport) -> None:
@@ -84,7 +146,43 @@ class RunRecorder:
 
     def has_run(self, run_id: str) -> bool:
         return (self._store.latest_checkpoint(run_id) is not None or
-                self._store.get_object("interaction", run_id) is not None)
+                self._store.get_object("interaction", run_id) is not None or
+                self._store.get_object("run_definition", run_id) is not None or
+                bool(self._store.list_objects("initial_definition", run_id)))
+
+    def record_run_definition(self, run_id, raw_query, objectives):
+        payload = {"raw_query": raw_query, "objectives": [item.model_dump(mode="json") for item in objectives]}
+        self._store.create_object("run_definition", run_id, run_id, payload)
+        if self._store.get_object("run_definition", run_id).payload != payload:
+            raise ValueError("Persisted run definition cannot be changed")
+
+    def run_definition(self, run_id):
+        record = self._store.get_object("run_definition", run_id)
+        if record is None:
+            return None
+        return record.payload["raw_query"], tuple(AnalysisObjective.model_validate(item)
+                                                  for item in record.payload["objectives"])
+
+    def restore_objective(self, run_id, objective_ref, requirement_refs):
+        from app.persistence.resume import ResumeService
+        return ResumeService(self._store).rehydrate(run_id, objective_ref=objective_ref,
+                                                    requirement_refs=requirement_refs)
+
+    def initial_definitions(self, run_id: str):
+        return tuple((AnalysisObjective.model_validate(record.payload["objective"]),
+                      tuple(ArtifactRequirement.model_validate(item) for item in record.payload["requirements"]))
+                     for record in self._store.list_objects("initial_definition", run_id))
+
+    def record_initial_definition(self, run_id: str, objective: AnalysisObjective,
+                                   requirements: tuple[ArtifactRequirement, ...]):
+        key = f"{len(run_id)}:{run_id}{objective.objective_id}"
+        payload = {"objective": objective.model_dump(mode="json"),
+                   "requirements": [item.model_dump(mode="json") for item in requirements]}
+        self._store.create_object("initial_definition", key, run_id, payload)
+        record = self._store.get_object("initial_definition", key)
+        if record.payload["objective"] != payload["objective"]:
+            raise ValueError("Persisted initial objective cannot be changed")
+        return tuple(ArtifactRequirement.model_validate(item) for item in record.payload["requirements"])
 
     def consume_interaction(self, pending: InteractionRecord, result: InteractionRecord) -> None:
         record = self._store.get_object("interaction", pending.run_id)

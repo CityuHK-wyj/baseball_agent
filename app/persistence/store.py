@@ -54,6 +54,7 @@ class StoredObject(ArtifactContract):
 
 
 class OperationalStore(Protocol):
+    def create_object(self, kind: str, object_id: str, run_id: str, payload: dict) -> bool: ...
     def replace_object(self, expected: StoredObject, payload: dict) -> bool: ...
 
     def save_object(self, kind: str, object_id: str, run_id: str, payload: dict) -> StoredObject: ...
@@ -97,6 +98,16 @@ class SqlOperationalStore:
                             version=row[3], payload=json.loads(row[4]))
 
     # -- objects ---------------------------------------------------------------
+    def create_object(self, kind: str, object_id: str, run_id: str, payload: dict) -> bool:
+        """Insert a durable intent only if nobody has claimed its identity."""
+        p = self.placeholder
+        cursor = self._execute(
+            f"INSERT INTO objects (kind, object_id, run_id, version, payload, created_at) "
+            f"VALUES ({p}, {p}, {p}, 0, {p}, {p}) ON CONFLICT(kind, object_id) DO NOTHING",
+            (kind, object_id, run_id, json.dumps(payload), _now()))
+        self._connection.commit()
+        return cursor.rowcount == 1
+
     def replace_object(self, expected: StoredObject, payload: dict) -> bool:
         """Atomically claim a version; only one competing resume may execute."""
         p = self.placeholder

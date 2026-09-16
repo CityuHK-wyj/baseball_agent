@@ -46,6 +46,8 @@ def main():
                              "--choice", request["options"][0]["option_id"], "--demo", "--json"))
         assert done["objective_statuses"] == ["COMPLETE"], done
         assert done["run_ids"] == [run_id]
+        recovered = json.loads(cli("resume", "--run-id", run_id, "--execute", "--demo", "--json"))
+        assert recovered["objective_statuses"] == ["COMPLETE"], recovered
         for command in ("resume", "inspect", "metrics"):
             cli(command, "--run-id", run_id)
         print("PASS: 3 knowledge questions; persisted CLI clarification/answer; resume, inspect, metrics")

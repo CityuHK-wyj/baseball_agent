@@ -1,5 +1,12 @@
 # v0.1 integration development notes
 
+Recovery now persists `run_definition`, `initial_definition`, `execution_intent` and
+reference-only `execution_outcome` records. `RunRecorder.execute_once` claims work atomically
+before the external call; a completed execution can be recovered even if its outcome index
+was not written. Unknown in-flight outcomes stop with `EXECUTION_UNCERTAIN`. The pipeline
+restores each objective through `ResumeService.rehydrate(..., objective_ref=...)`; ambiguous
+unscoped multi-objective recovery is rejected. No new AgentState or orchestration service.
+
 `app/runtime.py` is the composition root, exposed by `AnalysisPipeline.default()` and
 the CLI. It projects the existing Knowledge Store into EntityDictionary and MetricRegistry,
 creates ContextService and SchemaRegistry, configures SourceMappingResolver, and owns local

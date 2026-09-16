@@ -2,6 +2,13 @@
 
 Status: IN_PROGRESS — stable checkpoint
 
+Latest runtime closure: 341 tests pass. Persisted run/initial definitions, execution intent,
+completed execution reuse and objective-scoped recovery are implemented. Actual process
+exit/restart tests prove one provider call across repeated recovery. Unknown external-call
+outcomes stop with `EXECUTION_UNCERTAIN`; no automatic duplicate execution is allowed.
+CLI `resume --execute` continues durable intent. Next: analytics/date planning, then ordered
+read-only live probes. This update supersedes the older recovery gap below.
+
 ## Current integration checkpoint — 2026-09-16
 
 Branch: `astra/v0.1-integration`; merged runtime `b68ccf7` and knowledge `7d44ef4`.

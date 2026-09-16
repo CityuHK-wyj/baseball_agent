@@ -50,7 +50,9 @@ do not assume `run-1`. The `answer` subcommand accepts the returned run and requ
 use `--choice` with the selected option ID, `--permission approve|reject`, or
 `--revision accept|reject`. The workflow script exercises the concrete clarification CLI
 command; the integration suite exercises paid Web approval/rejection and source revision.
-`resume` currently inspects recovery state; `answer` actually resumes a waiting interaction.
+`resume` inspects recovery state by default. `resume --execute` recovers a consumed
+interaction or a persisted run; use `--demo` again for synthetic runs. The workflow script
+also verifies this execution path in a new process. `answer` consumes a waiting interaction.
 
 Programmatic equivalents are `resume_clarification`, `resume_permission`, and
 `resume_constraint_revision`. Permission and revision requests expire after 15 minutes.
@@ -79,8 +81,16 @@ within-season rule changes need a more explicit date interpretation. Seed covera
 limited: the Hernandez ambiguity lifecycle is fixture-tested; the default player seed
 does not include the Hernandez candidates.
 
-Known recovery gap: a crash after consuming an answer but before finalization cannot yet
-be recovered automatically through AnalysisPipeline. Consumption prevents replay and
-duplicate execution; it does not establish exactly-once execution across crashes.
-Multi-objective reports are stored separately, but generic multi-objective crash recovery
-still needs an objective selection contract. Do not claim v0.1 completion yet.
+Crash recovery persists immutable run/initial definitions and atomically claims an
+execution intent before calling a tool. `AnalysisPipeline.resume_run(run_id)` restores
+each objective separately, reuses durable executions/artifacts, and does not consume the
+answer again. Completed objectives perform no new executions or duplicate assessment.
+Payloads remain in artifact storage; execution outcomes contain references only.
+
+If a process dies while a tool may have executed but no completed execution was persisted,
+recovery raises `EXECUTION_UNCERTAIN` and never automatically retries. An external call
+and a local commit cannot be made exactly-once without provider cooperation. This is a
+deliberate at-most-once boundary, not a success claim. Expired or revoked permission fails
+closed on recovery. Tests include actual `os._exit` and repeated fresh-process restarts,
+plus failures before assessment and before the outcome index is committed.
+Analytics/date planning and the live gaps above still prevent a v0.1 completion claim.

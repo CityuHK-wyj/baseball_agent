@@ -32,7 +32,7 @@ from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
 
 def pipeline(dictionary: EntityDictionary, *, row_count: int = 1200,
              recorder: RunRecorder | None = None, router: Router | None = None,
-             planner=None) -> AnalysisPipeline:
+             planner=None, tool_factory=None) -> AnalysisPipeline:
     counter = iter(range(1, 100_000))
     ids = lambda prefix: f"{prefix}-{next(counter)}"
     resolver = EntityResolver(dictionary, id_factory=ids)
@@ -46,7 +46,7 @@ def pipeline(dictionary: EntityDictionary, *, row_count: int = 1200,
     return AnalysisPipeline(
         semantic, RuleBasedRequirementDecomposer(id_factory=ids),
         planner or RuleBasedPlanner(id_factory=ids, max_rounds=3), router, assessment, registry,
-        tool_factory=default_tool_factory(row_count), recorder=recorder,
+        tool_factory=tool_factory or default_tool_factory(row_count), recorder=recorder,
         response_composer=DeterministicResponseComposer(), max_rounds=3, budget=10, id_factory=ids)
 
 
