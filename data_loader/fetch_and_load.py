@@ -18,7 +18,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 # DDL columns pitcher_id/batter_id). This is a maintenance loader run as baseball_admin;
 # the Agent runtime stays read-only and never imports this module.
 PITCH_COLUMNS = [
-    'game_date', 'game_pk', 'release_speed', 'release_spin_rate', 'pitch_type',
+    'game_date', 'game_pk', 'game_type', 'release_speed', 'release_spin_rate', 'pitch_type',
     'player_name', 'pitcher', 'batter', 'events', 'description', 'plate_x', 'plate_z',
     'sz_top', 'sz_bot', 'p_throws', 'stand', 'balls', 'strikes', 'zone', 'inning',
     'launch_speed', 'launch_angle', 'hit_distance_sc',
@@ -121,7 +121,7 @@ def fetch_and_append_mlb_data(start_date, end_date):
     # 2. 原始流水表 (Pitch Level)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS statcast_pitches (
-            game_date DATE, game_pk BIGINT, release_speed FLOAT, release_spin_rate FLOAT, pitch_type VARCHAR(10),
+            game_date DATE, game_pk BIGINT, game_type VARCHAR(4), release_speed FLOAT, release_spin_rate FLOAT, pitch_type VARCHAR(10),
             player_name VARCHAR(100), pitcher_id INT, batter_id INT, events VARCHAR(100), description VARCHAR(255),
             plate_x FLOAT, plate_z FLOAT, sz_top FLOAT, sz_bot FLOAT, p_throws VARCHAR(5),
             stand VARCHAR(5), balls INT, strikes INT, zone INT, inning INT,
@@ -129,12 +129,13 @@ def fetch_and_append_mlb_data(start_date, end_date):
             estimated_ba_using_speedangle FLOAT, estimated_woba_using_speedangle FLOAT
         );
     """)
-    # Idempotent migration for databases created before sz_top/sz_bot/p_throws existed.
+    # Idempotent migration for databases created before sz_top/sz_bot/p_throws/game_type.
     cursor.execute("""
         ALTER TABLE statcast_pitches
         ADD COLUMN IF NOT EXISTS sz_top FLOAT,
         ADD COLUMN IF NOT EXISTS sz_bot FLOAT,
-        ADD COLUMN IF NOT EXISTS p_throws VARCHAR(5);
+        ADD COLUMN IF NOT EXISTS p_throws VARCHAR(5),
+        ADD COLUMN IF NOT EXISTS game_type VARCHAR(4);
     """)
     # 3. 🚨 核心改动 2：为你量身定制的 Agent 战力事件表 (At-Bat / Event Level)
     cursor.execute("""
@@ -161,7 +162,7 @@ def fetch_and_append_mlb_data(start_date, end_date):
 
     # Column names (not positions) keep the INSERT correct even after ALTER appends.
     pitch_target_columns = (
-        'game_date', 'game_pk', 'release_speed', 'release_spin_rate', 'pitch_type',
+        'game_date', 'game_pk', 'game_type', 'release_speed', 'release_spin_rate', 'pitch_type',
         'player_name', 'pitcher_id', 'batter_id', 'events', 'description', 'plate_x',
         'plate_z', 'sz_top', 'sz_bot', 'p_throws', 'stand', 'balls', 'strikes', 'zone',
         'inning', 'launch_speed', 'launch_angle', 'hit_distance_sc',

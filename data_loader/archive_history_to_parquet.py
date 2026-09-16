@@ -26,7 +26,7 @@ def archive_mlb_history(output_dir="./parquet_archive"):
 
     # 定义我们要为未来 Agent 储备的黄金物理与博弈列
     target_columns = [
-        'game_date', 'game_pk', 'release_speed', 'release_spin_rate', 'pitch_type',
+        'game_date', 'game_pk', 'game_type', 'release_speed', 'release_spin_rate', 'pitch_type',
         'player_name', 'pitcher', 'batter', 'events', 'description', 'plate_x', 'plate_z',
         'sz_top', 'sz_bot', 'p_throws', 'stand', 'balls', 'strikes', 'zone', 'inning',
         'launch_speed', 'launch_angle', 'hit_distance_sc',
@@ -59,6 +59,8 @@ def archive_mlb_history(output_dir="./parquet_archive"):
             # 清洗转换：剔除没有轨迹坐标的死数据
             available_cols = [c for c in target_columns if c in df.columns]
             df_clean = df[available_cols].dropna(subset=['plate_x', 'plate_z']).copy()
+            if 'game_type' not in df_clean.columns:
+                df_clean['game_type'] = None
 
             # 严格的数据类型固化（防止转换为 Parquet 时发生 Object 类型混乱）
             df_clean['game_date'] = pd.to_datetime(df_clean['game_date'])

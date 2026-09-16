@@ -26,7 +26,7 @@ from app.semantic.entity_resolver import EntityResolver
 from app.semantic.normalizer import SemanticNormalizer
 from app.semantic.objective_extractor import RuleBasedObjectiveExtractor
 from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
-from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, ZONE_ABOVE_UPPER_EDGE,
+from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, ZONE_UPPER_OUTSIDE,
                                         ZONE_UPPER_THIRD, FieldMappingRegistry)
 from app.semantic.schema_registry import SchemaRegistry, statcast_schema_registry
 from app.tools.execution import DuckDBReadOnlyExecutor, PostgresReadOnlyExecutor
@@ -75,11 +75,12 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
                 tool="statcast-parquet", source_kind="PARQUET",
                 supported_artifact_types=("TABLE",),
                 supported_data_keys=("exit_velocity", "batter", "pitch_velocity", "pitch_type",
-                                     "count", "balls", "pitch_location", "game_date"),
+                                     "count", "balls", "pitch_location", "game_date",
+                                     "game_type"),
                 supported_constraint_keys=("count", "pitch_velocity", "pitch_type",
-                                           "ranking",
+                                           "ranking", "population",
                                            f"pitch_location:{ZONE_UPPER_THIRD}",
-                                           f"pitch_location:{ZONE_ABOVE_UPPER_EDGE}",
+                                           f"pitch_location:{ZONE_UPPER_OUTSIDE}",
                                            f"pitch_location:{BATTER_RELATIVE_UPPER_EDGE}"),
                 coverage="2015-04-05..2023-11-01 Parquet archive",
                 coverage_start=date(2015, 4, 5), coverage_end=date(2023, 11, 1)),
@@ -87,11 +88,12 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
                 tool="statcast-postgres", source_kind="POSTGRES",
                 supported_artifact_types=("TABLE",),
                 supported_data_keys=("exit_velocity", "batter", "pitch_velocity", "pitch_type",
-                                     "count", "balls", "pitch_location", "game_date"),
+                                     "count", "balls", "pitch_location", "game_date",
+                                     "game_type"),
                 supported_constraint_keys=("count", "pitch_velocity", "pitch_type",
-                                           "ranking",
+                                           "ranking", "population",
                                            f"pitch_location:{ZONE_UPPER_THIRD}",
-                                           f"pitch_location:{ZONE_ABOVE_UPPER_EDGE}",
+                                           f"pitch_location:{ZONE_UPPER_OUTSIDE}",
                                            f"pitch_location:{BATTER_RELATIVE_UPPER_EDGE}"),
                 coverage="2024-03-15..2026-09-14 PostgreSQL",
                 coverage_start=date(2024, 3, 15), coverage_end=date(2026, 9, 14),

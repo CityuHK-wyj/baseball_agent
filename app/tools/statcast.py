@@ -18,13 +18,23 @@ from app.agent.executor import ToolResult
 from app.models.artifacts import Artifact, Provenance
 from app.models.contracts import (ArtifactRequirement, CategoryConstraint, CountConstraint,
                                   LocationConstraint, NumericConstraint, PitchTypeConstraint,
-                                  RankingConstraint, TimeRange)
+                                  PopulationConstraint, RankingConstraint, TimeRange)
 from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, FieldMappingRegistry,
                                         UPPER_EDGE_BAND_FEET)
 
-# A stable, documented ranking qualification: a player needs this many qualifying
-# batted balls to be ranked. It is surfaced in the payload, not silently applied.
+# A stable, documented ranking qualification used only when neither the user nor the
+# frozen Requirement supplies one. It is surfaced in the payload, never silently applied.
 DEFAULT_MIN_BATTED_BALLS = 3
+
+# MLB StatsAPI game-type codes retained on Statcast rows. Regular season is the narrow
+# v0.1 default; postseason covers the Wild Card / Division / Championship / World Series
+# codes and Spring Training its own code.
+_GAME_TYPE_CODES: dict[str, tuple[str, ...]] = {
+    "REGULAR_SEASON": ("R",),
+    "POSTSEASON": ("F", "D", "L", "W"),
+    "SPRING_TRAINING": ("S",),
+    "EXHIBITION": ("E", "A"),
+}
 
 
 def _quote(value: str) -> str:
@@ -41,10 +51,12 @@ class StatcastAnalyticsTool:
     def __init__(self, requirements: Iterable[ArtifactRequirement],
                  field_mapping: FieldMappingRegistry,
                  player_names: dict[str, str] | None = None,
-                 min_batted_balls: int = DEFAULT_MIN_BATTED_BALLS) -> None:
+                 min_batted_balls: int | None = None) -> None:
         self._by_id = {item.requirement_id: item for item in requirements}
         self._field_mapping = field_mapping
         self._player_names = dict(player_names or {})
+        # None means "use the Requirement's frozen qualification rule"; an explicit value
+        # is a test/injection override, never a hidden production default.
         self._min_batted_balls = min_batted_balls
 
     def execute(self, task) -> ToolResult:
@@ -73,8 +85,10 @@ class StatcastAnalyticsTool:
                 "Required physical fields are unavailable in this source: "
                 + ", ".join(sorted(missing)), retryable=False,
                 error_code="MISSING_PHYSICAL_FIELDS")
+        min_batted_balls = self._qualification_threshold(requirement)
 
-        rows = self._query(self._main_sql(requirement, where, metric_field, batter_field, ranking))
+        rows = self._query(self._main_sql(requirement, where, metric_field, batter_field,
+                                          ranking, min_batted_balls))
         if rows is None:
             return ToolResult.failure("Source query failed", retryable=True,
                                       error_code="SOURCE_QUERY_FAILED")
@@ -100,7 +114,8 @@ class StatcastAnalyticsTool:
             "columns": list(columns),
             "rows": projected,
             "applied_constraints": [item.model_dump(mode="json") for item in requirement.descriptor.constraints],
-            "min_batted_balls": self._min_batted_balls,
+            "min_batted_balls": min_batted_balls,
+            "population": self._population(requirement).model_dump(mode="json"),
             "observed_time_range": observed_range.model_dump(mode="json") if observed_range else None,
             "source_kind": self.source_kind,
         }, ensure_ascii=False).encode()
@@ -123,6 +138,20 @@ class StatcastAnalyticsTool:
             if isinstance(constraint, RankingConstraint):
                 return constraint
         raise UnavailablePhysicalFields("no ranking constraint")
+
+    def _qualification_threshold(self, requirement: ArtifactRequirement) -> int:
+        if self._min_batted_balls is not None:
+            return int(self._min_batted_balls)
+        rule = requirement.qualification_rule
+        if rule is not None and rule.min_batted_balls is not None:
+            return int(rule.min_batted_balls)
+        return DEFAULT_MIN_BATTED_BALLS
+
+    def _population(self, requirement: ArtifactRequirement) -> PopulationConstraint:
+        for constraint in requirement.descriptor.constraints:
+            if isinstance(constraint, PopulationConstraint):
+                return constraint
+        return PopulationConstraint()
 
     def _resolve_names(self, batter_ids: list[int]) -> dict[str, str]:
         """Optional source-specific batter-name resolution. Base sources return {}."""
@@ -175,11 +204,34 @@ class StatcastAnalyticsTool:
                 clauses.append(f"{field} IN ({code_list})")
             elif isinstance(constraint, LocationConstraint):
                 self._apply_location(constraint, clauses, missing)
+            elif isinstance(constraint, PopulationConstraint):
+                self._apply_population(constraint, clauses, missing)
             elif isinstance(constraint, CategoryConstraint) and constraint.key == "date_range":
                 if len(constraint.values) == 2:
                     clauses.append(self._date_clause(constraint.values[0], constraint.values[1]))
         clauses.append(f"{metric_field} IS NOT NULL")
         return (" AND ".join(clauses) if clauses else "1 = 1"), missing
+
+    def _apply_population(self, constraint: PopulationConstraint, clauses: list[str],
+                          missing: set[str]) -> None:
+        """Apply the explicit population filter; never silently widen it."""
+        game_field = self._physical_field("game_type")
+        if game_field is None:
+            missing.add("game_type")
+        else:
+            codes: list[str] = []
+            for game_type in constraint.game_types:
+                codes.extend(_GAME_TYPE_CODES.get(game_type, ()))
+            if not codes:
+                missing.add("game_type")
+            else:
+                code_list = ", ".join(_quote(code) for code in dict.fromkeys(codes))
+                clauses.append(f"{game_field} IN ({code_list})")
+        if constraint.event_population == "BATTED_BALL":
+            if self._physical_field("events") is None:
+                missing.add("events")
+            else:
+                clauses.append("events IS NOT NULL")
 
     def _apply_location(self, constraint: LocationConstraint, clauses: list[str],
                         missing: set[str]) -> None:
@@ -231,14 +283,14 @@ class StatcastAnalyticsTool:
         raise NotImplementedError
 
     def _main_sql(self, requirement, where, metric_field, batter_field,
-                  ranking: RankingConstraint) -> str:
+                  ranking: RankingConstraint, min_batted_balls: int) -> str:
         direction = "DESC" if ranking.direction == "DESC" else "ASC"
         aggregation = ranking.aggregation
         return (
             f"SELECT {batter_field} AS batter, COUNT(*) AS n, "
             f"AVG({metric_field}) AS avg_metric, MAX({metric_field}) AS max_metric "
             f"FROM {self._from_clause()} WHERE {where} "
-            f"GROUP BY {batter_field} HAVING COUNT(*) >= {int(self._min_batted_balls)} "
+            f"GROUP BY {batter_field} HAVING COUNT(*) >= {int(min_batted_balls)} "
             f"ORDER BY {aggregation}({metric_field}) {direction} LIMIT {int(ranking.limit)}"
         )
 
@@ -278,17 +330,17 @@ class ParquetStatcastTool(StatcastAnalyticsTool):
     source_label = "parquet-archive"
 
     _COLUMNS = frozenset({
-        "game_date", "game_pk", "release_speed", "release_spin_rate", "pitch_type",
-        "player_name", "pitcher", "batter", "events", "description", "plate_x", "plate_z",
-        "sz_top", "sz_bot", "p_throws", "stand", "balls", "strikes", "zone", "inning",
-        "launch_speed", "launch_angle", "hit_distance_sc",
+        "game_date", "game_pk", "game_type", "release_speed", "release_spin_rate",
+        "pitch_type", "player_name", "pitcher", "batter", "events", "description",
+        "plate_x", "plate_z", "sz_top", "sz_bot", "p_throws", "stand", "balls", "strikes",
+        "zone", "inning", "launch_speed", "launch_angle", "hit_distance_sc",
         "estimated_ba_using_speedangle", "estimated_woba_using_speedangle",
     })
 
     def __init__(self, requirements, field_mapping: FieldMappingRegistry,
                  executor, archive_glob: str = "mlb_statcast_*.parquet",
                  player_names: dict[str, str] | None = None,
-                 min_batted_balls: int = DEFAULT_MIN_BATTED_BALLS) -> None:
+                 min_batted_balls: int | None = None) -> None:
         super().__init__(requirements, field_mapping, player_names, min_batted_balls)
         self._executor = executor
         self._archive_glob = archive_glob
@@ -317,9 +369,9 @@ class PostgresStatcastTool(StatcastAnalyticsTool):
     source_label = "postgres-baseball_analytics"
 
     _COLUMNS = frozenset({
-        "game_date", "game_pk", "release_speed", "release_spin_rate", "pitch_type",
-        "player_name", "pitcher_id", "batter_id", "events", "description", "plate_x",
-        "plate_z", "sz_top", "sz_bot", "p_throws", "stand", "balls", "strikes",
+        "game_date", "game_pk", "game_type", "release_speed", "release_spin_rate",
+        "pitch_type", "player_name", "pitcher_id", "batter_id", "events", "description",
+        "plate_x", "plate_z", "sz_top", "sz_bot", "p_throws", "stand", "balls", "strikes",
         "zone", "inning", "launch_speed", "launch_angle", "hit_distance_sc",
         "estimated_ba_using_speedangle", "estimated_woba_using_speedangle",
     })
@@ -328,7 +380,7 @@ class PostgresStatcastTool(StatcastAnalyticsTool):
                  executor, table: str = "statcast_pitches",
                  name_table: str | None = "player_dictionary",
                  player_names: dict[str, str] | None = None,
-                 min_batted_balls: int = DEFAULT_MIN_BATTED_BALLS) -> None:
+                 min_batted_balls: int | None = None) -> None:
         super().__init__(requirements, field_mapping, player_names, min_batted_balls)
         self._executor = executor
         self._table = table

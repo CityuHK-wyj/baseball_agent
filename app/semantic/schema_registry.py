@@ -43,7 +43,7 @@ class SchemaRegistry:
 # These are declared schemas, not runtime introspection. Both rebuilt sources retain
 # sz_top / sz_bot; a stale installation still fails at query time.
 _PARQUET_STATCAST_COLUMNS = (
-    "game_date", "game_pk", "release_speed", "release_spin_rate", "pitch_type",
+    "game_date", "game_pk", "game_type", "release_speed", "release_spin_rate", "pitch_type",
     "player_name", "pitcher", "batter", "events", "description", "plate_x", "plate_z",
     "sz_top", "sz_bot", "p_throws", "stand", "balls", "strikes", "zone", "inning",
     "launch_speed", "launch_angle", "hit_distance_sc",
@@ -51,7 +51,7 @@ _PARQUET_STATCAST_COLUMNS = (
 )
 
 _POSTGRES_STATCAST_COLUMNS = (
-    "game_date", "game_pk", "release_speed", "release_spin_rate", "pitch_type",
+    "game_date", "game_pk", "game_type", "release_speed", "release_spin_rate", "pitch_type",
     "player_name", "pitcher_id", "batter_id", "events", "description", "plate_x",
     "plate_z", "sz_top", "sz_bot", "p_throws", "stand", "balls", "strikes",
     "zone", "inning", "launch_speed", "launch_angle", "hit_distance_sc",
@@ -72,11 +72,11 @@ def statcast_schema_registry() -> SchemaRegistry:
     return SchemaRegistry((
         SchemaTable(
             table_name="mlb_statcast_archive", source_kind="PARQUET",
-            description="Historical Statcast 2015-2023 pitch-level archive; has sz_top/sz_bot/p_throws",
+            description="Historical Statcast 2015-2023 pitch-level archive; has sz_top/sz_bot/p_throws and game_type",
             columns=_PARQUET_STATCAST_COLUMNS),
         SchemaTable(
             table_name="statcast_pitches", source_kind="POSTGRES",
-            description="Hot Statcast pitch-level table (2024-2026); has sz_top/sz_bot/p_throws for batter-relative location",
+            description="Hot Statcast pitch-level table (2024-2026); has sz_top/sz_bot/p_throws and game_type for batter-relative location and population filtering",
             columns=_POSTGRES_STATCAST_COLUMNS),
         SchemaTable(
             table_name="batting_events", source_kind="POSTGRES",

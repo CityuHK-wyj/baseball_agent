@@ -4,10 +4,11 @@ from datetime import date
 
 from app.models.contracts import (AnalysisObjective, CategoryConstraint, CountConstraint,
                                   LocationConstraint, NumericConstraint, PitchTypeConstraint,
+                                  PopulationConstraint, QualificationConstraint,
                                   RankingConstraint, TimeRange)
 from app.models.planning import AgentTask
 from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, FieldMappingRegistry,
-                                        ZONE_UPPER_THIRD)
+                                        ZONE_UPPER_OUTSIDE, ZONE_UPPER_THIRD)
 from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
 from app.tools.results import ToolResult
 from app.tools.statcast import ParquetStatcastTool, PostgresStatcastTool
@@ -45,9 +46,15 @@ def analytics_objective(**location):
                              description="top 5 exit velocity", constraints=tuple(constraints))
 
 
-def requirement():
+def requirement(**location):
     return RuleBasedRequirementDecomposer(id_factory=lambda prefix: f"{prefix}-1").decompose(
-        analytics_objective(definition=ZONE_UPPER_THIRD))[0]
+        analytics_objective(**(location or {"definition": ZONE_UPPER_THIRD})))[0]
+
+
+def requirement_with(constraints):
+    objective = analytics_objective()
+    return RuleBasedRequirementDecomposer(id_factory=lambda prefix: f"{prefix}-1").decompose(
+        objective.model_copy(update={"constraints": tuple(objective.constraints) + tuple(constraints)}))[0]
 
 
 def task():
@@ -224,6 +231,69 @@ class StatcastToolTests(unittest.TestCase):
         main = executor.statements[0]
         self.assertIn("strikes = 2", main)
         self.assertIn("balls IN (0, 1, 2, 3)", main)
+
+    def test_default_qualification_is_frozen_not_hidden(self):
+        executor = RecordingExecutor(rows=[(1, 30, 90.0, 95.0)])
+        tool = ParquetStatcastTool([requirement()], FieldMappingRegistry(), executor)
+        result = tool.execute(task())
+        self.assertIn("HAVING COUNT(*) >= 3", executor.statements[0])
+        self.assertEqual(json.loads(result.payload)["min_batted_balls"], 3)
+
+    def test_explicit_qualification_threshold_is_used_by_the_query(self):
+        requirement_ = requirement_with([QualificationConstraint(min_batted_balls=20)])
+        executor = RecordingExecutor(rows=[(1, 30, 90.0, 95.0)])
+        tool = ParquetStatcastTool([requirement_], FieldMappingRegistry(), executor)
+        result = tool.execute(task())
+        self.assertIn("HAVING COUNT(*) >= 20", executor.statements[0])
+        self.assertNotIn("HAVING COUNT(*) >= 3", executor.statements[0])
+        self.assertEqual(json.loads(result.payload)["min_batted_balls"], 20)
+
+    def test_default_population_is_regular_season_batted_balls(self):
+        requirement_ = requirement_with([PopulationConstraint()])
+        executor = RecordingExecutor(rows=[(1, 30, 90.0, 95.0)])
+        ParquetStatcastTool([requirement_], FieldMappingRegistry(), executor).execute(task())
+        main = executor.statements[0]
+        self.assertIn("game_type IN ('R')", main)
+        self.assertIn("events IS NOT NULL", main)
+
+    def test_postseason_population_uses_postseason_codes(self):
+        requirement_ = requirement_with(
+            [PopulationConstraint(game_types=("POSTSEASON",), event_population="BATTED_BALL")])
+        executor = RecordingExecutor(rows=[(1, 30, 90.0, 95.0)])
+        ParquetStatcastTool([requirement_], FieldMappingRegistry(), executor).execute(task())
+        self.assertIn("game_type IN ('F', 'D', 'L', 'W')", executor.statements[0])
+
+    def test_measured_contact_population_does_not_require_terminal_events(self):
+        requirement_ = requirement_with(
+            [PopulationConstraint(event_population="MEASURED_CONTACT")])
+        executor = RecordingExecutor(rows=[(1, 30, 90.0, 95.0)])
+        ParquetStatcastTool([requirement_], FieldMappingRegistry(), executor).execute(task())
+        self.assertNotIn("events IS NOT NULL", executor.statements[0])
+        self.assertIn("launch_speed IS NOT NULL", executor.statements[0])
+
+    def test_source_without_game_type_fails_closed(self):
+        requirement_ = requirement_with([PopulationConstraint()])
+
+        class NoGameTypeParquetTool(ParquetStatcastTool):
+            _COLUMNS = frozenset(ParquetStatcastTool._COLUMNS) - {"game_type"}
+
+        tool = NoGameTypeParquetTool([requirement_], FieldMappingRegistry(), RecordingExecutor())
+        result = tool.execute(task())
+        self.assertEqual(result.status, "ERROR")
+        self.assertEqual(result.error_code, "MISSING_PHYSICAL_FIELDS")
+        self.assertIn("game_type", result.safe_error_summary)
+
+    def test_zones_11_12_are_a_zone_set_not_an_above_sz_top_predicate(self):
+        requirement_ = requirement_with([LocationConstraint(definition=ZONE_UPPER_OUTSIDE,
+                                                            origin="USER_CONFIRMED")])
+        executor = RecordingExecutor(rows=[(1, 1, 90.0, 90.0)])
+        tool = ParquetStatcastTool([requirement_], FieldMappingRegistry(), executor)
+        result = tool.execute(task())
+        self.assertEqual(result.status, "OK")
+        main = executor.statements[0]
+        self.assertIn("zone IN (11, 12)", main)
+        self.assertNotIn("plate_z > sz_top", main)
+        self.assertNotIn("sz_top - 0.25", main)
 
     def test_postgres_batter_relative_edge_emits_physical_band(self):
         requirement_ = RuleBasedRequirementDecomposer(id_factory=lambda p: f"{p}-1").decompose(
