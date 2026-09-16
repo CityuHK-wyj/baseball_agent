@@ -1,6 +1,30 @@
 # Development status
 
-Status: IN_PROGRESS
+Status: IN_PROGRESS — stable checkpoint
+
+## Current integration checkpoint — 2026-09-16
+
+Branch: `astra/v0.1-integration`; merged runtime `b68ccf7` and knowledge `7d44ef4`.
+335 tests pass; compileall, secret scan and the separate-process CLI workflow script pass.
+The two source branches, `codex/review-hardening`, and `stash@{0}` remain untouched.
+
+Delivered: expiring objective-scoped permission, checkpointed source-constraint revision,
+atomic answer consumption, durable audit/metrics, default pipeline composition, bounded
+query/date-aware knowledge for Planner/Judge/Response, default paid Web injection,
+cross-run Planner isolation, per-objective report persistence and usable payload references.
+Definitions use real stored knowledge; synthetic analytics requires explicit `--demo`.
+
+Live: guarded local Parquet read verified; MLB teams transport succeeded once then failed
+on repeats. Analytics PostgreSQL refused connection; Operational PostgreSQL is unconfigured.
+High-zone query and current-data analysis remain UNVERIFIED_LIVE.
+
+Next: persist execution intent and initial definitions so a process can resume after an
+interaction was consumed without re-executing completed work; then finish configured
+analytics/date planning and historical coverage. Do not mark V0.1_READY_FOR_USER_VALIDATION.
+See [verified usage and limitations](usage/v01-validation.md) and
+[composition details](development/v01-integration.md).
+
+## Historical milestone notes (superseded by the checkpoint above)
 
 Integration update (2026-09-15): runtime hardening `b68ccf7` + Shared Knowledge `7d44ef4`.
 The audit wired SourceMapping, Web Evidence and Orchestrator metrics; fixed cross-objective

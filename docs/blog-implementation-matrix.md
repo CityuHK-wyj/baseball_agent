@@ -6,7 +6,7 @@ and posts 01–09 of `CityuHK-wyj/cityuhk-wyj.github.io` as of 2026-09-14.
 
 Status values:
 
-- **IMPLEMENTED** — code plus tests exist on `agent/deepseek-implementation-safe`.
+- **IMPLEMENTED** — code plus tests exist on the integrated branch.
 - **PARTIAL** — some code exists; a named gap remains.
 - **MISSING** — confirmed requirement with no implementation yet.
 - **NOT_REQUIRED** — deliberately not implemented; reason recorded.
@@ -16,7 +16,19 @@ This file is maintained as implementation proceeds. It is the evidence for
 "which blog designs are actually implemented", not a wish list.
 
 Integration base: runtime hardening `b68ccf7` + Shared Knowledge `7d44ef4`.
-Live PostgreSQL, DuckDB/Parquet, and web-provider integrations remain UNVERIFIED_LIVE.
+Current branch: `astra/v0.1-integration`, 335 tests passing (2026-09-16).
+Guarded local Parquet reads are VERIFIED_LIVE. PostgreSQL, the full high-zone query and
+live Web evidence remain UNVERIFIED_LIVE. See [validation](usage/v01-validation.md).
+
+| v0.1 integration surface | Status | Evidence |
+| --- | --- | --- |
+| Default dependency composition | IMPLEMENTED | `app/runtime.py`, `tests/integration/test_default_pipeline.py` |
+| Permission expiry/scope and source constraint revision | IMPLEMENTED | `app/pipeline.py`, atomic recorder consumption, E2E tests |
+| Durable metrics | IMPLEMENTED | OperationalStore `run_event`, persisted-flow test |
+| Knowledge in Planner/Judge/Response | IMPLEMENTED | bounded query/date-aware ContextPackage, integration/LLM tests |
+| Cross-run Planner isolation | IMPLEMENTED | repeated pipeline E2E regression |
+| Multi-objective report persistence | IMPLEMENTED | reports keyed by run and objective, E2E regression |
+| Crash after interaction consumption | PARTIAL | replay prevented; automatic recovery still open |
 
 ## A. Core domain contracts (O001, D005, D013, D014, D036)
 
@@ -183,7 +195,7 @@ Live PostgreSQL, DuckDB/Parquet, and web-provider integrations remain UNVERIFIED
 | --- | --- | --- | --- | --- |
 | Read-only policy | IMPLEMENTED | `app/validation/policy.py`, guard | `tests/test_safety.py` | |
 | Secret scanning (D060 scope) | IMPLEMENTED | `scripts/secret_scan.py` | `tests/test_secret_scan.py` | |
-| Permission/cost policy levels (O008) | PARTIAL | Router cost filter | `tests/test_routing.py` | |
+| Permission/cost policy levels (O008) | IMPLEMENTED | Router cost/data-key filter, expiring scoped request, atomic consumption | routing and integration tests | System policy remains mandatory |
 | Clarification/permission escalation (§42-43) | MISSING | — | — | |
 | Observability structured metrics (§58) | IMPLEMENTED | `app/observability/metrics.py`, `app/agent/orchestrator.py` | `tests/observability/test_metrics.py`, `tests/test_orchestrator.py` | Orchestrator emits redacted lifecycle events into `RunResult` |
 | Evaluation metrics (§59) | IMPLEMENTED | `app/observability/evaluation.py` | `tests/observability/test_evaluation.py` | Completion/replan/retry/failure rates, steps |
@@ -220,15 +232,11 @@ Live PostgreSQL, DuckDB/Parquet, and web-provider integrations remain UNVERIFIED
 Not yet implemented (next work, no decision change required):
 
 - Live SourceMapping/Feature and Web providers (the injected runtime seams are tested).
-- A metrics sink beyond `RunResult.metrics`.
 - Full live verification of the community directory: the 2026-09-15 network sweep verified
   a subset of creators; the rest are marked `UNVERIFIED` and need a recheck.
-- Cross-run context isolation asserted at the Orchestrator level (service-level tested).
 - Weighted objective coverage beyond the critical gate (O003).
-- `ConstraintRevisionRequest` / `PermissionRequest` escalation flows (clarification is
-  implemented).
-- A live PostgreSQL/DuckDB integration test — **UNVERIFIED_LIVE**; no live database exists
-  in this environment.
+- Crash recovery after consuming a user interaction, including multi-objective selection.
+- Live PostgreSQL, current-data analytics and the complete high-zone query — **UNVERIFIED_LIVE**.
 
 Explicitly deferred with reason:
 
@@ -253,7 +261,7 @@ Explicitly deferred with reason:
 | O005 persistence schema/version/retention | PARTIAL — schema + version RESOLVED (ADR 0007/0016); retention DEFERRED |
 | O006 context retrieval/projection policy | RESOLVED — deterministic knowledge retrieval + freshness/authority ranking (ADR 0019); semantic/vector DEFERRED |
 | O007 qualification/sample adequacy/league state | RESOLVED — ADR 0011 |
-| O008 permission/cost levels + escalation | PARTIAL — Router cost filter RESOLVED; escalation requests DEFERRED |
+| O008 permission/cost levels + escalation | IMPLEMENTED — expiring scoped permission and source constraint revision |
 | O009 LangGraph adoption | DEFERRED — deterministic state machine first |
 
 ## Completion assessment
@@ -263,5 +271,6 @@ All core domain contracts, the semantic→requirement→plan→route→execute�
 response loop, source mapping execution, persistence, checkpoint/resume, shared context,
 the persistent Shared Knowledge base, LLM Protocol implementations, read-only safety,
 secret safety, docs, usage guides and E2E tests are present. Remaining before the
-completion claim: live source wiring and integration tests (UNVERIFIED_LIVE), web wiring,
-the unverified portion of the community directory, and the deferred items above.
+completion claim: post-interaction crash recovery, configured analytics/date planning,
+live source verification (UNVERIFIED_LIVE), and historical/entity coverage. Deliberately
+deferred infrastructure is not a v0.1 completion prerequisite.

@@ -1,5 +1,30 @@
 # Codex Handoff
 
+## Current checkpoint — 2026-09-16
+
+- Active branch: `astra/v0.1-integration`, based on runtime `b68ccf7`, merged knowledge
+  `7d44ef44ec88113a9306aab03881197dc7a115cf`; no main merge.
+- Status: **IN_PROGRESS — stable checkpoint**; 335 tests pass, compileall and secret scan
+  pass, and `python3 scripts/verify_v01_workflows.py` passes.
+- Completed: request expiry/scope/replay protection, source constraint revision,
+  default composition and CLI answer, canonical knowledge projections, bounded
+  Planner/Judge/Response knowledge, durable metrics, default Web provider seam,
+  cross-run Planner isolation, per-objective reports, persisted payload references.
+- Live: local Parquet bounded read verified; MLB teams API transport succeeded once but
+  subsequent requests failed. PostgreSQL refused connection, no operational PG configured;
+  high-zone and current-data analytics remain UNVERIFIED_LIVE.
+- Exact next task: persist the run's immutable initial definitions and execution intent,
+  then add process-crash recovery after interaction consumption without duplicate execution.
+  Generic multi-objective resume must select the right objective instead of the first row.
+- Then wire configured analytics providers and temporal planning; the high-zone archive
+  query lacks sz_bot/sz_top, and the player seed has no Hernandez candidates (fixtures do).
+- Preserve both source branches, `codex/review-hardening` and `stash@{0}`. Do not add RAG or
+  change the frozen architecture. `python3` works; the repo `.venv` lacks pydantic.
+- Read [v0.1 validation](usage/v01-validation.md) and
+  [composition notes](development/v01-integration.md) for exact paths, seams and commands.
+
+## Historical handoff (superseded by the checkpoint above)
+
 ## Runtime audit update (2026-09-15)
 
 - audit branch: `gpt56/runtime-audit-hardening`, latest pushed audit checkpoint `5e84f01`

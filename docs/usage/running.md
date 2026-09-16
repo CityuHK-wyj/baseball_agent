@@ -1,5 +1,10 @@
 # Running
 
+For the current default composition and tested interaction commands, use
+[v0.1 validation](v01-validation.md). Synthetic analytics below requires `--demo`.
+Run IDs are unique; replace historical `run-1` examples with the returned ID.
+`answer` resumes persisted clarification/permission/revision requests; `resume` is inspection.
+
 ## Entry point
 
 ```bash
@@ -11,7 +16,7 @@ All commands are offline by default and never print credentials.
 ## `ask` — one analysis request
 
 ```bash
-python3 -m app.cli ask "How did Aaron Judge perform at the plate?"
+python3 -m app.cli ask "How did Aaron Judge perform at the plate?" --demo
 ```
 
 | Option | Effect |

@@ -1,7 +1,8 @@
 # Quickstart
 
 This gets you from a clean checkout to a first answer. It requires no database and no
-credentials — the default pipeline uses an offline synthetic source.
+credentials — the default pipeline reads local Shared Knowledge. Analytics demonstrations
+require explicit `--demo`. See [verified v0.1 commands](v01-validation.md).
 
 ## 1. Python
 
@@ -40,16 +41,13 @@ load the file yourself (for example `set -a; source .env; set +a`). See
 ## 5. First run
 
 ```bash
-python3 -m app.cli ask "How did Aaron Judge perform at the plate?"
+python3 -m app.cli ask "DFA是什么意思？" --json
 ```
 
 Expected shape of the output:
 
 ```
-=== COMPLETE ===
-Objective objective-...: COMPLETE
-- [ACCEPTABLE] synthetic-... from synthetic: ACCEPTABLE (1200 rows): ...
-Limitations: Optional data key barrel_rate is absent; ...
+{"objective_statuses": ["COMPLETE"], "responses": ["...shared-knowledge..."], ...}
 ```
 
 `COMPLETE` means the core Initial Requirements were satisfied. The line under it is the
@@ -58,11 +56,11 @@ accepted evidence that supports the answer.
 ## 6. Persist and resume
 
 ```bash
-python3 -m app.cli ask "How did Aaron Judge perform?" --persist
-python3 -m app.cli inspect --run-id run-1
-python3 -m app.cli resume  --run-id run-1
+python3 scripts/verify_v01_workflows.py
 ```
 
+The script exercises persisted clarification and answer in an isolated directory.
+For your own runs, use the IDs returned by `ask --persist --json`.
 `inspect` lists the checkpoints (`PLAN_ACCEPTED`, `ARTIFACT_ASSESSED`,
 `PLANNER_TERMINAL`, `FINALIZATION`) and the stored objects. `resume` shows whether the run
 is resumable, which artifacts can be reused, and whether planning is terminal.

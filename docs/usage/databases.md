@@ -2,6 +2,10 @@
 
 There are two planes, and they must stay separate.
 
+Current physical paths and live probe results: [v0.1 validation](v01-validation.md).
+Shared Knowledge lives at `.runtime/knowledge.db`; operational state and durable metrics
+live at `.runtime/operational.db`. Neither is stored in `baseball_analytics`.
+
 ## Data plane (read-only analytics)
 
 | Store | Holds | Access |

@@ -47,7 +47,21 @@ Ground truth (2026-09-15, Python 3.14.4):
   response composition.
 - Permission and constraint-revision workflows.
 - Realistic baseball E2E and CLI/documentation truthfulness.
-# v0.1 integration checkpoint (2026-09-15)
+# Latest v0.1 checkpoint (2026-09-16)
+
+335 tests pass; compileall, secret scan and separate-process CLI workflows pass.
+Additional regressions fixed: reused run IDs overwrite prior work, multi-objective report
+overwrite, inaccessible response payload references, mixed-source partial routing, and
+current snapshots being treated as historical facts without effective dates. One original
+refresh test depended on the calendar date; it now verifies the actual verification time.
+The default paid Web seam is tested through rejection, approval and repeated-answer rejection.
+Full-name entity resolution now suppresses overlapping short aliases: Aaron Judge no longer
+triggers an unrelated Hank Aaron clarification during the README demo command.
+
+Remaining work and exact next task are in `docs/codex-handoff.md`; live probe details are
+in `docs/usage/v01-validation.md`. Status remains IN_PROGRESS — stable checkpoint.
+
+# Earlier v0.1 integration checkpoint (2026-09-15)
 
 Runtime `b68ccf7` and Shared Knowledge `7d44ef4` are merged on
 `astra/v0.1-integration`. Combined suite: 320 tests passing.

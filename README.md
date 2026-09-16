@@ -40,8 +40,10 @@ exactly which blog decisions are implemented.
   (rules, transactions, bilingual glossary and metrics, all 30 teams, ballparks, players,
   awards, trusted sources and the community directory) behind `ContextService`.
 
-Not yet implemented: live PostgreSQL/Parquet integration tests, a live web provider,
-and durable metrics. RAG and pgvector are deferred; structured Shared Knowledge is implemented.
+Status: **IN_PROGRESS — stable checkpoint** on `astra/v0.1-integration`.
+Shared Knowledge and the hardened runtime are integrated. Definition questions use stored
+knowledge; synthetic analytics requires `--demo`. See tested commands, live results,
+and remaining gaps in [v0.1 validation](docs/usage/v01-validation.md).
 
 ## Architecture
 
@@ -103,20 +105,19 @@ Nothing is required for the offline CLI. See
 ## Run
 
 ```bash
-# One question, offline (synthetic data source, no database or credentials)
-python3 -m app.cli ask "How did Aaron Judge perform at the plate?"
+# A sourced definition from local Shared Knowledge
+python3 -m app.cli ask "DFA是什么意思？" --persist --json
+
+# Explicit synthetic demonstration (not a real performance result)
+python3 -m app.cli ask "How did Aaron Judge perform at the plate?" --demo
 
 # Shared Knowledge: inspect, search and refresh the domain knowledge base
-python3 -m app.cli knowledge --seed status
+python3 -m app.cli knowledge status
 python3 -m app.cli knowledge search "DFA"
 python3 -m app.cli knowledge show TEAM:LAD
-python3 -m app.cli knowledge refresh teams
 
-# Persist a run and inspect it
-python3 -m app.cli ask "How did Aaron Judge perform?" --persist
-python3 -m app.cli inspect --run-id run-1
-python3 -m app.cli resume --run-id run-1
-python3 -m app.cli metrics --run-id run-1
+# Reproduce persisted ask/answer/inspect/resume/metrics in a temporary directory
+python3 scripts/verify_v01_workflows.py
 ```
 
 See [docs/usage/quickstart.md](docs/usage/quickstart.md),
@@ -126,9 +127,9 @@ See [docs/usage/quickstart.md](docs/usage/quickstart.md),
 ## Test
 
 ```bash
-python3 -m unittest discover -s tests -v   # 254 tests (audit branch, 2026-09-15)
+python3 -m unittest discover -s tests -q
 python3 scripts/secret_scan.py             # credential tripwire (exit 0 = clean)
-python3 -m compileall app                  # byte-compile check
+python3 -m compileall -q app tests scripts
 ```
 
 ## Shared Knowledge
@@ -148,7 +149,7 @@ Physical layout:
 - source manifests: `knowledge/sources/*.json`; structured seed: `knowledge/seed/*.json`.
 
 ```bash
-python3 -m app.cli knowledge --seed status
+python3 -m app.cli knowledge status
 python3 -m app.cli knowledge search "infield fly"
 python3 -m app.cli knowledge show PLAYER:660271
 python3 -m app.cli knowledge sources --community
@@ -198,8 +199,9 @@ docs/
 
 ## Status and limitations
 
-`IN_PROGRESS`. The deterministic vertical slice is complete and tested; several
-integrations (live databases, Web evidence, RAG) are stubs or absent and are listed in
-[docs/blog-implementation-matrix.md](docs/blog-implementation-matrix.md). No live
-database or LLM call has been verified from this repository. See
+`IN_PROGRESS — stable checkpoint`. Local Parquet reads were verified. MLB StatsAPI
+returned 30 teams once; later network attempts failed. PostgreSQL, current-data analytics,
+the complete high-zone query and live Web evidence remain `UNVERIFIED_LIVE`.
+Interaction answers are consumed atomically, but recovery from a crash after consumption
+still needs completion. RAG and pgvector remain deferred. See
 [docs/development-status.md](docs/development-status.md).

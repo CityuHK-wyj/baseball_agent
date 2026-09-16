@@ -1,6 +1,8 @@
 # Architecture (developer guide)
 
 The macro architecture is frozen. This guide explains where each responsibility lives.
+The current composition root and integration seams are described in
+[v0.1 integration](v01-integration.md).
 Read [../../CONTEXT.md](../../CONTEXT.md) for vocabulary and `docs/adr/` for the rationale
 behind each decision.
 
