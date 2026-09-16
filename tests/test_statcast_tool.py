@@ -23,6 +23,8 @@ class RecordingExecutor:
         self.statements.append(sql)
         if "MIN(" in sql:
             return ToolResult.ok(len(self.observed)), self.observed
+        if "player_dictionary" in sql:
+            return ToolResult.ok(0), []
         return ToolResult.ok(len(self.rows)), self.rows
 
 
@@ -130,6 +132,24 @@ class StatcastToolTests(unittest.TestCase):
         self.assertNotIn("INSERT", main)
         self.assertNotIn("UPDATE", main)
         self.assertNotIn("DELETE", main)
+
+    def test_postgres_tool_resolves_batter_names_from_player_dictionary(self):
+        class NameExecutor(RecordingExecutor):
+            def execute_with_rows(self, sql):
+                self.statements.append(sql)
+                if "MIN(" in sql:
+                    return ToolResult.ok(len(self.observed)), self.observed
+                if "player_dictionary" in sql:
+                    return ToolResult.ok(2), [(592450, "Aaron Judge"), (669261, "Jack Suwinski")]
+                return ToolResult.ok(len(self.rows)), self.rows
+
+        executor = NameExecutor(rows=[(592450, 9, 101.8, 115.5), (669261, 3, 107.2, 108.7)])
+        tool = PostgresStatcastTool([requirement()], FieldMappingRegistry(), executor)
+        result = tool.execute(task())
+        payload = json.loads(result.payload.decode())
+        names = {row[0]: row[1] for row in payload["rows"]}
+        self.assertEqual(names["592450"], "Aaron Judge")
+        self.assertEqual(names["669261"], "Jack Suwinski")
 
 
 if __name__ == "__main__":

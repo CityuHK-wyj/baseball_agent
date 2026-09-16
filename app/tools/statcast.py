@@ -80,6 +80,9 @@ class StatcastAnalyticsTool:
         observed = self._query(self._observed_sql(requirement, where))
         observed_range = self._observed_range(observed, requirement)
 
+        names = dict(self._player_names)
+        names.update(self._resolve_names([int(row[0]) for row in rows]))
+
         columns = ("batter", "batter_name", "batted_balls", "avg_exit_velocity_mph",
                    "max_exit_velocity_mph")
         projected = []
@@ -87,7 +90,7 @@ class StatcastAnalyticsTool:
             batter_id_text = str(int(batter_id))
             projected.append([
                 batter_id_text,
-                self._player_names.get(batter_id_text, ""),
+                names.get(batter_id_text, ""),
                 int(count),
                 round(float(avg_ev), 1),
                 round(float(max_ev), 1),
@@ -119,6 +122,10 @@ class StatcastAnalyticsTool:
             if isinstance(constraint, RankingConstraint):
                 return constraint
         raise UnavailablePhysicalFields("no ranking constraint")
+
+    def _resolve_names(self, batter_ids: list[int]) -> dict[str, str]:
+        """Optional source-specific batter-name resolution. Base sources return {}."""
+        return {}
 
     def _where_clause(self, requirement: ArtifactRequirement, metric_field: str) -> tuple[str, set[str]]:
         clauses: list[str] = []
@@ -292,11 +299,13 @@ class PostgresStatcastTool(StatcastAnalyticsTool):
 
     def __init__(self, requirements, field_mapping: FieldMappingRegistry,
                  executor, table: str = "statcast_pitches",
+                 name_table: str | None = "player_dictionary",
                  player_names: dict[str, str] | None = None,
                  min_batted_balls: int = DEFAULT_MIN_BATTED_BALLS) -> None:
         super().__init__(requirements, field_mapping, player_names, min_batted_balls)
         self._executor = executor
         self._table = table
+        self._name_table = name_table
 
     def _available_columns(self) -> frozenset[str]:
         return self._COLUMNS
@@ -312,3 +321,13 @@ class PostgresStatcastTool(StatcastAnalyticsTool):
         if result.status != "OK":
             return None
         return list(rows)
+
+    def _resolve_names(self, batter_ids: list[int]) -> dict[str, str]:
+        if not batter_ids or not self._name_table:
+            return {}
+        id_list = ", ".join(str(int(item)) for item in batter_ids)
+        result, rows = self._executor.execute_with_rows(
+            f"SELECT player_id, player_name FROM {self._name_table} WHERE player_id IN ({id_list})")
+        if result.status != "OK":
+            return {}
+        return {str(int(player_id)): name for player_id, name in rows if name}

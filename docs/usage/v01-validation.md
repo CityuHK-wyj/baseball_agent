@@ -7,7 +7,7 @@ Status: **IN_PROGRESS — stable checkpoint**, 2026-09-16.
 | Store | Default location | Purpose |
 | --- | --- | --- |
 | Shared Knowledge | `.runtime/knowledge.db` | 605 seed items, provenance, versions, aliases; rebuilt from `knowledge/seed` and `knowledge/sources` |
-| Analytics PostgreSQL | `127.0.0.1:5433/baseball_analytics` | Read-only recent Statcast; this session received connection refused |
+| Analytics PostgreSQL | `127.0.0.1:5433/baseball_analytics` | Read-only recent Statcast (`baseball_readonly`); LIVE_VERIFIED for SELECT, writes denied |
 | Analytics Parquet | `data_loader/parquet_archive` | Read-only historical files, 2015–2023 present |
 | Operational store | `.runtime/operational.db` | Checkpoints, interactions, audit snapshots, reports, redacted `run_event` metrics |
 | Artifact payloads | `.runtime/artifacts` | Persisted accepted-product payloads |
@@ -69,7 +69,7 @@ expiry fail closed.
 | DuckDB guarded read of `mlb_statcast_2023.parquet` | `VERIFIED_LIVE`: five rows returned |
 | Real analytics slice (two-strike, fastball >95 mph, upper zone, top-5 EV) | `LIVE_VERIFIED`: end-to-end over the Parquet archive with provenance, no synthetic fallback |
 | High-zone exact batter-relative upper edge | `UNVERIFIED_LIVE`: archive and PostgreSQL lack `sz_top`/`sz_bot`; surfaced as clarification/limitation, never silently replaced with `zone IN (...)` |
-| Analytics PostgreSQL | `UNVERIFIED_LIVE`: reachable but requires `POSTGRES_PASSWORD` |
+| Analytics PostgreSQL | `LIVE_VERIFIED`: read-only SELECT works; CREATE/INSERT/UPDATE/DELETE/DROP all denied |
 | MLB StatsAPI transport | Returned 30 teams once; subsequent attempts failed; transport verification does not prove live Web evidence extraction |
 | Live WebEvidenceTool flow | `UNVERIFIED_LIVE`; default pipeline tested with an injected document fixture |
 | Operational PostgreSQL | `UNVERIFIED_LIVE`: separate connection not configured |
@@ -106,6 +106,8 @@ sz_bot/sz_top. Transport success is not current-data or Web Evidence validation.
 
 The real analytics vertical slice (typed constraints → read-only Parquet adapter → ranked
 answer) is exercised by `tests/integration/test_analytics_integration.py` and requires no
-synthetic data. To live-verify the PostgreSQL adapter, export `POSTGRES_PASSWORD` for the
-`baseball_readonly` role in the current environment; the runtime never reads it from source
-or `.env.example`.
+synthetic data. The PostgreSQL adapter is live-verified with `POSTGRES_PASSWORD` in the
+environment; it resolves batter names via `player_dictionary`. See
+[docs/development/analytics-capability-matrix.md](../development/analytics-capability-matrix.md)
+for the verified schema, semantic capability matrix and the reported `sz_top`/`sz_bot`
+ingestion gap.

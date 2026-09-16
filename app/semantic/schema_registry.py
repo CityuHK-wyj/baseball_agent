@@ -57,6 +57,14 @@ _POSTGRES_STATCAST_COLUMNS = (
     "estimated_woba_using_speedangle",
 )
 
+_POSTGRES_BATTING_EVENTS_COLUMNS = (
+    "game_date", "game_pk", "batter_id", "batter_name", "pitcher_id", "pitcher_name",
+    "inning", "events", "launch_speed", "launch_angle", "hit_distance_sc", "stand",
+    "pitch_type", "estimated_ba_using_speedangle", "estimated_woba_using_speedangle",
+)
+
+_POSTGRES_PLAYER_DICTIONARY_COLUMNS = ("player_id", "player_name")
+
 
 def statcast_schema_registry() -> SchemaRegistry:
     """Deterministic schema registry built from verified source inspection."""
@@ -67,6 +75,14 @@ def statcast_schema_registry() -> SchemaRegistry:
             columns=_PARQUET_STATCAST_COLUMNS),
         SchemaTable(
             table_name="statcast_pitches", source_kind="POSTGRES",
-            description="Hot Statcast 2024-2026 pitch-level table; lacks sz_top/sz_bot",
+            description="Hot Statcast 2024-03-15..2026-06-18 pitch-level table (1.86M rows); lacks sz_top/sz_bot",
             columns=_POSTGRES_STATCAST_COLUMNS),
+        SchemaTable(
+            table_name="batting_events", source_kind="POSTGRES",
+            description="Event-level Statcast outcomes (478k rows); batter/pitcher names present",
+            columns=_POSTGRES_BATTING_EVENTS_COLUMNS),
+        SchemaTable(
+            table_name="player_dictionary", source_kind="POSTGRES",
+            description="MLBAM player_id -> player_name mapping (913 rows)",
+            columns=_POSTGRES_PLAYER_DICTIONARY_COLUMNS),
     ))

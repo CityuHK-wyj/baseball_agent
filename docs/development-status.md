@@ -14,17 +14,23 @@ named location definitions, real read-only `ParquetStatcastTool` / `PostgresStat
 adapters, constraint-key-aware routing, and an end-to-end real-data answer projection.
 
 The target query — top-5 exit velocity over two-strike, fastball ≥ 95 mph, upper-zone
-pitches — now runs end to end against the historical Parquet archive with provenance and
-**no synthetic fallback** (`LIVE_VERIFIED`). The bare "upper edge" wording is surfaced as a
-constraint clarification; the exact batter-relative definition (needs `sz_top`/`sz_bot`) is
-never silently replaced with `zone IN (...)`. Analytical PostgreSQL is `UNVERIFIED_LIVE`
-and blocked on `POSTGRES_PASSWORD`. Multi-window date comparison remains `DEFERRED`.
+pitches — now runs end to end against **both** the historical Parquet archive and the live
+analytical PostgreSQL database, with provenance and **no synthetic fallback**
+(`LIVE_VERIFIED`). The bare "upper edge" wording is surfaced as a constraint
+clarification; the exact batter-relative definition (needs `sz_top`/`sz_bot`) is never
+silently replaced with `zone IN (...)`. Multi-window date comparison remains `DEFERRED`.
+
+PostgreSQL live audit: `baseball_readonly` connects, can `SELECT`
+`statcast_pitches`/`batting_events`/`player_dictionary`, and is denied all writes
+(role grants + `default_transaction_read_only=on` + runtime guard). Full verified schema
+and semantic capability matrix: [analytics-capability-matrix.md](development/analytics-capability-matrix.md).
 
 Schema discovery (verified, not from docs): Parquet 2015–2023 has `release_speed`,
 `pitch_type`, `plate_z`, `zone`, `balls`, `strikes`, `launch_speed`, `batter` but lacks
 `sz_top`/`sz_bot`/`p_throws`/`exit_velocity` (exit velocity is `launch_speed`). PostgreSQL
-`statcast_pitches` uses `batter_id`/`pitcher_id` and the same physical fields, also lacking
-`sz_top`/`sz_bot`.
+`statcast_pitches` (2024-03-15..2026-06-18, 1.86M rows) uses `batter_id`/`pitcher_id` and
+the same physical fields, also lacking `sz_top`/`sz_bot`. `sz_top`/`sz_bot` are an
+**ingestion gap** (upstream Statcast has them; the loader dropped them).
 
 ## Previous checkpoint
 

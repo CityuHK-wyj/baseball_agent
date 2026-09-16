@@ -89,7 +89,7 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
                                            "ranking",
                                            f"pitch_location:{ZONE_UPPER_THIRD}",
                                            f"pitch_location:{ZONE_ABOVE_UPPER_EDGE}"),
-                coverage="2024-2026 PostgreSQL",
+                coverage="2024-03-15..2026-06-18 PostgreSQL",
                 available=bool(settings.postgres_password)),
         ]
     all_capabilities = (knowledge_capability, *analytics_capabilities, *capabilities)
@@ -119,7 +119,8 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
                 player_names=player_names)
             result["statcast-postgres"] = PostgresStatcastTool(
                 requirements, field_mapping,
-                PostgresReadOnlyExecutor(settings, allowed_tables=("statcast_pitches",)),
+                PostgresReadOnlyExecutor(settings, allowed_tables=("statcast_pitches",
+                                                                   "player_dictionary")),
                 player_names=player_names)
         if tool_factory is not None:
             injected = tool_factory(requirements)
