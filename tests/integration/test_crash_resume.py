@@ -14,6 +14,52 @@ from tests.integration.test_end_to_end import pipeline, ambiguous_dictionary
 
 
 class CrashResumeTests(unittest.TestCase):
+    def test_artifact_is_reused_if_execution_status_write_crashes(self):
+        from app.agent.executor import Executor
+        from app.agent.routing import Router, ToolCapability
+        from app.models.planning import AgentTask
+        from app.tools.synthetic import SyntheticDataTool
+        from tests.factories import requirement
+
+        class Crash(BaseException):
+            pass
+
+        class CrashStore(SqliteOperationalStore):
+            def save_object(self, kind, *args, **kwargs):
+                if kind == "execution":
+                    raise Crash()
+                return super().save_object(kind, *args, **kwargs)
+
+        task = AgentTask(task_id="task", objective_ref="o1", requirement_refs=("r1",), description="get EV")
+        route = Router((ToolCapability(tool="synthetic", source_kind="SYNTHETIC",
+                                       supported_artifact_types=("TABLE",)),)).route(task, "TABLE")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            storage = LocalFilesystemArtifactStorage(root / "artifacts")
+            store = CrashStore(root / "operations.db")
+            with self.assertRaises(Crash):
+                RunRecorder(store, storage).execute_once("run", task, route, Executor({
+                    "synthetic": SyntheticDataTool((requirement(),))}))
+            self.assertEqual(len(store.list_objects("artifact", "run")), 1)
+            store.close()
+            reopened = SqliteOperationalStore(root / "operations.db")
+            self.addCleanup(reopened.close)
+            result = RunRecorder(reopened, storage).execute_once("run", task, route, Executor({}))
+            self.assertEqual(result.execution.status, "SUCCEEDED")
+            self.assertIsNotNone(storage.get(result.artifact.artifact_id))
+
+            # Staging alone is not completion: if artifact persistence did not finish,
+            # recovery must refuse rather than rerun the external tool.
+            artifact_record = reopened.get_object("artifact", result.artifact.artifact_id)
+            self.assertIsNotNone(artifact_record)
+            empty_store = SqliteOperationalStore(root / "incomplete.db")
+            self.addCleanup(empty_store.close)
+            for kind in ("execution_intent", "execution_result_staged"):
+                for record in reopened.list_objects(kind, "run"):
+                    empty_store.save_object(kind, record.object_id, "run", record.payload)
+            with self.assertRaisesRegex(RuntimeError, "missing or foreign artifact"):
+                RunRecorder(empty_store, storage).execute_once("run", task, route, Executor({}))
+
     def test_abrupt_process_exit_after_execution_recovers_without_duplicate_fetch(self):
         worker = '''
 import os, sys

@@ -55,6 +55,8 @@ class RunRecorder:
             if original.run_id != run_id or original.payload["routing"]["selected_tool"] != routing.selected_tool:
                 raise ValueError("Persisted execution scope differs from current routing")
             record = self._store.get_object("execution_outcome", key)
+            if record is None:
+                record = self._store.get_object("execution_result_staged", key)
             payload = record.payload if record else None
             if payload is None:
                 completed = [item.payload for item in self._store.list_objects("execution", run_id)
@@ -79,6 +81,16 @@ class RunRecorder:
                 artifact=artifact(payload["artifact_ref"]) if payload["artifact_ref"] else None,
                 supporting_artifacts=tuple(artifact(reference) for reference in payload["supporting_refs"]))
         outcome = executor.run(task, routing)
+        # Journal the returned result before storing its artifacts. This is not a
+        # completed execution: recovery must still find every referenced artifact.
+        # Artifact metadata is written only after its payload, so a crash after that
+        # write can reuse the result even if execution status was not finalized.
+        durable_outcome = {
+            "execution": outcome.execution.model_dump(mode="json"),
+            "attempts": [item.model_dump(mode="json") for item in outcome.attempts],
+            "artifact_ref": outcome.artifact.artifact_id if outcome.artifact else None,
+            "supporting_refs": [item.artifact_id for item in outcome.supporting_artifacts]}
+        self._store.save_object("execution_result_staged", key, run_id, durable_outcome)
         for supporting in outcome.supporting_artifacts:
             self.record_artifact(run_id, supporting)
         artifact = outcome.artifact
@@ -87,11 +99,7 @@ class RunRecorder:
             if stored:
                 artifact = artifact.model_copy(update={"payload_ref": stored.location})
         self.record_execution(run_id, outcome.execution, outcome.attempts, artifact, intent_ref=key)
-        self._store.save_object("execution_outcome", key, run_id, {
-            "execution": outcome.execution.model_dump(mode="json"),
-            "attempts": [item.model_dump(mode="json") for item in outcome.attempts],
-            "artifact_ref": artifact.artifact_id if artifact else None,
-            "supporting_refs": [item.artifact_id for item in outcome.supporting_artifacts]})
+        self._store.save_object("execution_outcome", key, run_id, durable_outcome)
         return outcome.model_copy(update={"artifact": artifact, "payload": None})
 
     def record_artifact(self, run_id: str, artifact: Artifact, payload: bytes | None = None,
