@@ -2,9 +2,11 @@
 
 The authoritative physical coordinate for pitch height is ``plate_z`` (feet above the
 ground). The Statcast ``zone`` field numbers the strike-zone heart 1-9 (1-3 top, 4-6
-middle, 7-9 bottom) and the shadow regions 11-14 (11-12 above, 13-14 below). This test
-locks the semantic definitions to that orientation so a future edit cannot silently
-flip "upper third" to the bottom of the zone.
+middle, 7-9 bottom) and the shadow regions 11-14 (11-12 upper outside quadrants, 13-14
+lower outside quadrants). This test locks the semantic definitions to that orientation so
+a future edit cannot silently flip "upper third" to the bottom of the zone, and it locks
+the zones 11-12 wording to "upper outside quadrants" rather than a strict above-the-zone
+predicate that the numbered zones do not implement.
 """
 
 import unittest
@@ -12,7 +14,8 @@ from pathlib import Path
 
 from app.config import settings
 from app.semantic.field_mapping import (FieldMappingRegistry, ZONE_ABOVE_UPPER_EDGE,
-                                        ZONE_LOWER_THIRD, ZONE_UPPER_THIRD)
+                                        ZONE_LOWER_THIRD, ZONE_UPPER_OUTSIDE,
+                                        ZONE_UPPER_THIRD)
 
 _UPPER = (1, 2, 3)
 _MIDDLE = (4, 5, 6)
@@ -29,6 +32,21 @@ class ZoneOrientationTests(unittest.TestCase):
         self.assertEqual(ZONE_LOWER_THIRD, _LOWER)
         # Upper third must never equal the lower third (the inversion regression).
         self.assertNotEqual(_UPPER, _LOWER)
+
+    def test_zone_11_12_is_described_as_outside_not_strictly_above(self):
+        registry = FieldMappingRegistry()
+        definition = registry.location(ZONE_UPPER_OUTSIDE)
+        self.assertEqual(definition.definition, ZONE_UPPER_OUTSIDE)
+        self.assertEqual(definition.zone_codes, (11, 12))
+        # The name and description must agree: numbered upper outside quadrants, not an
+        # exact above-sz_top predicate.
+        self.assertEqual(definition.predicate, "ZONE_SET")
+        self.assertIn("outside", definition.description.casefold())
+        self.assertNotIn("just above the strike zone", definition.description.casefold())
+        # The legacy alias must resolve to the corrected definition, never a separate one.
+        self.assertIs(ZONE_ABOVE_UPPER_EDGE, ZONE_UPPER_OUTSIDE)
+        self.assertEqual(registry.location(ZONE_ABOVE_UPPER_EDGE).definition,
+                         ZONE_UPPER_OUTSIDE)
 
     @unittest.skipUnless(
         any(settings.parquet_archive_path.glob("mlb_statcast_*.parquet")),

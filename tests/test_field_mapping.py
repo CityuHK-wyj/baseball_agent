@@ -46,6 +46,11 @@ class FieldMappingRegistryTests(unittest.TestCase):
         self.assertIn("launch_speed", fields)
         self.assertNotIn("pitch_velocity", fields)
 
+    def test_game_type_maps_on_both_sources(self):
+        registry = FieldMappingRegistry()
+        self.assertEqual(registry.physical_field("game_type", "PARQUET"), "game_type")
+        self.assertEqual(registry.physical_field("game_type", "POSTGRES"), "game_type")
+
 
 if __name__ == "__main__":
     unittest.main()

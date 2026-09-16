@@ -12,8 +12,8 @@ from datetime import date
 
 from app.models.artifacts import ArtifactContract
 from app.models.contracts import (Constraint, CountConstraint, LocationConstraint, Name,
-                                  NumericConstraint, PitchTypeConstraint, RankingConstraint,
-                                  TimeRange)
+                                  NumericConstraint, PitchTypeConstraint, PopulationConstraint,
+                                  RankingConstraint, TimeRange)
 from app.models.planning import AgentTask, RoutingDecision
 
 Cost = Literal["FREE", "PAID", "HIGH"]
@@ -38,8 +38,11 @@ def constraint_capability_keys(constraints: tuple[Constraint, ...]) -> tuple[str
             keys.append(f"pitch_location:{constraint.definition}")
         elif isinstance(constraint, RankingConstraint):
             keys.append("ranking")
+        elif isinstance(constraint, PopulationConstraint):
+            keys.append("population")
         # CategoryConstraint (entity_key, source, season, date_range) is metadata or
-        # routing state, not an analytical capability the source must advertise.
+        # routing state; QualificationConstraint is frozen requirement eligibility that
+        # does not change which source can provide the metric.
     return tuple(dict.fromkeys(keys))
 
 

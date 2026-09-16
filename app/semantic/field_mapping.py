@@ -14,12 +14,23 @@ from app.models.schema import FieldMapping, LocationDefinition
 # replaced with a zone set when those fields are absent.
 BATTER_RELATIVE_UPPER_EDGE = "BATTER_RELATIVE_UPPER_EDGE"
 ZONE_UPPER_THIRD = "ZONE_UPPER_THIRD"
-ZONE_ABOVE_UPPER_EDGE = "ZONE_ABOVE_UPPER_EDGE"
+# Statcast zones 11-12 are the upper outside quadrants: laterally outside the strike
+# zone at upper height. They are a numbered-zone approximation of "just outside high",
+# NOT a vertical predicate that plate_z is above the batter's sz_top. Keeping a distinct
+# name prevents conflating the zone approximation with the batter-relative predicate.
+ZONE_UPPER_OUTSIDE = "ZONE_UPPER_OUTSIDE"
+
+# Backwards-compatible import alias. New code must use ZONE_UPPER_OUTSIDE; the old name
+# implied a strict above-the-zone predicate that zones 11-12 do not implement.
+ZONE_ABOVE_UPPER_EDGE = ZONE_UPPER_OUTSIDE
 
 # Verified against plate_z (the physical vertical coordinate) in both PostgreSQL and the
-# Parquet archive: zones 1-3 sit highest inside the zone, 7-9 lowest, 11-12 above the top
-# edge and 13-14 below. This is the canonical Statcast zone orientation.
+# Parquet archive: zones 1-3 sit highest inside the zone, 7-9 lowest, 11-12 are the upper
+# outside quadrants and 13-14 the lower outside quadrants. This is the canonical Statcast
+# zone orientation. Zones 11-12 span vertically from the top edge downward and are
+# laterally outside, so they must never be described as strictly "above" the zone.
 ZONE_LOWER_THIRD: tuple[int, ...] = (7, 8, 9)
+ZONE_UPPER_OUTSIDE_CODES: tuple[int, ...] = (11, 12)
 
 # Deterministic batter-relative upper-edge band, in feet. A pitch is "near the upper
 # edge" of a batter's own strike zone when its vertical center is at or within this band
@@ -43,11 +54,12 @@ DEFAULT_LOCATION_DEFINITIONS: tuple[LocationDefinition, ...] = (
         description="upper third of the strike zone (Statcast zones 1-3)",
     ),
     LocationDefinition(
-        definition=ZONE_ABOVE_UPPER_EDGE,
+        definition=ZONE_UPPER_OUTSIDE,
         required_physical_fields=("zone",),
-        zone_codes=(11, 12),
+        zone_codes=ZONE_UPPER_OUTSIDE_CODES,
         predicate="ZONE_SET",
-        description="just above the strike zone (Statcast shadow zones 11-12)",
+        description="upper outside quadrants (Statcast zones 11-12); laterally outside "
+                    "the strike zone at upper height, not a strict above-sz_top predicate",
     ),
 )
 
@@ -75,6 +87,8 @@ DEFAULT_FIELD_MAPPINGS: tuple[FieldMapping, ...] = (
     FieldMapping(semantic_key="batter", source_kind="POSTGRES", physical_field="batter_id"),
     FieldMapping(semantic_key="game_date", source_kind="PARQUET", physical_field="game_date"),
     FieldMapping(semantic_key="game_date", source_kind="POSTGRES", physical_field="game_date"),
+    FieldMapping(semantic_key="game_type", source_kind="PARQUET", physical_field="game_type"),
+    FieldMapping(semantic_key="game_type", source_kind="POSTGRES", physical_field="game_type"),
 )
 
 

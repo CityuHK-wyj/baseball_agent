@@ -1,6 +1,7 @@
 import unittest
 
-from app.models.contracts import AnalysisObjective, CategoryConstraint, Entity
+from app.models.contracts import (AnalysisObjective, CategoryConstraint, Entity,
+                                  QualificationConstraint, RankingConstraint)
 from app.models.requirements import RequirementCatalog
 from app.semantic.requirement_decomposer import DecompositionContext, RuleBasedRequirementDecomposer
 
@@ -55,6 +56,31 @@ class RequirementDecomposerTests(unittest.TestCase):
         self.assertEqual(catalog.initial_requirements, requirements)
         fields = set(requirements[0].model_dump())
         self.assertFalse({"tool", "source", "source_mapping"} & fields)
+
+    def test_analytics_requirement_freezes_the_default_qualification(self):
+        ranking = RankingConstraint(metric_key="exit_velocity", direction="DESC", limit=5)
+        requirement = decomposer().decompose(objective(constraints=(ranking,)))[0]
+        self.assertIsNotNone(requirement.qualification_rule)
+        self.assertEqual(requirement.qualification_rule.min_batted_balls, 3)
+        self.assertIsNone(requirement.sample_adequacy_rule)
+
+    def test_explicit_qualification_threshold_is_frozen_not_defaulted(self):
+        ranking = RankingConstraint(metric_key="exit_velocity", direction="DESC", limit=5)
+        threshold = QualificationConstraint(min_batted_balls=20)
+        requirement = decomposer().decompose(objective(constraints=(ranking, threshold)))[0]
+        self.assertEqual(requirement.qualification_rule.min_batted_balls, 20)
+
+    def test_explicit_qualification_wins_over_the_default(self):
+        ranking = RankingConstraint(metric_key="exit_velocity", direction="DESC", limit=5)
+        threshold = QualificationConstraint(min_batted_balls=10)
+        requirement = decomposer().decompose(objective(constraints=(ranking, threshold)))[0]
+        self.assertNotEqual(requirement.qualification_rule.min_batted_balls, 3)
+        self.assertEqual(requirement.qualification_rule.min_batted_balls, 10)
+
+    def test_ranking_metric_becomes_a_semantic_data_key(self):
+        ranking = RankingConstraint(metric_key="pitch_velocity", direction="DESC", limit=5)
+        requirement = decomposer().decompose(objective(constraints=(ranking,)))[0]
+        self.assertEqual(requirement.descriptor.data_keys, ("pitch_velocity", "batter"))
 
 
 if __name__ == "__main__":

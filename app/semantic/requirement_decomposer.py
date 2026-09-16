@@ -10,10 +10,12 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from app.models.artifacts import ArtifactContract
-from app.models.contracts import (AnalysisObjective, ArtifactDescriptor, ArtifactRequirement,
-                                  CountConstraint, LeagueStateSnapshot, LocationConstraint,
-                                  PitchTypeConstraint, QualificationRule, RankingConstraint,
-                                  SampleAdequacyRule, TimeRange)
+from app.models.contracts import (DEFAULT_MIN_BATTED_BALLS, AnalysisObjective,
+                                  ArtifactDescriptor, ArtifactRequirement, CountConstraint,
+                                  LeagueStateSnapshot, LocationConstraint, NumericConstraint,
+                                  PitchTypeConstraint, PopulationConstraint,
+                                  QualificationConstraint, QualificationRule,
+                                  RankingConstraint, SampleAdequacyRule, TimeRange)
 from app.models.metrics import MetricDefinition
 from app.models.schema import SchemaTable
 
@@ -75,7 +77,8 @@ class RequirementDecomposer(Protocol):
 
 def _is_analytics_objective(objective: AnalysisObjective) -> bool:
     return any(isinstance(item, (CountConstraint, PitchTypeConstraint, LocationConstraint,
-                                 RankingConstraint)) for item in objective.constraints)
+                                 RankingConstraint, NumericConstraint, PopulationConstraint))
+               for item in objective.constraints)
 
 
 class RuleBasedRequirementDecomposer:
@@ -119,16 +122,20 @@ class RuleBasedRequirementDecomposer:
     def _analytics_requirements(self, objective: AnalysisObjective) -> tuple[ArtifactRequirement, ...]:
         """One semantic-atomic ranking requirement over filtered Statcast pitches.
 
-        The output keys are semantic (exit velocity plus the batter identity); the filter
-        concepts stay typed constraints. Physical columns are resolved later by the
-        adapter, never by the Planner or this decomposer.
+        The output keys are semantic (the ranking metric plus the batter identity); the
+        filter concepts stay typed constraints. Physical columns are resolved later by
+        the adapter, never by the Planner or this decomposer. A requested qualification
+        threshold is frozen here as a separate ``QualificationRule`` so the adapter can
+        never substitute its own default.
         """
         ranking = next((item for item in objective.constraints if isinstance(item, RankingConstraint)), None)
         location = next((item for item in objective.constraints if isinstance(item, LocationConstraint)), None)
         pitch_type = next((item for item in objective.constraints if isinstance(item, PitchTypeConstraint)), None)
         count = next((item for item in objective.constraints if isinstance(item, CountConstraint)), None)
+        qualification = next((item for item in objective.constraints
+                              if isinstance(item, QualificationConstraint)), None)
 
-        parts = ["ranked exit velocity"]
+        parts = ["ranked exit velocity" if ranking is None else f"ranked {ranking.metric_key}"]
         if count is not None:
             parts.append(f"with {count.strikes} strike(s)")
         if pitch_type is not None:
@@ -145,17 +152,22 @@ class RuleBasedRequirementDecomposer:
         time_range = windows[0] if windows else None
         population_scope = "player" if any(
             entity.entity_type == "PLAYER" for entity in objective.entities) else "league"
+        metric_key = ranking.metric_key if ranking is not None else "exit_velocity"
         descriptor = ArtifactDescriptor(
             artifact_type="TABLE",
             entities=objective.entities,
-            data_keys=("exit_velocity", "batter"),
+            data_keys=(metric_key, "batter"),
             constraints=objective.constraints,
             granularity="player_rank",
             time_range=time_range,
             population_scope=population_scope)
+        min_batted_balls = (qualification.min_batted_balls if qualification is not None
+                            else DEFAULT_MIN_BATTED_BALLS)
         requirement = ArtifactRequirement(
             requirement_id=self._id_factory("requirement"), objective_ref=objective.objective_id,
             description=description, descriptor=descriptor, origin="INITIAL",
             base_criticality="CORE", evidence_purpose="DESCRIPTIVE",
-            min_row_count=ranking.limit if ranking is not None else None)
+            min_row_count=ranking.limit if ranking is not None else None,
+            qualification_rule=QualificationRule(kind="CUSTOM",
+                                                 min_batted_balls=min_batted_balls))
         return (requirement,)

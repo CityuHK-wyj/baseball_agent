@@ -144,8 +144,8 @@ class RankingConstraint(_Constraint):
 
     ``aggregation`` is explicit so the SQL builder never silently decides whether a
     leaderboard ranks by average or maximum exit velocity. Qualification/minimum sample
-    is a separate concern (``ArtifactRequirement.sample_adequacy_rule`` / the adapter's
-    documented minimum batted-ball count), never folded into the metric.
+    is a separate concern (``ArtifactRequirement.qualification_rule`` /
+    ``sample_adequacy_rule``), never folded into the metric.
     """
 
     kind: Literal["RANKING"] = "RANKING"
@@ -158,9 +158,57 @@ class RankingConstraint(_Constraint):
     authority: ConstraintAuthority = "USER_CONSTRAINT"
 
 
+GameType = Literal["REGULAR_SEASON", "POSTSEASON", "SPRING_TRAINING", "EXHIBITION"]
+EventPopulation = Literal["BATTED_BALL", "MEASURED_CONTACT", "ALL_PITCHES"]
+
+# The explicit v0.1 analytical population contract. The parser emits this constraint
+# for every analytical query (explicit or defaulted) so the analyzed population is
+# always visible on the objective, requirement and artifact instead of implicit in SQL.
+DEFAULT_GAME_TYPES: tuple[str, ...] = ("REGULAR_SEASON",)
+DEFAULT_EVENT_POPULATION: str = "BATTED_BALL"
+# A documented ranking qualification when the user does not request one. The semantic
+# layer owns this default so the physical adapter never substitutes a hidden value.
+DEFAULT_MIN_BATTED_BALLS = 3
+
+
+class PopulationConstraint(_Constraint):
+    """Explicit analytical population: game types and event grain.
+
+    ``game_types`` distinguishes regular season, postseason, Spring Training and
+    exhibition games; ``event_population`` distinguishes fair batted-ball events from
+    measured contact (which may include fouls) and from all qualifying pitches. The
+    physical adapter must apply both, and must fail closed when a source cannot.
+    """
+
+    kind: Literal["POPULATION"] = "POPULATION"
+    key: Name = "population"
+    game_types: tuple[GameType, ...] = Field(default=DEFAULT_GAME_TYPES, min_length=1)
+    event_population: EventPopulation = DEFAULT_EVENT_POPULATION
+    origin: ConstraintOrigin = "SYSTEM_INFERRED"
+    authority: ConstraintAuthority = "INFERRED_DEFAULT"
+
+
+class QualificationConstraint(_Constraint):
+    """Explicit user qualification/sample threshold, before it is frozen on a Requirement.
+
+    This is eligibility for the ranking population, not metric aggregation and not
+    sample adequacy. The Requirement Decomposer freezes it into ``QualificationRule``;
+    the physical adapter reads that frozen rule and never substitutes its own default
+    when the user supplied a value.
+    """
+
+    kind: Literal["QUALIFICATION"] = "QUALIFICATION"
+    key: Name = "qualification"
+    min_batted_balls: int | None = Field(default=None, ge=0)
+    min_pitches: int | None = Field(default=None, ge=0)
+    origin: ConstraintOrigin = "USER_EXPLICIT"
+    authority: ConstraintAuthority = "USER_CONSTRAINT"
+
+
 Constraint = Annotated[
     NumericConstraint | CategoryConstraint | CountConstraint | PitchTypeConstraint |
-    LocationConstraint | RankingConstraint,
+    LocationConstraint | RankingConstraint | PopulationConstraint |
+    QualificationConstraint,
     Field(discriminator="kind")]
 
 
@@ -192,6 +240,8 @@ class QualificationRule(Contract):
     kind: Literal["ALL_PLAYERS", "MLB_QUALIFIED", "CUSTOM"] = "ALL_PLAYERS"
     min_plate_appearances: int | None = Field(default=None, ge=0)
     min_batters_faced: int | None = Field(default=None, ge=0)
+    min_batted_balls: int | None = Field(default=None, ge=0)
+    min_pitches: int | None = Field(default=None, ge=0)
     custom_expression: str = ""
 
 

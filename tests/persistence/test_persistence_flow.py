@@ -73,6 +73,26 @@ class PersistenceFlowTests(unittest.TestCase):
         self.assertEqual(second.interrupted_execution_refs, (), "already reclassified")
         self.assertEqual(second.recovery_position, "PLAN_ACCEPTED")
 
+    def test_explicit_qualification_threshold_survives_restart(self):
+        from app.models.contracts import (AnalysisObjective, QualificationConstraint,
+                                          RankingConstraint)
+        from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
+        ranking = RankingConstraint(metric_key="exit_velocity", direction="DESC", limit=5)
+        threshold = QualificationConstraint(min_batted_balls=20)
+        objective = AnalysisObjective(objective_id="o1", raw_query="top 5 EV minimum 20 batted balls",
+                                      description="top 5 EV", constraints=(ranking, threshold))
+        requirements = RuleBasedRequirementDecomposer(
+            id_factory=lambda prefix: f"{prefix}-1").decompose(objective)
+        self.assertEqual(requirements[0].qualification_rule.min_batted_balls, 20)
+        self.recorder.record_initial_definition("run-1", objective, requirements)
+        self.store.close()
+        reopened = SqliteOperationalStore(Path(self._directory.name) / "operational.db")
+        self.addCleanup(reopened.close)
+        recovered = RunRecorder(reopened, self.storage).initial_definitions("run-1")
+        recovered_requirement = recovered[0][1][0]
+        self.assertEqual(recovered_requirement.qualification_rule.min_batted_balls, 20)
+        self.assertIsNone(recovered_requirement.sample_adequacy_rule)
+
 
 if __name__ == "__main__":
     unittest.main()
