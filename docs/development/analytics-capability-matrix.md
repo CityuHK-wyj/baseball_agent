@@ -28,7 +28,7 @@ was altered during the audit.
 | `pitch_velocity` (e.g. > 95 mph) | `release_speed` | `release_speed` | **EXACTLY_SUPPORTED** (both) |
 | `pitch_type` fastball family | `pitch_type` → FF/SI/FC/FA | `pitch_type` → FF/SI/FC/FA | **EXACTLY_SUPPORTED** (both; codes explicit in `FieldMappingRegistry`) |
 | `count` two-strike | `balls` / `strikes` | `balls` / `strikes` | **EXACTLY_SUPPORTED** (both) |
-| `pitch_location` zone-based (upper third 7-9; above-zone 11-12) | `zone` | `zone` | **EXACTLY_SUPPORTED** (both) |
+| `pitch_location` zone-based (upper third 1-3; above-zone 11-12) | `zone` | `zone` | **EXACTLY_SUPPORTED** (both) |
 | `pitch_location` batter-relative upper edge | **missing `sz_top`/`sz_bot`** | **missing `sz_top`/`sz_bot`** | **UNSUPPORTED** (both; never silently substituted) |
 | `ranking` (metric + direction + limit) | aggregation | aggregation | **EXACTLY_SUPPORTED** (both) |
 | `batter` identity | `batter_id` + `player_dictionary` (45% name coverage) | `batter` (id only; no name) | **EXACTLY_SUPPORTED** for id; **APPROXIMATELY_SUPPORTED** for name (Postgres), **UNSUPPORTED** for name (Parquet) |

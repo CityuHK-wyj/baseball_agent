@@ -108,7 +108,7 @@ def extract_analytical_constraints(raw_query: str) -> AnalyticsIntent:
 def location_clarification_options() -> tuple[tuple[str, str, str], ...]:
     """(value, label, rationale) triples for the upper-edge location clarification."""
     return (
-        (ZONE_UPPER_THIRD, "Upper third of the strike zone (zones 7-9)",
+        (ZONE_UPPER_THIRD, "Upper third of the strike zone (zones 1-3)",
          "high in the strike zone, the common reading of 'near the upper edge'"),
         (ZONE_ABOVE_UPPER_EDGE, "Just above the strike zone (zones 11-12)",
          "the upper edge / shadow zone above the strike zone"),

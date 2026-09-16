@@ -24,7 +24,7 @@ class FieldMappingRegistryTests(unittest.TestCase):
         registry = FieldMappingRegistry()
         location = registry.location(BATTER_RELATIVE_UPPER_EDGE)
         self.assertEqual(location.required_physical_fields, ("plate_z", "sz_top", "sz_bot"))
-        self.assertEqual(registry.location(ZONE_UPPER_THIRD).zone_codes, (7, 8, 9))
+        self.assertEqual(registry.location(ZONE_UPPER_THIRD).zone_codes, (1, 2, 3))
 
     def test_zone_definition_requires_only_zone(self):
         registry = FieldMappingRegistry()

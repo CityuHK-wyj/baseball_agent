@@ -16,6 +16,11 @@ BATTER_RELATIVE_UPPER_EDGE = "BATTER_RELATIVE_UPPER_EDGE"
 ZONE_UPPER_THIRD = "ZONE_UPPER_THIRD"
 ZONE_ABOVE_UPPER_EDGE = "ZONE_ABOVE_UPPER_EDGE"
 
+# Verified against plate_z (the physical vertical coordinate) in both PostgreSQL and the
+# Parquet archive: zones 1-3 sit highest inside the zone, 7-9 lowest, 11-12 above the top
+# edge and 13-14 below. This is the canonical Statcast zone orientation.
+ZONE_LOWER_THIRD: tuple[int, ...] = (7, 8, 9)
+
 DEFAULT_LOCATION_DEFINITIONS: tuple[LocationDefinition, ...] = (
     LocationDefinition(
         definition=BATTER_RELATIVE_UPPER_EDGE,
@@ -26,8 +31,8 @@ DEFAULT_LOCATION_DEFINITIONS: tuple[LocationDefinition, ...] = (
     LocationDefinition(
         definition=ZONE_UPPER_THIRD,
         required_physical_fields=("zone",),
-        zone_codes=(7, 8, 9),
-        description="upper third of the strike zone (Statcast zones 7-9)",
+        zone_codes=(1, 2, 3),
+        description="upper third of the strike zone (Statcast zones 1-3)",
     ),
     LocationDefinition(
         definition=ZONE_ABOVE_UPPER_EDGE,
