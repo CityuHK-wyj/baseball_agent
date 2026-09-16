@@ -81,7 +81,7 @@ def extract_analytical_constraints(raw_query: str) -> AnalyticsIntent:
     if ranking is not None:
         limit = int(ranking.group("limit") or ranking.group("limit2"))
         direction = (ranking.group("dir") or ranking.group("dir2") or "top").strip()
-        constraints.append(RankingConstraint(metric_key="exit_velocity",
+        constraints.append(RankingConstraint(metric_key="exit_velocity", aggregation="AVG",
                                              direction="ASC" if direction == "bottom" else "DESC",
                                              limit=limit, origin="SYSTEM_INFERRED"))
 

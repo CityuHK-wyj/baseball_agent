@@ -69,12 +69,31 @@ class StatcastToolTests(unittest.TestCase):
         self.assertIn("pitch_type", main)
         self.assertIn("zone", main)
         self.assertIn("GROUP BY batter", main)
-        self.assertIn("ORDER BY avg_metric DESC", main)
+        self.assertIn("ORDER BY AVG(launch_speed) DESC", main)
         self.assertIn("LIMIT 5", main)
         self.assertNotIn("pitch_velocity", main)
         self.assertNotIn("exit_velocity", main)
         self.assertIn("SELECT", main)
         self.assertIn("read_parquet(", main)
+
+    def test_ranking_aggregation_is_explicit_not_silently_decided(self):
+        objective_max = analytics_objective(definition=ZONE_UPPER_THIRD)
+        # Replace the ranking with an explicit MAX aggregation.
+        from app.models.contracts import RankingConstraint
+        constraints = tuple(
+            RankingConstraint(metric_key="exit_velocity", aggregation="MAX", direction="DESC",
+                              limit=5, origin="SYSTEM_INFERRED")
+            if getattr(item, "kind", "") == "RANKING" else item
+            for item in objective_max.constraints)
+        objective_max = objective_max.model_copy(update={"constraints": constraints})
+        requirement_ = RuleBasedRequirementDecomposer(id_factory=lambda p: f"{p}-1").decompose(
+            objective_max)[0]
+        executor = RecordingExecutor(rows=[(1, 1, 90.0, 95.0)])
+        tool = ParquetStatcastTool([requirement_], FieldMappingRegistry(), executor)
+        tool.execute(task())
+        self.assertIn("ORDER BY MAX(launch_speed) DESC", executor.statements[0])
+        self.assertIn("AVG(launch_speed) AS avg_metric", executor.statements[0])
+        self.assertIn("MAX(launch_speed) AS max_metric", executor.statements[0])
 
     def test_fastball_maps_to_explicit_code_set(self):
         executor = RecordingExecutor(rows=[(1, 1, 90.0, 90.0)])
@@ -119,6 +138,17 @@ class StatcastToolTests(unittest.TestCase):
         main = executor.statements[0]
         self.assertIn("strikes = 2", main)
         self.assertNotIn("balls IN", main)
+
+    def test_postgres_batter_relative_edge_emits_physical_band(self):
+        requirement_ = RuleBasedRequirementDecomposer(id_factory=lambda p: f"{p}-1").decompose(
+            analytics_objective(definition=BATTER_RELATIVE_UPPER_EDGE))[0]
+        executor = RecordingExecutor(rows=[(592450, 9, 101.8, 115.5)])
+        tool = PostgresStatcastTool([requirement_], FieldMappingRegistry(), executor)
+        result = tool.execute(task())
+        self.assertEqual(result.status, "OK")
+        main = executor.statements[0]
+        self.assertIn("plate_z >= sz_top - 0.25", main)
+        self.assertNotIn("zone IN", main)
 
     def test_postgres_tool_uses_batter_id_and_read_only_table(self):
         executor = RecordingExecutor(rows=[(592450, 12, 95.4, 108.1)])

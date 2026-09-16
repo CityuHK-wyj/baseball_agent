@@ -21,23 +21,32 @@ ZONE_ABOVE_UPPER_EDGE = "ZONE_ABOVE_UPPER_EDGE"
 # edge and 13-14 below. This is the canonical Statcast zone orientation.
 ZONE_LOWER_THIRD: tuple[int, ...] = (7, 8, 9)
 
+# Deterministic batter-relative upper-edge band, in feet. A pitch is "near the upper
+# edge" of a batter's own strike zone when its vertical center is at or within this band
+# below the batter-specific top (sz_top). 0.25 feet = 3 inches.
+UPPER_EDGE_BAND_FEET = 0.25
+
 DEFAULT_LOCATION_DEFINITIONS: tuple[LocationDefinition, ...] = (
     LocationDefinition(
         definition=BATTER_RELATIVE_UPPER_EDGE,
         required_physical_fields=("plate_z", "sz_top", "sz_bot"),
         zone_codes=(),
-        description="exact upper edge relative to the batter's own strike zone",
+        predicate="BATTER_RELATIVE_UPPER_EDGE",
+        description="upper edge band relative to the batter's own strike zone "
+                    "(plate_z >= sz_top - 0.25 ft)",
     ),
     LocationDefinition(
         definition=ZONE_UPPER_THIRD,
         required_physical_fields=("zone",),
         zone_codes=(1, 2, 3),
+        predicate="ZONE_SET",
         description="upper third of the strike zone (Statcast zones 1-3)",
     ),
     LocationDefinition(
         definition=ZONE_ABOVE_UPPER_EDGE,
         required_physical_fields=("zone",),
         zone_codes=(11, 12),
+        predicate="ZONE_SET",
         description="just above the strike zone (Statcast shadow zones 11-12)",
     ),
 )

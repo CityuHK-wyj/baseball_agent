@@ -19,7 +19,8 @@ from app.models.artifacts import Artifact, Provenance
 from app.models.contracts import (ArtifactRequirement, CategoryConstraint, CountConstraint,
                                   LocationConstraint, NumericConstraint, PitchTypeConstraint,
                                   RankingConstraint, TimeRange)
-from app.semantic.field_mapping import BATTER_RELATIVE_UPPER_EDGE, FieldMappingRegistry
+from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, FieldMappingRegistry,
+                                        UPPER_EDGE_BAND_FEET)
 
 # A stable, documented ranking qualification: a player needs this many qualifying
 # batted balls to be ranked. It is surfaced in the payload, not silently applied.
@@ -176,6 +177,10 @@ class StatcastAnalyticsTool:
             # Never silently degrade: the exact definition's fields are unavailable.
             raise UnavailablePhysicalFields(
                 f"{constraint.definition} requires {', '.join(unavailable)}")
+        if definition.predicate == "BATTER_RELATIVE_UPPER_EDGE":
+            # plate_z, sz_top and sz_bot are guaranteed available above.
+            clauses.append(f"plate_z >= sz_top - {UPPER_EDGE_BAND_FEET}")
+            return
         if definition.zone_codes:
             zone_field = self._physical_field("zone")
             if zone_field is None:
@@ -183,9 +188,6 @@ class StatcastAnalyticsTool:
                 return
             zone_list = ", ".join(str(int(code)) for code in definition.zone_codes)
             clauses.append(f"{zone_field} IN ({zone_list})")
-        elif constraint.definition == BATTER_RELATIVE_UPPER_EDGE:
-            raise UnavailablePhysicalFields(
-                "batter-relative upper edge needs plate_z and sz_top/sz_bot")
 
     def _physical_column_available(self, field: str) -> bool:
         return field in self._available_columns()
@@ -215,17 +217,25 @@ class StatcastAnalyticsTool:
     def _main_sql(self, requirement, where, metric_field, batter_field,
                   ranking: RankingConstraint) -> str:
         direction = "DESC" if ranking.direction == "DESC" else "ASC"
+        aggregation = ranking.aggregation
         return (
             f"SELECT {batter_field} AS batter, COUNT(*) AS n, "
             f"AVG({metric_field}) AS avg_metric, MAX({metric_field}) AS max_metric "
             f"FROM {self._from_clause()} WHERE {where} "
             f"GROUP BY {batter_field} HAVING COUNT(*) >= {int(self._min_batted_balls)} "
-            f"ORDER BY avg_metric {direction} LIMIT {int(ranking.limit)}"
+            f"ORDER BY {aggregation}({metric_field}) {direction} LIMIT {int(ranking.limit)}"
         )
 
     def _observed_sql(self, requirement, where) -> str:
+        """Observed coverage is the source's data span for the requested window, not the
+        span of qualifying events (which is naturally sparse for filtered rankings)."""
         field = self._field_mapping.physical_field("game_date", self.source_kind) or "game_date"
-        return f"SELECT MIN({field}), MAX({field}) FROM {self._from_clause()} WHERE {where}"
+        if requirement.descriptor.time_range is not None:
+            start = requirement.descriptor.time_range.start.isoformat()
+            end = requirement.descriptor.time_range.end.isoformat()
+            return (f"SELECT MIN({field}), MAX({field}) FROM {self._from_clause()} "
+                    f"WHERE {field} >= DATE '{start}' AND {field} <= DATE '{end}'")
+        return f"SELECT MIN({field}), MAX({field}) FROM {self._from_clause()}"
 
     def _from_clause(self) -> str:
         raise NotImplementedError
@@ -292,9 +302,9 @@ class PostgresStatcastTool(StatcastAnalyticsTool):
     _COLUMNS = frozenset({
         "game_date", "game_pk", "release_speed", "release_spin_rate", "pitch_type",
         "player_name", "pitcher_id", "batter_id", "events", "description", "plate_x",
-        "plate_z", "stand", "balls", "strikes", "zone", "inning", "launch_speed",
-        "launch_angle", "hit_distance_sc", "estimated_ba_using_speedangle",
-        "estimated_woba_using_speedangle",
+        "plate_z", "sz_top", "sz_bot", "p_throws", "stand", "balls", "strikes",
+        "zone", "inning", "launch_speed", "launch_angle", "hit_distance_sc",
+        "estimated_ba_using_speedangle", "estimated_woba_using_speedangle",
     })
 
     def __init__(self, requirements, field_mapping: FieldMappingRegistry,

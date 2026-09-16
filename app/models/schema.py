@@ -30,11 +30,13 @@ class LocationDefinition(ArtifactContract):
     """An explicit, named pitch-location definition and the physical fields it needs.
 
     A batter-relative upper edge requires ``plate_z`` plus ``sz_top`` / ``sz_bot``; a
-    zone-based definition requires only ``zone``. Keeping these separate prevents a
-    source from silently redefining the semantic request.
+    zone-based definition requires only ``zone``. ``predicate`` names how the adapter
+    turns the definition into SQL so a batter-relative edge can never be aliased to a
+    numbered zone.
     """
 
     definition: Name
     required_physical_fields: tuple[Name, ...] = ()
     zone_codes: tuple[int, ...] = ()
+    predicate: Literal["ZONE_SET", "BATTER_RELATIVE_UPPER_EDGE"] = "ZONE_SET"
     description: str = ""

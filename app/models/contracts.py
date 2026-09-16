@@ -140,11 +140,18 @@ class LocationConstraint(_Constraint):
 
 
 class RankingConstraint(_Constraint):
-    """Explicit ranking intent: metric, direction and limit."""
+    """Explicit ranking intent: metric, aggregation, direction and limit.
+
+    ``aggregation`` is explicit so the SQL builder never silently decides whether a
+    leaderboard ranks by average or maximum exit velocity. Qualification/minimum sample
+    is a separate concern (``ArtifactRequirement.sample_adequacy_rule`` / the adapter's
+    documented minimum batted-ball count), never folded into the metric.
+    """
 
     kind: Literal["RANKING"] = "RANKING"
     key: Name = "ranking"
     metric_key: Name
+    aggregation: Literal["AVG", "MAX", "MIN", "SUM"] = "AVG"
     direction: Literal["ASC", "DESC"] = "DESC"
     limit: int = Field(ge=1)
     origin: ConstraintOrigin = "USER_CONFIRMED"
