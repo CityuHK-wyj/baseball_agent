@@ -6,10 +6,11 @@ ClarificationRequest instead of being silently decided (D045).
 """
 
 from collections.abc import Callable, Iterable
+from datetime import date, timedelta
 import re
 
 from app.models.clarification import ClarificationRequest
-from app.models.contracts import Constraint, Entity
+from app.models.contracts import CategoryConstraint, Constraint, Entity, TimeRange
 from app.models.entities import CanonicalEntity
 from app.models.semantic import SemanticResult
 from app.semantic.constraints import normalize_constraints
@@ -22,15 +23,46 @@ _NAMESPACE_FALLBACK = "LOCAL"
 class SemanticNormalizer:
     def __init__(self, extractor: ObjectiveExtractor, entity_resolver: EntityResolver,
                  dictionary: EntityDictionary | None = None,
-                 id_factory: Callable[[str], str] | None = None) -> None:
+                 id_factory: Callable[[str], str] | None = None,
+                 today: Callable[[], date] = date.today) -> None:
         self._extractor = extractor
+        self._today = today
         self._resolver = entity_resolver
         self._dictionary = dictionary or EntityDictionary()
         self._id_factory = id_factory or (lambda prefix: f"{prefix}-{abs(hash(prefix))}")
 
     def normalize(self, raw_query: str, constraints: Iterable[Constraint] = (),
                   mentions: Iterable[str] | None = None) -> SemanticResult:
-        normalized = normalize_constraints(constraints)
+        supplied = tuple(constraints)
+        inferred = ()
+        # Freeze relative dates before any interaction or execution can suspend the run.
+        if not any(c.key == "date_range" for c in supplied):
+            recent = re.search(r"(?:近|过去|過去)\s*(\d+)\s*天|\blast\s+(\d+)\s+days\b",
+                               raw_query, re.IGNORECASE)
+            dates = re.findall(r"(?<!\d)\d{4}-\d{2}-\d{2}(?!\d)", raw_query)
+            years = set(re.findall(r"(?<!\d)(?:19|20)\d{2}(?!\d)", raw_query))
+            window = None
+            if dates:
+                if recent or len(dates) > 2:
+                    raise ValueError("Ambiguous date windows require clarification")
+                window = TimeRange(start=dates[0], end=dates[-1])
+            elif years:
+                if recent or len(years) != 1:
+                    raise ValueError("Multiple date windows require clarification")
+                year = int(next(iter(years)))
+                window = TimeRange(start=date(year, 1, 1), end=date(year, 12, 31))
+            if recent:
+                days = int(recent.group(1) or recent.group(2))
+                if not 1 <= days <= 36600:
+                    raise ValueError("Recent date window must be between 1 and 36600 days")
+                end = self._today()
+                start = end - timedelta(days=days - 1)
+                window = TimeRange(start=start, end=end)
+            if window is not None:
+                inferred = (CategoryConstraint(key="date_range",
+                    values=(window.start.isoformat(), window.end.isoformat()),
+                    origin="SYSTEM_INFERRED"),)
+        normalized = normalize_constraints((*supplied, *inferred))
         surface_mentions = tuple(mentions) if mentions is not None else self._scan_mentions(raw_query)
 
         entities: list[Entity] = []

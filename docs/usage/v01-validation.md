@@ -93,4 +93,12 @@ and a local commit cannot be made exactly-once without provider cooperation. Thi
 deliberate at-most-once boundary, not a success claim. Expired or revoked permission fails
 closed on recovery. Tests include actual `os._exit` and repeated fresh-process restarts,
 plus failures before assessment and before the outcome index is committed.
-Analytics/date planning and the live gaps above still prevent a v0.1 completion claim.
+Date planning supports inclusive `近30天` / `last 30 days`, a single calendar year,
+and one/two ISO dates. Dates are frozen before waiting and retained on same-run resume.
+The Python builder accepts `today=` for a deterministic clock; normal use defaults to
+the host's current date. Multiple date windows fail closed, not silently interpreted.
+Complex analytics planning and the live gaps above still prevent a v0.1 completion claim.
+
+Latest `python3 scripts/verify_v01_live.py`: PostgreSQL authentication requires a password;
+historical Parquet bounded reads and MLB teams transport pass. High-zone analytics lacks
+sz_bot/sz_top. Transport success is not current-data or Web Evidence validation.

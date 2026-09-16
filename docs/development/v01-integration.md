@@ -37,3 +37,11 @@ readable; automatic migration/recovery of older incomplete runs is not claimed.
 Verification: run the full unittest suite, compileall, secret scan and
 `scripts/verify_v01_workflows.py`. See [validation](../usage/v01-validation.md) for exact
 commands, live results and remaining work. Architecture decisions remain unchanged.
+# Date-window closure
+
+Normalization now freezes relative day windows, calendar years and ISO date ranges into
+existing typed constraints; decomposition projects them into core descriptor time ranges.
+Optional historical baselines exclude the recent-window constraint. Restart tests verify
+the same run retains its original dates. Multiple windows require future clarification
+support and currently raise a validation error before execution. No new context/store
+architecture was introduced.

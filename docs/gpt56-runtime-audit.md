@@ -102,3 +102,10 @@ Live probe: local 2023 Parquet bounded reads pass. High-zone query lacks `sz_bot
 MLB StatsAPI returned 30 teams on one attempt, then timed out on a repeat; this verifies
 transport once, not the WebEvidenceTool end-to-end. PostgreSQL localhost:5433 refused the
 connection; no Operational PostgreSQL connection is configured.
+# Integration date-window regression checkpoint
+
+343 tests pass. Pipeline restart keeps the original inclusive relative-date window;
+single seasons and explicit ISO ranges propagate into core requirements. Reversed and
+ambiguous windows fail closed. Ordered live probes confirm historical Parquet reads and
+MLB teams transport only; PostgreSQL requires credentials, high-zone fields are absent,
+and complete current-data/Web Evidence remains UNVERIFIED_LIVE.

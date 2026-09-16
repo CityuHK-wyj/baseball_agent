@@ -11,7 +11,7 @@ from typing import Protocol
 
 from app.models.artifacts import ArtifactContract
 from app.models.contracts import (AnalysisObjective, ArtifactDescriptor, ArtifactRequirement,
-                                  LeagueStateSnapshot, QualificationRule, SampleAdequacyRule)
+                                  LeagueStateSnapshot, QualificationRule, SampleAdequacyRule, TimeRange)
 from app.models.metrics import MetricDefinition
 from app.models.schema import SchemaTable
 
@@ -84,11 +84,21 @@ class RuleBasedRequirementDecomposer:
         population_scope = "player" if any(
             entity.entity_type == "PLAYER" for entity in objective.entities) else "league"
         requirements: list[ArtifactRequirement] = []
+        date_constraints = [c for c in objective.constraints if c.key == "date_range"]
+        if any(c.kind != "CATEGORY" or len(c.values) != 2 for c in date_constraints):
+            raise ValueError("Date range requires exactly two ISO dates")
+        windows = [TimeRange(start=c.values[0], end=c.values[1]) for c in date_constraints]
+        if any(w != windows[0] for w in windows):
+            raise ValueError("Conflicting date ranges require clarification")
+        time_range = windows[0] if windows else None
         for spec in specs:
             descriptor = ArtifactDescriptor(
                 artifact_type=spec.artifact_type, entities=objective.entities,
                 data_keys=spec.required_keys, optional_data_keys=spec.optional_keys,
-                constraints=objective.constraints, granularity=spec.granularity,
+                constraints=tuple(c for c in objective.constraints
+                                  if spec.criticality == "CORE" or c.key != "date_range"),
+                granularity=spec.granularity,
+                time_range=time_range if spec.criticality == "CORE" else None,
                 population_scope=population_scope)
             requirements.append(ArtifactRequirement(
                 requirement_id=self._id_factory("requirement"), objective_ref=objective.objective_id,

@@ -206,3 +206,10 @@ Consumed interactions can resume with `resume --execute`; durable executions are
 Uncertain in-flight tool calls stop without automatic retry. Analytics/date planning still
 needs completion. RAG and pgvector remain deferred. See
 [docs/development-status.md](docs/development-status.md).
+# Date planning checkpoint
+
+The default pipeline freezes `近30天` / `last 30 days`, single calendar years and ISO
+date ranges before execution, preserving them across resume. Complex analytics planning
+and multi-window date clarification are still incomplete; see
+[validation status](docs/usage/v01-validation.md). Current-data/Web Evidence remains
+`UNVERIFIED_LIVE` despite successful public MLB teams transport.

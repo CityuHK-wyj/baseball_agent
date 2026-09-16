@@ -35,7 +35,7 @@ from app.semantic.evidence import RuleBasedEvidenceExtractor
 def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=None,
                    persist: bool = True, demo: bool = False, empty: bool = False,
                    tool_factory=None, capabilities=(), metric_registry=None, schema_registry=None,
-                   web_fetcher=None, evidence_extractor=None, web_cost="FREE"):
+                   web_fetcher=None, evidence_extractor=None, web_cost="FREE", today=None):
     ids = lambda prefix: f"{prefix}-{uuid4().hex}"
     root = Path(runtime_dir) if runtime_dir is not None else settings.operational_store_path.parent
     owned = []
@@ -82,7 +82,8 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
         return result
     registry = ArtifactRegistry()
     result = AnalysisPipeline(
-        SemanticNormalizer(RuleBasedObjectiveExtractor(ids), EntityResolver(dictionary, ids), dictionary, ids),
+        SemanticNormalizer(RuleBasedObjectiveExtractor(ids), EntityResolver(dictionary, ids), dictionary, ids,
+                           **({"today": today} if today is not None else {})),
         RuleBasedRequirementDecomposer(ids), RuleBasedPlanner(id_factory=ids),
         Router(all_capabilities, id_factory=ids), AssessmentService(registry, RuleBasedJudge(), ids), registry,
         tool_factory=tools, context_service=context, recorder=recorder, id_factory=ids,

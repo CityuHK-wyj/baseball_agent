@@ -2,12 +2,19 @@
 
 Status: IN_PROGRESS — stable checkpoint
 
-Latest runtime closure: 341 tests pass. Persisted run/initial definitions, execution intent,
+Latest runtime closure: 343 tests pass. Relative day windows, single calendar years and
+ISO date ranges now enter immutable requirements and survive restart without drift.
+Multiple date windows fail closed pending date clarification support. Ordered live probes:
+analytics PostgreSQL is reachable but authentication needs a password; local historical
+Parquet reads and MLB teams transport pass; full high-zone analytics lacks sz_bot/sz_top.
+Current-data/Web Evidence and Operational PostgreSQL remain UNVERIFIED_LIVE.
+
+Persisted run/initial definitions, execution intent,
 completed execution reuse and objective-scoped recovery are implemented. Actual process
 exit/restart tests prove one provider call across repeated recovery. Unknown external-call
 outcomes stop with `EXECUTION_UNCERTAIN`; no automatic duplicate execution is allowed.
-CLI `resume --execute` continues durable intent. Next: analytics/date planning, then ordered
-read-only live probes. This update supersedes the older recovery gap below.
+CLI `resume --execute` continues durable intent. Next: typed complex analytics planning
+and a configured read-only analytics adapter. This supersedes older checkpoint gaps below.
 
 ## Current integration checkpoint — 2026-09-16
 

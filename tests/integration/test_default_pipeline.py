@@ -2,12 +2,51 @@
 
 import tempfile
 import unittest
+from datetime import date
 from pathlib import Path
 
 from app.pipeline import AnalysisPipeline
 
 
 class DefaultPipelineTests(unittest.TestCase):
+    def test_explicit_dates_and_seasons_are_planned_without_silent_ambiguity(self):
+        from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
+        with tempfile.TemporaryDirectory() as directory:
+            subject = AnalysisPipeline.default(runtime_dir=Path(directory), demo=True)
+            self.addCleanup(subject.close)
+            for query, start, end in (
+                ("Judge 2023表现", "2023-01-01", "2023-12-31"),
+                ("Judge 2024-02-28 to 2024-03-01", "2024-02-28", "2024-03-01"),
+            ):
+                result = subject.analyze(query)
+                requirements = RuleBasedRequirementDecomposer().decompose(result.objectives[0])
+                self.assertEqual(requirements[0].descriptor.time_range.model_dump(mode="json"),
+                                 {"start": start, "end": end})
+            for query in ("Judge 2023 vs 2024", "Judge近0天", "Judge 2024-03-01 to 2024-02-28"):
+                with self.assertRaises(ValueError):
+                    subject.analyze(query)
+
+    def test_recent_date_window_survives_restart(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subject = AnalysisPipeline.default(runtime_dir=root, demo=True,
+                                                today=lambda: date(2026, 3, 1))
+            result = subject.analyze("Judge近30天表现", run_id="dated")
+            window = next(c for c in result.objectives[0].constraints if c.key == "date_range")
+            self.assertEqual(window.values, ("2026-01-31", "2026-03-01"))
+            subject.close()
+            resumed = AnalysisPipeline.default(runtime_dir=root, demo=True,
+                                                today=lambda: date(2026, 4, 1))
+            self.addCleanup(resumed.close)
+            recovered = resumed.resume_run("dated")
+            self.assertEqual(recovered.objectives[0].constraints, result.objectives[0].constraints)
+            from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
+            requirements = RuleBasedRequirementDecomposer().decompose(recovered.objectives[0])
+            self.assertEqual(requirements[0].descriptor.time_range.start, date(2026, 1, 31))
+            self.assertEqual(requirements[0].descriptor.time_range.end, date(2026, 3, 1))
+            self.assertIsNone(requirements[1].descriptor.time_range)
+            self.assertFalse(any(c.key == "date_range" for c in requirements[1].descriptor.constraints))
+
     def test_default_pipeline_answers_definition_from_shared_knowledge(self):
         with tempfile.TemporaryDirectory() as directory:
             subject = AnalysisPipeline.default(runtime_dir=Path(directory))

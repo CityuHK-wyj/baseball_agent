@@ -16,7 +16,9 @@ This file is maintained as implementation proceeds. It is the evidence for
 "which blog designs are actually implemented", not a wish list.
 
 Integration base: runtime hardening `b68ccf7` + Shared Knowledge `7d44ef4`.
-Current branch: `astra/v0.1-integration`, 335 tests passing (2026-09-16).
+Current branch: `astra/v0.1-integration`, 343 tests passing (2026-09-16).
+Crash-safe consumed-interaction recovery and frozen date windows are implemented.
+Complex analytics planning and multi-window date clarification remain partial.
 Guarded local Parquet reads are VERIFIED_LIVE. PostgreSQL, the full high-zone query and
 live Web evidence remain UNVERIFIED_LIVE. See [validation](usage/v01-validation.md).
 

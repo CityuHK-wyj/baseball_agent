@@ -13,6 +13,9 @@ from app.tools.execution import DuckDBReadOnlyExecutor, PostgresReadOnlyExecutor
 
 def main():
     report = {}
+    result = PostgresReadOnlyExecutor(settings, allowed_tables=()).execute("SELECT 1 AS connection_check")
+    report["analytics_postgres"] = {"status": "VERIFIED_LIVE" if result.status == "OK" else "UNVERIFIED_LIVE",
+                                    "result": result.model_dump(mode="json")}
     files = sorted(settings.parquet_archive_path.glob("*.parquet"))
     if files:
         path = str(files[-1].resolve()).replace("'", "''")
@@ -33,9 +36,6 @@ def main():
             "scope": "bounded historical archive read; complex high-zone query reported separately"}
     else:
         report["duckdb_parquet"] = {"status": "UNVERIFIED_LIVE", "reason": "No local archive"}
-    result = PostgresReadOnlyExecutor(settings, allowed_tables=()).execute("SELECT 1 AS connection_check")
-    report["analytics_postgres"] = {"status": "VERIFIED_LIVE" if result.status == "OK" else "UNVERIFIED_LIVE",
-                                    "result": result.model_dump(mode="json")}
     try:
         with urlopen("https://statsapi.mlb.com/api/v1/teams?sportId=1", timeout=10) as response:
             payload = json.loads(response.read(1_000_000))

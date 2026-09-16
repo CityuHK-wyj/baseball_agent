@@ -1,5 +1,17 @@
 # Codex Handoff
 
+## Date planning checkpoint — 2026-09-16
+
+343 tests pass. Relative day windows (inclusive), single calendar years and ISO date
+ranges are frozen during normalization and propagated to core requirements. Optional
+historical baselines do not inherit the recent window. Recovery retains the original
+window. Ambiguous multi-window queries fail closed; date clarification UI is not done.
+Live probes ran in the requested order: PostgreSQL now reaches authentication but needs
+a password, Parquet bounded read passes, high-zone query lacks sz_bot/sz_top, MLB teams
+transport passes. Complete current-data/Web Evidence is still UNVERIFIED_LIVE.
+Exact next task: typed complex analytics planning and read-only adapter wiring; do not
+silently reinterpret high-zone semantics to fit available columns.
+
 ## Crash recovery checkpoint — 2026-09-16
 
 341 tests pass, including actual process exit/restart. `resume_run` / CLI `resume --execute`
