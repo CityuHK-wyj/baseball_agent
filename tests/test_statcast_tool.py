@@ -56,6 +56,79 @@ def task():
 
 
 class StatcastToolTests(unittest.TestCase):
+    def test_entity_date_and_valid_count_bounds_filter_actual_rows(self):
+        import duckdb
+        from app.models.contracts import Entity
+
+        original = requirement()
+        descriptor = original.descriptor.model_copy(update={
+            "entities": (Entity(namespace="MLBAM", entity_type="PLAYER", identifier="1"),),
+            "constraints": tuple(c for c in original.descriptor.constraints if c.key != "date_range"),
+        })
+        scoped = original.model_copy(update={"descriptor": descriptor})
+        connection = duckdb.connect()
+        self.addCleanup(connection.close)
+        connection.execute("""CREATE TABLE pitches AS
+            SELECT batter, game_date, balls, 2 AS strikes, 96.0 AS release_speed,
+                   'FF' AS pitch_type, 100.0 AS launch_speed, 1 AS zone
+            FROM (VALUES (1, DATE '2023-06-01', 0), (1, DATE '2023-06-01', 1),
+                         (1, DATE '2023-06-01', 2), (1, DATE '2023-06-01', 3),
+                         (1, DATE '2023-06-01', 4), (1, DATE '2023-06-01', NULL),
+                         (1, DATE '2022-06-01', 0), (2, DATE '2023-06-01', 0))
+                 AS sample(batter, game_date, balls)""")
+
+        class FixtureExecutor:
+            def execute_with_rows(self, sql):
+                rows = connection.execute(sql).fetchall()
+                return ToolResult.ok(len(rows)), rows
+
+        class FixtureTool(ParquetStatcastTool):
+            def _from_clause(self):
+                return "pitches"
+
+        result = FixtureTool([scoped], FieldMappingRegistry(), FixtureExecutor(),
+                             min_batted_balls=1).execute(task())
+        self.assertEqual(json.loads(result.payload)["rows"], [["1", "", 4, 100.0, 100.0]])
+
+    def test_unmapped_entity_cannot_be_stamped_onto_league_results(self):
+        from app.models.contracts import Entity
+        original = requirement()
+        scoped = original.model_copy(update={"descriptor": original.descriptor.model_copy(update={
+            "entities": (Entity(namespace="LOCAL", entity_type="TEAM", identifier="NYY"),)})})
+        executor = RecordingExecutor(rows=[(1, 3, 100.0, 100.0)])
+        result = ParquetStatcastTool([scoped], FieldMappingRegistry(), executor).execute(task())
+        self.assertNotEqual(result.status, "OK")
+        self.assertEqual(executor.statements, [])
+
+    def test_upper_edge_band_excludes_pitches_above_batter_zone(self):
+        import duckdb
+
+        requirement_ = RuleBasedRequirementDecomposer(id_factory=lambda p: f"{p}-1").decompose(
+            analytics_objective(definition=BATTER_RELATIVE_UPPER_EDGE))[0]
+        connection = duckdb.connect()
+        self.addCleanup(connection.close)
+        connection.execute("""CREATE TABLE pitches AS
+            SELECT batter, plate_z, 3.5 AS sz_top, 1.5 AS sz_bot,
+                   2 AS strikes, 1 AS balls, 96.0 AS release_speed,
+                   'FF' AS pitch_type, 100.0 AS launch_speed,
+                   DATE '2023-06-01' AS game_date
+            FROM (VALUES (1, 3.25), (2, 3.5), (3, 3.24),
+                         (4, 3.51), (5, 6.0)) AS sample(batter, plate_z)""")
+
+        class FixtureExecutor:
+            def execute_with_rows(self, sql):
+                rows = connection.execute(sql).fetchall()
+                return ToolResult.ok(len(rows)), rows
+
+        class FixtureTool(ParquetStatcastTool):
+            def _from_clause(self):
+                return "pitches"
+
+        result = FixtureTool([requirement_], FieldMappingRegistry(), FixtureExecutor(),
+                             min_batted_balls=1).execute(task())
+        self.assertEqual(result.status, "OK")
+        self.assertEqual({row[0] for row in json.loads(result.payload)["rows"]}, {"1", "2"})
+
     def test_generated_sql_is_read_only_and_uses_physical_columns(self):
         executor = RecordingExecutor(rows=[(592450, 12, 95.4, 108.1)])
         tool = ParquetStatcastTool([requirement()], FieldMappingRegistry(), executor)
@@ -150,7 +223,7 @@ class StatcastToolTests(unittest.TestCase):
         tool.execute(task())
         main = executor.statements[0]
         self.assertIn("strikes = 2", main)
-        self.assertNotIn("balls IN", main)
+        self.assertIn("balls IN (0, 1, 2, 3)", main)
 
     def test_postgres_batter_relative_edge_emits_physical_band(self):
         requirement_ = RuleBasedRequirementDecomposer(id_factory=lambda p: f"{p}-1").decompose(

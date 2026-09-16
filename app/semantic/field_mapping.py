@@ -33,7 +33,7 @@ DEFAULT_LOCATION_DEFINITIONS: tuple[LocationDefinition, ...] = (
         zone_codes=(),
         predicate="BATTER_RELATIVE_UPPER_EDGE",
         description="upper edge band relative to the batter's own strike zone "
-                    "(plate_z >= sz_top - 0.25 ft)",
+                    "(sz_top - 0.25 ft <= plate_z <= sz_top)",
     ),
     LocationDefinition(
         definition=ZONE_UPPER_THIRD,

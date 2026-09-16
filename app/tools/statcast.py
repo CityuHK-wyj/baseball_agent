@@ -131,6 +131,20 @@ class StatcastAnalyticsTool:
     def _where_clause(self, requirement: ArtifactRequirement, metric_field: str) -> tuple[str, set[str]]:
         clauses: list[str] = []
         missing: set[str] = set()
+        window = requirement.descriptor.time_range
+        if window is not None:
+            clauses.append(self._date_clause(window.start.isoformat(), window.end.isoformat()))
+        if requirement.descriptor.entities:
+            entities = requirement.descriptor.entities
+            if any(entity.namespace != "MLBAM" or entity.entity_type != "PLAYER"
+                   or not entity.identifier.isascii() or not entity.identifier.isdigit()
+                   for entity in entities):
+                raise UnavailablePhysicalFields("unsupported analytics entity identity")
+            batter = self._field_mapping.physical_field("batter", self.source_kind)
+            if batter is None:
+                raise UnavailablePhysicalFields("batter identity field is unavailable")
+            identifiers = ", ".join(str(int(entity.identifier)) for entity in entities)
+            clauses.append(f"{batter} IN ({identifiers})")
         for constraint in requirement.descriptor.constraints:
             if isinstance(constraint, CountConstraint):
                 strikes = self._field_mapping.physical_field("count", self.source_kind)
@@ -139,9 +153,11 @@ class StatcastAnalyticsTool:
                     missing.update({"count", "balls"})
                     continue
                 clauses.append(f"{strikes} = {int(constraint.strikes)}")
-                if set(constraint.balls) != {0, 1, 2, 3}:
+                if constraint.balls:
                     ball_list = ", ".join(str(int(ball)) for ball in sorted(constraint.balls))
                     clauses.append(f"{balls} IN ({ball_list})")
+                else:
+                    clauses.append("1 = 0")
             elif isinstance(constraint, NumericConstraint):
                 field = self._field_mapping.physical_field(constraint.key, self.source_kind)
                 if field is None:
@@ -179,7 +195,7 @@ class StatcastAnalyticsTool:
                 f"{constraint.definition} requires {', '.join(unavailable)}")
         if definition.predicate == "BATTER_RELATIVE_UPPER_EDGE":
             # plate_z, sz_top and sz_bot are guaranteed available above.
-            clauses.append(f"plate_z >= sz_top - {UPPER_EDGE_BAND_FEET}")
+            clauses.append(f"plate_z >= sz_top - {UPPER_EDGE_BAND_FEET} AND plate_z <= sz_top")
             return
         if definition.zone_codes:
             zone_field = self._physical_field("zone")
