@@ -2,35 +2,23 @@
 
 Status: IN_PROGRESS — stable checkpoint
 
-## Analytics vertical slice checkpoint — 2026-09-16
+## Real data layer checkpoint — 2026-09-16 (post-migration)
 
-Branch: `pi/analytics-integration` (branched from `astra/v0.1-integration` @ `107d55e`).
-369 tests pass; compileall and secret scan pass.
+Branch: `pi/analytics-integration`. 379 tests pass; compileall and secret scan pass.
 
-Delivered: typed analytical constraints (`CountConstraint`, `PitchTypeConstraint`,
-`LocationConstraint`, `RankingConstraint`), a deterministic analytics-intent parser, a
-semantic-key → physical-field `FieldMappingRegistry` with explicit fastball codes and
-named location definitions, real read-only `ParquetStatcastTool` / `PostgresStatcastTool`
-adapters, constraint-key-aware routing, and an end-to-end real-data answer projection.
+Migration delivered: the loader now retains `sz_top`/`sz_bot`/`p_throws`; PostgreSQL
+`statcast_pitches` was migrated (idempotent `ALTER`) and reloaded to **2,196,186 rows**
+covering **2024-03-15..2026-09-14**, with the new fields 100% non-null. `player_dictionary`
+was backfilled from the MLB StatsAPI to **3,726** players, resolving **100%** of the 2,050
+distinct batters. Zone orientation was corrected (upper third = zones 1-3, verified by
+`plate_z`). Batter-relative upper edge is `EXACTLY_SUPPORTED` on PostgreSQL
+(`plate_z >= sz_top - 0.25 ft`); Parquet keeps the corrected zone-based mapping until its
+archive is rebuilt. Routing is now coverage-aware, and deterministic year-vs-year and
+recent-vs-previous windows run as separate frozen objectives.
 
-The target query — top-5 exit velocity over two-strike, fastball ≥ 95 mph, upper-zone
-pitches — now runs end to end against **both** the historical Parquet archive and the live
-analytical PostgreSQL database, with provenance and **no synthetic fallback**
-(`LIVE_VERIFIED`). The bare "upper edge" wording is surfaced as a constraint
-clarification; the exact batter-relative definition (needs `sz_top`/`sz_bot`) is never
-silently replaced with `zone IN (...)`. Multi-window date comparison remains `DEFERRED`.
-
-PostgreSQL live audit: `baseball_readonly` connects, can `SELECT`
-`statcast_pitches`/`batting_events`/`player_dictionary`, and is denied all writes
-(role grants + `default_transaction_read_only=on` + runtime guard). Full verified schema
-and semantic capability matrix: [analytics-capability-matrix.md](development/analytics-capability-matrix.md).
-
-Schema discovery (verified, not from docs): Parquet 2015–2023 has `release_speed`,
-`pitch_type`, `plate_z`, `zone`, `balls`, `strikes`, `launch_speed`, `batter` but lacks
-`sz_top`/`sz_bot`/`p_throws`/`exit_velocity` (exit velocity is `launch_speed`). PostgreSQL
-`statcast_pitches` (2024-03-15..2026-06-18, 1.86M rows) uses `batter_id`/`pitcher_id` and
-the same physical fields, also lacking `sz_top`/`sz_bot`. `sz_top`/`sz_bot` are an
-**ingestion gap** (upstream Statcast has them; the loader dropped them).
+`baseball_readonly` remains strictly read-only after migration (SELECT succeeds; CREATE /
+INSERT / UPDATE / DELETE / DROP all fail). See
+[analytics-capability-matrix.md](development/analytics-capability-matrix.md).
 
 ## Previous checkpoint
 

@@ -214,15 +214,16 @@ docs/
 ## Status and limitations
 
 `IN_PROGRESS — stable checkpoint`. Both the historical Parquet archive (2015–2023) and the
-live analytical PostgreSQL database (2024–2026) are `LIVE_VERIFIED` through the real
-read-only analytics path: the target two-strike, fastball ≥ 95 mph, upper-zone, top-5
-exit-velocity query returns real rows with provenance and no synthetic fallback.
-PostgreSQL is strictly read-only (`SELECT` only; writes denied). The exact batter-relative
-upper edge needs `sz_top`/`sz_bot`, which both sources lack (an ingestion gap), so it is
-surfaced as an explicit clarification/limitation rather than silently replaced with
-`zone IN (...)`. MLB StatsAPI returned 30 teams once; later network attempts failed.
-Current-data analytics and live Web evidence remain `UNVERIFIED_LIVE`. RAG and pgvector
-remain deferred. See [docs/development-status.md](docs/development-status.md) and the
+live analytical PostgreSQL database (2024-03-15…2026-09-14) are `LIVE_VERIFIED` through
+the real read-only analytics path: the target two-strike, fastball ≥ 95 mph, upper-zone,
+top-5 exit-velocity query returns real rows with provenance and no synthetic fallback.
+PostgreSQL now retains `sz_top`/`sz_bot`/`p_throws`, so the exact batter-relative upper
+edge (`plate_z >= sz_top - 0.25 ft`) is `EXACTLY_SUPPORTED`; Parquet supports the corrected
+zone-based upper third (zones 1-3). PostgreSQL is strictly read-only (`SELECT` only; writes
+denied). Batter names resolve from `player_dictionary` (100% of distinct batters). MLB
+StatsAPI returned 30 teams once; later network attempts failed. Current-data analytics and
+live Web evidence remain `UNVERIFIED_LIVE`. RAG and pgvector remain deferred. See
+[docs/development-status.md](docs/development-status.md) and the
 [capability matrix](docs/development/analytics-capability-matrix.md).
 
 # Date planning checkpoint

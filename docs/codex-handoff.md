@@ -1,30 +1,20 @@
 # Codex Handoff
 
-## Analytics vertical slice checkpoint — 2026-09-16
+## Real data layer checkpoint — 2026-09-16 (post-migration)
 
-Branch `pi/analytics-integration` (from `astra/v0.1-integration` @ `107d55e`); 369 tests
-pass, compileall and secret scan pass. The first real-data analytics path is done end to
-end against **both** the historical Parquet archive (DuckDB) and the live analytical
-PostgreSQL database: typed two-strike / fastball / pitch-velocity / upper-zone constraints
-plus exit-velocity ranking travel query → semantic normalization → requirement → Planner →
-Router → real read-only adapter → real rows → Artifact → assessment → ResponsePackage →
-answer, with provenance and no synthetic fallback. Both are `LIVE_VERIFIED`.
+Branch `pi/analytics-integration`; 379 tests pass, compileall and secret scan pass.
+The ingestion gap is resolved for PostgreSQL: `sz_top`/`sz_bot`/`p_throws` are retained,
+the schema migrated, and 2024–2026 reloaded (2,196,186 rows, 2024-03-15..2026-09-14).
+`player_dictionary` backfilled to 100% batter-name coverage via the MLB StatsAPI.
+Zone orientation corrected (upper third = zones 1-3). Batter-relative upper edge is
+`EXACTLY_SUPPORTED` on PostgreSQL (`plate_z >= sz_top - 0.25 ft`); Parquet keeps the
+zone-based mapping until its archive is rebuilt (loader already updated). Routing is
+coverage-aware, ranking aggregation (AVG/MAX) is explicit, and year-vs-year /
+recent-vs-previous windows run as separate frozen objectives.
 
-Key seams: `app/semantic/analytics_intent.py` (typed intent + location clarification),
-`app/semantic/field_mapping.py` (semantic → physical keys, fastball codes, location
-definitions), `app/tools/statcast.py` (real adapters, PostgreSQL resolves names via
-`player_dictionary`), `constraint_capability_keys` in `app/agent/routing.py`, and
-`objective_result` projection in the Orchestrator/Response.
-
-Truthful status: Parquet and analytical PostgreSQL `LIVE_VERIFIED`. The exact
-batter-relative upper edge still needs `sz_top`/`sz_bot`, which both sources lack; that is
-an **ingestion gap** (upstream Statcast provides them, the loader dropped them), reported in
-[docs/development/analytics-capability-matrix.md](docs/development/analytics-capability-matrix.md).
-It is clarified/limited rather than silently substituted. Multi-window date comparison
-remains `DEFERRED`.
-
-Exact next task: multi-window date comparison (or its clarification), without
-over-generalizing; optionally approve the non-destructive `sz_top`/`sz_bot` backfill.
+Exact next task: rebuild the historical Parquet archive (loader is ready, gated behind
+`STATCAST_ARCHIVE_ENABLED=1`) to bring batter-relative location to historical ranges;
+then the final Codex review. `baseball_readonly` remains strictly read-only.
 
 ## Date planning checkpoint — 2026-09-16
 

@@ -1,8 +1,8 @@
 # Analytics source capability matrix
 
 Verified against the live `baseball_analytics` PostgreSQL database (role
-`baseball_readonly`) and the local historical Parquet archive on 2026-09-16. No schema
-was altered during the audit.
+`baseball_readonly`) and the local historical Parquet archive on 2026-09-16, after the
+non-destructive migration that retained `sz_top`/`sz_bot`/`p_throws`.
 
 ## Verified schema summary
 
@@ -10,9 +10,9 @@ was altered during the audit.
 
 | Table | Grain | Coverage | Rows | Notes |
 | --- | --- | --- | --- | --- |
-| `statcast_pitches` | pitch | 2024-03-15 .. 2026-06-18 | 1,861,212 | `release_speed`, `pitch_type`, `plate_x`, `plate_z`, `zone`, `balls`, `strikes`, `launch_speed`, `batter_id`, `pitcher_id`, `game_date` all populated; **no `sz_top` / `sz_bot` / `p_throws`** |
-| `batting_events` | event/at-bat | 2024-03-15 .. 2026-06-18 | 478,250 | has `batter_name` and `pitcher_name`; event-level results |
-| `player_dictionary` | player | n/a | 913 | `player_id` → `player_name`; covers 913 of 2,039 distinct batters (~45%) |
+| `statcast_pitches` | pitch | 2024-03-15 .. 2026-09-14 | 2,196,186 | `release_speed`, `pitch_type`, `plate_x`, `plate_z`, `zone`, `balls`, `strikes`, `launch_speed`, `batter_id`, `pitcher_id`, `game_date`, **`sz_top`, `sz_bot`, `p_throws`** all populated (new fields 100% non-null) |
+| `batting_events` | event/at-bat | 2024-03-15 .. 2026-09-14 | 564,307 | has `batter_name` and `pitcher_name`; event-level results |
+| `player_dictionary` | player | n/a | 3,726 | `player_id` → `player_name`; covers 2,050 of 2,050 distinct batters (100%) after StatsAPI backfill |
 
 ### Parquet archive (`data_loader/parquet_archive`, 2015–2023)
 
@@ -29,9 +29,9 @@ was altered during the audit.
 | `pitch_type` fastball family | `pitch_type` → FF/SI/FC/FA | `pitch_type` → FF/SI/FC/FA | **EXACTLY_SUPPORTED** (both; codes explicit in `FieldMappingRegistry`) |
 | `count` two-strike | `balls` / `strikes` | `balls` / `strikes` | **EXACTLY_SUPPORTED** (both) |
 | `pitch_location` zone-based (upper third 1-3; above-zone 11-12) | `zone` | `zone` | **EXACTLY_SUPPORTED** (both) |
-| `pitch_location` batter-relative upper edge | **missing `sz_top`/`sz_bot`** | **missing `sz_top`/`sz_bot`** | **UNSUPPORTED** (both; never silently substituted) |
+| `pitch_location` batter-relative upper edge | `plate_z` + `sz_top`/`sz_bot` (predicate `plate_z >= sz_top - 0.25 ft`) | **missing `sz_top`/`sz_bot`** | **EXACTLY_SUPPORTED** (PostgreSQL); **UNSUPPORTED** (Parquet, until rebuilt) |
 | `ranking` (metric + direction + limit) | aggregation | aggregation | **EXACTLY_SUPPORTED** (both) |
-| `batter` identity | `batter_id` + `player_dictionary` (45% name coverage) | `batter` (id only; no name) | **EXACTLY_SUPPORTED** for id; **APPROXIMATELY_SUPPORTED** for name (Postgres), **UNSUPPORTED** for name (Parquet) |
+| `batter` identity | `batter_id` + `player_dictionary` (100% name coverage) | `batter` (id only; no name) | **EXACTLY_SUPPORTED** for id + name (Postgres); **EXACTLY_SUPPORTED** for id, **UNSUPPORTED** for name (Parquet) |
 | `pitcher` identity | `pitcher_id` (name only in `batting_events`) | `pitcher` + `player_name` (pitcher name) | **APPROXIMATELY_SUPPORTED** (both, differently) |
 | `game_date` window | `game_date` | `game_date` | **EXACTLY_SUPPORTED** (both) |
 | `sz_top` / `sz_bot` | absent | absent | **UNSUPPORTED** (both) |
@@ -50,17 +50,16 @@ was altered during the audit.
 The Agent runtime additionally parses SQL before connect and runs
 `SET TRANSACTION READ ONLY`, so there are three independent read-only layers.
 
-## Ingestion gap (reported, not applied)
+## Ingestion gap (resolved for PostgreSQL, pending for Parquet)
 
 `sz_top`, `sz_bot` (and `p_throws`) are present in the upstream pybaseball Statcast
-export but were omitted by the loader's hardcoded column list:
+export but were omitted by the loader's hardcoded column list. This was an **ingestion
+gap**, not a source limitation.
 
-- `data_loader/archive_history_to_parquet.py` (`target_columns`)
-- `data_loader/fetch_and_load.py` (`pitch_columns` and the `statcast_pitches` DDL)
+**Resolved** for PostgreSQL: the loaders now retain the three fields, the
+`statcast_pitches` schema was migrated (idempotent `ALTER ... ADD COLUMN IF NOT EXISTS`),
+and the 2024–2026 range was reloaded (2,196,186 rows, new fields 100% non-null).
 
-This is an **ingestion gap**, not a source limitation. Recommended non-destructive
-migration (do not run without approval): add `sz_top FLOAT`, `sz_bot FLOAT`,
-`p_throws VARCHAR(5)` to the loader column list and `statcast_pitches` DDL, then
-incrementally backfill the affected windows. Doing so would make
-`BATTER_RELATIVE_UPPER_EDGE` `EXACTLY_SUPPORTED`. Until then it stays `UNSUPPORTED`
-and the Agent must not silently substitute a zone set.
+**Pending** for Parquet: the historical loader (`archive_history_to_parquet.py`) now
+retains the fields for future rebuilds, but the existing 2015–2023 archive was not
+rebuilt, so Parquet batter-relative location remains `UNSUPPORTED` until a rebuild.
