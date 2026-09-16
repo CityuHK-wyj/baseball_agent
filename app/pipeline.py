@@ -99,6 +99,8 @@ class AnalysisPipeline:
 
     def analyze(self, raw_query: str, mentions: tuple[str, ...] | None = None,
                 constraints: tuple[Constraint, ...] = (), run_id: str | None = None) -> PipelineResult:
+        if run_id is not None and self._recorder is not None and self._recorder.has_run(run_id):
+            raise ValueError("Run already exists; answer its pending request or inspect resume state")
         semantic = self._semantic.normalize(raw_query, constraints=constraints, mentions=mentions)
         if semantic.needs_clarification:
             effective_run_id = run_id or self._id_factory("run")

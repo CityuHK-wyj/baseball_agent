@@ -244,7 +244,6 @@ class Orchestrator:
                 if outcome.artifact is not None:
                     if outcome.artifact.artifact_id not in self._registry:
                         new_artifact_ids.append(outcome.artifact.artifact_id)
-                    self._registry.register(outcome.artifact)
                     metrics.record("ARTIFACT", subject_ref=outcome.artifact.artifact_id,
                                    agent="EXECUTOR", status="CREATED",
                                    source=outcome.artifact.provenance.source,
@@ -252,8 +251,12 @@ class Orchestrator:
                     # Payload and artifact metadata are persisted before any state or
                     # assessment that references them. A failure here aborts the round.
                     if self._recorder is not None:
-                        self._recorder.record_artifact(run_id, outcome.artifact, outcome.payload,
-                                                       outcome.payload_content_type)
+                        stored = self._recorder.record_artifact(run_id, outcome.artifact, outcome.payload,
+                                                                outcome.payload_content_type)
+                        artifact = outcome.artifact.model_copy(update={"payload_ref": stored.location}) if stored else outcome.artifact
+                    else:
+                        artifact = outcome.artifact
+                    self._registry.register(artifact)
                     assessment = self._assessment_service.assess(
                         outcome.artifact.artifact_id, requirement, objective.objective_id,
                         context_items=self._retrieve_context(ContextRequest(

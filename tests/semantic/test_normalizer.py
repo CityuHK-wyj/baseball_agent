@@ -35,6 +35,18 @@ class SemanticNormalizerTests(unittest.TestCase):
         self.assertEqual((entity.namespace, entity.identifier), ("MLBAM", "592450"))
         self.assertEqual(result.objectives[0].constraints[0].key, "season")
 
+    def test_full_name_suppresses_overlapping_ambiguous_short_alias(self):
+        known = EntityDictionary((
+            CanonicalEntity(entity_key="MLBAM:592450", entity_type="PLAYER",
+                            display_name="Aaron Judge", aliases=("Aaron", "Judge")),
+            CanonicalEntity(entity_key="HIST:hank_aaron", entity_type="PLAYER",
+                            display_name="Hank Aaron", aliases=("Aaron",)),))
+        subject = SemanticNormalizer(RuleBasedObjectiveExtractor(), EntityResolver(known), known)
+        result = subject.normalize("How did Aaron Judge perform?")
+        self.assertFalse(result.needs_clarification)
+        self.assertEqual(len(result.objectives[0].entities), 1)
+        self.assertEqual(result.objectives[0].entities[0].identifier, "592450")
+
     def test_ambiguous_mention_produces_clarification_and_is_not_ready(self):
         result = normalizer().normalize("How did Hernandez perform?")
         self.assertTrue(result.needs_clarification)

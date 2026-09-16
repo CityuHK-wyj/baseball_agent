@@ -59,8 +59,8 @@ class PersistenceFlowTests(unittest.TestCase):
         plan = self.resume.build_plan("run-1")
         self.assertTrue(plan.planner_terminal)
         self.assertEqual(plan.reusable_artifact_refs, ("a1",))
-        self.assertEqual(self.store.get_object("completion_report", "run-1").payload["stop_reason"], "COMPLETE")
-        self.assertEqual(self.store.get_object("response_package", "run-1").payload["objective_status"], "COMPLETE")
+        self.assertEqual(self.store.list_objects("completion_report", "run-1")[0].payload["stop_reason"], "COMPLETE")
+        self.assertEqual(self.store.list_objects("response_package", "run-1")[0].payload["objective_status"], "COMPLETE")
 
     def test_resuming_twice_is_stable(self):
         from app.models.planning import TaskExecution

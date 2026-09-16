@@ -47,6 +47,10 @@ class SourceMappingResolver:
                 task_ref=task_ref, mode="NO_MAPPING", unmapped_keys=tuple(unmapped),
                 reason=f"No source mapping for {', '.join(unmapped)}")
 
+        if (direct and calculated) or len({kind for _, kind in direct}) > 1:
+            return ExecutionRoute(task_ref=task_ref, mode="NO_MAPPING",
+                reason="Requirement spans multiple execution sources; no single tool provides every key")
+
         for key, source_kind in direct:
             tool = self._tools.get(source_kind)
             if tool is not None:

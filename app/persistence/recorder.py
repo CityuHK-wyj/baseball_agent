@@ -63,10 +63,12 @@ class RunRecorder:
         self._store.save_object("execution", execution.execution_id, run_id, payload)
 
     def record_completion_report(self, run_id: str, report: CompletionReport) -> None:
-        self._store.save_object("completion_report", report.run_id, run_id, report.model_dump(mode="json"))
+        self._store.save_object("completion_report", f"{len(run_id)}:{run_id}{report.objective_ref}",
+                                run_id, report.model_dump(mode="json"))
 
     def record_response_package(self, run_id: str, package: ResponsePackage) -> None:
-        self._store.save_object("response_package", package.run_id, run_id, package.model_dump(mode="json"))
+        self._store.save_object("response_package", f"{len(run_id)}:{run_id}{package.objective_ref}",
+                                run_id, package.model_dump(mode="json"))
 
     def record_interaction(self, interaction: InteractionRecord) -> None:
         self._store.save_object("interaction_audit", self._id_factory("interaction-event"),
@@ -76,7 +78,13 @@ class RunRecorder:
 
     def load_interaction(self, run_id: str) -> InteractionRecord | None:
         record = self._store.get_object("interaction", run_id)
+        if record and record.payload.get("permission") and "expires_at" not in record.payload["permission"]:
+            raise ValueError("Legacy permission expired; issue a new scoped request")
         return InteractionRecord.model_validate(record.payload) if record else None
+
+    def has_run(self, run_id: str) -> bool:
+        return (self._store.latest_checkpoint(run_id) is not None or
+                self._store.get_object("interaction", run_id) is not None)
 
     def consume_interaction(self, pending: InteractionRecord, result: InteractionRecord) -> None:
         record = self._store.get_object("interaction", pending.run_id)

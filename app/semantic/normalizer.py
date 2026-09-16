@@ -58,14 +58,21 @@ class SemanticNormalizer:
     def _scan_mentions(self, raw_query: str) -> tuple[str, ...]:
         """Find known entity surfaces that literally occur in the query."""
         lowered = raw_query.casefold()
-        found: list[str] = []
+        matches: list[tuple[int, int, str]] = []
         for entity in self._dictionary.entities():
             surfaces = (entity.display_name, *entity.aliases)
             for surface in surfaces:
                 min_length = 2 if re.search(r"[\u4e00-\u9fff]", surface) else 3
-                if len(surface) >= min_length and surface.casefold() in lowered and surface not in found:
-                    found.append(surface)
-        return tuple(found)
+                if len(surface) < min_length:
+                    continue
+                pattern = r"(?<![a-z0-9])" + re.escape(surface.casefold()) + r"(?![a-z0-9])"
+                for match in re.finditer(pattern, lowered):
+                    matches.append((match.start(), match.end(), surface))
+        selected: list[tuple[int, int, str]] = []
+        for start, end, surface in sorted(matches, key=lambda item: (item[0] - item[1], item[0], item[2])):
+            if not any(start < other_end and other_start < end for other_start, other_end, _ in selected):
+                selected.append((start, end, surface))
+        return tuple(dict.fromkeys(surface for _, _, surface in sorted(selected)))
 
     def entity_for_key(self, entity_key: str) -> CanonicalEntity:
         return self._dictionary.get(entity_key)

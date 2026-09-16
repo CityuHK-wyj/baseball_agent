@@ -38,3 +38,29 @@ class DefaultPipelineTests(unittest.TestCase):
             result = subject.analyze("Judge injury")
             self.assertEqual(len(result.permissions), 1)
             self.assertEqual(result.permissions[0].tool, "paid-news")
+
+    def test_default_paid_web_provider_approval_and_rejection(self):
+        from app.models.evidence import RawWebResult
+        from app.models.interaction import PermissionAnswer
+        calls = []
+        def fetch(task):
+            calls.append(task.task_id)
+            return RawWebResult(result_id=task.task_id, url="https://example.test/fixture",
+                title="Injury fixture", source="test-fixture",
+                text="Aaron Judge was placed on the injured list in 2025 with a wrist strain.")
+        with tempfile.TemporaryDirectory() as directory:
+            subject = AnalysisPipeline.default(runtime_dir=Path(directory), web_fetcher=fetch,
+                                                web_cost="PAID")
+            self.addCleanup(subject.close)
+            for approved in (False, True):
+                waiting = subject.analyze("Judge injury")
+                self.assertEqual(calls, [])
+                answer = PermissionAnswer(permission_ref=waiting.permissions[0].permission_id,
+                                           approved=approved)
+                result = subject.resume_permission(waiting.run_ids[0], answer)
+                if approved:
+                    self.assertEqual(result.objective_statuses, ("COMPLETE",))
+                    self.assertEqual(len(calls), 1)
+                    self.assertEqual(result.response_packages[0].accepted_evidence[0].source_kind, "WEB")
+                with self.assertRaises(ValueError):
+                    subject.resume_permission(waiting.run_ids[0], answer)

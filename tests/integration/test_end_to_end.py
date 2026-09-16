@@ -226,6 +226,33 @@ class EndToEndTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 recorder.consume_interaction(pending, confirmed)
 
+    def test_analyze_cannot_replace_a_persisted_run_or_pending_request(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SqliteOperationalStore()
+            self.addCleanup(store.close)
+            recorder = RunRecorder(store, LocalFilesystemArtifactStorage(Path(directory)))
+            subject = pipeline(judge_dictionary(), recorder=recorder)
+            subject.analyze("Judge performance", run_id="existing")
+            with self.assertRaisesRegex(ValueError, "already exists"):
+                subject.analyze("Judge performance", run_id="existing")
+
+    def test_permission_without_legacy_expiry_cannot_be_renewed_by_reloading(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SqliteOperationalStore()
+            self.addCleanup(store.close)
+            recorder = RunRecorder(store, LocalFilesystemArtifactStorage(Path(directory)))
+            subject = pipeline(judge_dictionary(), recorder=recorder, router=Router((
+                ToolCapability(tool="synthetic", source_kind="SYNTHETIC",
+                               supported_artifact_types=("TABLE",), cost="PAID"),)))
+            waiting = subject.analyze("Judge performance", run_id="legacy")
+            record = store.get_object("interaction", "legacy")
+            payload = dict(record.payload)
+            payload["permission"].pop("expires_at")
+            store.save_object("interaction", "legacy", "legacy", payload)
+            with self.assertRaisesRegex(ValueError, "expired"):
+                subject.resume_permission("legacy", PermissionAnswer(
+                    permission_ref=waiting.permissions[0].permission_id, approved=True))
+
     def test_revision_rejection_wrong_run_and_system_policy_preserve_constraints(self):
         from app.models.interaction import ConstraintRevisionAnswer
         with tempfile.TemporaryDirectory() as directory:
@@ -269,6 +296,18 @@ class EndToEndTests(unittest.TestCase):
         for package in result.response_packages:
             self.assertEqual(len(package.accepted_evidence), 1, "no cross-objective leakage")
 
+    def test_multi_objective_reports_do_not_overwrite_each_other(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = SqliteOperationalStore()
+            self.addCleanup(store.close)
+            recorder = RunRecorder(store, LocalFilesystemArtifactStorage(Path(directory)))
+            result = pipeline(judge_dictionary(), recorder=recorder).analyze(
+                "Judge injury and salary value", run_id="multi")
+            reports = store.list_objects("completion_report", "multi")
+            self.assertEqual(len(reports), 2)
+            self.assertEqual({item.payload["objective_ref"] for item in reports},
+                             {item.objective_id for item in result.objectives})
+
     def test_empty_source_yields_failed_objective_with_no_accepted_evidence(self):
         result = pipeline(judge_dictionary(), row_count=0).analyze("How did Judge perform?")
         self.assertEqual(result.objective_statuses, ("FAILED",))
@@ -292,6 +331,7 @@ class EndToEndTests(unittest.TestCase):
                 plan = ResumeService(store).build_plan("run-e2e")
                 self.assertTrue(plan.planner_terminal)
                 self.assertTrue(plan.reusable_artifact_refs)
+                self.assertTrue(Path(result.response_packages[0].accepted_evidence[0].payload_ref).is_file())
                 persisted_metrics = store.list_objects("run_event", "run-e2e")
                 self.assertEqual(len(persisted_metrics), len(result.runs[0].metrics))
                 self.assertEqual(persisted_metrics[-1].payload["event_type"], "FINALIZATION")

@@ -101,6 +101,10 @@ class KnowledgeRetriever:
             return False
         if query.as_of is not None and not item.is_current_on(today):
             return False
+        if (query.as_of is not None and item.as_of is not None and query.as_of < item.as_of
+                and item.effective_from is None):
+            # A current snapshot with no historical validity cannot establish a past fact.
+            return False
         if query.authority_floor is not None:
             if AUTHORITY_RANK[item.source_authority] < AUTHORITY_RANK[query.authority_floor]:
                 return False

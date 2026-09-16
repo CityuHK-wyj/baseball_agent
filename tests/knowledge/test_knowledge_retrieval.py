@@ -71,6 +71,12 @@ class RetrieverTests(unittest.TestCase):
                                                   as_of=date(2021, 6, 1)))
         self.assertEqual([entry.item_id for entry in package.items], ["RULE:OLD"])
 
+    def test_current_snapshot_without_effective_dates_is_not_a_historical_fact(self):
+        self.store.upsert_item(item("TEAM:NEW", "new_club", knowledge_type="TEAM",
+            aliases=("Club",), summary="Current sponsored stadium name.", as_of=date(2026, 9, 15)))
+        matches = self.retriever.retrieve(KnowledgeQuery(query="Club", as_of=date(2021, 7, 1)))
+        self.assertNotIn("TEAM:NEW", [match.item.knowledge_id for match in matches])
+
     def test_free_text_prefers_official_over_community(self):
         matches = self.retriever.retrieve(KnowledgeQuery(query="sentiment", max_items=5))
         official_rank = {match.item.knowledge_id: match.score for match in matches}

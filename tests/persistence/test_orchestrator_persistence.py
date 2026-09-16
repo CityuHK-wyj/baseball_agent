@@ -91,8 +91,8 @@ class OrchestratorPersistenceTests(unittest.TestCase):
         self.assertEqual(self.store.get_object("requirement_state", "r1").payload["status"], "SATISFIED")
         self.assertEqual(self.store.get_object("objective_state", "o1").payload["status"], "COMPLETE")
         self.assertEqual(len(self.store.list_objects("execution", RUN_ID)), 1)
-        self.assertIsNotNone(self.store.get_object("completion_report", RUN_ID))
-        self.assertIsNotNone(self.store.get_object("response_package", RUN_ID))
+        self.assertEqual(len(self.store.list_objects("completion_report", RUN_ID)), 1)
+        self.assertEqual(len(self.store.list_objects("response_package", RUN_ID)), 1)
 
         positions = [item.recovery_position for item in self.store.list_checkpoints(RUN_ID)]
         for expected in ("PLAN_ACCEPTED", "ARTIFACT_ASSESSED", "PLANNER_TERMINAL", "FINALIZATION"):

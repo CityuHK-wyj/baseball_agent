@@ -28,11 +28,14 @@ from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
 from app.semantic.schema_registry import SchemaRegistry
 from app.tools.knowledge import KnowledgeTool
 from app.tools.synthetic import SyntheticDataTool
+from app.tools.web_evidence import WebEvidenceTool
+from app.semantic.evidence import RuleBasedEvidenceExtractor
 
 
 def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=None,
                    persist: bool = True, demo: bool = False, empty: bool = False,
-                   tool_factory=None, capabilities=(), metric_registry=None, schema_registry=None):
+                   tool_factory=None, capabilities=(), metric_registry=None, schema_registry=None,
+                   web_fetcher=None, evidence_extractor=None, web_cost="FREE"):
     ids = lambda prefix: f"{prefix}-{uuid4().hex}"
     root = Path(runtime_dir) if runtime_dir is not None else settings.operational_store_path.parent
     owned = []
@@ -59,11 +62,18 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
                                           supported_artifact_types=("EVIDENCE",),
                                           supported_data_keys=("knowledge_statement",))
     all_capabilities = (knowledge_capability, *capabilities)
+    if web_fetcher is not None:
+        all_capabilities += (ToolCapability(tool="web-evidence", source_kind="WEB", cost=web_cost,
+            supported_artifact_types=("EVIDENCE",),
+            supported_data_keys=("injury_status", "salary", "news_claim")),)
     if demo:
         all_capabilities += (ToolCapability(tool="synthetic", source_kind="SYNTHETIC",
                              supported_artifact_types=("TABLE", "EVIDENCE", "FEATURE")),)
     def tools(requirements):
         result = {"shared-knowledge": KnowledgeTool(knowledge, requirements)}
+        if web_fetcher is not None:
+            result["web-evidence"] = WebEvidenceTool(web_fetcher,
+                evidence_extractor or RuleBasedEvidenceExtractor(id_factory=ids), requirements)
         if demo:
             result["synthetic"] = SyntheticDataTool(requirements, row_count=0 if empty else 1200)
         if tool_factory is not None:

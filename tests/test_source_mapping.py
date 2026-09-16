@@ -51,6 +51,11 @@ class SourceMappingResolverTests(unittest.TestCase):
         route = SourceMappingResolver(registry(), {}).resolve("t1", ("exit_velocity",))
         self.assertEqual(route.mode, "NO_MAPPING")
 
+    def test_mixed_direct_and_calculated_requirement_is_not_partially_routed(self):
+        route = SourceMappingResolver(registry(), {"POSTGRES": "hot"}).resolve(
+            "t1", ("exit_velocity", "wrc_plus"))
+        self.assertEqual(route.mode, "NO_MAPPING")
+
 
 class RouterSourceMappingTests(unittest.TestCase):
     def setUp(self):

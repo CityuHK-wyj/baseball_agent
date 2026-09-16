@@ -4,7 +4,7 @@ import io
 import json
 import unittest
 from contextlib import redirect_stdout
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from app.cli import main
@@ -43,6 +43,7 @@ class RefreshTests(unittest.TestCase):
         self.store.close()
 
     def test_reference_refresh_updates_live_fields_and_keeps_curated_identity(self):
+        started_at = datetime.now(timezone.utc)
         teams = [team for team in all_fake_teams(self.store) if team["abbreviation"] != "LAD"]
         teams.append(fake_team("LAD", "Los Angeles Dodgers", "New Sponsor Park",
                                division="National League West", league="National League"))
@@ -51,7 +52,8 @@ class RefreshTests(unittest.TestCase):
         lad = self.store.get_item("TEAM:LAD")
         self.assertEqual(lad.structured_payload["venue"], "New Sponsor Park")
         self.assertEqual(lad.structured_payload["zh_name"], "洛杉矶道奇")  # curated field preserved
-        self.assertEqual(lad.last_verified_at.date(), date(2026, 9, 15))
+        self.assertGreaterEqual(lad.last_verified_at, started_at)
+        self.assertLessEqual(lad.last_verified_at, datetime.now(timezone.utc))
         self.assertTrue(lad.structured_payload["franchise_lineage"])
         # The refresh pack must re-assert every reference item it owns, or a refresh would
         # supersede the league structure and silently degrade the store.

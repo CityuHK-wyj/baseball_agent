@@ -217,8 +217,7 @@ class KnowledgeDomainTests(unittest.TestCase):
 
     def test_temporal_validity_filtering(self):
         matches = self.kb.retriever.retrieve(KnowledgeQuery(query="balk", as_of=date(2019, 6, 1)))
-        self.assertTrue(matches)  # rules have no effective_from and remain valid
-        self.assertTrue(all(m.item.is_current_on(date(2019, 6, 1)) for m in matches))
+        self.assertEqual(matches, ())  # current rule snapshot has no asserted historical validity
 
 
 if __name__ == "__main__":
