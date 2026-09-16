@@ -9,6 +9,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
+from app.config import settings
 from app.models.clarification import ClarificationAnswer
 from app.pipeline import AnalysisPipeline
 from app.semantic.field_mapping import ZONE_UPPER_THIRD
@@ -17,7 +18,10 @@ TARGET = ("Find the top 5 MLB hitters by Exit Velocity when, after reaching two 
           "they faced fastballs above 95 mph located near the upper edge of the strike "
           "zone during 2023.")
 
+_PARQUET_PRESENT = any(settings.parquet_archive_path.glob("mlb_statcast_*.parquet"))
 
+
+@unittest.skipUnless(_PARQUET_PRESENT, "historical Parquet archive is not present locally")
 class RealAnalyticsSliceTests(unittest.TestCase):
     def _pipeline(self, root: Path, today=None) -> AnalysisPipeline:
         return AnalysisPipeline.default(
