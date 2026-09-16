@@ -113,5 +113,5 @@ def location_clarification_options() -> tuple[tuple[str, str, str], ...]:
         (ZONE_ABOVE_UPPER_EDGE, "Just above the strike zone (zones 11-12)",
          "the upper edge / shadow zone above the strike zone"),
         (BATTER_RELATIVE_UPPER_EDGE, "Exact batter-relative upper edge (needs sz_top/sz_bot)",
-         "most precise definition; the current local archive lacks those fields"),
+         "three-inch band at or below the batter-specific zone top; requires retained zone fields"),
     )

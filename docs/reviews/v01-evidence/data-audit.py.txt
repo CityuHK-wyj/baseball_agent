@@ -1,0 +1,52 @@
+import json,sys
+from pathlib import Path
+import duckdb
+sys.path.insert(0,'/home/158112/baseball_agent/baseball_agent')
+from app.config import settings as s
+
+def emit(key, rows): print(json.dumps({key:rows},default=str),flush=True)
+d=duckdb.connect(config={'threads':2})
+root=s.parquet_archive_path
+backup=Path('/tmp/ba_parquet_backup_20260916_191753')
+for f in sorted(root.glob('*.parquet')):
+ old=backup/f.name
+ d.execute(f"CREATE OR REPLACE VIEW n AS SELECT * FROM read_parquet('{f}')")
+ emit(f.name,d.execute('SELECT count(*),min(game_date),max(game_date),count(sz_top),count(sz_bot),count(p_throws),count(*) FILTER(WHERE balls NOT BETWEEN 0 AND 3 OR strikes NOT BETWEEN 0 AND 2) FROM n').fetchall())
+ if old.exists():
+  d.execute(f"CREATE OR REPLACE VIEW o AS SELECT * FROM read_parquet('{old}')")
+  cols=[x[0] for x in d.execute('DESCRIBE o').fetchall()]
+  col=','.join('"'+x+'"' for x in cols)
+  emit(f.name+'_difference',d.execute(f'SELECT (SELECT count(*) FROM o), (SELECT count(*) FROM (SELECT {col} FROM n EXCEPT ALL SELECT {col} FROM o)), (SELECT count(*) FROM (SELECT {col} FROM o EXCEPT ALL SELECT {col} FROM n))').fetchall())
+  emit(f.name+'_changed_rows',d.execute(f'SELECT game_date,game_pk,batter,pitcher,plate_x,plate_z FROM (SELECT {col} FROM n EXCEPT ALL SELECT {col} FROM o) LIMIT 12').fetchall())
+ emit(f.name+'_identical_duplicates',d.execute('SELECT coalesce(sum(n-1),0) FROM (SELECT count(*) n FROM n GROUP BY ALL HAVING count(*)>1)').fetchall()) if False else None
+# full-row duplicates without inventing pitch key absent from retained schema
+emit('parquet_duplicate_excess',d.execute(f"SELECT (SELECT count(*) FROM read_parquet('{root}/*.parquet')) - (SELECT count(*) FROM (SELECT DISTINCT * FROM read_parquet('{root}/*.parquet')))").fetchall())
+f=root/'mlb_statcast_2023.parquet'
+for label,predicate in [('old','plate_z >= sz_top - .25'),('bounded','plate_z BETWEEN sz_top-.25 AND sz_top')]:
+ emit('parquet2023_'+label,d.execute(f"SELECT count(*),count(*) FILTER(WHERE {predicate}), avg(launch_speed) FILTER(WHERE {predicate}),count(*) FILTER(WHERE launch_speed IS NOT NULL),count(*) FILTER(WHERE {predicate} AND launch_speed IS NOT NULL),count(*) FILTER(WHERE {predicate} AND launch_speed IS NOT NULL AND description='hit_into_play') FROM read_parquet('{f}')").fetchall())
+try:
+ import psycopg2
+ c=psycopg2.connect(host=s.postgres_host,port=s.postgres_port,dbname=s.postgres_db,user=s.postgres_user,password=s.postgres_password,connect_timeout=5)
+ cur=c.cursor()
+ queries={
+ 'role':"SELECT current_user,current_setting('transaction_read_only'),rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls FROM pg_roles WHERE rolname=current_user",
+ 'pg_pitch': 'SELECT count(*),min(game_date),max(game_date),count(sz_top),count(sz_bot),count(p_throws),count(distinct batter_id) FROM statcast_pitches',
+ 'pg_events':'SELECT count(*),min(game_date),max(game_date) FROM batting_events',
+ 'pg_dictionary':'SELECT count(*),count(distinct player_id) FROM player_dictionary',
+ 'pg_unresolved':'SELECT count(distinct p.batter_id),count(*) FROM statcast_pitches p LEFT JOIN player_dictionary d ON p.batter_id=d.player_id WHERE d.player_id IS NULL OR d.player_name IS NULL',
+ 'pg_duplicate_excess':'SELECT (SELECT count(*) FROM statcast_pitches) - (SELECT count(*) FROM (SELECT DISTINCT * FROM statcast_pitches) x)',
+ 'pg_first_dates':'SELECT game_date,count(*),count(distinct game_pk) FROM statcast_pitches GROUP BY game_date ORDER BY game_date LIMIT 10',
+ 'pg_first_games':"SELECT DISTINCT game_pk FROM statcast_pitches WHERE game_date='2024-03-15'",
+ 'pg_invalid_counts':'SELECT count(*) FROM statcast_pitches WHERE balls NOT BETWEEN 0 AND 3 OR strikes NOT BETWEEN 0 AND 2',
+ }
+ for label,predicate in [('old','plate_z >= sz_top - .25'),('bounded','plate_z BETWEEN sz_top-.25 AND sz_top')]:
+  queries['postgres_'+label]=f"SELECT count(*),count(*) FILTER(WHERE {predicate}), avg(launch_speed) FILTER(WHERE {predicate}),count(*) FILTER(WHERE launch_speed IS NOT NULL),count(*) FILTER(WHERE {predicate} AND launch_speed IS NOT NULL),count(*) FILTER(WHERE {predicate} AND launch_speed IS NOT NULL AND description='hit_into_play') FROM statcast_pitches"
+ for key,sql in queries.items():
+  cur.execute(sql);emit(key,cur.fetchall())
+ # Transaction rollback after each probe: no durable writes even if unexpected permission succeeds.
+ for label,sql in [('CREATE','CREATE TABLE public.v01_review_privilege_probe(x int)'),('INSERT','INSERT INTO statcast_pitches(game_pk) SELECT -1 WHERE false'),('UPDATE','UPDATE statcast_pitches SET game_pk=game_pk WHERE false'),('DELETE','DELETE FROM statcast_pitches WHERE false'),('DROP','DROP TABLE IF EXISTS public.v01_review_privilege_probe')]:
+  try: cur.execute(sql);emit('privilege_'+label,'UNEXPECTED_SUCCESS')
+  except Exception as e: emit('privilege_'+label,{'error':type(e).__name__,'sqlstate':e.pgcode})
+  finally:c.rollback()
+ c.close()
+except Exception as e: emit('postgres_connection',type(e).__name__)

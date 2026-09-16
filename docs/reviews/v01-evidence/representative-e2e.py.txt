@@ -1,0 +1,12 @@
+import sys,json,tempfile
+from pathlib import Path
+sys.path.insert(0,'/home/158112/baseball_agent/baseball_agent')
+from app.pipeline import AnalysisPipeline
+from app.models.contracts import RankingConstraint,NumericConstraint,LocationConstraint
+from app.semantic.field_mapping import BATTER_RELATIVE_UPPER_EDGE
+for year in ('2023','2025','2023 vs 2024'):
+ with tempfile.TemporaryDirectory() as directory:
+  p=AnalysisPipeline.default(runtime_dir=Path(directory))
+  result=p.analyze(f'Top 5 by exit velocity against fastballs after two strikes during {year}; minimum 3 batted balls.',constraints=(RankingConstraint(metric_key='exit_velocity',aggregation='AVG',limit=5),NumericConstraint(key='pitch_velocity',operator='GTE',value=95,unit='mph'),LocationConstraint(definition=BATTER_RELATIVE_UPPER_EDGE)),run_id='review')
+  print(json.dumps({'window':year,'statuses':result.objective_statuses,'objective_count':len(result.objectives),'sources':[[e.source_kind for e in pkg.accepted_evidence] for pkg in result.response_packages],'responses':result.responses,'runs':[r.model_dump(mode='json') for r in result.runs]},default=str),flush=True)
+  p.close()

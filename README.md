@@ -7,7 +7,7 @@ tracks requirement/objective state, and produces a sourced answer with explicit
 limitations.
 
 The architecture is **frozen** (blog decisions D001–D066). This repository is the working
-implementation: a deterministic, fully tested vertical slice with provider-agnostic LLM
+implementation: a deterministic vertical slice with a passing regression suite with provider-agnostic LLM
 seams. See [docs/blog-implementation-matrix.md](docs/blog-implementation-matrix.md) for
 exactly which blog decisions are implemented.
 
@@ -51,7 +51,10 @@ exactly which blog decisions are implemented.
   (rules, transactions, bilingual glossary and metrics, all 30 teams, ballparks, players,
   awards, trusted sources and the community directory) behind `ContextService`.
 
-Status: **IN_PROGRESS — stable checkpoint** on `pi/analytics-integration`.
+Status: **FINAL_REVIEW_BLOCKED** on `codex/v0.1-final-review`.
+The independent review found remaining analytics intent and population defects despite
+passing tests and live queries. See [the final review](docs/reviews/v01-final-review.md)
+for fixed defects, open blockers, and precise verification limits.
 Shared Knowledge and the hardened runtime are integrated. Definition questions use stored
 knowledge; synthetic analytics requires `--demo`. The first real analytics vertical slice
 now runs end to end against the historical Parquet archive (typed two-strike / fastball /

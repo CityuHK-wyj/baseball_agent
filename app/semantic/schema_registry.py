@@ -40,8 +40,8 @@ class SchemaRegistry:
 
 
 # Verified against the real archive (2015-2023 Parquet) and the loader DDL (PostgreSQL).
-# Neither local source carries ``sz_top`` / ``sz_bot``, so the exact batter-relative
-# upper-edge definition is deliberately not advertised as physically available.
+# These are declared schemas, not runtime introspection. Both rebuilt sources retain
+# sz_top / sz_bot; a stale installation still fails at query time.
 _PARQUET_STATCAST_COLUMNS = (
     "game_date", "game_pk", "release_speed", "release_spin_rate", "pitch_type",
     "player_name", "pitcher", "batter", "events", "description", "plate_x", "plate_z",
@@ -80,10 +80,10 @@ def statcast_schema_registry() -> SchemaRegistry:
             columns=_POSTGRES_STATCAST_COLUMNS),
         SchemaTable(
             table_name="batting_events", source_kind="POSTGRES",
-            description="Event-level Statcast outcomes (478k rows); batter/pitcher names present",
+            description="Event-level Statcast outcomes; batter/pitcher names present",
             columns=_POSTGRES_BATTING_EVENTS_COLUMNS),
         SchemaTable(
             table_name="player_dictionary", source_kind="POSTGRES",
-            description="MLBAM player_id -> player_name mapping (913 rows)",
+            description="MLBAM player_id -> player_name mapping",
             columns=_POSTGRES_PLAYER_DICTIONARY_COLUMNS),
     ))

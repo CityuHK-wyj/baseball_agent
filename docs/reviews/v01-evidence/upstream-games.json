@@ -1,0 +1,67 @@
+[
+  {
+    "game": 414012,
+    "upstream_total_valid_rebuilt_old": [
+      243,
+      243,
+      243,
+      242
+    ],
+    "matched_field_mismatches": [
+      243,
+      0
+    ]
+  },
+  {
+    "game": 414625,
+    "upstream_total_valid_rebuilt_old": [
+      264,
+      264,
+      264,
+      263
+    ],
+    "matched_field_mismatches": [
+      264,
+      0
+    ]
+  },
+  {
+    "game": 414773,
+    "upstream_total_valid_rebuilt_old": [
+      291,
+      291,
+      291,
+      289
+    ],
+    "matched_field_mismatches": [
+      291,
+      0
+    ]
+  },
+  {
+    "game": 490181,
+    "upstream_total_valid_rebuilt_old": [
+      288,
+      287,
+      287,
+      284
+    ],
+    "matched_field_mismatches": [
+      287,
+      0
+    ]
+  },
+  {
+    "game": 529812,
+    "upstream_total_valid_rebuilt_old": [
+      298,
+      292,
+      292,
+      291
+    ],
+    "matched_field_mismatches": [
+      292,
+      0
+    ]
+  }
+]

@@ -15,12 +15,14 @@ Status values:
 This file is maintained as implementation proceeds. It is the evidence for
 "which blog designs are actually implemented", not a wish list.
 
-Integration base: runtime hardening `b68ccf7` + Shared Knowledge `7d44ef4`.
-Current branch: `astra/v0.1-integration`, 343 tests passing (2026-09-16).
-Crash-safe consumed-interaction recovery and frozen date windows are implemented.
-Complex analytics planning and multi-window date clarification remain partial.
-Guarded local Parquet reads are VERIFIED_LIVE. PostgreSQL, the full high-zone query and
-live Web evidence remain UNVERIFIED_LIVE. See [validation](usage/v01-validation.md).
+Current review: **FINAL_REVIEW_BLOCKED**, `codex/v0.1-final-review`, Builder
+`b0e5d86bb9e2b254bd82c390a9fcf8e609c49d57`. Baseline 380 / reviewed 388 tests.
+See [independent final review](reviews/v01-final-review.md) for authoritative status.
+PostgreSQL and Parquet executions are LIVE_VERIFIED; analytics intent/qualification and
+population correctness remain blockers. Web Evidence and Operational PostgreSQL are
+UNVERIFIED_LIVE. Older IMPLEMENTED rows describe structural code presence, not release approval.
+Verification vocabulary: IMPLEMENTED, TESTED_OFFLINE, LIVE_VERIFIED,
+PARTIALLY_LIVE_VERIFIED, UNVERIFIED_LIVE, DEFERRED. Older PARTIAL/MISSING entries identify gaps.
 
 | v0.1 integration surface | Status | Evidence |
 | --- | --- | --- |
@@ -30,7 +32,7 @@ live Web evidence remain UNVERIFIED_LIVE. See [validation](usage/v01-validation.
 | Knowledge in Planner/Judge/Response | IMPLEMENTED | bounded query/date-aware ContextPackage, integration/LLM tests |
 | Cross-run Planner isolation | IMPLEMENTED | repeated pipeline E2E regression |
 | Multi-objective report persistence | IMPLEMENTED | reports keyed by run and objective, E2E regression |
-| Crash after interaction consumption | PARTIAL | replay prevented; automatic recovery still open |
+| Crash after interaction consumption | TESTED_OFFLINE | consumed answers, durable intent, artifact reuse, process restart tested; uncertain external outcomes fail closed |
 
 ## A. Core domain contracts (O001, D005, D013, D014, D036)
 
@@ -59,7 +61,7 @@ live Web evidence remain UNVERIFIED_LIVE. See [validation](usage/v01-validation.
 | Controlled objective type + open subtype (D024) | IMPLEMENTED | `app/models/contracts.py`, `app/semantic/objective_extractor.py` | `tests/semantic/test_objective_extractor.py` | Type + subtype + base_priority |
 | Implicit constraint marked as inferred (D026) | IMPLEMENTED | `app/models/contracts.py` origin/authority | `tests/semantic/test_constraints.py` | CONTEXT_INFERRED → INFERRED_DEFAULT |
 | Clarification with options when ambiguous (D045) | IMPLEMENTED | `app/models/clarification.py`, `app/semantic/entity_resolver.py` | `tests/semantic/test_entity_resolver.py` | Recommendation, never silent choice |
-| Entity resolution + alias/nickname (D004) | IMPLEMENTED | `app/semantic/entity_resolver.py` | `tests/semantic/test_entity_resolver.py` | In-memory dictionary; persistent dictionary pending |
+| Entity resolution + alias/nickname (D004) | IMPLEMENTED | `app/semantic/entity_resolver.py` | `tests/semantic/test_entity_resolver.py` | Projection from canonical KnowledgeStore; resolver dictionary is a runtime view |
 | Evidence/Artifact/Metric transformation (post 09 §1) | IMPLEMENTED | `app/semantic/evidence.py`, `app/tools/web_evidence.py`, `app/features/metrics.py` | `tests/test_evidence.py`, `tests/test_web_evidence_tool.py`, `tests/test_feature_engine.py` | Injected Web Tool → RawWebResult → Evidence → EVIDENCE Artifact runtime chain; live provider unverified |
 
 ## C. Requirement Decomposer (D034, D062)
