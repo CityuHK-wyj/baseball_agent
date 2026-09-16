@@ -9,12 +9,14 @@ role and a DuckDB connection is ticket 02 (`02-verified-execution.md`).
 """
 
 from dataclasses import dataclass
+from glob import iglob
 from pathlib import Path
 from typing import Iterable
 
 import sqlglot
 from sqlglot import exp
 from sqlglot.errors import ParseError
+from sqlglot.optimizer.scope import traverse_scope
 
 
 @dataclass(frozen=True)
@@ -41,12 +43,16 @@ DEFAULT_FORBIDDEN_FUNCTIONS = frozenset({
     "lo_import", "lo_export", "dblink", "pg_sleep", "query_to_xml",
     "read_text", "read_blob", "write_file", "write_text", "write_blob", "copy_file",
     "shell", "system", "getenv", "setenv", "load_extension",
+    "query", "query_table", "json_execute_serialized_sql", "read_duckdb",
 })
 
 # Functions that read data files. Allowed only under an explicit file root.
 FILE_READING_FUNCTIONS = frozenset({
     "read_parquet", "parquet_scan", "read_csv", "read_csv_auto", "read_json",
     "read_json_auto", "read_ndjson", "read_ndjson_auto", "read_xlsx", "glob",
+    "read_json_objects", "read_json_objects_auto", "read_ndjson_objects", "sniff_csv",
+    "parquet_metadata", "parquet_schema", "parquet_file_metadata", "parquet_full_metadata",
+    "parquet_kv_metadata", "parquet_bloom_probe",
 })
 
 _SELECT_ROOTS = (exp.Select, exp.Union, exp.Intersect, exp.Except, exp.Subquery)
@@ -63,7 +69,8 @@ def resolve_within_root(path: str, root: str | Path) -> bool:
     if ".." in candidate.parts:
         return False
     if not candidate.is_absolute():
-        candidate = root_path / candidate
+        # DuckDB interprets relative paths against the process working directory.
+        candidate = Path.cwd() / candidate
     literal_parts: list[str] = []
     for part in candidate.parts:
         if any(token in part for token in "*?["):
@@ -71,7 +78,12 @@ def resolve_within_root(path: str, root: str | Path) -> bool:
         literal_parts.append(part)
     prefix = Path(*literal_parts) if literal_parts else root_path
     resolved = prefix.resolve()
-    return resolved == root_path or root_path in resolved.parents
+    if resolved != root_path and root_path not in resolved.parents:
+        return False
+    # A safe glob prefix can still match a symlink to an external file.
+    return all(root_path == target or root_path in target.parents
+               for match in iglob(str(candidate), recursive=True)
+               for target in (Path(match).resolve(),))
 
 
 def _function_name(node: exp.Expression) -> str:
@@ -114,18 +126,17 @@ def _file_paths(node: exp.Expression) -> tuple[str, ...] | None:
 
 
 def _referenced_tables(tree: exp.Expression) -> tuple[str, ...]:
-    cte_names = {cte.alias_or_name for cte in tree.find_all(exp.CTE)}
     names: list[str] = []
-    for table in tree.find_all(exp.Table):
-        if not isinstance(table.this, (exp.Identifier, exp.Dot)):
-            continue  # table function such as read_parquet(...)
-        name = table.name
-        if not name or name in cte_names:
-            continue
-        # Keep schema/database qualification so an unqualified allowlist entry
-        # cannot be satisfied by a trusted name in an untrusted schema.
-        qualified = f"{table.db}.{name}" if table.db else name
-        names.append(qualified)
+    for scope in traverse_scope(tree):
+        for table in scope.tables:
+            if not isinstance(table.this, (exp.Identifier, exp.Dot)):
+                continue
+            # Qualified tables always refer to physical relations. Unqualified
+            # CTE references are resolved only in their actual lexical scope.
+            source = scope.sources.get(table.alias_or_name)
+            if not table.db and not table.catalog and not isinstance(source, exp.Table):
+                continue
+            names.append(".".join(part for part in (table.catalog, table.db, table.name) if part))
     return tuple(dict.fromkeys(names))
 
 

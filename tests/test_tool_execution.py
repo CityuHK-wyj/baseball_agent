@@ -143,6 +143,14 @@ REJECTED_SQL = [
 
 
 class PostgresGuardTests(unittest.TestCase):
+    def test_runtime_rejects_non_readonly_role_before_connecting(self):
+        from dataclasses import replace
+        connect = ExplodingConnect()
+        config = replace(settings(credential_environment()), postgres_user="maintenance_role")
+        result = PostgresReadOnlyExecutor(config, allowed_tables=(), connect_fn=connect).execute("SELECT 1")
+        self.assertEqual(connect.calls, 0)
+        self.assertTrue(result.policy_blocked)
+
     def test_rejected_sql_never_opens_a_connection(self):
         for sql in REJECTED_SQL:
             with self.subTest(sql=sql):
@@ -212,6 +220,9 @@ class DuckDBGuardTests(unittest.TestCase):
                     "SELECT * FROM read_parquet(['/etc/passwd'])",
                     "SELECT * FROM read_parquet('https://example.test/x.parquet')",
                     "SELECT * FROM read_parquet((SELECT '/etc/passwd'))",
+                    "SELECT * FROM query('SELECT * FROM read_csv_auto(''/tmp/outside.csv'')')",
+                    "SELECT * FROM query_table('/tmp/outside.csv')",
+                    "SELECT * FROM parquet_metadata('/tmp/outside.parquet')",
                     "SELECT * FROM read_csv_auto('file:///etc/passwd')",
                     "SELECT * FROM '/etc/passwd'"):
             with self.subTest(sql=sql):

@@ -52,6 +52,8 @@ class PostgresReadOnlyExecutor:
         return self.execute_with_rows(sql)[0]
 
     def execute_with_rows(self, sql: str) -> tuple[ToolResult, tuple]:
+        if self._config.postgres_user != "baseball_readonly":
+            return ToolResult.policy("Analytics runtime requires the baseball_readonly role."), ()
         guard = guard_read_only_sql(sql, dialect="postgres", allowed_tables=self._allowed_tables)
         if not guard.allowed:
             return ToolResult.policy(guard.reason), ()
