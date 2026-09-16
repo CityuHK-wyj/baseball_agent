@@ -93,7 +93,8 @@ live Web evidence remain UNVERIFIED_LIVE. See [validation](usage/v01-validation.
 | Source preference is soft | IMPLEMENTED | `app/agent/routing.py` | `tests/test_routing.py` | |
 | `MetricDefinition` + `SourceMapping` (D020, D021) | IMPLEMENTED | `app/models/metrics.py`, `app/semantic/metric_registry.py` | `tests/test_metrics.py` | DIRECT/CALCULATED modeled and consumed by the resolver |
 | Source Mapping execution (§21) | IMPLEMENTED | `app/agent/source_mapping.py`, `Orchestrator`, `Router.route(execution_route=...)` | `tests/test_source_mapping.py` | DIRECT / CALCULATED / NO_MAPPING and mapped physical tool constraint tested through runtime |
-| Schema Registry semantic→physical (D015) | PARTIAL | `app/semantic/schema_registry.py` | `tests/test_schema_registry.py` | Lookup only; no planner/tool consumption |
+| Schema Registry semantic→physical (D015) | IMPLEMENTED | `app/semantic/schema_registry.py` + `app/semantic/field_mapping.py` | `tests/test_schema_registry.py`, `tests/test_field_mapping.py`, `tests/test_statcast_tool.py` | Semantic keys map to physical columns only in the registry; the real Statcast adapters consume it, never the Planner |
+| Typed analytical constraints (count / pitch velocity / pitch family / location / ranking) | IMPLEMENTED | `app/models/contracts.py`, `app/semantic/analytics_intent.py` | `tests/semantic/test_analytics_intent.py` | Two-strike, fastball, pitch velocity, upper-zone and ranking are typed, not opaque strings |
 
 ## F. Data & Tool layer (D002, D009, D016, D047)
 

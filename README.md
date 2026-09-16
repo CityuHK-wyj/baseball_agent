@@ -36,14 +36,27 @@ exactly which blog decisions are implemented.
   implementations and LLM implementations behind the same Protocols.
 - **Read-only safety** — an AST-based SQL guard validated before any connection, a
   read-only PostgreSQL transaction, a DuckDB path sandbox, and a redacted result contract.
+- **Typed analytical constraints** — two-strike count, pitch velocity (distinct from exit
+  velocity), pitch family (fastball → explicit FF/SI/FC/FA codes), upper-zone location
+  definitions and ranking intent are typed, not opaque strings, and flow from the query
+  into the Planner without leaking physical column names.
+- **Semantic/physical separation** — semantic keys (`pitch_velocity`, `exit_velocity`,
+  `pitch_type`, `count`, `pitch_location`, `batter`) map to physical columns
+  (`release_speed`, `launch_speed`, `zone`, `strikes`, …) only in the deterministic
+  `FieldMappingRegistry` + read-only adapters, never in the Planner.
+- **Real read-only Statcast adapters** — `ParquetStatcastTool` (DuckDB) and
+  `PostgresStatcastTool` (read-only PostgreSQL) build one validated read-only query from
+  the semantic descriptor and typed constraints, returning an `Artifact` with provenance.
 - **Shared Knowledge base** — a persistent, sourced, versioned MLB domain knowledge base
   (rules, transactions, bilingual glossary and metrics, all 30 teams, ballparks, players,
   awards, trusted sources and the community directory) behind `ContextService`.
 
-Status: **IN_PROGRESS — stable checkpoint** on `astra/v0.1-integration`.
+Status: **IN_PROGRESS — stable checkpoint** on `pi/analytics-integration`.
 Shared Knowledge and the hardened runtime are integrated. Definition questions use stored
-knowledge; synthetic analytics requires `--demo`. See tested commands, live results,
-and remaining gaps in [v0.1 validation](docs/usage/v01-validation.md).
+knowledge; synthetic analytics requires `--demo`. The first real analytics vertical slice
+now runs end to end against the historical Parquet archive (typed two-strike / fastball /
+pitch-velocity / upper-zone constraints + exit-velocity ranking). See tested commands, live
+results, and remaining gaps in [v0.1 validation](docs/usage/v01-validation.md).
 
 ## Architecture
 
@@ -171,14 +184,15 @@ See [docs/usage/knowledge-base.md](docs/usage/knowledge-base.md),
 
 ```
 app/
-  semantic/      entity resolution, objectives, requirement decomposition, registries
+  semantic/      entity resolution, objectives, requirement decomposition, registries,
+                 typed analytical intent + semantic/physical field mapping
   models/        domain contracts (definitions and runtime state, including knowledge)
   knowledge/     persistent Shared Knowledge store, ingestion, refresh and retrieval
   agent/         planner, router, source mapping, executor, orchestrator, response, review
   assessment/    deterministic validator, judge, adequacy rules
   context/       Shared Context retrieval (not an agent)
   persistence/   operational store, artifact storage, recorder, resume, checkpoints
-  tools/         guarded read-only execution, results, synthetic source
+  tools/         guarded read-only execution, results, real Statcast adapters, synthetic source
   features/      deterministic Feature Engine
   llm/           provider abstraction, prompts, LLM planner/judge/response
   observability/ redacted events and evaluation metrics
@@ -199,17 +213,21 @@ docs/
 
 ## Status and limitations
 
-`IN_PROGRESS — stable checkpoint`. Local Parquet reads were verified. MLB StatsAPI
-returned 30 teams once; later network attempts failed. PostgreSQL, current-data analytics,
-the complete high-zone query and live Web evidence remain `UNVERIFIED_LIVE`.
-Consumed interactions can resume with `resume --execute`; durable executions are reused.
-Uncertain in-flight tool calls stop without automatic retry. Analytics/date planning still
-needs completion. RAG and pgvector remain deferred. See
+`IN_PROGRESS — stable checkpoint`. The historical Parquet archive (2015–2023) is
+`LIVE_VERIFIED` through the real read-only analytics path: the target two-strike,
+fastball ≥ 95 mph, upper-zone, top-5 exit-velocity query returns real rows with
+provenance and no synthetic fallback. Analytical PostgreSQL is `UNVERIFIED_LIVE` and
+blocked on `POSTGRES_PASSWORD`; the exact batter-relative upper edge needs
+`sz_top`/`sz_bot`, which neither local source provides, so it is surfaced as an explicit
+clarification/limitation rather than silently replaced with `zone IN (...)`. MLB StatsAPI
+returned 30 teams once; later network attempts failed. Current-data analytics and live Web
+evidence remain `UNVERIFIED_LIVE`. RAG and pgvector remain deferred. See
 [docs/development-status.md](docs/development-status.md).
+
 # Date planning checkpoint
 
 The default pipeline freezes `近30天` / `last 30 days`, single calendar years and ISO
-date ranges before execution, preserving them across resume. Complex analytics planning
-and multi-window date clarification are still incomplete; see
-[validation status](docs/usage/v01-validation.md). Current-data/Web Evidence remains
-`UNVERIFIED_LIVE` despite successful public MLB teams transport.
+date ranges before execution, preserving them across resume (now also in the real analytics
+path). Multi-window date comparison (`2023 vs 2024`, recent vs previous period) still fails
+closed pending date clarification support; see
+[validation status](docs/usage/v01-validation.md).

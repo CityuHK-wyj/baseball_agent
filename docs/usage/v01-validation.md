@@ -67,8 +67,9 @@ expiry fail closed.
 | Probe | Result |
 | --- | --- |
 | DuckDB guarded read of `mlb_statcast_2023.parquet` | `VERIFIED_LIVE`: five rows returned |
-| High-zone two-strike >95 mph EV ranking | `UNVERIFIED_LIVE`: archive lacks `sz_bot` and `sz_top` used by this query; no silent zone substitution |
-| Analytics PostgreSQL | `UNVERIFIED_LIVE`: localhost:5433 refused the connection |
+| Real analytics slice (two-strike, fastball >95 mph, upper zone, top-5 EV) | `LIVE_VERIFIED`: end-to-end over the Parquet archive with provenance, no synthetic fallback |
+| High-zone exact batter-relative upper edge | `UNVERIFIED_LIVE`: archive and PostgreSQL lack `sz_top`/`sz_bot`; surfaced as clarification/limitation, never silently replaced with `zone IN (...)` |
+| Analytics PostgreSQL | `UNVERIFIED_LIVE`: reachable but requires `POSTGRES_PASSWORD` |
 | MLB StatsAPI transport | Returned 30 teams once; subsequent attempts failed; transport verification does not prove live Web evidence extraction |
 | Live WebEvidenceTool flow | `UNVERIFIED_LIVE`; default pipeline tested with an injected document fixture |
 | Operational PostgreSQL | `UNVERIFIED_LIVE`: separate connection not configured |
@@ -102,3 +103,9 @@ Complex analytics planning and the live gaps above still prevent a v0.1 completi
 Latest `python3 scripts/verify_v01_live.py`: PostgreSQL authentication requires a password;
 historical Parquet bounded reads and MLB teams transport pass. High-zone analytics lacks
 sz_bot/sz_top. Transport success is not current-data or Web Evidence validation.
+
+The real analytics vertical slice (typed constraints → read-only Parquet adapter → ranked
+answer) is exercised by `tests/integration/test_analytics_integration.py` and requires no
+synthetic data. To live-verify the PostgreSQL adapter, export `POSTGRES_PASSWORD` for the
+`baseball_readonly` role in the current environment; the runtime never reads it from source
+or `.env.example`.

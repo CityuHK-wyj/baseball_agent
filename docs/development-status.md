@@ -2,7 +2,33 @@
 
 Status: IN_PROGRESS — stable checkpoint
 
-Latest runtime closure: 343 tests pass. Relative day windows, single calendar years and
+## Analytics vertical slice checkpoint — 2026-09-16
+
+Branch: `pi/analytics-integration` (branched from `astra/v0.1-integration` @ `107d55e`).
+369 tests pass; compileall and secret scan pass.
+
+Delivered: typed analytical constraints (`CountConstraint`, `PitchTypeConstraint`,
+`LocationConstraint`, `RankingConstraint`), a deterministic analytics-intent parser, a
+semantic-key → physical-field `FieldMappingRegistry` with explicit fastball codes and
+named location definitions, real read-only `ParquetStatcastTool` / `PostgresStatcastTool`
+adapters, constraint-key-aware routing, and an end-to-end real-data answer projection.
+
+The target query — top-5 exit velocity over two-strike, fastball ≥ 95 mph, upper-zone
+pitches — now runs end to end against the historical Parquet archive with provenance and
+**no synthetic fallback** (`LIVE_VERIFIED`). The bare "upper edge" wording is surfaced as a
+constraint clarification; the exact batter-relative definition (needs `sz_top`/`sz_bot`) is
+never silently replaced with `zone IN (...)`. Analytical PostgreSQL is `UNVERIFIED_LIVE`
+and blocked on `POSTGRES_PASSWORD`. Multi-window date comparison remains `DEFERRED`.
+
+Schema discovery (verified, not from docs): Parquet 2015–2023 has `release_speed`,
+`pitch_type`, `plate_z`, `zone`, `balls`, `strikes`, `launch_speed`, `batter` but lacks
+`sz_top`/`sz_bot`/`p_throws`/`exit_velocity` (exit velocity is `launch_speed`). PostgreSQL
+`statcast_pitches` uses `batter_id`/`pitcher_id` and the same physical fields, also lacking
+`sz_top`/`sz_bot`.
+
+## Previous checkpoint
+
+343 tests pass. Relative day windows, single calendar years and
 ISO date ranges now enter immutable requirements and survive restart without drift.
 Multiple date windows fail closed pending date clarification support. Ordered live probes:
 analytics PostgreSQL is reachable but authentication needs a password; local historical

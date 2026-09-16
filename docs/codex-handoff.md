@@ -1,5 +1,28 @@
 # Codex Handoff
 
+## Analytics vertical slice checkpoint — 2026-09-16
+
+Branch `pi/analytics-integration` (from `astra/v0.1-integration` @ `107d55e`); 369 tests
+pass, compileall and secret scan pass. The first real-data analytics path is done end to
+end against the historical Parquet archive: typed two-strike / fastball / pitch-velocity /
+upper-zone constraints plus exit-velocity ranking travel query → semantic normalization →
+requirement → Planner → Router → real read-only DuckDB adapter → real rows → Artifact →
+assessment → ResponsePackage → answer, with provenance and no synthetic fallback.
+
+Key seams: `app/semantic/analytics_intent.py` (typed intent + location clarification),
+`app/semantic/field_mapping.py` (semantic → physical keys, fastball codes, location
+definitions), `app/tools/statcast.py` (real adapters), `constraint_capability_keys` in
+`app/agent/routing.py`, and `objective_result` projection in the Orchestrator/Response.
+
+Truthful status: Parquet `LIVE_VERIFIED`; analytical PostgreSQL `UNVERIFIED_LIVE` (needs
+`POSTGRES_PASSWORD` — do not guess or commit it); the exact batter-relative upper edge needs
+`sz_top`/`sz_bot`, which both local sources lack, so it is clarified/limited rather than
+silently substituted. Multi-window date comparison remains `DEFERRED`.
+
+Exact next task: provide `POSTGRES_PASSWORD` in the environment to live-verify the
+PostgreSQL adapter; then implement multi-window date comparison (or its clarification)
+without over-generalizing.
+
 ## Date planning checkpoint — 2026-09-16
 
 343 tests pass. Relative day windows (inclusive), single calendar years and ISO date
