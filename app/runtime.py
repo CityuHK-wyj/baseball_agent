@@ -25,8 +25,12 @@ from app.semantic.entity_resolver import EntityResolver
 from app.semantic.normalizer import SemanticNormalizer
 from app.semantic.objective_extractor import RuleBasedObjectiveExtractor
 from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
-from app.semantic.schema_registry import SchemaRegistry
+from app.semantic.field_mapping import (ZONE_ABOVE_UPPER_EDGE, ZONE_UPPER_THIRD,
+                                        FieldMappingRegistry)
+from app.semantic.schema_registry import SchemaRegistry, statcast_schema_registry
+from app.tools.execution import DuckDBReadOnlyExecutor, PostgresReadOnlyExecutor
 from app.tools.knowledge import KnowledgeTool
+from app.tools.statcast import ParquetStatcastTool, PostgresStatcastTool
 from app.tools.synthetic import SyntheticDataTool
 from app.tools.web_evidence import WebEvidenceTool
 from app.semantic.evidence import RuleBasedEvidenceExtractor
@@ -49,7 +53,7 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
         knowledge = KnowledgeBase(store)
     dictionary = entity_dictionary_from_knowledge(knowledge.store)
     metric_registry = metric_registry or metric_registry_from_knowledge(knowledge.store)
-    schema_registry = schema_registry or SchemaRegistry()
+    schema_registry = schema_registry or (SchemaRegistry() if demo else statcast_schema_registry())
     context = ContextService((KnowledgeContextSource(knowledge), SchemaRegistrySource(schema_registry)))
     if recorder is None and persist:
         path = root / "operational.db" if runtime_dir is not None else settings.operational_store_path
@@ -61,7 +65,34 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
     knowledge_capability = ToolCapability(tool="shared-knowledge", source_kind="WEB",
                                           supported_artifact_types=("EVIDENCE",),
                                           supported_data_keys=("knowledge_statement",))
-    all_capabilities = (knowledge_capability, *capabilities)
+    analytics_capabilities: list[ToolCapability] = []
+    field_mapping: FieldMappingRegistry | None = None
+    if not demo:
+        field_mapping = FieldMappingRegistry()
+        analytics_capabilities = [
+            ToolCapability(
+                tool="statcast-parquet", source_kind="PARQUET",
+                supported_artifact_types=("TABLE",),
+                supported_data_keys=("exit_velocity", "batter", "pitch_velocity", "pitch_type",
+                                     "count", "balls", "pitch_location", "game_date"),
+                supported_constraint_keys=("count", "pitch_velocity", "pitch_type",
+                                           "ranking",
+                                           f"pitch_location:{ZONE_UPPER_THIRD}",
+                                           f"pitch_location:{ZONE_ABOVE_UPPER_EDGE}"),
+                coverage="2015-2023 Parquet archive"),
+            ToolCapability(
+                tool="statcast-postgres", source_kind="POSTGRES",
+                supported_artifact_types=("TABLE",),
+                supported_data_keys=("exit_velocity", "batter", "pitch_velocity", "pitch_type",
+                                     "count", "balls", "pitch_location", "game_date"),
+                supported_constraint_keys=("count", "pitch_velocity", "pitch_type",
+                                           "ranking",
+                                           f"pitch_location:{ZONE_UPPER_THIRD}",
+                                           f"pitch_location:{ZONE_ABOVE_UPPER_EDGE}"),
+                coverage="2024-2026 PostgreSQL",
+                available=bool(settings.postgres_password)),
+        ]
+    all_capabilities = (knowledge_capability, *analytics_capabilities, *capabilities)
     if web_fetcher is not None:
         all_capabilities += (ToolCapability(tool="web-evidence", source_kind="WEB", cost=web_cost,
             supported_artifact_types=("EVIDENCE",),
@@ -76,6 +107,20 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
                 evidence_extractor or RuleBasedEvidenceExtractor(id_factory=ids), requirements)
         if demo:
             result["synthetic"] = SyntheticDataTool(requirements, row_count=0 if empty else 1200)
+        elif field_mapping is not None:
+            player_names = {
+                item.entity_key.partition(":")[2]: item.display_name
+                for item in dictionary.entities() if item.entity_type == "PLAYER"
+            }
+            result["statcast-parquet"] = ParquetStatcastTool(
+                requirements, field_mapping,
+                DuckDBReadOnlyExecutor(settings.parquet_archive_path),
+                archive_glob=str(settings.parquet_archive_path / "mlb_statcast_*.parquet"),
+                player_names=player_names)
+            result["statcast-postgres"] = PostgresStatcastTool(
+                requirements, field_mapping,
+                PostgresReadOnlyExecutor(settings, allowed_tables=("statcast_pitches",)),
+                player_names=player_names)
         if tool_factory is not None:
             injected = tool_factory(requirements)
             result.update(injected if isinstance(injected, dict) else {injected.name: injected})

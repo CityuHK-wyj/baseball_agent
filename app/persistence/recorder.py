@@ -31,6 +31,13 @@ class RunRecorder:
         self._store.save_object("run_event", self._id_factory("event"), event.run_id,
                                 event.model_dump(mode="json"))
 
+    def read_payload(self, artifact_id: str) -> bytes | None:
+        """Read a stored artifact payload back, or None when it is absent."""
+        try:
+            return self._storage.get(artifact_id)
+        except (FileNotFoundError, ValueError):
+            return None
+
     def execute_once(self, run_id, task, routing, executor):
         """Journal a semantic work intent before any external execution.
 

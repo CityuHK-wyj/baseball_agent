@@ -9,10 +9,35 @@ from typing import Callable, Literal
 from pydantic import Field
 
 from app.models.artifacts import ArtifactContract
-from app.models.contracts import Name
+from app.models.contracts import (Constraint, CountConstraint, LocationConstraint, Name,
+                                  NumericConstraint, PitchTypeConstraint, RankingConstraint)
 from app.models.planning import AgentTask, RoutingDecision
 
 Cost = Literal["FREE", "PAID", "HIGH"]
+
+
+def constraint_capability_keys(constraints: tuple[Constraint, ...]) -> tuple[str, ...]:
+    """Stable capability keys for typed analytical constraints.
+
+    The date range is handled by ``TimeRange`` on the descriptor, not by a source's
+    constraint capability, so it is excluded. A location constraint keys on its exact
+    definition so an unavailable definition can never silently degrade to another one.
+    """
+    keys: list[str] = []
+    for constraint in constraints:
+        if isinstance(constraint, NumericConstraint):
+            keys.append(constraint.key)
+        elif isinstance(constraint, CountConstraint):
+            keys.append("count")
+        elif isinstance(constraint, PitchTypeConstraint):
+            keys.append("pitch_type")
+        elif isinstance(constraint, LocationConstraint):
+            keys.append(f"pitch_location:{constraint.definition}")
+        elif isinstance(constraint, RankingConstraint):
+            keys.append("ranking")
+        # CategoryConstraint (entity_key, source, season, date_range) is metadata or
+        # routing state, not an analytical capability the source must advertise.
+    return tuple(dict.fromkeys(keys))
 
 
 class ToolCapability(ArtifactContract):
@@ -24,10 +49,15 @@ class ToolCapability(ArtifactContract):
     system_permitted: bool = True
     coverage: str = ""
     supported_data_keys: tuple[str, ...] = ()
+    supported_constraint_keys: tuple[str, ...] = ()
 
-    def supports(self, artifact_type: str, data_keys: tuple[str, ...] = ()) -> bool:
-        return artifact_type in self.supported_artifact_types and (
+    def supports(self, artifact_type: str, data_keys: tuple[str, ...] = (),
+                 constraint_keys: tuple[str, ...] = ()) -> bool:
+        data_ok = artifact_type in self.supported_artifact_types and (
             not self.supported_data_keys or set(data_keys) <= set(self.supported_data_keys))
+        constraint_ok = (not constraint_keys
+                         or set(constraint_keys) <= set(self.supported_constraint_keys))
+        return data_ok and constraint_ok
 
 
 class Router:
@@ -38,16 +68,18 @@ class Router:
         self._id_factory = id_factory or (lambda prefix: f"{prefix}-{id(object())}")
         self._permitted_costs = permitted_costs
 
-    def candidate_sources(self, artifact_type: str, data_keys: tuple[str, ...] = ()) -> tuple[ToolCapability, ...]:
+    def candidate_sources(self, artifact_type: str, data_keys: tuple[str, ...] = (),
+                          constraint_keys: tuple[str, ...] = ()) -> tuple[ToolCapability, ...]:
         """Capabilities that can produce this artifact type, before policy and constraints."""
-        return tuple(c for c in self._capabilities if c.supports(artifact_type, data_keys))
+        return tuple(c for c in self._capabilities if c.supports(artifact_type, data_keys, constraint_keys))
 
-    def permission_candidates(self, artifact_type: str, data_keys: tuple[str, ...] = ()) -> tuple[ToolCapability, ...]:
+    def permission_candidates(self, artifact_type: str, data_keys: tuple[str, ...] = (),
+                              constraint_keys: tuple[str, ...] = ()) -> tuple[ToolCapability, ...]:
         """Consent-gated capabilities; system-forbidden capabilities are excluded."""
         return tuple(c for c in self._capabilities if c.system_permitted and c.available
                      and c.cost in ("PAID", "HIGH")
                      and c.cost not in self._permitted_costs
-                     and c.supports(artifact_type, data_keys))
+                     and c.supports(artifact_type, data_keys, constraint_keys))
 
     def authorized_for(self, costs: tuple[Cost, ...], tools: tuple[str, ...] = ()) -> "Router":
         capabilities = tuple(
@@ -58,20 +90,22 @@ class Router:
                       permitted_costs=tuple(dict.fromkeys((*self._permitted_costs, *costs))))
 
     def eligible_sources(self, artifact_type: str, user_hard_sources: tuple[str, ...] = (),
-                         data_keys: tuple[str, ...] = ()) -> tuple[ToolCapability, ...]:
+                         data_keys: tuple[str, ...] = (),
+                         constraint_keys: tuple[str, ...] = ()) -> tuple[ToolCapability, ...]:
         """Capabilities that satisfy policy, user constraints and required artifact type."""
         return tuple(
             capability for capability in self._capabilities
             if capability.system_permitted
             and capability.available
             and capability.cost in self._permitted_costs
-            and capability.supports(artifact_type, data_keys)
+            and capability.supports(artifact_type, data_keys, constraint_keys)
             and (not user_hard_sources or capability.source_kind in user_hard_sources)
         )
 
     def route(self, task: AgentTask, artifact_type: str,
               user_hard_sources: tuple[str, ...] = (),
-              execution_route: object | None = None, data_keys: tuple[str, ...] = ()) -> RoutingDecision:
+              execution_route: object | None = None, data_keys: tuple[str, ...] = (),
+              constraint_keys: tuple[str, ...] = ()) -> RoutingDecision:
         """Pick a tool. ``execution_route`` (from SourceMappingResolver) acts as a
         system-derived capability constraint above Planner preference."""
         notes: list[str] = []
@@ -104,7 +138,7 @@ class Router:
             if capability.cost not in self._permitted_costs:
                 notes.append(f"{capability.tool}: {capability.cost} source not permitted")
                 continue
-            if not capability.supports(artifact_type, data_keys):
+            if not capability.supports(artifact_type, data_keys, constraint_keys):
                 notes.append(f"{capability.tool}: cannot provide {artifact_type}")
                 continue
             if user_sources and capability.source_kind not in user_sources:

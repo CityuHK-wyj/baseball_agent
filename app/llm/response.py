@@ -21,12 +21,34 @@ class DeterministicResponseComposer:
         lines = [f"Objective {package.objective_ref}: {package.objective_status}"]
         for item in package.accepted_evidence:
             lines.append(f"- [{item.level}] {item.artifact_ref} from {item.source}: {item.summary}")
+        if package.objective_result:
+            lines.append("Result:")
+            lines.append(self._render_result(package.objective_result))
         for item in package.knowledge_context:
+            if item.kind == "SCHEMA":
+                continue  # raw physical columns are internal, not user-facing facts
             lines.append(f"- {item.title}: {item.content} ({item.provenance_ref or item.source})")
         if package.limitations:
             lines.append("Limitations: " + "; ".join(package.limitations))
         if package.unresolved_items:
             lines.append("Unresolved: " + ", ".join(package.unresolved_items))
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_result(result_json: str) -> str:
+        try:
+            data = json.loads(result_json)
+        except ValueError:
+            return result_json
+        columns = data.get("columns", [])
+        rows = data.get("rows", [])
+        if not columns or not rows:
+            return result_json
+        header = " | ".join(columns)
+        body = [" | ".join("" if cell is None else str(cell) for cell in row) for row in rows]
+        lines = [header, "-" * len(header), *body]
+        if data.get("min_batted_balls"):
+            lines.append(f"(qualification: >= {data['min_batted_balls']} qualifying batted balls)")
         return "\n".join(lines)
 
 

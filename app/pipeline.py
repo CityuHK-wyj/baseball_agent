@@ -22,7 +22,7 @@ from app.llm.response import DeterministicResponseComposer, ResponseComposer
 from app.models.artifacts import ArtifactContract
 from app.models.clarification import ClarificationAnswer, ClarificationRequest
 from app.models.contracts import (AnalysisObjective, ArtifactRequirement, CategoryConstraint,
-                                  Constraint, Entity)
+                                  Constraint, Entity, LocationConstraint)
 from app.models.interaction import (InteractionRecord, PermissionAnswer, PermissionRequest,
                                     ConstraintRevisionRequest, ConstraintRevisionAnswer)
 from app.models.reports import ResponsePackage
@@ -260,6 +260,8 @@ class AnalysisPipeline:
         option = interaction.clarification.chosen(answer.chosen_option_id)
         if option is None:
             raise ValueError("Clarification answer selected an unknown option")
+        if interaction.clarification.kind == "CONSTRAINT":
+            return self._resume_constraint_clarification(interaction, option, run_id)
         canonical = self._semantic.entity_for_key(option.value)
         namespace, _, identifier = canonical.entity_key.partition(":")
         entity = Entity(namespace=namespace or "LOCAL", entity_type=canonical.entity_type,
@@ -268,6 +270,18 @@ class AnalysisPipeline:
                                        origin="USER_CONFIRMED", authority="USER_CONSTRAINT")
         objectives = tuple(item.model_copy(update={
             "entities": tuple((*item.entities, entity)),
+            "constraints": tuple((*item.constraints, confirmed)),
+        }) for item in interaction.objectives)
+        self._recorder.consume_interaction(interaction, interaction.model_copy(update={
+            "status": "CONFIRMED", "objectives": objectives,
+            "confirmed_constraints": (confirmed,)}))
+        return self._prepare_objectives(interaction.raw_query, objectives, run_id)
+
+    def _resume_constraint_clarification(self, interaction, option, run_id: str) -> PipelineResult:
+        """Apply a CONSTRAINT clarification (currently pitch-location definition)."""
+        confirmed = LocationConstraint(key="pitch_location", definition=option.value,
+                                       origin="USER_CONFIRMED", authority="USER_CONSTRAINT")
+        objectives = tuple(item.model_copy(update={
             "constraints": tuple((*item.constraints, confirmed)),
         }) for item in interaction.objectives)
         self._recorder.consume_interaction(interaction, interaction.model_copy(update={

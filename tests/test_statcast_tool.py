@@ -1,0 +1,136 @@
+import json
+import unittest
+from datetime import date
+
+from app.models.contracts import (AnalysisObjective, CategoryConstraint, CountConstraint,
+                                  LocationConstraint, NumericConstraint, PitchTypeConstraint,
+                                  RankingConstraint, TimeRange)
+from app.models.planning import AgentTask
+from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, FieldMappingRegistry,
+                                        ZONE_UPPER_THIRD)
+from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
+from app.tools.results import ToolResult
+from app.tools.statcast import ParquetStatcastTool, PostgresStatcastTool
+
+
+class RecordingExecutor:
+    def __init__(self, rows=(), observed=((date(2023, 4, 1), date(2023, 10, 1)),)):
+        self.rows = [tuple(row) for row in rows]
+        self.observed = [tuple(row) for row in observed]
+        self.statements = []
+
+    def execute_with_rows(self, sql):
+        self.statements.append(sql)
+        if "MIN(" in sql:
+            return ToolResult.ok(len(self.observed)), self.observed
+        return ToolResult.ok(len(self.rows)), self.rows
+
+
+def analytics_objective(**location):
+    constraints = [
+        CategoryConstraint(key="date_range", values=("2023-01-01", "2023-12-31"),
+                           origin="SYSTEM_INFERRED"),
+        CountConstraint(strikes=2, origin="SYSTEM_INFERRED"),
+        NumericConstraint(key="pitch_velocity", operator="GT", value=95.0, unit="mph",
+                          origin="SYSTEM_INFERRED"),
+        PitchTypeConstraint(family="fastball", origin="SYSTEM_INFERRED"),
+        RankingConstraint(metric_key="exit_velocity", direction="DESC", limit=5,
+                          origin="SYSTEM_INFERRED"),
+    ]
+    if location:
+        constraints.append(LocationConstraint(origin="USER_CONFIRMED", **location))
+    return AnalysisObjective(objective_id="o1", raw_query="top 5 exit velocity",
+                             description="top 5 exit velocity", constraints=tuple(constraints))
+
+
+def requirement():
+    return RuleBasedRequirementDecomposer(id_factory=lambda prefix: f"{prefix}-1").decompose(
+        analytics_objective(definition=ZONE_UPPER_THIRD))[0]
+
+
+def task():
+    return AgentTask(task_id="t1", objective_ref="o1", requirement_refs=("requirement-1",),
+                     description="ranked exit velocity")
+
+
+class StatcastToolTests(unittest.TestCase):
+    def test_generated_sql_is_read_only_and_uses_physical_columns(self):
+        executor = RecordingExecutor(rows=[(592450, 12, 95.4, 108.1)])
+        tool = ParquetStatcastTool([requirement()], FieldMappingRegistry(), executor)
+        result = tool.execute(task())
+        self.assertEqual(result.status, "OK")
+        main, observed = executor.statements
+        # Physical columns only; semantic keys never leak into the query.
+        self.assertIn("release_speed", main)
+        self.assertIn("launch_speed", main)
+        self.assertIn("strikes", main)
+        self.assertIn("pitch_type", main)
+        self.assertIn("zone", main)
+        self.assertIn("GROUP BY batter", main)
+        self.assertIn("ORDER BY avg_metric DESC", main)
+        self.assertIn("LIMIT 5", main)
+        self.assertNotIn("pitch_velocity", main)
+        self.assertNotIn("exit_velocity", main)
+        self.assertIn("SELECT", main)
+        self.assertIn("read_parquet(", main)
+
+    def test_fastball_maps_to_explicit_code_set(self):
+        executor = RecordingExecutor(rows=[(1, 1, 90.0, 90.0)])
+        tool = ParquetStatcastTool([requirement()], FieldMappingRegistry(), executor)
+        tool.execute(task())
+        main = executor.statements[0]
+        self.assertIn("pitch_type IN ('FF', 'SI', 'FC', 'FA')", main)
+
+    def test_exact_batter_relative_definition_cannot_silently_degrade(self):
+        requirement_ = RuleBasedRequirementDecomposer(id_factory=lambda p: f"{p}-1").decompose(
+            analytics_objective(definition=BATTER_RELATIVE_UPPER_EDGE))[0]
+        tool = ParquetStatcastTool([requirement_], FieldMappingRegistry(), RecordingExecutor())
+        result = tool.execute(task())
+        self.assertEqual(result.status, "ERROR")
+        self.assertEqual(result.error_code, "MISSING_PHYSICAL_FIELDS")
+        self.assertIn("sz_top", result.safe_error_summary)
+
+    def test_artifact_carries_provenance_and_matches_requirement(self):
+        executor = RecordingExecutor(rows=[(592450, 12, 95.4, 108.1), (660271, 9, 94.0, 107.0)])
+        tool = ParquetStatcastTool([requirement()], FieldMappingRegistry(), executor)
+        result = tool.execute(task())
+        self.assertIsNotNone(result.artifact)
+        self.assertEqual(result.artifact.provenance.source_kind, "PARQUET")
+        self.assertEqual(result.artifact.provenance.source, "parquet-archive")
+        self.assertEqual(result.artifact.descriptor.data_keys, ("exit_velocity", "batter"))
+        self.assertEqual(result.artifact.row_count, 2)
+        payload = json.loads(result.payload.decode())
+        self.assertEqual(payload["columns"][0], "batter")
+        self.assertEqual(len(payload["rows"]), 2)
+
+    def test_observed_range_is_truthful(self):
+        executor = RecordingExecutor(rows=[(592450, 12, 95.4, 108.1)])
+        tool = ParquetStatcastTool([requirement()], FieldMappingRegistry(), executor)
+        result = tool.execute(task())
+        self.assertEqual(result.artifact.observed_time_range.start, date(2023, 4, 1))
+        self.assertEqual(result.artifact.observed_time_range.end, date(2023, 10, 1))
+
+    def test_count_constraint_applies_strikes(self):
+        executor = RecordingExecutor(rows=[(1, 1, 90.0, 90.0)])
+        tool = ParquetStatcastTool([requirement()], FieldMappingRegistry(), executor)
+        tool.execute(task())
+        main = executor.statements[0]
+        self.assertIn("strikes = 2", main)
+        self.assertNotIn("balls IN", main)
+
+    def test_postgres_tool_uses_batter_id_and_read_only_table(self):
+        executor = RecordingExecutor(rows=[(592450, 12, 95.4, 108.1)])
+        tool = PostgresStatcastTool([requirement()], FieldMappingRegistry(), executor)
+        result = tool.execute(task())
+        self.assertEqual(result.status, "OK")
+        main = executor.statements[0]
+        self.assertIn("FROM statcast_pitches", main)
+        self.assertIn("GROUP BY batter_id", main)
+        self.assertIn("SELECT batter_id AS batter", main)
+        self.assertNotIn("INSERT", main)
+        self.assertNotIn("UPDATE", main)
+        self.assertNotIn("DELETE", main)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -15,13 +15,13 @@ from app.agent.executor import ExecutionOutcome, Executor
 from app.agent.planner import Planner, PlannerContext, PlannerTerminalLatch
 from app.agent.registry import ArtifactRegistry
 from app.agent.response import build_response_package
-from app.agent.routing import Router
+from app.agent.routing import Router, constraint_capability_keys
 from app.agent.source_mapping import SourceMappingResolver
 from app.assessment.service import AssessmentService
 from app.context.service import ContextRequest, ContextService
 from app.models.artifacts import ArtifactAssessment, ArtifactContract
 from app.models.contracts import (AnalysisObjective, ArtifactRequirement, ObjectiveState,
-                                  RequirementState)
+                                  RankingConstraint, RequirementState)
 from app.models.planning import PlanningDecision, RoutingDecision
 from app.models.reports import (CompletionReport, ExecutionSummary, RequirementCompletion,
                                 ResponsePackage)
@@ -105,6 +105,48 @@ class Orchestrator:
             return ()
         return self._context_service.retrieve(request).items
 
+    def _project_accepted_result(self, response, executions) -> str:
+        """Project the accepted artifact's factual rows for the user-facing answer.
+
+        Only accepted evidence is projected; failed attempts and rejected evidence never
+        reach this path. The projection is a bounded JSON string of columns and rows.
+        """
+        import json
+        accepted = {item.artifact_ref for item in response.accepted_evidence}
+        payloads = {}
+        for outcome in executions:
+            if outcome.artifact is None or outcome.artifact.artifact_id not in accepted:
+                continue
+            payload = outcome.payload
+            if payload is None and self._recorder is not None:
+                payload = self._recorder.read_payload(outcome.artifact.artifact_id)
+            if payload is not None:
+                payloads[outcome.artifact.artifact_id] = payload
+        if not payloads:
+            return ""
+        for artifact_ref, payload in payloads.items():
+            try:
+                data = json.loads(payload.decode())
+            except (ValueError, UnicodeDecodeError):
+                continue
+            if isinstance(data, dict) and "columns" in data and "rows" in data:
+                return json.dumps({
+                    "columns": data["columns"],
+                    "rows": data["rows"][:50],
+                    "row_count": len(data["rows"]),
+                    "source_kind": data.get("source_kind", ""),
+                    "min_batted_balls": data.get("min_batted_balls"),
+                }, ensure_ascii=False)
+        return ""
+
+    @staticmethod
+    def _is_ranking(requirement: ArtifactRequirement) -> bool:
+        return any(isinstance(item, RankingConstraint) for item in requirement.descriptor.constraints)
+
+    @staticmethod
+    def _constraint_keys(requirement: ArtifactRequirement) -> tuple[str, ...]:
+        return constraint_capability_keys(requirement.descriptor.constraints)
+
     def _apply_restored(self, restored: RestoredRun, states: dict[str, RequirementState]) -> None:
         """Rehydrate persisted domains. Each domain keeps its own representation."""
         for artifact in restored.artifacts:
@@ -163,11 +205,13 @@ class Orchestrator:
             recoverable = tuple(
                 item.requirement_id for item in unmet
                 if self._router.eligible_sources(item.descriptor.artifact_type, self._permitted_sources,
-                                                 item.descriptor.data_keys))
+                                                 item.descriptor.data_keys,
+                                                 constraint_keys=self._constraint_keys(item)))
             policy_blocked = tuple(
                 item.requirement_id for item in unmet
                 if item.requirement_id not in recoverable
-                and self._router.candidate_sources(item.descriptor.artifact_type, item.descriptor.data_keys))
+                and self._router.candidate_sources(item.descriptor.artifact_type, item.descriptor.data_keys,
+                                                   constraint_keys=self._constraint_keys(item)))
             scoped_assessments = tuple(item for item in self._assessment_service.all_assessments()
                                        if item.requirement_ref in by_id
                                        and item.objective_ref in (None, objective.objective_id))
@@ -214,13 +258,16 @@ class Orchestrator:
                     break
                 requirement = by_id[task.requirement_refs[0]]
                 execution_route = None
-                if self._source_mapping_resolver is not None and requirement.descriptor.artifact_type != "EVIDENCE":
+                if (self._source_mapping_resolver is not None
+                        and requirement.descriptor.artifact_type != "EVIDENCE"
+                        and not self._is_ranking(requirement)):
                     execution_route = self._source_mapping_resolver.resolve(
                         task.task_id, requirement.descriptor.data_keys)
                 routing = self._router.route(task, requirement.descriptor.artifact_type,
                                              self._permitted_sources,
                                              execution_route=execution_route,
-                                             data_keys=requirement.descriptor.data_keys)
+                                             data_keys=requirement.descriptor.data_keys,
+                                             constraint_keys=self._constraint_keys(requirement))
                 routings.append(routing)
                 metrics.record("ROUTE", subject_ref=routing.decision_id, agent="ROUTER",
                                status="SELECTED" if routing.selected_tool else "BLOCKED",
@@ -326,6 +373,9 @@ class Orchestrator:
                 request_id=f"response-{run_id}", purpose="RESPONSE",
                 query=objective.raw_query,
                 kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS, run_id=run_id)))
+        result_preview = self._project_accepted_result(response, executions)
+        if result_preview:
+            response = response.model_copy(update={"objective_result": result_preview})
         if self._recorder is not None:
             self._recorder.record_objective_state(run_id, objective_state)
             self._recorder.record_completion_report(run_id, completion)
