@@ -12,10 +12,10 @@ from typing import Protocol
 from app.models.artifacts import ArtifactContract
 from app.models.contracts import (DEFAULT_MIN_BATTED_BALLS, AnalysisObjective,
                                   ArtifactDescriptor, ArtifactRequirement, CountConstraint,
-                                  LeagueStateSnapshot, LocationConstraint, NumericConstraint,
-                                  PitchTypeConstraint, PopulationConstraint,
-                                  QualificationConstraint, QualificationRule,
-                                  RankingConstraint, SampleAdequacyRule, TimeRange)
+                                  LeagueStateSnapshot, LocationConstraint,
+                                  PitchTypeConstraint, QualificationConstraint,
+                                  QualificationRule, RankingConstraint, SampleAdequacyRule,
+                                  TimeRange)
 from app.models.metrics import MetricDefinition
 from app.models.schema import SchemaTable
 
@@ -77,8 +77,7 @@ class RequirementDecomposer(Protocol):
 
 def _is_analytics_objective(objective: AnalysisObjective) -> bool:
     return any(isinstance(item, (CountConstraint, PitchTypeConstraint, LocationConstraint,
-                                 RankingConstraint, NumericConstraint, PopulationConstraint))
-               for item in objective.constraints)
+                                 RankingConstraint)) for item in objective.constraints)
 
 
 class RuleBasedRequirementDecomposer:

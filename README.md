@@ -36,10 +36,12 @@ exactly which blog decisions are implemented.
   implementations and LLM implementations behind the same Protocols.
 - **Read-only safety** — an AST-based SQL guard validated before any connection, a
   read-only PostgreSQL transaction, a DuckDB path sandbox, and a redacted result contract.
-- **Typed analytical constraints** — two-strike count, pitch velocity (distinct from exit
-  velocity), pitch family (fastball → explicit FF/SI/FC/FA codes), upper-zone location
-  definitions and ranking intent are typed, not opaque strings, and flow from the query
-  into the Planner without leaking physical column names.
+- **Typed analytical constraints** — two-strike count (exact counts stay exact), pitch
+  velocity (distinct from exit velocity), pitch family (fastball → explicit FF/SI/FC/FA
+  codes), upper-zone location definitions, ranking intent with explicit aggregation, an
+  explicit game-type/event population, and a frozen qualification threshold are typed, not
+  opaque strings, and flow from the query into the Planner without leaking physical column
+  names.
 - **Semantic/physical separation** — semantic keys (`pitch_velocity`, `exit_velocity`,
   `pitch_type`, `count`, `pitch_location`, `batter`) map to physical columns
   (`release_speed`, `launch_speed`, `zone`, `strikes`, …) only in the deterministic
@@ -51,15 +53,19 @@ exactly which blog decisions are implemented.
   (rules, transactions, bilingual glossary and metrics, all 30 teams, ballparks, players,
   awards, trusted sources and the community directory) behind `ContextService`.
 
-Status: **FINAL_REVIEW_BLOCKED** on `codex/v0.1-final-review`.
-The independent review found remaining analytics intent and population defects despite
-passing tests and live queries. See [the final review](docs/reviews/v01-final-review.md)
-for fixed defects, open blockers, and precise verification limits.
-Shared Knowledge and the hardened runtime are integrated. Definition questions use stored
-knowledge; synthetic analytics requires `--demo`. The first real analytics vertical slice
-now runs end to end against the historical Parquet archive (typed two-strike / fastball /
-pitch-velocity / upper-zone constraints + exit-velocity ranking). See tested commands, live
-results, and remaining gaps in [v0.1 validation](docs/usage/v01-validation.md).
+Status: **SEMANTIC_BLOCKERS_FIXED — READY_FOR_CODEX_RECHECK** on
+`pi/v0.1-semantic-fixes`. The independent review's four analytics blockers are repaired:
+explicit pitch/exit-velocity filters, explicit AVG/MAX aggregation and exact counts are
+preserved; the qualification threshold is frozen; the game-type and batted-ball
+population is explicit; and Statcast zones 11-12 are described as upper outside
+quadrants. See [the final review](docs/reviews/v01-final-review.md) for the blocked
+baseline and [the population ADR](docs/adr/0020-analytical-population-and-qualification.md)
+for the contract. Shared Knowledge and the hardened runtime are integrated. Definition
+questions use stored knowledge; synthetic analytics requires `--demo`. The real analytics
+vertical slice runs end to end against the historical Parquet archive and live PostgreSQL
+(typed two-strike / fastball / pitch-velocity / upper-zone constraints + exit-velocity
+ranking + explicit population/qualification). See tested commands, live results, and
+remaining gaps in [v0.1 validation](docs/usage/v01-validation.md).
 
 ## Architecture
 

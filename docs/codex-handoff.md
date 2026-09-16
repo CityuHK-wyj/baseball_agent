@@ -1,41 +1,47 @@
 # Codex handoff
 
-Status: **FINAL_REVIEW_BLOCKED**. Continue from `codex/v0.1-final-review`, based exactly on
-Builder `b0e5d86bb9e2b254bd82c390a9fcf8e609c49d57`. Builder branch and main are untouched.
-See [the final review](reviews/v01-final-review.md) and its evidence directory.
+Status: **SEMANTIC_BLOCKERS_FIXED — READY_FOR_CODEX_RECHECK**. The focused repair branch
+`pi/v0.1-semantic-fixes` is based exactly on the reviewed
+`codex/v0.1-final-review` checkpoint (Builder `b0e5d86bb9e2b254bd82c390a9fcf8e609c49d57`,
+review fixes through `6560bb0`). Builder branch and main are untouched.
+See [the final review](reviews/v01-final-review.md) for the blocked baseline,
+[the capability matrix](development/analytics-capability-matrix.md) for the current
+source/population contract, and
+[the population ADR](adr/0020-analytical-population-and-qualification.md) for the design.
 
-Fixed with failing regressions first:
+The five Codex-reproduced failures are resolved and covered by regression tests:
+
+1. Normalization now preserves explicit pitch/exit-velocity filters (including `>=`),
+   explicit AVG/MAX aggregation, and exact `0-2` counts; unsupported wording asks for
+   clarification instead of widening intent.
+2. A requested qualification threshold is a typed `QualificationConstraint` frozen as
+   `QualificationRule`; the adapter applies the frozen value and never substitutes its
+   own default when one is present.
+3. The analyzed population is an explicit `PopulationConstraint`. `game_type` is retained
+   by the loaders and backfilled on already-stored rows from the authoritative StatsAPI
+   schedule (`python3 -m data_loader.backfill_game_type`), so regular season, postseason,
+   Spring Training, fair batted balls and measured contact are distinct and visible.
+4. Statcast zones 11-12 are renamed `ZONE_UPPER_OUTSIDE` and described as upper outside
+   quadrants; `just above the zone` no longer silently claims that zone set.
+
+Fixed earlier with regressions first (must not regress):
 
 - SQL dynamic-query/file-reader escapes, CTE allowlist scope, catalog qualification,
-  relative-path and glob/symlink checks; reject runtime roles other than baseball_readonly.
+  relative-path and glob/symlink checks; reject runtime roles other than
+  baseball_readonly.
 - Persisted artifact reuse when a crash interrupts execution-status finalization.
-- Upper-edge upper bound, canonical batter filter, descriptor date window, valid ball counts;
-  unsupported entity identities fail closed.
+- Upper-edge upper bound, canonical batter filter, descriptor date window, valid ball
+  counts; unsupported entity identities fail closed.
 
-Baseline 380 tests; reviewed implementation 388 passing. Use system `python3`:
-the repository `.venv` lacks dependencies. Verification commands are in the review report.
+Gates on this branch: 432 tests pass, blocker reproduction exits 0, `compileall` passes,
+secret scan passes, live PostgreSQL and Parquet analytics pass, and the 2023-vs-2024
+cross-source comparison produces distinct accepted products. Do not adopt this tree onto
+main or tag a release before the independent recheck approves it.
 
-Next work is defect correction, not feature expansion:
-
-1. Preserve >= pitch-speed, explicit EV filters/AVG/MAX, and explicit counts in normalization;
-   unsupported recognized analytics intent must fail closed or ask clarification.
-2. Persist qualification independently from metric and sample adequacy, and execute that
-   frozen rule rather than a mutable adapter default. A requested minimum20 currently becomes3.
-3. Define and enforce the batted-ball and season population. Measured foul contacts currently
-   enter the leaderboard; Spring Training/postseason rows coexist and game_type is discarded.
-4. Resolve the misleading zones11/12 “just above” contract: those are outside upper quadrants,
-   not a predicate requiring plate_z above sz_top. Do not silently substitute definitions.
-5. Re-run independent review and all live gates before any release adoption.
-
-LIVE_VERIFIED: local PostgreSQL counts/coverage/readonly privileges; Parquet counts and
-new fields; representative historical/recent/multi-source executions. Their COMPLETE output
-is not approval of analytical correctness. UNVERIFIED_LIVE: full Web Evidence, Operational
+LIVE_VERIFIED: local PostgreSQL counts/coverage/readonly privileges and `game_type`
+coverage; Parquet counts, retained fields and `game_type`; representative
+historical/recent/multi-source executions. UNVERIFIED_LIVE: full Web Evidence, Operational
 PostgreSQL, complete upstream pitch-grain reconciliation. No synthetic fallback observed.
-
-The +8 Parquet delta is localized to five games, with net +4/+3/+1 in 2015/2017/2018.
-It is not caused by dropping null-coordinate rows. Keep `/tmp/ba_parquet_backup_20260916_191753`.
-PostgreSQL starts March15 because pybaseball's fallback iterator skips earlier dates;
-this is not a verified upstream absence. See the report for exact evidence and limitations.
 
 Remote main observed during review: `c93953d4c7e54dfd2b98ffd7d559e5efc946e6b9`.
 Only after approval, re-fetch main and verify both SHAs. Create one adoption commit with

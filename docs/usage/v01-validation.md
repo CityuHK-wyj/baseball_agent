@@ -111,3 +111,15 @@ environment; it resolves batter names via `player_dictionary`. See
 [docs/development/analytics-capability-matrix.md](../development/analytics-capability-matrix.md)
 for the verified schema, semantic capability matrix and the reported `sz_top`/`sz_bot`
 ingestion gap.
+
+### Semantic blocker repair
+
+The five demonstrated semantic failures are resolved on `pi/v0.1-semantic-fixes` and
+gated by `python3 docs/reviews/v01-reproduce-blockers.py` (exit 0). Regression coverage
+includes exact `0-2` versus generic two-strike counts, `>=` pitch/exit-velocity filters,
+explicit AVG/MAX aggregation, a frozen minimum batted-ball threshold that survives
+restart, and an explicit population contract. `game_type` was retained at ingestion and
+backfilled from the authoritative StatsAPI schedule on the stored PostgreSQL and Parquet
+data, so regular season, postseason, Spring Training, fair batted balls and measured
+contact are distinct in live executions. Statcast zones 11-12 are named and described as
+upper outside quadrants, not a strict above-`sz_top` predicate.

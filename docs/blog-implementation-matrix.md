@@ -15,11 +15,13 @@ Status values:
 This file is maintained as implementation proceeds. It is the evidence for
 "which blog designs are actually implemented", not a wish list.
 
-Current review: **FINAL_REVIEW_BLOCKED**, `codex/v0.1-final-review`, Builder
-`b0e5d86bb9e2b254bd82c390a9fcf8e609c49d57`. Baseline 380 / reviewed 388 tests.
-See [independent final review](reviews/v01-final-review.md) for authoritative status.
-PostgreSQL and Parquet executions are LIVE_VERIFIED; analytics intent/qualification and
-population correctness remain blockers. Web Evidence and Operational PostgreSQL are
+Current review: **SEMANTIC_BLOCKERS_FIXED — READY_FOR_CODEX_RECHECK** on
+`pi/v0.1-semantic-fixes`, based exactly on the reviewed `codex/v0.1-final-review`
+checkpoint. 432 tests pass. See [independent final review](reviews/v01-final-review.md)
+for the blocked baseline and
+[the population ADR](adr/0020-analytical-population-and-qualification.md) for the repair.
+PostgreSQL and Parquet executions are LIVE_VERIFIED, including explicit
+population/qualification filters. Web Evidence and Operational PostgreSQL are
 UNVERIFIED_LIVE. Older IMPLEMENTED rows describe structural code presence, not release approval.
 Verification vocabulary: IMPLEMENTED, TESTED_OFFLINE, LIVE_VERIFIED,
 PARTIALLY_LIVE_VERIFIED, UNVERIFIED_LIVE, DEFERRED. Older PARTIAL/MISSING entries identify gaps.

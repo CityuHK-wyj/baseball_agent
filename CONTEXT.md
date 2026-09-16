@@ -56,6 +56,15 @@ Baseball Agent answers baseball analytics questions by selecting an appropriate 
 
 **Qualification**: Eligibility for inclusion in a defined population or ranking.
 
+**Analytical Population**: The explicit set of events a metric is computed over, defined by
+its game types (regular season, postseason, Spring Training, exhibition) and its event
+grain (fair batted-ball events, measured contact, or all qualifying pitches). It is a
+typed constraint on the objective, requirement and artifact, never an implicit SQL
+condition.
+
+**Game Type**: The MLB StatsAPI competition code retained per Statcast row (R, F, D, L, W,
+S, E, A) that makes the analytical population's game-type filter reproducible.
+
 **Sample Adequacy**: Whether the available sample supports the particular conclusion sought; distinct from qualification.
 
 **League Progress**: Authoritative season progress, independent of how much data a local archive has ingested.
