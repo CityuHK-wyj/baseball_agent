@@ -1,6 +1,13 @@
 # Development status
 
-Status: **SEMANTIC_BLOCKERS_FIXED — READY_FOR_CODEX_RECHECK** on
+Current independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
+`codex/v0.1-semantic-recheck`. [Semantic re-review](reviews/v01-semantic-recheck.md)
+records the remaining five compositional failures, regression-backed fixes, and live evidence.
+Baseline: 432 tests; corrected review: 435 tests, no skips. The original blocker gate
+passes, but the expanded NL-to-SQL release gate fails. No main adoption or tag is authorized
+while those P1 defects remain. Repair-checkpoint claims below are not release approval.
+
+Status: **FINAL_REVIEW_BLOCKED** on
 `pi/v0.1-semantic-fixes`, branched from the reviewed `codex/v0.1-final-review`.
 
 The authoritative blocked baseline is [the final review](reviews/v01-final-review.md).
@@ -27,7 +34,7 @@ statements remain in Git history; they are not current capability claims.
 | Web Evidence | UNVERIFIED_LIVE | StatsAPI transport is not evidence-chain verification |
 | Operational PostgreSQL | UNVERIFIED_LIVE | Local SQLite recovery tested |
 
-The five Codex-reproduced semantic blockers are resolved: explicit pitch/exit-velocity
+The five original sentence-level reproductions pass; broader composition remains blocked: explicit pitch/exit-velocity
 filters, explicit AVG/MAX aggregation, exact `0-2` counts, frozen qualification
 thresholds, and an explicit game-type/batted-ball population. Do not adopt this tree onto
 main or tag a release until the independent recheck approves it.

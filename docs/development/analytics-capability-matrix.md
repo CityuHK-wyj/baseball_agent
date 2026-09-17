@@ -1,6 +1,13 @@
 # Analytics source capability matrix
 
-Status: **SEMANTIC_BLOCKERS_FIXED**. Source reads are LIVE_VERIFIED on the semantic-fix
+Current independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
+`codex/v0.1-semantic-recheck`. [Semantic re-review](../reviews/v01-semantic-recheck.md)
+records the remaining five compositional failures, regression-backed fixes, and live evidence.
+Baseline: 432 tests; corrected review: 435 tests, no skips. The original blocker gate
+passes, but the expanded NL-to-SQL release gate fails. No main adoption or tag is authorized
+while those P1 defects remain. Repair-checkpoint claims below are not release approval.
+
+Status: **FINAL_REVIEW_BLOCKED**. Source reads are LIVE_VERIFIED on the semantic-fix
 branch; the independent recheck is pending. See
 [final review](../reviews/v01-final-review.md) for the originally blocked baseline and
 [the population ADR](../adr/0020-analytical-population-and-qualification.md) for the
@@ -39,7 +46,7 @@ non-destructive migration that retained `sz_top`/`sz_bot`/`p_throws` and the add
 | `pitch_location` batter-relative upper edge | `plate_z` + `sz_top`/`sz_bot` (predicate `sz_top - 0.25 ft <= plate_z <= sz_top`) | `plate_z` + `sz_top`/`sz_bot` (predicate `sz_top - 0.25 ft <= plate_z <= sz_top`) | **EXACTLY_SUPPORTED** (both) |
 | `ranking` (metric + direction + limit + aggregation) | aggregation | aggregation | **EXACTLY_SUPPORTED** (both) |
 | `population` game type (`game_type`) | `game_type` (R/F/D/L/W/S/E/A) | `game_type` | **EXACTLY_SUPPORTED** (both, after additive backfill from StatsAPI) |
-| `population` event grain | `events` | `events` | **EXACTLY_SUPPORTED** for fair batted balls (`events IS NOT NULL`) and measured contact |
+| `population` event grain | `description` / `launch_speed` | `description` / `launch_speed` | **EXACTLY_SUPPORTED** for fair batted balls (`description = 'hit_into_play'`) and measured contact |
 | `qualification` minimum batted balls | frozen `QualificationRule` → `HAVING COUNT(*)` | frozen `QualificationRule` → `HAVING COUNT(*)` | **EXACTLY_SUPPORTED** (both; explicit user threshold never replaced by the default) |
 | `batter` identity | `batter_id` + `player_dictionary` (100% name coverage) | `batter` (id only; no name) | **EXACTLY_SUPPORTED** for id + name (Postgres); **EXACTLY_SUPPORTED** for id, **UNSUPPORTED** for name (Parquet) |
 | `pitcher` identity | `pitcher_id` (name only in `batting_events`) | `pitcher` + `player_name` (pitcher name) | **APPROXIMATELY_SUPPORTED** (both, differently) |
@@ -85,7 +92,7 @@ Parquet and 7,502 PostgreSQL game keys resolve; row counts are unchanged.
 The v0.1 contract is explicit and reproducible rather than implicit in SQL:
 
 - default `game_types=("REGULAR_SEASON",)` → `game_type IN ('R')`;
-- default `event_population="BATTED_BALL"` → `events IS NOT NULL` in addition to the
+- default `event_population="BATTED_BALL"` → `description = 'hit_into_play'` in addition to the
   metric not being null; `MEASURED_CONTACT` deliberately includes measured fouls and
   `ALL_PITCHES` omits the event predicate;
 - an explicit user threshold (`minimum 20 batted balls`) is frozen as
@@ -99,7 +106,7 @@ Schema/coverage metadata is declared statically, not discovered from each instal
 Fastball codes FF/SI/FC/FA are the explicit project definition. The AVG/MAX SQL contract
 is explicit and the natural-language parser preserves explicit metric, filter, count and
 aggregation wording. Qualification is frozen requirement semantics, not an adapter
-default. The default batted-ball population is fair balls in play (`events IS NOT NULL`),
+default. The default batted-ball population is fair balls in play (`description = 'hit_into_play'`),
 not measured contact, and the analyzed population is visible on the artifact. Zone codes
 11/12 are named and described as upper outside quadrants, not a strict above-sz_top
 predicate. Parquet provides IDs and only sparse seed names; PostgreSQL dictionary identity

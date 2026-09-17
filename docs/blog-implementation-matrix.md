@@ -1,5 +1,12 @@
 # Blog implementation matrix
 
+Current independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
+`codex/v0.1-semantic-recheck`. [Semantic re-review](reviews/v01-semantic-recheck.md)
+records the remaining five compositional failures, regression-backed fixes, and live evidence.
+Baseline: 432 tests; corrected review: 435 tests, no skips. The original blocker gate
+passes, but the expanded NL-to-SQL release gate fails. No main adoption or tag is authorized
+while those P1 defects remain. Repair-checkpoint claims below are not release approval.
+
 Maps every confirmed blog decision/requirement to its implementation status in this
 repository. Source: `content/knowledge/{current-state,decisions,project-state,sources}`
 and posts 01–09 of `CityuHK-wyj/cityuhk-wyj.github.io` as of 2026-09-14.
@@ -15,7 +22,7 @@ Status values:
 This file is maintained as implementation proceeds. It is the evidence for
 "which blog designs are actually implemented", not a wish list.
 
-Current review: **SEMANTIC_BLOCKERS_FIXED — READY_FOR_CODEX_RECHECK** on
+Current review: **FINAL_REVIEW_BLOCKED** on
 `pi/v0.1-semantic-fixes`, based exactly on the reviewed `codex/v0.1-final-review`
 checkpoint. 432 tests pass. See [independent final review](reviews/v01-final-review.md)
 for the blocked baseline and

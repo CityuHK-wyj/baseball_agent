@@ -1,6 +1,13 @@
 # Codex handoff
 
-Status: **SEMANTIC_BLOCKERS_FIXED — READY_FOR_CODEX_RECHECK**. The focused repair branch
+Current independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
+`codex/v0.1-semantic-recheck`. [Semantic re-review](reviews/v01-semantic-recheck.md)
+records the remaining five compositional failures, regression-backed fixes, and live evidence.
+Baseline: 432 tests; corrected review: 435 tests, no skips. The original blocker gate
+passes, but the expanded NL-to-SQL release gate fails. No main adoption or tag is authorized
+while those P1 defects remain. Repair-checkpoint claims below are not release approval.
+
+Status: **FINAL_REVIEW_BLOCKED**. The focused repair branch
 `pi/v0.1-semantic-fixes` is based exactly on the reviewed
 `codex/v0.1-final-review` checkpoint (Builder `b0e5d86bb9e2b254bd82c390a9fcf8e609c49d57`,
 review fixes through `6560bb0`). Builder branch and main are untouched.
@@ -9,7 +16,7 @@ See [the final review](reviews/v01-final-review.md) for the blocked baseline,
 source/population contract, and
 [the population ADR](adr/0020-analytical-population-and-qualification.md) for the design.
 
-The five Codex-reproduced failures are resolved and covered by regression tests:
+The five original sentence-level reproductions pass, with regression coverage:
 
 1. Normalization now preserves explicit pitch/exit-velocity filters (including `>=`),
    explicit AVG/MAX aggregation, and exact `0-2` counts; unsupported wording asks for

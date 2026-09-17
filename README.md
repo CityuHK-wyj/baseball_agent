@@ -1,5 +1,12 @@
 # Baseball Agent
 
+Current independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
+`codex/v0.1-semantic-recheck`. [Semantic re-review](docs/reviews/v01-semantic-recheck.md)
+records the remaining five compositional failures, regression-backed fixes, and live evidence.
+Baseline: 432 tests; corrected review: 435 tests, no skips. The original blocker gate
+passes, but the expanded NL-to-SQL release gate fails. No main adoption or tag is authorized
+while those P1 defects remain. Repair-checkpoint claims below are not release approval.
+
 An explainable, verifiable MLB analytics agent. It turns a natural-language baseball
 question into a set of analysis objectives, decomposes them into information
 requirements, plans and routes work to data sources, validates and judges the results,
@@ -53,7 +60,7 @@ exactly which blog decisions are implemented.
   (rules, transactions, bilingual glossary and metrics, all 30 teams, ballparks, players,
   awards, trusted sources and the community directory) behind `ContextService`.
 
-Status: **SEMANTIC_BLOCKERS_FIXED — READY_FOR_CODEX_RECHECK** on
+Status: **FINAL_REVIEW_BLOCKED** on
 `pi/v0.1-semantic-fixes`. The independent review's four analytics blockers are repaired:
 explicit pitch/exit-velocity filters, explicit AVG/MAX aggregation and exact counts are
 preserved; the qualification threshold is frozen; the game-type and batted-ball
