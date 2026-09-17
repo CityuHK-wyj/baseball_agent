@@ -42,7 +42,11 @@ class BattingTool(RuntimeTool):
         name="batting_stats",
         accepts=("PLAYER_NAME", "PLAYER_ID_SET", "SEASON", "DATE_RANGE"),
         produces=("STATISTICAL_RESULT", "RANKED_ENTITY_SET"),
-        description="Live batting lines by season or explicit date range.")
+        description="Live batting lines by season or explicit date range.",
+        temporal_modes=("SEASON", "ARBITRARY_DATE_RANGE"),
+        supported_measures=("AVG", "OBP", "SLG", "OPS", "HR", "RBI", "SB", "H",
+                            "BB", "SO"),
+        game_types=("REGULAR_SEASON",), authority="SOURCE_BACKED")
 
     def run(self, request: ToolRequest, context: ToolContext) -> ToolOutcome:
         if context.batting is None:
@@ -50,6 +54,12 @@ class BattingTool(RuntimeTool):
                                detail="batting stats are not configured")
         inputs = request.structured_inputs
         metric = str(inputs.get("metric") or "OPS").upper()
+        if metric not in self.contract.supported_measures:
+            # Never silently downgrade an unsupported measure to OPS.
+            return ToolOutcome(
+                recovery_code="UNSUPPORTED_CAPABILITY",
+                detail=f"batting provider does not support measure {metric!r}; "
+                       f"supported: {', '.join(self.contract.supported_measures)}")
         names = tuple(str(item) for item in (inputs.get("names") or ()) if str(item).strip())
         player_ids = tuple(str(item) for item in ids_from_inputs(context, request))
         start = inputs.get("start")
@@ -77,6 +87,14 @@ class BattingTool(RuntimeTool):
         actual = Scope(entities=entities, population="players", time_range=actual_time,
                        seasons=(season_value,) if season_value else (),
                        metric=metric, source_coverage=("baseball-reference",))
+        receipt = {
+            "mode": "range" if start else "season",
+            "season": season_value, "start": str(start) if start else "",
+            "end": str(end) if end else "", "metric": metric,
+            "entities": list(entities), "population": "players",
+            "source_coverage": ["baseball-reference"],
+            "source_snapshot": f"bref:{evidence.reference}",
+            "row_count": len(rows), "evidence_refs": []}
         artifact = RuntimeArtifact(
             artifact_id=context.artifacts.next_id("batting"), kind="batting_stats",
             structured_data={"rows": list(rows), "metric": metric},
@@ -84,7 +102,8 @@ class BattingTool(RuntimeTool):
             requested_scope=requested, actual_scope=actual,
             provenance=(EvidenceSource(source="baseball-reference", source_kind="STATS_API",
                                        reference=evidence.reference, title=evidence.summary),),
-            confidence=0.8 if rows else 0.1, status="OK" if rows else "EMPTY")
+            confidence=0.8 if rows else 0.1, status="OK" if rows else "EMPTY",
+            metadata={"execution_receipt": receipt})
         exports = [build_export(artifact, "STATISTICAL_RESULT",
                                 {"columns": list(rows[0].keys()) if rows else [],
                                  "rows": [list(row.values()) for row in rows]},
@@ -127,8 +146,8 @@ class LocalAnalyticsTool(RuntimeTool):
         except Exception as error:  # noqa: BLE001 - malformed IR is a planning signal
             return ToolOutcome(recovery_code="INVALID_IR",
                                detail=f"{type(error).__name__}: {error}")
-        # A planner-provided window is applied as a real date filter, not just a scope
-        # annotation, so the calculation is actually restricted to the requested window.
+        # A planner-provided window is applied as a real date predicate by the compiler
+        # (single source of truth), so declared and executed window cannot diverge.
         inputs = request.structured_inputs
         if query.window is None and inputs.get("start") and inputs.get("end"):
             try:
@@ -137,14 +156,8 @@ class LocalAnalyticsTool(RuntimeTool):
                     end=date.fromisoformat(str(inputs["end"])))})
             except ValueError:
                 pass
-        if query.window is not None:
-            date_field = query.date_field or "game_date"
-            if not _references_field(query, date_field):
-                query = query.model_copy(update={
-                    "date_field": date_field,
-                    "filters": (*query.filters, Between(
-                        field=date_field, low=query.window.start.isoformat(),
-                        high=query.window.end.isoformat()))})
+        if query.window is not None and not query.date_field:
+            query = query.model_copy(update={"date_field": "game_date"})
         # An entity-set filter may name the field and leave the export to be resolved
         # from the request's referenced Artifacts (composition, not a hard-coded join).
         entity_labels: list[str] = []
@@ -202,22 +215,51 @@ class LocalAnalyticsTool(RuntimeTool):
                                detail=tool_result.safe_error_summary or "query failed")
         columns = [selection.alias for selection in query.selections]
         ordered_rows = [list(row) for row in rows]
+        upstream_membership = ""
+        upstream_seasons: tuple[str, ...] = ()
+        for ref in request.input_refs:
+            export = resolve_export_ref(context, ref)
+            if export is None or export.export_type != "PLAYER_ID_SET":
+                continue
+            metadata = export.metadata if isinstance(export.metadata, dict) else {}
+            upstream_membership = str(metadata.get("membership_basis")
+                                      or upstream_membership)
         actual = Scope(
             entities=tuple(dict.fromkeys((
                 *entity_labels,
                 *(context.player_names.get(str(row[0]), str(row[0]))
                   for row in ordered_rows if row and str(row[0]).isdigit())))),
             population="players", time_range=query.window,
+            membership_basis=upstream_membership,
             seasons=(tuple(period.time_range.start.year for period in query.periods)
                      if query.periods else ()),
-            game_types=tuple(str(item.value) for item in query.filters
-                             if getattr(item, "field", "") == "game_type"),
-            metric="+".join(compiled.applied_fields), event_population="",
+            game_types=compiled.game_types,
+            metric="+".join(compiled.applied_fields), event_population="pitch",
+            aggregation=compiled.aggregation,
+            qualification=compiled.qualification,
             source_coverage=(query.source_kind,))
+        # A truthful execution receipt: the verifier reads this, never the declared scope,
+        # to establish what actually ran.
+        receipt = {
+            "source_kind": query.source_kind, "table": query.table,
+            "applied_window": (compiled.applied_window[0], compiled.applied_window[1])
+            if compiled.applied_window else None,
+            "game_types": list(compiled.game_types),
+            "measure": "+".join(compiled.applied_fields) if compiled.applied_fields else "",
+            "aggregation": compiled.aggregation, "qualification": compiled.qualification,
+            "population": "players", "membership_basis": upstream_membership,
+            "canonical_entities": list(entity_labels),
+            "source_coverage": [query.source_kind],
+            "source_snapshot": f"{query.source_kind}:{query.table}:{compiled.ir_digest}",
+            "ir_digest": compiled.ir_digest, "row_count": len(ordered_rows),
+            "truncated": bool(query.limit is not None and len(ordered_rows) >= query.limit),
+            "evidence_refs": list(compiled.referenced_exports),
+        }
         artifact = RuntimeArtifact(
             artifact_id=context.artifacts.next_id("local"), kind="analytics",
             structured_data={"columns": columns, "rows": ordered_rows,
-                             "source_kind": query.source_kind, "sql": compiled.sql},
+                             "source_kind": query.source_kind, "sql": compiled.sql,
+                             "ir_digest": compiled.ir_digest},
             text_content=_render(columns, ordered_rows),
             requested_scope=requested, actual_scope=actual,
             lineage=tuple(dict.fromkeys(upstream)),
@@ -228,7 +270,8 @@ class LocalAnalyticsTool(RuntimeTool):
             confidence=0.85 if ordered_rows else 0.2,
             status="OK" if ordered_rows else "EMPTY",
             metadata={"applied_fields": list(compiled.applied_fields),
-                      "referenced_exports": list(compiled.referenced_exports)})
+                      "referenced_exports": list(compiled.referenced_exports),
+                      "execution_receipt": receipt})
         exports = [build_export(artifact, "STATISTICAL_RESULT",
                                 {"columns": columns, "rows": ordered_rows},
                                 provenance=query.source_kind, confidence=artifact.confidence)]
@@ -301,7 +344,8 @@ class ComputeTool(RuntimeTool):
         name="compute",
         accepts=("STATISTICAL_RESULT", "DERIVED_MEASURE", "RANKED_ENTITY_SET"),
         produces=("DERIVED_MEASURE", "STATISTICAL_RESULT", "RANKED_ENTITY_SET"),
-        description="Comparisons, differences, rates, ranking over aggregated artifacts.")
+        description="Comparisons, differences, rates, ranking over aggregated artifacts.",
+        authority="DERIVED")
 
     def run(self, request: ToolRequest, context: ToolContext) -> ToolOutcome:
         op = str(request.structured_inputs.get("op") or "").upper()
@@ -347,7 +391,10 @@ class ComputeTool(RuntimeTool):
             actual_scope=_scope_from_inputs(request.structured_inputs.get("actual_scope"))
             or Scope(note=label),
             lineage=tuple(request.input_refs), confidence=0.8 if value is not None else 0.2,
-            status="OK" if value is not None else "EMPTY")
+            status="OK" if value is not None else "EMPTY",
+            metadata={"execution_receipt": {
+                "aggregation": label, "inputs": list(request.input_refs),
+                "source_snapshot": label}})
         artifact = artifact.model_copy(update={"exports": (
             build_export(artifact, "DERIVED_MEASURE", {"label": label, "value": value},
                          provenance="compute", confidence=artifact.confidence),)})

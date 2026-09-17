@@ -39,18 +39,53 @@ class WebSearchResult:
 
 @dataclass
 class _Transport:
-    """Bounded HTTP transport with a one-shot session reuse."""
+    """Bounded HTTP transport with an explicit, SSRF-checked redirect policy.
+
+    Redirects are followed manually so every destination is validated, and the body is
+    streamed with a byte cap (never an unbounded download sliced afterwards).
+    """
 
     timeout: float = 15.0
     user_agent: str = _UA
+    max_redirects: int = 4
 
     def get(self, url: str) -> tuple[int, str, str]:
         import requests
-        response = requests.get(url, headers={"User-Agent": self.user_agent,
-                                              "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"},
-                                timeout=self.timeout, allow_redirects=True)
-        text = response.text[:_MAX_BYTES]
-        return response.status_code, text, response.url
+        from urllib.parse import urljoin
+
+        current = url
+        for _ in range(self.max_redirects + 1):
+            if not _host_is_safe(current):
+                raise WebResearchUnavailable(f"refusing unsafe host for {current!r}")
+            response = requests.get(
+                current, headers={"User-Agent": self.user_agent,
+                                  "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"},
+                timeout=self.timeout, allow_redirects=False, stream=True)
+            location = response.headers.get("Location")
+            if response.status_code in (301, 302, 303, 307, 308) and location:
+                response.close()
+                current = urljoin(current, location)
+                continue
+            chunks: list[bytes] = []
+            total = 0
+            try:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if not chunk:
+                        continue
+                    chunks.append(chunk)
+                    total += len(chunk)
+                    if total >= _MAX_BYTES:
+                        break
+            finally:
+                response.close()
+            raw = b"".join(chunks)[:_MAX_BYTES]
+            try:
+                text = raw.decode(response.encoding or "utf-8", errors="replace")
+            except LookupError:
+                text = raw.decode("utf-8", errors="replace")
+            # Return the final source identity so callers record where bytes came from.
+            return response.status_code, text, current
+        raise WebResearchUnavailable("too many redirects")
 
 
 def _decode_ddg_url(href: str) -> str:
@@ -186,8 +221,11 @@ class PageReader:
         if not _host_is_safe(url):
             return ""
         try:
-            status, html, _ = self._transport.get(url)
+            status, html, final_url = self._transport.get(url)
         except Exception:  # noqa: BLE001 - a page fetch failure is not fatal
+            return ""
+        # The final destination must satisfy the same policy as the initial URL.
+        if not _host_is_safe(final_url):
             return ""
         if status != 200 or not html:
             return ""

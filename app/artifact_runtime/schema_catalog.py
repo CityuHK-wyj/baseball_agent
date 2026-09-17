@@ -111,6 +111,9 @@ def _operations_for(role: str) -> tuple[str, ...]:
         return IDENTIFIER_OPERATIONS
     if role in ("MEASURE",):
         return MEASURE_OPERATIONS
+    if role == "DATE":
+        return ("EQ", "NE", "GT", "GTE", "LT", "LTE", "BETWEEN", "IN",
+                "IS_NULL", "NOT_NULL")
     return ("EQ", "NE", "IN", "IS_NULL", "NOT_NULL")
 
 

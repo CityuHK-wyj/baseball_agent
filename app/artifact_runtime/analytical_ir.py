@@ -16,10 +16,16 @@ from __future__ import annotations
 from datetime import date
 from typing import Annotated, Any, Literal, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.models.artifact_runtime import _Envelope
 from app.models.contracts import TimeRange
+
+# Only deterministic, model-controlled identifier slots that must be valid SQL identifiers
+# and nothing else. This is the primary defense against alias/identifier injection; the
+# compiler re-checks and the AST read-only guard remains an additional boundary.
+IDENTIFIER_PATTERN = r"^[A-Za-z_][A-Za-z0-9_]{0,63}$"
+Identifier = Annotated[str, Field(pattern=IDENTIFIER_PATTERN)]
 
 AggregationOp = Literal["COUNT", "COUNT_NON_NULL", "COUNT_IF", "AVG", "SUM", "MIN", "MAX"]
 BinaryOp = Literal["ADD", "SUB", "MUL", "DIV", "SAFE_DIV", "PCT", "DIFF", "RATE"]
@@ -79,7 +85,7 @@ class Aggregate(_Envelope):
     op: AggregationOp
     field: str = ""
     condition: "Condition | None" = None
-    alias: str
+    alias: Identifier
     period: str = ""  # optional period label -> conditional aggregation
 
 
@@ -106,7 +112,7 @@ BinaryOperand.model_rebuild()
 
 
 class Selection(_Envelope):
-    alias: str
+    alias: Identifier
     kind: Literal["GROUP_KEY", "AGGREGATE", "DERIVED"]
     field: str = ""
     aggregate: Aggregate | None = None
@@ -141,6 +147,26 @@ class AnalyticalQuery(BaseModel):
     date_field: str = ""
     periods: tuple[PeriodSelector, ...] = ()
     window: TimeRange | None = None
+
+    @field_validator("order_by")
+    @classmethod
+    def _validate_order_by_syntax(cls, value: str) -> str:
+        import re
+        if value and not re.match(IDENTIFIER_PATTERN, value):
+            raise ValueError(f"order_by {value!r} is not a valid identifier")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_structure(self):
+        aliases = [item.alias for item in self.selections]
+        if len(aliases) != len(set(aliases)):
+            raise ValueError("duplicate selection aliases")
+        labels = [item.label for item in self.periods]
+        if len(labels) != len(set(labels)):
+            raise ValueError("duplicate period labels")
+        if self.periods and not self.date_field:
+            raise ValueError("period selectors require date_field")
+        return self
 
     def alias_names(self) -> tuple[str, ...]:
         return tuple(item.alias for item in self.selections)

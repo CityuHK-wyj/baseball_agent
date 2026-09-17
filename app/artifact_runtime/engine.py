@@ -1,8 +1,18 @@
 """The artifact runtime: conversation -> goal -> need graph -> planner -> artifacts.
 
-This is the center of the v0.3 runtime. Tools are evidence-producing operators; the
-planner is an artifact/dataflow planner; completion depends on goal coverage. The engine
-owns conversation state, the reference graph, the artifact store and persistence.
+This is the center of the v0.4 runtime. Tools are evidence-producing operators; the
+planner is an artifact/dataflow planner; completion depends on frozen user obligations and
+independently judged verified evidence. The engine owns conversation state, the reference
+graph, the artifact store, the durable event journal and persistence.
+
+v0.4 invariants enforced here:
+
+* explicit instruction bindings (no ambient export injection),
+* deterministic scope verification for every produced artifact,
+* a first-class ToolOutcome/ToolAttempt for every attempted action,
+* independent Judge participation in every evidence loop,
+* state projection (not Planner/Judge) owns terminal truth,
+* an append-only redacted event journal that makes failures diagnosable.
 """
 
 from __future__ import annotations
@@ -15,17 +25,22 @@ from uuid import uuid4
 
 from app.models.agent_runtime import AgentMessage, PendingClarification, RunStatus
 from app.models.artifact_runtime import (Claim, CoverageAssessment, Goal, Need, PlannerDecision,
-                                         RuntimeArtifact, RuntimeTrace, Scope, SemanticBrief,
-                                         ToolRequest, utcnow)
+                                         RuntimeArtifact, RuntimeEvent, RuntimeTrace, Scope,
+                                         SemanticBrief, ToolAttempt, ToolRequest, utcnow)
 from app.artifact_runtime.artifacts import ArtifactStore
-from app.artifact_runtime.claims import build_claims
+from app.artifact_runtime.bindings import (apply_bindings, artifact_index, resolve_bindings)
+from app.artifact_runtime.claims import build_claims, validate_claims
+from app.artifact_runtime.events import EventJournal
+from app.artifact_runtime.obligations import (extract_obligations, obligation_coverage,
+                                              obligation_gaps)
 from app.artifact_runtime.planner import Planner, PlannerContext, PlannerAction, SemanticInterpreter
+from app.artifact_runtime.recovery import attempt_for, gap_for_attempt, normalize_outcome
 from app.artifact_runtime.references import ReferenceStore
 from app.artifact_runtime.response import DeterministicResponseComposer, ResponseComposer
-from app.artifact_runtime.roster import RosterUnavailable
-from app.artifact_runtime.scope import compare_scope
+from app.artifact_runtime.scope_verification import verify_artifact_scope
+from app.artifact_runtime.state import StateProjector
 from app.artifact_runtime.sufficiency import CoverageJudge, GoalCoverage
-from app.artifact_runtime.tool_base import RuntimeTool, ToolContext, ToolRegistry
+from app.artifact_runtime.tool_base import RuntimeTool, ToolContext, ToolOutcome, ToolRegistry
 
 _MAX_ITERATIONS = 6
 _MAX_HISTORY = 8
@@ -55,17 +70,22 @@ class RuntimeConversation:
     needs: list[Need] = field(default_factory=list)
     assessments: list[CoverageAssessment] = field(default_factory=list)
     decisions: list[PlannerDecision] = field(default_factory=list)
+    attempts: list[ToolAttempt] = field(default_factory=list)
+    events: EventJournal = field(default_factory=EventJournal)
     pending_clarification: PendingClarification | None = None
     accepted_context: list[str] = field(default_factory=list)
+    clarification_refs: list[str] = field(default_factory=list)
     recent_entities: list[str] = field(default_factory=list)
     export_refs: dict[str, str] = field(default_factory=dict)
     steps: list[str] = field(default_factory=list)
     turns: int = 0
     last_coverage: GoalCoverage | None = None
+    persistence_error: str = ""
 
     # -- persistence -------------------------------------------------------
     def snapshot(self) -> dict:
         return {
+            "schema_version": 2,
             "conversation_id": self.conversation_id, "status": self.status,
             "messages": [item.model_dump(mode="json") for item in self.messages],
             "references": [item.model_dump(mode="json") for item in self.refs.all()],
@@ -75,9 +95,12 @@ class RuntimeConversation:
             "needs": [item.model_dump(mode="json") for item in self.needs],
             "assessments": [item.model_dump(mode="json") for item in self.assessments],
             "decisions": [item.model_dump(mode="json") for item in self.decisions],
+            "attempts": [item.model_dump(mode="json") for item in self.attempts],
+            "events": [item.model_dump(mode="json") for item in self.events.all()],
             "pending_clarification": (self.pending_clarification.model_dump(mode="json")
                                       if self.pending_clarification else None),
             "accepted_context": list(self.accepted_context),
+            "clarification_refs": list(self.clarification_refs),
             "recent_entities": list(self.recent_entities),
             "export_refs": dict(self.export_refs), "steps": list(self.steps),
             "turns": self.turns,
@@ -91,8 +114,8 @@ class RuntimeConversation:
                                  for item in payload.get("messages", ())]
         for item in payload.get("references", ()):
             conversation.refs.put(_ReferenceModel.model_validate(item))
-        for item in payload.get("artifacts", ()):
-            conversation.artifacts.add(RuntimeArtifact.model_validate(item))
+        conversation.artifacts.seed_from(tuple(
+            RuntimeArtifact.model_validate(item) for item in payload.get("artifacts", ())))
         if payload.get("goal"):
             conversation.goal = Goal.model_validate(payload["goal"])
         conversation.previous_goals = [Goal.model_validate(item)
@@ -102,10 +125,15 @@ class RuntimeConversation:
                                     for item in payload.get("assessments", ())]
         conversation.decisions = [PlannerDecision.model_validate(item)
                                   for item in payload.get("decisions", ())]
+        conversation.attempts = [ToolAttempt.model_validate(item)
+                                 for item in payload.get("attempts", ())]
+        conversation.events.extend(RuntimeEvent.model_validate(item)
+                                   for item in payload.get("events", ()))
         if payload.get("pending_clarification"):
             conversation.pending_clarification = PendingClarification.model_validate(
                 payload["pending_clarification"])
         conversation.accepted_context = list(payload.get("accepted_context", ()))
+        conversation.clarification_refs = list(payload.get("clarification_refs", ()))
         conversation.recent_entities = list(payload.get("recent_entities", ()))
         conversation.export_refs = dict(payload.get("export_refs", {}))
         conversation.steps = list(payload.get("steps", ()))
@@ -125,7 +153,8 @@ class ArtifactRuntime:
                  postgres_executor=None, parquet_executor=None,
                  parquet_glob: str = "mlb_statcast_*.parquet", player_names=None,
                  field_mapping=None, candidate_sink=None, store=None,
-                 run_id: str = "runtime", today=date.today, id_factory=None) -> None:
+                 run_id: str = "runtime", today=date.today, id_factory=None,
+                 projector: StateProjector | None = None) -> None:
         self._interpreter = interpreter
         self._planner = planner
         self._registry = registry
@@ -146,6 +175,7 @@ class ArtifactRuntime:
         self._store = store
         self._run_id = run_id
         self._today = today
+        self._projector = projector or StateProjector()
         self._id = id_factory or (lambda prefix: f"{prefix}-{uuid4().hex}")
         self._conversations: dict[str, RuntimeConversation] = {}
 
@@ -163,10 +193,19 @@ class ArtifactRuntime:
         if self._store is not None:
             stored = self._store.get_object("runtime_conversation", conversation_id)
             if stored is not None:
+                self._check_ownership(stored)
                 conversation = RuntimeConversation.restore(stored.payload)
                 self._conversations[conversation_id] = conversation
+                conversation.events.emit(
+                    "RESUMED", conversation_id=conversation_id, run_id=self._run_id,
+                    detail="conversation restored from durable store")
                 return conversation
         raise KeyError(f"Unknown conversation {conversation_id!r}")
+
+    def _check_ownership(self, stored) -> None:
+        owner = getattr(stored, "run_id", None)
+        if owner and owner != self._run_id and self._run_id != "runtime":
+            raise KeyError(f"conversation belongs to run {owner!r}, not {self._run_id!r}")
 
     def get_conversation(self, conversation_id: str) -> RuntimeConversation:
         return self._conversations.get(conversation_id) or self.resume_conversation(
@@ -203,10 +242,15 @@ class ArtifactRuntime:
     def _turn(self, conversation_id: str, text: str, *, is_clarification: bool
               ) -> RuntimeTurnResult:
         conversation = self.get_conversation(conversation_id)
+        clarification_ref = ""
         if conversation.pending_clarification is not None:
             resolved = conversation.pending_clarification
             conversation.accepted_context.append(
                 f"Clarification asked: {resolved.question} | user answered: {text}")
+            clarification_ref = conversation.refs.add(
+                "CLARIFICATION_ANSWER", resolved.clarification_id,
+                selector=text[:200], label=resolved.question[:80]).ref_id
+            conversation.clarification_refs.append(clarification_ref)
             conversation.pending_clarification = None
         conversation.messages.append(AgentMessage(role="user", text=text))
         conversation.turns += 1
@@ -214,6 +258,9 @@ class ArtifactRuntime:
         user_ref = conversation.refs.add("USER_MESSAGE",
                                          f"{conversation_id}:{conversation.turns}",
                                          label=text[:80])
+        conversation.events.emit("USER_MESSAGE", conversation_id=conversation_id,
+                                 run_id=self._run_id, turn=conversation.turns,
+                                 parent_refs=(user_ref.ref_id,), detail=text[:200])
         resolved_entities = self._resolve_entities(text)
         brief = self._interpreter.brief(
             message=text, history=self._history(conversation),
@@ -230,45 +277,73 @@ class ArtifactRuntime:
             conversation.pending_clarification = pending
             conversation.status = "WAITING_FOR_USER"
             conversation.messages.append(AgentMessage(role="agent", text=pending.question))
+            conversation.events.emit("CLARIFICATION", conversation_id=conversation_id,
+                                     run_id=self._run_id, turn=conversation.turns,
+                                     detail=pending.question[:200])
             trace = self._build_trace(text, conversation, (), None, pending.question)
             self._remember_trace(conversation, trace)
             self._persist(conversation)
             return RuntimeTurnResult(conversation_id, "WAITING_FOR_USER", pending.question,
                                      pending, (), (), None, trace)
 
-        goal = self._new_goal(conversation, brief, user_ref)
+        goal = self._new_goal(conversation, brief, text, user_ref, clarification_ref)
         self._run_planner(conversation, goal, brief)
 
         assessments = tuple(item for item in conversation.assessments
                             if any(need.need_id == item.need_id
                                    for need in conversation.needs))
+        self._project_need_statuses(conversation)
+        coverage_map = obligation_coverage(goal, tuple(conversation.needs), assessments,
+                                           conversation.artifacts.all())
+        coverage = self._judge.summarize(goal, tuple(conversation.needs), assessments,
+                                         obligation_coverage=coverage_map)
+        coverage = self._with_attempt_gaps(conversation, coverage)
+        conversation.last_coverage = coverage
         claims = build_claims(goal, tuple(conversation.needs),
                               conversation.artifacts.all(), assessments)
-        coverage = self._judge.summarize(goal, tuple(conversation.needs), assessments)
-        conversation.last_coverage = coverage
-        status = self._status_for(conversation, coverage)
+        claims = validate_claims(claims, conversation.artifacts.all(), conversation.refs)
+        for claim in claims:
+            conversation.events.emit("CLAIM_ACCEPTED", conversation_id=conversation_id,
+                                     run_id=self._run_id, turn=conversation.turns,
+                                     goal_id=goal.goal_id, need_id="",
+                                     detail=f"{claim.claim_id} [{claim.claim_type}]")
+        state = self._projector.project_goal(coverage, claims,
+                                             coverage.accepted_artifact_ids)
+        conversation.events.emit("STATE_TRANSITION", conversation_id=conversation_id,
+                                 run_id=self._run_id, turn=conversation.turns,
+                                 goal_id=goal.goal_id, detail=state.status)
         answer = self._composer.compose(
             message=text, goal=goal, claims=claims,
             artifacts=conversation.artifacts.all(), coverage=coverage,
             assumptions=brief.assumptions)
         conversation.messages.append(AgentMessage(role="agent", text=answer))
-        conversation.status = status
+        conversation.status = state.status
         self._record_entities(conversation, resolved_entities)
         self._record_candidates(conversation, brief, text)
         trace = self._build_trace(text, conversation, claims, coverage, answer)
         self._remember_trace(conversation, trace)
         self._persist(conversation)
-        return RuntimeTurnResult(conversation_id, status, answer, None, claims,
+        return RuntimeTurnResult(conversation_id, state.status, answer, None, claims,
                                  conversation.artifacts.all(), coverage, trace)
 
     # -- planner loop ------------------------------------------------------
     def _run_planner(self, conversation: RuntimeConversation, goal: Goal,
                      brief: SemanticBrief) -> None:
         context = self._planner_context(conversation)
-        attempted: set[tuple[str, str]] = set()
+        # Durable attempt identity: an action already attempted for a Need is not repeated
+        # blindly after restart. Uncertain external work in particular is never assumed
+        # safe to retry.
+        attempted: set[tuple[str, str]] = {
+            (item.need_id, item.capability) for item in conversation.attempts
+            if item.need_id and item.capability}
         new_needs = self._planner.initial_needs(goal=goal, brief=brief, context=context)
         for need in new_needs:
             self._upsert_need(conversation, need)
+            conversation.events.emit("NEED_CREATED", conversation_id=conversation.conversation_id,
+                                     run_id=self._run_id, turn=conversation.turns,
+                                     goal_id=goal.goal_id, need_id=need.need_id,
+                                     need_revision=need.revision,
+                                     detail=need.proposed_capability or need.objective[:80])
         for iteration in range(_MAX_ITERATIONS):
             context = self._planner_context(conversation)
             context.attempted = attempted
@@ -279,54 +354,155 @@ class ArtifactRuntime:
                 coverage = self._summarize(conversation, goal)
                 if coverage.core_goal_supported:
                     break
+                gaps = tuple(dict.fromkeys((*coverage.gaps, *self._attempt_gaps(conversation))))
                 added = self._planner.add_needs(
                     goal=goal, brief=brief, existing=tuple(conversation.needs),
-                    artifacts=conversation.artifacts.all(), gaps=coverage.gaps,
+                    artifacts=conversation.artifacts.all(), gaps=gaps,
                     context=context)
                 if not added:
                     break
                 for need in added:
                     self._upsert_need(conversation, need)
+                    conversation.events.emit(
+                        "NEED_CREATED", conversation_id=conversation.conversation_id,
+                        run_id=self._run_id, turn=conversation.turns,
+                        goal_id=goal.goal_id, need_id=need.need_id,
+                        need_revision=need.revision,
+                        detail=f"replan: {need.proposed_capability or need.objective[:60]}")
                 continue
 
             need = self._need(conversation, action.need_id)
             attempted.add((action.need_id, action.request.capability))
-            self._execute(conversation, goal, need, action, conversation.steps)
+            self._execute(conversation, goal, need, action)
 
         self._refresh_assessments(conversation, goal)
 
     def _execute(self, conversation: RuntimeConversation, goal: Goal, need: Need | None,
-                 action: PlannerAction, steps: list[str]) -> None:
+                 action: PlannerAction) -> None:
+        attempts = conversation.steps
         tool = self._registry.get(action.request.capability)
         decision = PlannerDecision(
             decision_id=self._id("decision"), iteration=len(conversation.decisions) + 1,
             action="REQUEST_TOOL", need_id=action.need_id, request=action.request,
             rationale=action.rationale)
         conversation.decisions.append(decision)
+        attempt_id = self._id("attempt")
         if tool is None:
-            steps.append(f"no tool named {action.request.capability!r}")
-            return
-        context = self._tool_context(conversation)
-        outcome = tool.run(action.request, context)
-        self._add_artifacts(conversation, outcome.artifacts)
+            outcome = ToolOutcome(recovery_code="UNSUPPORTED_CAPABILITY",
+                                  detail=f"no tool named {action.request.capability!r}")
+        else:
+            bindings = ()
+            if need is not None:
+                bindings = resolve_bindings(
+                    need, artifacts=conversation.artifacts.all(),
+                    export_refs=conversation.export_refs,
+                    by_need=artifact_index(tuple(conversation.needs)),
+                    accepted_types=tool.contract.accepts)
+                if bindings:
+                    need = apply_bindings(need, bindings)
+                    self._upsert_need(conversation, need)
+                    for binding in bindings:
+                        conversation.events.emit(
+                            "BINDING_SELECTED", conversation_id=conversation.conversation_id,
+                            run_id=self._run_id, turn=conversation.turns,
+                            goal_id=goal.goal_id, need_id=need.need_id,
+                            detail=f"{binding.name} <- {binding.source_export_id} "
+                                   f"from {binding.source_need_id or binding.source_artifact_id}")
+            request = action.request
+            if bindings:
+                from app.artifact_runtime.bindings import binding_refs
+                request = request.model_copy(update={
+                    "input_refs": tuple(dict.fromkeys(
+                        (*request.input_refs, *binding_refs(bindings))))})
+            conversation.events.emit(
+                "ACTION_ADMITTED", conversation_id=conversation.conversation_id,
+                run_id=self._run_id, turn=conversation.turns, goal_id=goal.goal_id,
+                need_id=need.need_id if need else "", request_id=request.request_id,
+                attempt_id=attempt_id,
+                detail=f"{tool.name} admitted (cost={tool.contract.cost})")
+            # Durable execution intent is persisted before the side effect.
+            pending = ToolAttempt(
+                attempt_id=attempt_id, request_id=request.request_id,
+                need_id=need.need_id if need else "", capability=tool.name,
+                status="INTERRUPTED", outcome_code="INTERRUPTED",
+                detail="started", external_effect_possible=bool(tool.contract.cost > 1))
+            conversation.attempts.append(pending)
+            self._persist(conversation)
+            context = self._tool_context(conversation)
+            try:
+                raw_outcome = tool.run(request, context)
+                outcome = normalize_outcome(tool.name, raw_outcome)
+            except Exception as error:  # noqa: BLE001 - central exception -> safe outcome
+                outcome = normalize_outcome(tool.name, None, error)
+
+        # Verify scope before accepting evidence; a Tool's declared scope is never trusted.
+        upstream = tuple(
+            artifact for artifact in conversation.artifacts.all()
+            if artifact.artifact_id in {
+                item for item in (need.linked_artifacts if need else ())})
+        verified: list[RuntimeArtifact] = []
+        for artifact in outcome.artifacts:
+            requested = (need.required_scope if need else None) or artifact.requested_scope
+            lineage_upstream = tuple(
+                conversation.artifacts.maybe(parent) for parent in artifact.lineage)
+            parents = tuple(item for item in lineage_upstream if item is not None) or upstream
+            verifications = verify_artifact_scope(
+                requested, artifact,
+                receipt=artifact.metadata.get("execution_receipt"),
+                upstream=parents)
+            updated = artifact.model_copy(update={"scope_verifications": verifications})
+            conversation.artifacts.update(updated)
+            verified.append(updated)
+            for verification in verifications:
+                conversation.events.emit(
+                    "SCOPE_VERIFIED", conversation_id=conversation.conversation_id,
+                    run_id=self._run_id, turn=conversation.turns,
+                    goal_id=goal.goal_id, need_id=need.need_id if need else "",
+                    detail=f"{updated.artifact_id}:{verification.dimension}="
+                           f"{verification.status}")
+
+        self._add_artifacts(conversation, tuple(verified))
         if need is not None:
             need.linked_artifacts = tuple(dict.fromkeys(
-                (*need.linked_artifacts, *(item.artifact_id for item in outcome.artifacts))))
+                (*need.linked_artifacts, *(item.artifact_id for item in verified))))
+        attempt = attempt_for(
+            attempt_id=attempt_id, request_id=action.request.request_id,
+            need_id=need.need_id if need else "", capability=action.request.capability,
+            outcome=outcome, artifacts=tuple(verified),
+            binding_ids=tuple(binding.binding_id for binding in (
+                need.input_bindings if need else ())))
+        conversation.attempts = [item for item in conversation.attempts
+                                 if item.attempt_id != attempt_id]
+        conversation.attempts.append(attempt)
+        if need is not None:
+            need.attempts = (*need.attempts, attempt)
             need.status = "IN_PROGRESS"
-        if outcome.recovery_code:
-            steps.append(f"{tool.name}: {outcome.recovery_code} — {outcome.detail}")
-            if need is not None:
+            if outcome.recovery_code:
                 need.unsatisfied_inputs = tuple(dict.fromkeys(
                     (*need.unsatisfied_inputs, outcome.recovery_code)))
+        conversation.events.emit(
+            "EXECUTION_OUTCOME", conversation_id=conversation.conversation_id,
+            run_id=self._run_id, turn=conversation.turns, goal_id=goal.goal_id,
+            need_id=need.need_id if need else "", request_id=action.request.request_id,
+            attempt_id=attempt_id,
+            detail=f"{action.request.capability}: {attempt.outcome_code}"
+                   + (f" — {outcome.detail}" if outcome.detail else ""),
+            data={"artifact_ids": list(attempt.artifact_ids),
+                  "retryable": attempt.retryable})
+        if outcome.recovery_code:
+            attempts.append(f"{action.request.capability}: {outcome.recovery_code} — "
+                            f"{outcome.detail}")
         for artifact in outcome.artifacts:
             if artifact.metadata.get("recovery_code"):
-                steps.append(f"{tool.name}: {artifact.metadata['recovery_code']}")
+                attempts.append(f"{action.request.capability}: "
+                                f"{artifact.metadata['recovery_code']}")
         if need is not None:
             self._assess_need(conversation, goal, need)
-        # New exports may advance dependent needs; re-assess everything cheaply.
         for other in conversation.needs:
             if other.need_id != (need.need_id if need else None):
                 self._assess_need(conversation, goal, other)
+        self._project_need_statuses(conversation)
+        self._persist(conversation)
 
     # -- assessment --------------------------------------------------------
     def _assess_need(self, conversation: RuntimeConversation, goal: Goal, need: Need) -> None:
@@ -336,50 +512,110 @@ class ArtifactRuntime:
         conversation.assessments = [item for item in conversation.assessments
                                     if item.need_id != need.need_id]
         conversation.assessments.append(assessment)
-        need.status = {"SATISFIED": "SATISFIED", "PARTIAL": "PARTIAL",
-                       "IRRELEVANT": "PARTIAL", "UNSATISFIED": "FAILED"}[assessment.verdict]
+        conversation.events.emit("JUDGE_ASSESSMENT",
+                                 conversation_id=conversation.conversation_id,
+                                 run_id=self._run_id, turn=conversation.turns,
+                                 goal_id=goal.goal_id, need_id=need.need_id,
+                                 detail=f"verdict={assessment.verdict} "
+                                        f"judge={assessment.judge_outcome} "
+                                        f"available={assessment.assessment_available}")
 
     def _refresh_assessments(self, conversation: RuntimeConversation, goal: Goal) -> None:
         for need in conversation.needs:
             if need.linked_artifacts:
                 self._assess_need(conversation, goal, need)
+        self._project_need_statuses(conversation)
+
+    def _project_need_statuses(self, conversation: RuntimeConversation) -> None:
+        by_need = {item.need_id: item for item in conversation.assessments}
+        for need in conversation.needs:
+            assessment = by_need.get(need.need_id)
+            has_attempt = any(item.need_id == need.need_id for item in conversation.attempts)
+            need.status = self._projector.project_need(need, assessment,
+                                                       has_attempt=has_attempt)
 
     def _summarize(self, conversation: RuntimeConversation, goal: Goal) -> GoalCoverage:
-        return self._judge.summarize(goal, tuple(conversation.needs),
-                                     tuple(conversation.assessments))
+        assessments = tuple(item for item in conversation.assessments
+                            if any(need.need_id == item.need_id
+                                   for need in conversation.needs))
+        coverage_map = obligation_coverage(goal, tuple(conversation.needs), assessments,
+                                           conversation.artifacts.all())
+        return self._judge.summarize(goal, tuple(conversation.needs), assessments,
+                                     obligation_coverage=coverage_map)
 
-    def _status_for(self, conversation: RuntimeConversation, coverage: GoalCoverage
-                    ) -> RunStatus:
-        if coverage.core_goal_supported:
-            return "COMPLETE"
-        linked = {artifact_id for need in conversation.needs
-                  for artifact_id in need.linked_artifacts}
-        useful = [artifact for artifact in conversation.artifacts.all()
-                  if artifact.artifact_id in linked and artifact.status in ("OK", "PARTIAL")]
-        if useful:
-            return "LIMITED"
-        return "FAILED"
+    def _attempt_gaps(self, conversation: RuntimeConversation) -> tuple[str, ...]:
+        gaps: list[str] = []
+        seen_attempts: set[str] = set()
+        for attempt in conversation.attempts:
+            if attempt.attempt_id in seen_attempts:
+                continue
+            seen_attempts.add(attempt.attempt_id)
+            if attempt.status in ("FAILED", "INTERRUPTED", "UNCERTAIN"):
+                gaps.append(gap_for_attempt(attempt.need_id, attempt))
+        return tuple(dict.fromkeys(gaps))
+
+    def _with_attempt_gaps(self, conversation: RuntimeConversation,
+                           coverage: GoalCoverage) -> GoalCoverage:
+        extra = self._attempt_gaps(conversation)
+        if not extra:
+            return coverage
+        return GoalCoverage(
+            core_goal_supported=coverage.core_goal_supported, verdict=coverage.verdict,
+            quality=coverage.quality, gaps=tuple(dict.fromkeys((*coverage.gaps, *extra))),
+            missing_needs=coverage.missing_needs,
+            obligation_coverage=coverage.obligation_coverage,
+            missing_obligations=coverage.missing_obligations,
+            judge_available=coverage.judge_available,
+            accepted_artifact_ids=coverage.accepted_artifact_ids)
 
     # -- helpers -----------------------------------------------------------
-    def _new_goal(self, conversation: RuntimeConversation, brief: SemanticBrief,
-                  user_ref) -> Goal:
+    def _new_goal(self, conversation: RuntimeConversation, brief: SemanticBrief, text: str,
+                  user_ref, clarification_ref: str = "") -> Goal:
+        previous = conversation.goal
         constraint_refs: list[str] = []
         for constraint in brief.constraints:
             reference = conversation.refs.add("USER_SPAN", user_ref.target_id,
                                               selector=constraint, label=constraint)
             constraint_refs.append(reference.ref_id)
-        if conversation.goal is not None:
-            conversation.previous_goals.append(conversation.goal)
-        # A new goal starts a fresh need graph; prior Artifacts remain available for
-        # explicit reuse by reference, but they cannot silently satisfy the new goal.
+        fresh = extract_obligations(
+            message=text, brief=brief, source_ref=user_ref.ref_id,
+            clarification_refs=tuple(filter(None, (clarification_ref,))))
+        inherited: list[str] = []
+        changed: list[str] = []
+        obligations = list(fresh)
+        if previous is not None:
+            conversation.previous_goals.append(previous)
+            new_keys = {(item.kind, item.value) for item in fresh}
+            for obligation in previous.obligations:
+                if (obligation.kind, obligation.value) in new_keys:
+                    continue
+                # A follow-up inherits obligations it did not explicitly change.
+                inherited.append(obligation.obligation_id)
+                obligations.append(obligation.model_copy(update={"status": "OPEN"}))
+            changed = [item.obligation_id for item in fresh]
+        # Fresh need graph: prior Artifacts remain available only through explicit
+        # bindings and are re-assessed under the new Goal revision.
         conversation.needs = []
         conversation.assessments = []
-        goal = Goal(goal_id=self._id("goal"),
-                    statement=brief.goal_statement or brief.understanding or "",
-                    scope=brief.proposed_scope, constraint_refs=tuple(constraint_refs),
-                    constraints=tuple(brief.constraints),
-                    ambiguity_notes=tuple(brief.ambiguities), source_refs=(user_ref.ref_id,))
+        goal = Goal(
+            goal_id=self._id("goal"),
+            revision=(previous.revision + 1) if previous is not None else 1,
+            parent_goal_id=(previous.goal_id if previous is not None else ""),
+            statement=brief.goal_statement or brief.understanding or text,
+            scope=brief.proposed_scope,
+            obligations=tuple(obligations),
+            inherited_obligations=tuple(inherited), changed_obligations=tuple(changed),
+            constraint_refs=tuple(constraint_refs), constraints=tuple(brief.constraints),
+            ambiguity_notes=tuple(brief.ambiguities), source_refs=(user_ref.ref_id,),
+            clarification_refs=tuple(filter(None, conversation.clarification_refs)))
         conversation.goal = goal
+        conversation.events.emit(
+            "GOAL_REVISED" if previous is not None else "GOAL_INTERPRETED",
+            conversation_id=conversation.conversation_id, run_id=self._run_id,
+            turn=conversation.turns, goal_id=goal.goal_id, goal_revision=goal.revision,
+            detail=goal.statement[:200],
+            data={"obligations": [item.kind for item in goal.obligations],
+                  "inherited": list(inherited), "changed": list(changed)})
         return goal
 
     def _upsert_need(self, conversation: RuntimeConversation, need: Need) -> None:
@@ -408,6 +644,12 @@ class ArtifactRuntime:
                     "ARTIFACT_EXPORT", artifact.artifact_id, selector=export.export_id,
                     label=export.export_type, provenance=export.provenance)
                 conversation.export_refs[export.export_id] = reference.ref_id
+            conversation.events.emit(
+                "ARTIFACT_REGISTERED", conversation_id=conversation.conversation_id,
+                run_id=self._run_id, turn=conversation.turns,
+                goal_id=conversation.goal.goal_id if conversation.goal else "",
+                detail=f"{artifact.artifact_id} [{artifact.kind}/{artifact.status}]",
+                data={"exports": [item.export_type for item in artifact.exports]})
 
     def _planner_context(self, conversation: RuntimeConversation) -> PlannerContext:
         capabilities = {tool.name: (tool.contract.accepts, tool.contract.produces)
@@ -428,7 +670,7 @@ class ArtifactRuntime:
             budget_remaining=_MAX_ITERATIONS)
 
     def _tool_context(self, conversation: RuntimeConversation) -> ToolContext:
-        context = ToolContext(
+        return ToolContext(
             refs=conversation.refs, artifacts=conversation.artifacts, today=self._today(),
             knowledge=self._knowledge, entity_lookup=self._entity_lookup, web=self._web,
             batting=self._batting, pitching=self._pitching,
@@ -436,7 +678,6 @@ class ArtifactRuntime:
             parquet_executor=self._parquet_executor, parquet_glob=self._parquet_glob,
             player_names=self._player_names, field_mapping=self._field_mapping,
             roster_provider=self._roster_provider, candidate_sink=self._candidate_sink)
-        return context
 
     def _catalog_summary(self) -> str:
         from app.artifact_runtime.schema_catalog import catalog_from_registry
@@ -473,6 +714,10 @@ class ArtifactRuntime:
                            message: str) -> None:
         if self._candidate_sink is None or not brief.unresolved:
             return
+        evidence_refs = [artifact.artifact_id for artifact in conversation.artifacts.all()
+                         if artifact.artifact_id in {
+                             need.linked_artifacts[-1]
+                             for need in conversation.needs if need.linked_artifacts}]
         for mention in brief.unresolved:
             if self._entity_lookup is not None and self._entity_lookup.resolve(mention).resolved:
                 continue
@@ -481,6 +726,10 @@ class ArtifactRuntime:
                 "proposed_type": "CONTEXT_REFERENCE", "language": "und",
                 "discovered_from_query": message,
                 "reason": "unresolved runtime mention",
+                "originating_run": self._run_id,
+                "evidence_spans": tuple(conversation.artifacts.all()[-1].references
+                                        if conversation.artifacts.all() else ()),
+                "source_artifact_refs": tuple(evidence_refs),
                 "provenance": list(brief.research_queries[:3])})
 
     def _history(self, conversation: RuntimeConversation) -> str:
@@ -488,6 +737,9 @@ class ArtifactRuntime:
                  for item in conversation.messages[-_MAX_HISTORY:]]
         if conversation.goal is not None and conversation.goal.statement:
             parts.append(f"active goal: {conversation.goal.statement}")
+        if conversation.goal is not None and conversation.goal.obligations:
+            parts.append("frozen obligations: " + "; ".join(
+                obligation.description for obligation in conversation.goal.obligations))
         if conversation.accepted_context:
             parts.extend(conversation.accepted_context[-3:])
         return "\n".join(parts)
@@ -509,13 +761,18 @@ class ArtifactRuntime:
             needs=tuple(conversation.needs), decisions=tuple(conversation.decisions),
             artifact_summaries=tuple(
                 f"{artifact.artifact_id} [{artifact.kind}/{artifact.status}] "
-                f"exports={[item.export_type for item in artifact.exports]}"
+                f"exports={[item.export_type for item in artifact.exports]} "
+                f"scope={_scope_summary(artifact)}"
                 for artifact in conversation.artifacts.all()),
             assessments=tuple(conversation.assessments),
             coverage=(coverage.__dict__ if coverage else {}), claims=claims,
+            events=conversation.events.all(), attempts=tuple(conversation.attempts),
+            obligation_coverage=(coverage.obligation_coverage if coverage else {}),
             steps=tuple(conversation.steps) + tuple(
                 decision.rationale for decision in conversation.decisions
-                if decision.rationale),
+                if decision.rationale) + tuple(
+                f"{item.capability}: {item.outcome_code} [{item.status}]"
+                for item in conversation.attempts),
             tool_calls=tuple(f"{decision.request.capability}({decision.need_id})"
                              for decision in conversation.decisions
                              if decision.request is not None),
@@ -531,5 +788,18 @@ class ArtifactRuntime:
         try:
             self._store.save_object("runtime_conversation", conversation.conversation_id,
                                     self._run_id, conversation.snapshot())
-        except Exception:  # noqa: BLE001 - persistence must not break a live turn
-            pass
+            conversation.persistence_error = ""
+        except Exception as error:  # noqa: BLE001 - surfaced, never silently swallowed
+            conversation.persistence_error = f"{type(error).__name__}: {error}"
+            conversation.steps.append(f"persistence error: {conversation.persistence_error}")
+            conversation.events.emit(
+                "PERSISTENCE_ERROR", conversation_id=conversation.conversation_id,
+                run_id=self._run_id, turn=conversation.turns,
+                detail=conversation.persistence_error)
+
+
+def _scope_summary(artifact: RuntimeArtifact) -> str:
+    if not artifact.scope_verifications:
+        return "unverified"
+    return ",".join(f"{item.dimension}:{item.status}"
+                    for item in artifact.scope_verifications)

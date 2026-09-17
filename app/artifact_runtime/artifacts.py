@@ -21,13 +21,30 @@ class ArtifactStore:
         self._counter = 0
 
     def next_id(self, prefix: str) -> str:
-        self._counter += 1
-        return f"{prefix}-{self._counter}"
+        # Durable identity: never reuse an id, even after a restore whose counter was
+        # not persisted correctly.
+        while True:
+            self._counter += 1
+            candidate = f"{prefix}-{self._counter}"
+            if candidate not in self._artifacts:
+                return candidate
+
+    def seed_from(self, artifacts: tuple[RuntimeArtifact, ...]) -> None:
+        """Restore identity without reusing an existing id."""
+        for artifact in artifacts:
+            self._artifacts[artifact.artifact_id] = artifact
+            self._bump(artifact.artifact_id)
+
+    def _bump(self, artifact_id: str) -> None:
+        suffix = artifact_id.rsplit("-", 1)[-1]
+        if suffix.isdigit():
+            self._counter = max(self._counter, int(suffix))
 
     def add(self, artifact: RuntimeArtifact) -> RuntimeArtifact:
         if artifact.artifact_id in self._artifacts:
             raise ValueError(f"duplicate artifact id {artifact.artifact_id!r}")
         self._artifacts[artifact.artifact_id] = artifact
+        self._bump(artifact.artifact_id)
         return artifact
 
     def get(self, artifact_id: str) -> RuntimeArtifact:
@@ -38,6 +55,12 @@ class ArtifactStore:
 
     def maybe(self, artifact_id: str) -> RuntimeArtifact | None:
         return self._artifacts.get(artifact_id)
+
+    def update(self, artifact: RuntimeArtifact) -> RuntimeArtifact:
+        """Replace a stored artifact (same immutable id) with a verified copy."""
+        self._artifacts[artifact.artifact_id] = artifact
+        self._bump(artifact.artifact_id)
+        return artifact
 
     def all(self) -> tuple[RuntimeArtifact, ...]:
         return tuple(self._artifacts.values())

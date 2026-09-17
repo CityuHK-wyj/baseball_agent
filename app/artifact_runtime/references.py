@@ -24,16 +24,27 @@ class ReferenceStore:
     def add(self, ref_type: RefType, target_id: str, *, selector: str = "",
             provenance: str = "", label: str = "", ref_id: str | None = None) -> Reference:
         if ref_id is None:
-            self._counter += 1
-            ref_id = f"ref-{self._counter}"
+            # Durable identity: never overwrite an existing reference id.
+            while True:
+                self._counter += 1
+                ref_id = f"ref-{self._counter}"
+                if ref_id not in self._references:
+                    break
         reference = Reference(ref_id=ref_id, ref_type=ref_type, target_id=target_id,
                               selector=selector, provenance=provenance, label=label)
         self._references[ref_id] = reference
+        self._bump(ref_id)
         return reference
 
     def put(self, reference: Reference) -> Reference:
         self._references[reference.ref_id] = reference
+        self._bump(reference.ref_id)
         return reference
+
+    def _bump(self, ref_id: str) -> None:
+        suffix = ref_id.rsplit("-", 1)[-1]
+        if suffix.isdigit():
+            self._counter = max(self._counter, int(suffix))
 
     def get(self, ref_id: str) -> Reference:
         try:

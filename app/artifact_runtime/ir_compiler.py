@@ -33,6 +33,13 @@ class IRCompilationResult:
     detail: str = ""
     applied_fields: tuple[str, ...] = field(default_factory=tuple)
     referenced_exports: tuple[str, ...] = field(default_factory=tuple)
+    applied_window: tuple[str, str] | None = None
+    game_types: tuple[str, ...] = field(default_factory=tuple)
+    ir_digest: str = ""
+    coverage_status: str = "FULL"  # FULL | PARTIAL | NONE
+    qualification: str = ""
+    aggregation: str = ""
+    select_count: int = 0
 
     @property
     def ok(self) -> bool:
@@ -93,11 +100,35 @@ class _Compiler:
         self.applied.append(name)
         return spec
 
+    @staticmethod
+    def _allowed(spec, operation: str) -> bool:
+        # Catalog allowed-operations are advisory metadata only; enforce them so an
+        # accepted field/operation pair cannot be silently unsupported.
+        if not spec.allowed_operations:
+            return True
+        if operation in spec.allowed_operations:
+            return True
+        # IN / null checks apply to any comparable field.
+        if operation in ("IN", "IS_NULL", "NOT_NULL", "BETWEEN") and spec.role in (
+                "DIMENSION", "POPULATION", "DATE", "MEASURE", "IDENTIFIER"):
+            return operation not in ("BETWEEN",) or spec.role in ("DATE", "MEASURE")
+        return False
+
+    def _check_op(self, spec, operation: str) -> IRCompilationResult | None:
+        if self._allowed(spec, operation):
+            return None
+        return self.fail("UNSUPPORTED_OPERATION",
+                         f"operation {operation} is not allowed for field {spec.name!r} "
+                         f"(role {spec.role})")
+
     def render_condition(self, condition: Condition) -> tuple[str | None, IRCompilationResult | None]:
         if isinstance(condition, Compare):
             spec = self.field(condition.field)
             if spec is None:
                 return None, self.fail("UNKNOWN_FIELD", f"unknown field {condition.field!r}")
+            error = self._check_op(spec, condition.operator)
+            if error is not None:
+                return None, error
             operator = {"EQ": "=", "NE": "<>", "GT": ">", "GTE": ">=",
                         "LT": "<", "LTE": "<="}[condition.operator]
             value = _render_literal(spec.data_type, condition.value)
@@ -109,6 +140,9 @@ class _Compiler:
             spec = self.field(condition.field)
             if spec is None:
                 return None, self.fail("UNKNOWN_FIELD", f"unknown field {condition.field!r}")
+            error = self._check_op(spec, "BETWEEN")
+            if error is not None:
+                return None, error
             low = _render_literal(spec.data_type, condition.low)
             high = _render_literal(spec.data_type, condition.high)
             if low is None or high is None:
@@ -119,6 +153,9 @@ class _Compiler:
             spec = self.field(condition.field)
             if spec is None:
                 return None, self.fail("UNKNOWN_FIELD", f"unknown field {condition.field!r}")
+            error = self._check_op(spec, "IN")
+            if error is not None:
+                return None, error
             if not condition.values or len(condition.values) > _MAX_IN_VALUES:
                 return None, self.fail("UNSUPPORTED_OPERATION",
                                        f"IN set for {condition.field!r} has invalid size")
@@ -131,6 +168,9 @@ class _Compiler:
             spec = self.field(condition.field)
             if spec is None:
                 return None, self.fail("UNKNOWN_FIELD", f"unknown field {condition.field!r}")
+            error = self._check_op(spec, "NOT_NULL" if condition.negate else "IS_NULL")
+            if error is not None:
+                return None, error
             return f"{spec.name} IS {'NOT ' if condition.negate else ''}NULL", None
         if isinstance(condition, (And, Or)):
             parts: list[str] = []
@@ -149,29 +189,14 @@ class _Compiler:
         return None, self.fail("INVALID_IR", "unknown condition kind")
 
     def render_aggregate(self, aggregate: Aggregate) -> tuple[str | None, IRCompilationResult | None]:
+        op = aggregate.op
         condition_sql = None
         if aggregate.condition is not None:
             condition_sql, error = self.render_condition(aggregate.condition)
             if error is not None:
                 return None, error
-        op = aggregate.op
-        if op == "COUNT":
-            return "COUNT(*)", None
-        if op == "COUNT_IF":
-            if condition_sql is None:
-                return None, self.fail("INVALID_IR", "COUNT_IF requires a condition")
-            return f"SUM(CASE WHEN {condition_sql} THEN 1 ELSE 0 END)", None
-        spec = self.field(aggregate.field)
-        if spec is None:
-            return None, self.fail("UNKNOWN_FIELD", f"unknown field {aggregate.field!r}")
-        if op in ("AVG", "SUM") and spec.data_type not in _NUMERIC_TYPES:
-            return None, self.fail("UNSUPPORTED_OPERATION",
-                                   f"{op} requires a numeric field; {aggregate.field!r} is "
-                                   f"{spec.data_type}")
-        if op in ("MIN", "MAX") and spec.data_type not in _NUMERIC_TYPES | {"DATE"}:
-            return None, self.fail("UNSUPPORTED_OPERATION",
-                                   f"{op} is unsupported for {aggregate.field!r}")
-        target = spec.name
+
+        period_sql = None
         if aggregate.period:
             period = next((item for item in self.query.periods
                            if item.label == aggregate.period), None)
@@ -182,10 +207,43 @@ class _Compiler:
             if date_spec is None:
                 return None, self.fail("UNKNOWN_FIELD",
                                        f"unknown date field {self.query.date_field!r}")
-            start = period.time_range.start.isoformat()
-            end = period.time_range.end.isoformat()
-            target = (f"CASE WHEN {date_spec.name} >= DATE '{start}' "
-                      f"AND {date_spec.name} <= DATE '{end}' THEN {spec.name} END")
+            period_sql = (f"{date_spec.name} >= DATE '{period.time_range.start.isoformat()}' "
+                          f"AND {date_spec.name} <= DATE '{period.time_range.end.isoformat()}'")
+
+        predicates = [item for item in (condition_sql, period_sql) if item]
+        if len(predicates) == 1:
+            guard = predicates[0]
+        elif predicates:
+            guard = " AND ".join(f"({item})" for item in predicates)
+        else:
+            guard = None
+
+        # Every accepted condition/period combination has numerical semantics. COUNT is
+        # row-based only when unconditional; otherwise it counts qualifying rows instead
+        # of silently dropping the restriction.
+        if op == "COUNT":
+            if guard:
+                return f"SUM(CASE WHEN {guard} THEN 1 ELSE 0 END)", None
+            return "COUNT(*)", None
+        if op == "COUNT_IF":
+            if guard is None:
+                return None, self.fail("INVALID_IR", "COUNT_IF requires a condition")
+            return f"SUM(CASE WHEN {guard} THEN 1 ELSE 0 END)", None
+
+        spec = self.field(aggregate.field)
+        if spec is None:
+            return None, self.fail("UNKNOWN_FIELD", f"unknown field {aggregate.field!r}")
+        error = self._check_op(spec, op)
+        if error is not None:
+            return None, error
+        if op in ("AVG", "SUM") and spec.data_type not in _NUMERIC_TYPES:
+            return None, self.fail("UNSUPPORTED_OPERATION",
+                                   f"{op} requires a numeric field; {aggregate.field!r} is "
+                                   f"{spec.data_type}")
+        if op in ("MIN", "MAX") and spec.data_type not in _NUMERIC_TYPES | {"DATE"}:
+            return None, self.fail("UNSUPPORTED_OPERATION",
+                                   f"{op} is unsupported for {aggregate.field!r}")
+        target = f"CASE WHEN {guard} THEN {spec.name} END" if guard else spec.name
         if op == "COUNT_NON_NULL":
             return f"COUNT({target})", None
         return f"{op}({target})", None
@@ -263,6 +321,60 @@ class _Compiler:
                 f"requested {window.start}..{window.end}")
         return None
 
+    def _coverage_status(self) -> str:
+        entry = SOURCE_COVERAGE.get(self.query.source_kind)
+        if entry is None or self.query.window is None:
+            return "FULL"
+        _name, (start, end) = entry
+        coverage = (date.fromisoformat(start), date.fromisoformat(end))
+        window = self.query.window
+        if coverage[0] <= window.start and window.end <= coverage[1]:
+            return "FULL"
+        return "PARTIAL"
+
+    def _qualification_denominator(self) -> str:
+        """The HAVING denominator qualifies the intended sample, not raw row count.
+
+        For "average X over at least N measured events", the denominator is the count of
+        non-null measured events (then conditional counts, then rows), never total rows.
+        """
+        preference = {"COUNT_NON_NULL": 0, "COUNT_IF": 1, "COUNT": 2}
+        best: tuple[int, str] | None = None
+        for selection in self.query.selections:
+            if selection.kind != "AGGREGATE" or selection.aggregate is None:
+                continue
+            rank = preference.get(selection.aggregate.op)
+            if rank is None:
+                continue
+            sql = self.aggregate_sql.get(selection.alias)
+            if not sql:
+                continue
+            if best is None or rank < best[0]:
+                best = (rank, sql)
+        return best[1] if best is not None else "COUNT(*)"
+
+    def _collect_game_types(self) -> tuple[str, ...]:
+        values: list[str] = []
+
+        def walk(condition) -> None:
+            field = getattr(condition, "field", "")
+            if field == "game_type":
+                if getattr(condition, "kind", "") == "IN":
+                    values.extend(str(item) for item in condition.values)
+                else:
+                    value = getattr(condition, "value", None)
+                    if value is not None:
+                        values.append(str(value))
+            for child in getattr(condition, "conditions", ()) or ():
+                walk(child)
+            inner = getattr(condition, "condition", None)
+            if inner is not None:
+                walk(inner)
+
+        for condition in self.query.filters:
+            walk(condition)
+        return tuple(dict.fromkeys(values))
+
     def compile(self) -> IRCompilationResult:
         if self.catalog.table(self.query.source_kind, self.query.table) is None:
             return self.fail("UNKNOWN_TABLE",
@@ -292,7 +404,14 @@ class _Compiler:
 
         select_items: list[str] = []
         group_keys: list[str] = []
+        import re
+        from app.artifact_runtime.analytical_ir import IDENTIFIER_PATTERN
         for selection in self.query.selections:
+            if not re.match(IDENTIFIER_PATTERN, selection.alias):
+                # The model validates this; re-check so an in-process construction can
+                # never smuggle SQL structure through an identifier slot.
+                return self.fail("INVALID_IR",
+                                 f"alias {selection.alias!r} is not a valid identifier")
             if selection.kind == "GROUP_KEY":
                 spec = self.field(selection.field)
                 if spec is None:
@@ -327,24 +446,55 @@ class _Compiler:
         if entity_sql is not None:
             where_parts.append(f"({entity_sql})")
 
+        # The declared window is compiled into an executed predicate, so declared and
+        # executed window semantics can never diverge.
+        applied_window = None
+        if self.query.window is not None:
+            date_name = self.query.date_field or "game_date"
+            date_spec = self.field(date_name)
+            if date_spec is None:
+                return self.fail("UNKNOWN_FIELD", f"unknown date field {date_name!r}")
+            start = _render_literal(date_spec.data_type, self.query.window.start)
+            end = _render_literal(date_spec.data_type, self.query.window.end)
+            if start is None or end is None:
+                return self.fail("INVALID_IR", "window bounds are not renderable dates")
+            where_parts.append(f"({date_spec.name} BETWEEN {start} AND {end})")
+            applied_window = (self.query.window.start.isoformat(),
+                              self.query.window.end.isoformat())
+
         relation = self.relation_sql or self.query.table
         sql = f"SELECT {', '.join(select_items)} FROM {relation}"
         if where_parts:
             sql += " WHERE " + " AND ".join(where_parts)
         if group_keys:
             sql += " GROUP BY " + ", ".join(group_keys)
+        qualification = ""
         if self.query.min_rows is not None:
             if self.query.min_rows < 0:
                 return self.fail("INVALID_IR", "min_rows must be non-negative")
-            sql += f" HAVING COUNT(*) >= {int(self.query.min_rows)}"
+            denominator = self._qualification_denominator()
+            qualification = f"{denominator} >= {int(self.query.min_rows)}"
+            sql += f" HAVING {qualification}"
         order_alias = self.query.order_by or (self.query.selections[-1].alias)
         if order_alias not in self.query.alias_names():
             return self.fail("INVALID_IR", f"order_by {order_alias!r} is not a selected alias")
         sql += f" ORDER BY {order_alias} {self.query.direction}"
         if limit is not None:
             sql += f" LIMIT {int(limit)}"
-        return IRCompilationResult(sql=sql, applied_fields=tuple(dict.fromkeys(self.applied)),
-                                   referenced_exports=tuple(dict.fromkeys(self.used_exports)))
+        aggregation = ",".join(dict.fromkeys(
+            item.aggregate.op for item in self.query.selections
+            if item.kind == "AGGREGATE" and item.aggregate is not None))
+        import hashlib
+        import json
+        digest = hashlib.sha256(json.dumps(
+            self.query.model_dump(mode="json"), sort_keys=True).encode()).hexdigest()[:16]
+        return IRCompilationResult(
+            sql=sql, applied_fields=tuple(dict.fromkeys(self.applied)),
+            referenced_exports=tuple(dict.fromkeys(self.used_exports)),
+            applied_window=applied_window, game_types=self._collect_game_types(),
+            ir_digest=digest, coverage_status=self._coverage_status(),
+            qualification=qualification, aggregation=aggregation,
+            select_count=len(select_items))
 
 
 def _extract_ids(export: ArtifactExport) -> list[int]:

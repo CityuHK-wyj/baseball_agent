@@ -56,6 +56,9 @@ class ToolOutcome:
     detail: str = ""
     applied_fields: tuple[str, ...] = ()
     referenced_exports: tuple[str, ...] = ()
+    receipt: dict = field(default_factory=dict)
+    binding_ids: tuple[str, ...] = ()
+    external_effect_possible: bool = False
 
     @property
     def ok(self) -> bool:
@@ -117,26 +120,47 @@ class ToolRegistry:
 def build_export(artifact: RuntimeArtifact, export_type: str, value,
                  *, text: str = "", references: tuple[str, ...] = (),
                  provenance: str = "", confidence: float = 0.5,
-                 metadata: dict | None = None) -> ArtifactExport:
+                 metadata: dict | None = None,
+                 derived_from: tuple[str, ...] = ()) -> ArtifactExport:
+    from app.artifact_runtime.contracts import contract_for
+    scope = artifact.actual_scope
     return ArtifactExport(
         export_id=f"{artifact.artifact_id}:{export_type}", export_type=export_type,
         value=value, text=text, references=references, provenance=provenance,
-        confidence=confidence, metadata=metadata or {})
+        confidence=confidence, metadata=metadata or {},
+        contract=contract_for(export_type, scope=scope), derived_from=derived_from)
 
 
 def resolve_export_ref(context: ToolContext, ref: str) -> ArtifactExport | None:
-    """Resolve a reference id or export id to a reusable ArtifactExport."""
+    """Resolve a reference id or export id to a reusable ArtifactExport.
+
+    Resolution is intentionally *not* contextual acceptance: the binding layer decides
+    which upstream export a downstream action may consume. Here we only refuse exports
+    that are explicitly unaccepted or whose owning artifact is rejected/invalid.
+    """
     if not ref:
         return None
     reference = context.refs.maybe(ref)
     if reference is not None:
         if reference.ref_type == "ARTIFACT_EXPORT":
-            return context.artifacts.resolve_export(reference.selector)
+            export = context.artifacts.resolve_export(reference.selector)
+            return export if _export_usable(context, export) else None
         if reference.ref_type == "ARTIFACT":
             artifact = context.artifacts.maybe(reference.target_id)
             if artifact is not None and artifact.exports:
-                return artifact.export("PLAYER_ID_SET") or artifact.exports[0]
-    return context.artifacts.resolve_export(ref)
+                candidate = artifact.export("PLAYER_ID_SET") or artifact.exports[0]
+                return candidate if _export_usable(context, candidate) else None
+    export = context.artifacts.resolve_export(ref)
+    return export if _export_usable(context, export) else None
+
+
+def _export_usable(context: ToolContext, export: ArtifactExport | None) -> bool:
+    if export is None or not export.accepted:
+        return False
+    for artifact in context.artifacts.all():
+        if any(item.export_id == export.export_id for item in artifact.exports):
+            return artifact.status in ("OK", "PARTIAL")
+    return False
 
 
 def ids_from_inputs(context: ToolContext, request: ToolRequest,

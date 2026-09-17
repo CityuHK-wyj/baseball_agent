@@ -276,11 +276,17 @@ class DeterministicPlanner:
     def next_action(self, *, goal: Goal, needs: tuple[Need, ...],
                     artifacts: tuple[RuntimeArtifact, ...],
                     context: PlannerContext) -> PlannerAction | None:
-        status = {need.need_id: need.status for need in needs}
+        # A dependency is ready for *dataflow* once it has produced evidence, even if its
+        # own Need verdict is only PARTIAL: a partial upstream product can still feed a
+        # downstream action that needs its value.
+        ready: set[str] = set()
+        for need in needs:
+            if need.status in ("SATISFIED", "PARTIAL") or need.linked_artifacts:
+                ready.add(need.need_id)
         for need in needs:
             if need.status in ("SATISFIED", "FAILED", "BLOCKED"):
                 continue
-            if any(status.get(dep) != "SATISFIED" for dep in need.depends_on):
+            if any(dep not in ready for dep in need.depends_on):
                 continue
             tool_name = need.proposed_capability
             if not tool_name or (need.need_id, tool_name) in context.attempted:
@@ -294,12 +300,9 @@ class DeterministicPlanner:
         inputs = normalize_tool_inputs(dict(need.parameters))
         if "query" not in inputs and need.objective:
             inputs["query"] = need.objective
+        # No ambient export injection: the engine resolves exact upstream bindings from
+        # the Need's declared dependencies. Only explicit planner-declared refs are added.
         refs = list(need.input_refs)
-        accepted = context.accepts_for(need.proposed_capability)
-        for input_type in accepted:
-            for ref in context.export_ref_hints.get(input_type, ()):
-                if ref not in refs:
-                    refs.append(ref)
         return ToolRequest(
             request_id=f"req-{need.need_id}", objective=need.objective,
             capability=need.proposed_capability, input_refs=tuple(refs),
@@ -437,10 +440,9 @@ def _parse_needs(text: str) -> tuple[Need, ...]:
             continue
         scope = None
         if isinstance(raw.get("required_scope"), dict):
-            try:
-                scope = Scope.model_validate(raw["required_scope"])
-            except Exception:  # noqa: BLE001 - a malformed scope is simply dropped
-                scope = None
+            # A malformed scope must not be silently deleted: that would drop explicit user
+            # meaning. Raising makes the caller fall back to a conservative plan.
+            scope = Scope.model_validate(raw["required_scope"])
         needs.append(Need(
             need_id=str(raw.get("need_id") or f"need-{index + 1}"),
             objective=str(raw.get("objective") or ""),
