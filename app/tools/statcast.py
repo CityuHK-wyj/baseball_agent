@@ -181,6 +181,14 @@ class StatcastAnalyticsTool:
                 if strikes is None or balls is None:
                     missing.update({"count", "balls"})
                     continue
+                if constraint.states:
+                    # Exact compound semantics: preserve the requested logical union
+                    # without widening it into an independent cartesian product.
+                    disjuncts = [
+                        f"({balls} = {ball} AND {strikes} = {strike})"
+                        for ball, strike in constraint.exact_states]
+                    clauses.append("(" + " OR ".join(disjuncts) + ")" if disjuncts else "1 = 0")
+                    continue
                 clauses.append(f"{strikes} = {int(constraint.strikes)}")
                 if constraint.balls:
                     ball_list = ", ".join(str(int(ball)) for ball in sorted(constraint.balls))

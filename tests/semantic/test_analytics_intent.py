@@ -188,6 +188,52 @@ class AnalyticsIntentTests(unittest.TestCase):
         self.assertFalse(any(getattr(item, "definition", "") == ZONE_UPPER_OUTSIDE
                              for item in intent.constraints))
 
+    # -- Block 5: compositional / numeric ownership --------------------------
+
+    def test_exhibition_population_is_explicit_and_not_regular_season(self):
+        self.assertEqual(
+            _population("top 5 by maximum exit velocity in exhibition games in 2023").game_types,
+            ("EXHIBITION",))
+
+    def test_explicit_qualification_number_is_not_read_as_a_velocity(self):
+        intent = extract_analytical_constraints(
+            "top 5 by maximum exit velocity on fastballs at least 95 mph, at least 100 BBE in 2023")
+        numerics = [item for item in intent.constraints if isinstance(item, NumericConstraint)]
+        self.assertEqual([(n.key, n.value) for n in numerics], [("pitch_velocity", 95.0)])
+        qualification = next(item for item in intent.constraints
+                             if isinstance(item, QualificationConstraint))
+        self.assertEqual(qualification.min_batted_balls, 100)
+
+    def test_symbolic_qualification_number_is_not_read_as_a_velocity(self):
+        intent = extract_analytical_constraints(
+            "top 5 by maximum exit velocity with >= 20 BBE in 2023")
+        self.assertFalse(any(isinstance(item, NumericConstraint) for item in intent.constraints))
+        qualification = next(item for item in intent.constraints
+                             if isinstance(item, QualificationConstraint))
+        self.assertEqual(qualification.min_batted_balls, 20)
+
+    def test_filter_metric_does_not_steal_the_ranking(self):
+        ranking = _ranking(
+            "top 5 hitters facing pitch velocity >= 95 mph ranked by maximum exit velocity in 2023")
+        self.assertEqual((ranking.metric_key, ranking.aggregation), ("exit_velocity", "MAX"))
+        velocity = _numeric(
+            "top 5 hitters facing pitch velocity >= 95 mph ranked by maximum exit velocity in 2023")
+        self.assertEqual((velocity.key, velocity.value), ("pitch_velocity", 95.0))
+
+    def test_mixed_count_states_are_preserved_exactly(self):
+        count = _count("top 5 by maximum exit velocity on 0-2 or 1-1 counts in 2023")
+        self.assertEqual(count.exact_states, ((0, 2), (1, 1)))
+
+    def test_mixed_count_states_do_not_form_a_cartesian_product(self):
+        count = _count("top 5 by maximum exit velocity on 0-2 or 1-1 counts in 2023")
+        # The wider product would also admit (0, 1) and (1, 2).
+        self.assertNotIn((0, 1), count.exact_states)
+        self.assertNotIn((1, 2), count.exact_states)
+
+    def test_exact_state_set_is_the_authoritative_count_projection(self):
+        count = CountConstraint(strikes=2, balls=(0, 1, 2, 3), origin="SYSTEM_INFERRED")
+        self.assertEqual(count.exact_states, ((0, 2), (1, 2), (2, 2), (3, 2)))
+
 
 if __name__ == "__main__":
     unittest.main()

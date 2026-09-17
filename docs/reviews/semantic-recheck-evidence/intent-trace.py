@@ -47,7 +47,9 @@ with tempfile.TemporaryDirectory() as directory:
   count=next((c for c in cs if c.kind=='COUNT'),None)
   pop=next((c for c in cs if c.kind=='POPULATION'),None)
   valid=bool(rank and rank.metric_key==metric and rank.aggregation==agg and req.qualification_rule.min_batted_balls==n and sorted(c.value for c in nums)==sorted(values) and pop.game_types==(game,))
-  if balls=='mixed': valid=bool(semantic.clarifications) # No supported union: must not silently discard.
+  if balls=='mixed': # Represent the exact union OR clarify; never silently discard/widen.
+   represented = count is not None and {(s.balls,s.strikes) for s in count.states}=={(0,2),(1,1)}
+   valid=bool(semantic.clarifications) or represented
   elif balls is not None: valid=valid and count is not None and count.balls==balls
   if label=='both_metrics': valid=valid and {c.key:c.value for c in nums}=={'pitch_velocity':95,'exit_velocity':100}
   queries={}

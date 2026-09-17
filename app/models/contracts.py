@@ -86,18 +86,33 @@ class CategoryConstraint(_Constraint):
     authority: ConstraintAuthority = "USER_CONSTRAINT"
 
 
+class CountState(Contract):
+    """One exact baseball count: a specific (balls, strikes) pair."""
+
+    balls: int = Field(ge=0, le=3)
+    strikes: int = Field(ge=0, le=2)
+
+
 class CountConstraint(_Constraint):
     """A typed two-strike (or other count) situation.
 
     ``strikes`` is the required strike count and ``balls`` is the set of allowed ball
-    counts. The target "after reaching two strikes" is represented as ``strikes=2``,
-    never as an opaque "two strikes" string once it reaches execution planning.
+    counts for the simple, uniform case (for example ``strikes=2`` with every ball count,
+    or every strike level with a single ball count).
+
+    Compound explicit expressions must not be flattened into an independent cartesian
+    product. ``states`` carries the exact set of allowed ``(balls, strikes)`` pairs, so
+    ``0-2 or 1-1`` is ``{(0, 2), (1, 1)}`` and never the wider ``balls IN (0, 1) AND
+    strikes IN (1, 2)``. When ``states`` is non-empty it is authoritative and the physical
+    layer must use it; ``strikes``/``balls`` remain for the uniform case and for
+    backward-compatible serialization.
     """
 
     kind: Literal["COUNT"] = "COUNT"
     key: Name = "count"
-    strikes: int = Field(ge=0, le=2)
+    strikes: int = Field(default=0, ge=0, le=2)
     balls: tuple[int, ...] = Field(default=(0, 1, 2, 3))
+    states: tuple[CountState, ...] = ()
     origin: ConstraintOrigin = "USER_CONFIRMED"
     authority: ConstraintAuthority = "USER_CONSTRAINT"
 
@@ -106,6 +121,17 @@ class CountConstraint(_Constraint):
         if any(ball < 0 or ball > 3 for ball in self.balls):
             raise ValueError("Ball counts must be between 0 and 3")
         return self
+
+    @property
+    def exact_states(self) -> tuple[tuple[int, int], ...]:
+        """The exact allowed ``(balls, strikes)`` pairs, deduplicated and ordered.
+
+        ``states`` wins when present; otherwise the uniform ``strikes``/``balls`` pair
+        is projected into its state set.
+        """
+        if self.states:
+            return tuple(sorted({(state.balls, state.strikes) for state in self.states}))
+        return tuple(sorted({(ball, self.strikes) for ball in self.balls}))
 
 
 class PitchTypeConstraint(_Constraint):

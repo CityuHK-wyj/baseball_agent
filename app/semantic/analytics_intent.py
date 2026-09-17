@@ -14,8 +14,8 @@ import re
 from dataclasses import dataclass
 
 from app.models.contracts import (DEFAULT_EVENT_POPULATION, DEFAULT_GAME_TYPES, Constraint,
-                                  CountConstraint, LocationConstraint, NumericConstraint,
-                                  PitchTypeConstraint, PopulationConstraint,
+                                  CountConstraint, CountState, LocationConstraint,
+                                  NumericConstraint, PitchTypeConstraint, PopulationConstraint,
                                   QualificationConstraint, RankingConstraint)
 from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, ZONE_UPPER_OUTSIDE,
                                         ZONE_UPPER_THIRD)
@@ -78,6 +78,9 @@ _OPERATOR_TOKENS: dict[str, str] = {
 }
 
 _RANKING_RE = re.compile(r"\b(?P<dir>top|bottom)\s+(?P<limit>\d+)\b", re.IGNORECASE)
+# Explicit ranking clause markers. The metric after the marker owns the ranking, so a
+# filtered metric mentioned earlier in the sentence cannot steal it.
+_RANKING_MARKER_RE = re.compile(r"\b(?:ranked|sorted|ordered)\s+by\b|\bby\b", re.IGNORECASE)
 _RANKING_METRIC_RE = re.compile(
     r"\b(?:by\s+)?(?:(?P<agg>maximum|max|highest|peak|average|avg|mean|minimum|min|"
     r"lowest|total|sum)\s+)?"
@@ -99,7 +102,7 @@ _RANKING_METRICS: dict[str, str] = {
 }
 
 _QUALIFICATION_RE = re.compile(
-    r"\b(?:minimum|min|at\s+least|no\s+less\s+than|>=)\s*"
+    r"(?:\b(?:minimum|min|at\s+least|no\s+less\s+than)\s+(?:of\s+)?|>=)\s*"
     r"(?P<value>\d+)\s*"
     r"(?P<unit>batted[-\s]?balls?|batted[-\s]?ball\s+events?|bbe|balls\s+in\s+play|"
     r"qualifying\s+events?|qualifying\s+batted\s+balls?)\b",
@@ -108,6 +111,8 @@ _QUALIFICATION_RE = re.compile(
 
 _POSTSEASON_CUES: tuple[str, ...] = (r"\bpostseason\b", r"\bplayoffs?\b")
 _SPRING_TRAINING_CUES: tuple[str, ...] = (r"\bspring\s+training\b", r"\bspring\s+games?\b")
+_EXHIBITION_CUES: tuple[str, ...] = (
+    r"\bexhibition\b", r"\bexhibition\s+games?\b", r"\bpreseason\b", r"\bfriendly\b")
 _REGULAR_SEASON_CUES: tuple[str, ...] = (r"\bregular\s+season\b", r"\bregular-season\b")
 _ALL_GAMES_CUES: tuple[str, ...] = (
     r"\ball\s+games?\b", r"\ball\s+game\s+types?\b", r"\bany\s+game\s+type\b")
@@ -149,14 +154,43 @@ def _nearest_metric(window: str) -> str | None:
     return best_metric
 
 
+def _mask_spans(text: str, spans: tuple[tuple[int, int], ...] | list[tuple[int, int]]) -> str:
+    """Blank out protected spans while preserving character offsets.
+
+    Numeric ownership is not a suggestion: a number that belongs to a qualification,
+    count, date or ranking limit must never be scanned as a velocity threshold.
+    """
+    chars = list(text)
+    for start, end in spans:
+        for index in range(max(0, start), min(len(chars), end)):
+            chars[index] = " "
+    return "".join(chars)
+
+
+def _protected_spans(lowered: str) -> list[tuple[int, int]]:
+    spans: list[tuple[int, int]] = []
+    for match in re.finditer(r"(?<!\d)\d{4}-\d{2}-\d{2}(?!\d)", lowered):
+        spans.append(match.span())
+    for match in _COUNT_TOKEN_RE.finditer(lowered):
+        spans.append(match.span())
+    for match in _QUALIFICATION_RE.finditer(lowered):
+        spans.append(match.span())
+    for match in _RANKING_RE.finditer(lowered):
+        spans.append(match.span("limit"))
+    for match in re.finditer(r"(?<!\d)(?:19|20)\d{2}(?!\d)", lowered):
+        spans.append(match.span())
+    return spans
+
+
 def _velocity_constraints(raw_query: str) -> list[NumericConstraint]:
     constraints: list[NumericConstraint] = []
-    for match in _VELOCITY_THRESHOLD_RE.finditer(raw_query):
+    masked = _mask_spans(raw_query, _protected_spans(raw_query.casefold()))
+    for match in _VELOCITY_THRESHOLD_RE.finditer(masked):
         operator = _OPERATOR_TOKENS.get(match.group("op").casefold().strip())
         if operator is None:
             continue
         unit = (match.group("unit") or "").casefold()
-        window = raw_query[max(0, match.start() - 60):match.start()]
+        window = masked[max(0, match.start() - 60):match.start()]
         metric = _nearest_metric(window)
         if metric is None:
             if not unit:
@@ -175,9 +209,13 @@ def _ranking_constraint(lowered: str) -> RankingConstraint | None:
         return None
     direction = "ASC" if ranking.group("dir").casefold() == "bottom" else "DESC"
     limit = int(ranking.group("limit"))
-    metric_match = _RANKING_METRIC_RE.search(lowered, ranking.end())
+    marker = _RANKING_MARKER_RE.search(lowered, ranking.end())
+    clause_start = marker.end() if marker is not None else ranking.end()
+    metric_match = _RANKING_METRIC_RE.search(lowered, clause_start)
     if metric_match is None:
-        metric_match = _RANKING_METRIC_RE.search(lowered)
+        # No metric after an explicit marker: fall back to the text after "top N" so a
+        # terse "top 5 exit velocity" still resolves, matching the previous behavior.
+        metric_match = _RANKING_METRIC_RE.search(lowered, ranking.end())
     if metric_match is None:
         return None
     aggregation_word = (metric_match.group("agg") or "").casefold()
@@ -193,12 +231,18 @@ def _ranking_constraint(lowered: str) -> RankingConstraint | None:
 def _count_constraint(lowered: str) -> CountConstraint | None:
     explicit = _COUNT_TOKEN_RE.findall(lowered)
     if explicit:
-        strikes = {int(strike) for _, strike in explicit}
-        if len(strikes) != 1:
-            # Different strike levels in one request cannot be ANDed safely; fail closed.
-            return None
-        balls = tuple(sorted({int(ball) for ball, _ in explicit}))
-        return CountConstraint(strikes=strikes.pop(), balls=balls, origin="USER_EXPLICIT")
+        states = tuple(sorted({(int(ball), int(strike)) for ball, strike in explicit}))
+        strike_levels = {strike for _, strike in states}
+        if len(strike_levels) == 1:
+            # Uniform strike level: the compact form is exact (every listed ball count
+            # with that strike count).
+            return CountConstraint(
+                strikes=strike_levels.pop(), balls=tuple(sorted({b for b, _ in states})),
+                origin="USER_EXPLICIT")
+        # Mixed strike levels form an explicit state set, never a cartesian product.
+        return CountConstraint(
+            states=tuple(CountState(balls=balls, strikes=strikes) for balls, strikes in states),
+            balls=(), origin="USER_EXPLICIT")
     if _matches(lowered, _TWO_STRIKE_CUES):
         return CountConstraint(strikes=2, balls=(0, 1, 2, 3), origin="SYSTEM_INFERRED")
     return None
@@ -219,6 +263,9 @@ def _population_constraint(lowered: str) -> PopulationConstraint:
         explicit = True
     elif _matches(lowered, _SPRING_TRAINING_CUES):
         game_types = ("SPRING_TRAINING",)
+        explicit = True
+    elif _matches(lowered, _EXHIBITION_CUES):
+        game_types = ("EXHIBITION",)
         explicit = True
     elif _matches(lowered, _ALL_GAMES_CUES):
         game_types = _ALL_GAME_TYPES

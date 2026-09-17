@@ -3,10 +3,11 @@ import unittest
 from datetime import date
 
 from app.models.contracts import (AnalysisObjective, CategoryConstraint, CountConstraint,
-                                  LocationConstraint, NumericConstraint, PitchTypeConstraint,
-                                  PopulationConstraint, QualificationConstraint,
-                                  RankingConstraint, TimeRange)
+                                  CountState, LocationConstraint, NumericConstraint,
+                                  PitchTypeConstraint, PopulationConstraint,
+                                  QualificationConstraint, RankingConstraint, TimeRange)
 from app.models.planning import AgentTask
+from app.semantic.constraints import normalize_constraints
 from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, FieldMappingRegistry,
                                         ZONE_UPPER_OUTSIDE, ZONE_UPPER_THIRD)
 from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
@@ -287,6 +288,24 @@ class StatcastToolTests(unittest.TestCase):
         main = executor.statements[0]
         self.assertIn("strikes = 2", main)
         self.assertIn("balls IN (0, 1, 2, 3)", main)
+
+    def test_compound_count_preserves_the_exact_union_not_a_cartesian_product(self):
+        objective = analytics_objective()
+        without_count = tuple(c for c in objective.constraints
+                              if not isinstance(c, CountConstraint))
+        mixed = CountConstraint(
+            states=(CountState(balls=0, strikes=2), CountState(balls=1, strikes=1)),
+            balls=(), origin="USER_EXPLICIT")
+        normalized = normalize_constraints((*without_count, mixed))
+        requirement_ = RuleBasedRequirementDecomposer(id_factory=lambda p: f"{p}-1").decompose(
+            objective.model_copy(update={"constraints": normalized}))[0]
+        executor = RecordingExecutor(rows=[(1, 1, 90.0, 90.0)])
+        ParquetStatcastTool([requirement_], FieldMappingRegistry(), executor).execute(task())
+        main = executor.statements[0]
+        self.assertIn("(balls = 0 AND strikes = 2)", main)
+        self.assertIn("(balls = 1 AND strikes = 1)", main)
+        self.assertNotIn("balls IN", main)
+        self.assertNotIn("strikes IN", main)
 
     def test_default_qualification_is_frozen_not_hidden(self):
         executor = RecordingExecutor(rows=[(1, 30, 90.0, 95.0)])
