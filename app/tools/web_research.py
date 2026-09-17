@@ -233,14 +233,21 @@ class WebResearchTool:
         fetched = 0
         for result in results:
             text = ""
+            fetched_page = False
             if fetched < pages:
                 text = self._reader.read(result.url)
                 if text:
                     fetched += 1
+                    fetched_page = True
             evidence.append(EvidenceItem(
                 kind="WEB", summary=result.title or query, source=urlparse(result.url).netloc,
                 reference=result.url,
                 text=(text or result.snippet)[:_MAX_TEXT],
-                data={"query": query, "snippet": result.snippet},
+                data={"query": query, "snippet": result.snippet, "title": result.title,
+                      "url": result.url, "fetched": fetched_page,
+                      "retrieved_at": datetime.now(timezone.utc).isoformat()},
+                # A search snippet is a hit, not grounded evidence. Only a retrieved
+                # page body is accepted as support.
+                accepted=fetched_page,
                 retrieved_at=datetime.now(timezone.utc)))
         return tuple(evidence)

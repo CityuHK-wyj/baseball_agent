@@ -155,18 +155,38 @@ def select_players(lines: tuple[BattingLine, ...], names: tuple[str, ...]
                         key=lambda item: item.name))
 
 
+def select_players_by_id(lines: tuple[BattingLine, ...], player_ids: tuple[str, ...]
+                         ) -> tuple[BattingLine, ...]:
+    """Match by canonical player id (from a PLAYER_ID_SET artifact), never by city."""
+    wanted = {str(item).strip() for item in player_ids if str(item).strip()}
+    if not wanted:
+        return ()
+    return tuple(line for line in lines if str(line.player_id) in wanted)
+
+
 def select_team(lines: tuple[BattingLine, ...], team: str) -> tuple[BattingLine, ...]:
-    """Filter by BRef city, derived from the data itself (no hardcoded team map)."""
+    """Deprecated city-based filter.
+
+    BRef ``Tm`` values are city names, and three cities are shared by two clubs. A
+    city-only match therefore cannot identify a club and returns no rows instead of
+    silently mixing two populations. The authoritative path resolves a team to a
+    PLAYER_ID_SET and filters local analytics by canonical ids.
+    """
     needle = _normalize(team)
     if not needle:
         return ()
+    ambiguous = {_normalize(city) for city in _AMBIGUOUS_CITIES}
     cities = {_normalize(line.team) for line in lines if line.team}
     matches = [city for city in cities if city and (city in needle or needle in city)]
     if not matches:
         words = set(needle.split())
         matches = [city for city in cities
                    if any(word and word in city.split() for word in words)]
+    matches = [city for city in matches if city]
     if not matches:
+        return ()
+    if any(city in ambiguous for city in matches):
+        # The requested club cannot be determined from a shared city alone.
         return ()
     city = max(matches, key=len)
     return tuple(line for line in lines if _normalize(line.team) == city)
@@ -211,24 +231,30 @@ class BattingStatsTool:
 
     def season_evidence(self, year: int, *, names: tuple[str, ...] = (),
                         team: str | None = None, metric: str = "OPS",
-                        limit: int = 10) -> EvidenceItem:
+                        limit: int = 10, player_ids: tuple[str, ...] = ()) -> EvidenceItem:
         lines = self.client.season(year)
         return self._evidence(lines, year=year, names=names, team=team, metric=metric,
-                              limit=limit)
+                              limit=limit, player_ids=player_ids)
 
     def range_evidence(self, start: str, end: str, *, names: tuple[str, ...] = (),
-                       metric: str = "OPS", limit: int = 10) -> EvidenceItem:
+                       metric: str = "OPS", limit: int = 10,
+                       player_ids: tuple[str, ...] = ()) -> EvidenceItem:
         lines = self.client.date_range(start, end)
         return self._evidence(lines, year=None, names=names, team=None, metric=metric,
-                              limit=limit, start=start, end=end)
+                              limit=limit, start=start, end=end, player_ids=player_ids)
 
     def _evidence(self, lines: tuple[BattingLine, ...], *, year: int | None,
                   names: tuple[str, ...], team: str | None, metric: str, limit: int,
-                  start: str | None = None, end: str | None = None) -> EvidenceItem:
+                  start: str | None = None, end: str | None = None,
+                  player_ids: tuple[str, ...] = ()) -> EvidenceItem:
         caveats: list[str] = []
+        if player_ids:
+            lines = select_players_by_id(lines, player_ids)
         if names:
             lines = select_players(lines, names)
         if team:
+            # Deprecated city-based path. The authoritative path resolves team identity
+            # to a PLAYER_ID_SET and filters by canonical ids instead.
             lines = select_team(lines, team)
             if any(_normalize(city) in _normalize(team) for city in _AMBIGUOUS_CITIES):
                 caveats.append("team filtered by city, which is shared by two clubs")

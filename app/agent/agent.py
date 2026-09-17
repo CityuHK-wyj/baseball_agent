@@ -27,6 +27,7 @@ from app.models.agent_runtime import (AgentMessage, AgentTrace, CognitionPlan, C
                                       EvidenceItem, PendingClarification, RunStatus,
                                       utcnow)
 from app.models.knowledge import KnowledgeQuery
+from app.artifact_runtime.temporal import parse_time_window
 from app.tools.batting import BattingStatsTool, BattingStatsUnavailable
 from app.tools.entity_lookup import EntityLookup
 from app.tools.pitching import PitchingStatsTool
@@ -53,6 +54,23 @@ class _Gathered:
     sql_requests: list[str] = field(default_factory=list)
     tool_calls: list[str] = field(default_factory=list)
     steps: list[str] = field(default_factory=list)
+
+
+def _batting_window(plan: CognitionPlan, today: date) -> tuple[str, str] | None:
+    """Explicit or relative user window, parsed by a general temporal helper.
+
+    A full-year window is the season path (not a date-range query), so it is ignored
+    when an explicit season is also present.
+    """
+    if plan.batting_start and plan.batting_end:
+        return plan.batting_start, plan.batting_end
+    text = " ".join(part for part in (plan.user_goal, plan.understanding) if part)
+    window = parse_time_window(text, today)
+    if window is None:
+        return None
+    if (window.end - window.start).days >= 360 and plan.batting_year:
+        return None
+    return window.start.isoformat(), window.end.isoformat()
 
 
 class BaseballAgent:
@@ -202,14 +220,20 @@ class BaseballAgent:
             return
         year = plan.batting_year or self._today().year
         names = tuple(plan.batting_entity_names)
-        gathered.tool_calls.append(f"batting.season({year})")
+        metric = (plan.batting_metrics or ("OPS",))[0]
+        window = _batting_window(plan, self._today())
         try:
-            if plan.batting_team and not names:
+            if window is not None and not (plan.batting_team and not names):
+                start, end = window
+                gathered.tool_calls.append(f"batting.range({start}..{end})")
+                evidence = self._batting.range_evidence(start, end, names=names, metric=metric)
+            elif plan.batting_team and not names:
+                gathered.tool_calls.append(f"batting.season({year})")
                 evidence = self._batting.season_evidence(year, team=plan.batting_team,
-                                                         metric=(plan.batting_metrics or ("OPS",))[0])
+                                                         metric=metric)
             else:
-                evidence = self._batting.season_evidence(year, names=names,
-                                                         metric=(plan.batting_metrics or ("OPS",))[0])
+                gathered.tool_calls.append(f"batting.season({year})")
+                evidence = self._batting.season_evidence(year, names=names, metric=metric)
             gathered.evidence.append(evidence)
         except BattingStatsUnavailable as error:
             gathered.recovery_codes.append("BATTING_STATS_UNAVAILABLE")
@@ -307,15 +331,26 @@ class BaseballAgent:
         return any(needle and needle in item.casefold() for item in conversation.accepted_context)
 
     @staticmethod
+    def _supporting(item: EvidenceItem) -> bool:
+        """Only grounded, attributed evidence can support a COMPLETE answer."""
+        if item.kind in ("KNOWLEDGE", "NOTE"):
+            return True
+        if item.kind == "WEB":
+            return bool(item.data.get("grounded") or item.data.get("fetched"))
+        return bool(item.data.get("rows"))
+
+    @staticmethod
     def _status_for(gathered: _Gathered) -> RunStatus:
-        if gathered.evidence:
-            empty_local = any(item.kind == "LOCAL_ANALYTICS" and not item.data.get("rows")
-                              for item in gathered.evidence)
-            if gathered.recovery_codes or empty_local or any(
-                    item.data.get("caveats") for item in gathered.evidence):
-                return "LIMITED"
-            return "COMPLETE"
-        return "FAILED"
+        supporting = [item for item in gathered.evidence
+                      if BaseballAgent._supporting(item)]
+        if not supporting:
+            return "FAILED"
+        empty_local = any(item.kind == "LOCAL_ANALYTICS" and not item.data.get("rows")
+                          for item in gathered.evidence)
+        if gathered.recovery_codes or empty_local or any(
+                item.data.get("caveats") for item in gathered.evidence):
+            return "LIMITED"
+        return "COMPLETE"
 
     def _record_entities(self, conversation: Conversation, names: tuple[str, ...]) -> None:
         for name in names:

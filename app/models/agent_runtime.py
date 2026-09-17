@@ -77,6 +77,8 @@ class CognitionPlan(ArtifactContract):
     research_queries: tuple[str, ...] = ()
     needs_batting_stats: bool = False
     batting_year: int | None = None
+    batting_start: str | None = None
+    batting_end: str | None = None
     batting_team: str | None = None
     batting_entity_names: tuple[str, ...] = ()
     batting_metrics: tuple[str, ...] = ()

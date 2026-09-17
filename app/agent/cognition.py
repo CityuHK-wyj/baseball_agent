@@ -305,8 +305,7 @@ class DeterministicCognition:
         year = _year_in(message) or _year_from_iso(today)
         if resolved_entities:
             local_metrics: tuple[LocalMetricHint, ...] = ()
-            if any(cue in lowered for cue in self._EV_CUES) or any(
-                    cue in message for cue in ("高区", "高區", "快速球")):
+            if any(cue in lowered for cue in self._EV_CUES):
                 local_metrics = (LocalMetricHint(
                     metric="exit_velocity", aggregation="AVG", direction="DESC", limit=10,
                     entity_names=resolved_entities, note=message),)
