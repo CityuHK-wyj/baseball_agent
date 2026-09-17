@@ -158,7 +158,22 @@ def _print_semantic_trace(pipeline, result) -> None:
             print(f"  task={routing.task_ref} tool={routing.selected_tool or 'BLOCKED'} "
                   f":: {routing.rationale}")
         print("SQL Boundary")
+        import json as _json
         for outcome in run.executions:
+            data = None
+            if outcome.payload:
+                try:
+                    data = _json.loads(outcome.payload.decode())
+                except (ValueError, UnicodeDecodeError):
+                    data = None
+            request = (data or {}).get("compiled_sql_request")
+            if request:
+                filters = ", ".join(item.get("kind", "") for item in request.get("filters", []))
+                print(f"  compiled SQLAnalysisRequest: metric={request.get('metric')} "
+                      f"agg={request.get('aggregation')} limit={request.get('limit')} "
+                      f"source={request.get('source_kind')} filters=[{filters}]")
+                print(f"  validation: {outcome.execution.status} "
+                      f"({len(outcome.attempts)} attempt(s))")
             for attempt in outcome.attempts:
                 if attempt.error_code:
                     print(f"  attempt={attempt.attempt_id} status={attempt.status} "
