@@ -1,0 +1,6498 @@
+{
+ "domain": "glossary",
+ "items": [
+  {
+   "knowledge_id": "METRIC:AB",
+   "knowledge_type": "METRIC",
+   "canonical_key": "ab",
+   "title": "At-Bat",
+   "aliases": [
+    "打数"
+   ],
+   "language": "en",
+   "summary": "A plate appearance that ends with a hit, an out or a fielder's choice, excluding walks, hit-by-pitch, sacrifices, catcher's interference and some other events. The denominator of batting average.",
+   "structured_payload": {
+    "definition": "A plate appearance that ends with a hit, an out or a fielder's choice, excluding walks, hit-by-pitch, sacrifices, catcher's interference and some other events. The denominator of batting average.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "打数",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.02"
+   },
+   "entity_refs": [
+    "METRIC:AB"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:PA",
+   "knowledge_type": "METRIC",
+   "canonical_key": "pa",
+   "title": "Plate Appearance",
+   "aliases": [
+    "打席"
+   ],
+   "language": "en",
+   "summary": "Any completed turn at bat, including walks, hit-by-pitch and sacrifices. The broadest measure of batting opportunities.",
+   "structured_payload": {
+    "definition": "Any completed turn at bat, including walks, hit-by-pitch and sacrifices. The broadest measure of batting opportunities.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "打席",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:PA"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:H",
+   "knowledge_type": "METRIC",
+   "canonical_key": "h",
+   "title": "Hit",
+   "aliases": [
+    "安打"
+   ],
+   "language": "en",
+   "summary": "A base hit: the batter reaches base safely on a fair ball that is not handled by a fielder under the ordinary-effort standard.",
+   "structured_payload": {
+    "definition": "A base hit: the batter reaches base safely on a fair ball that is not handled by a fielder under the ordinary-effort standard.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "安打",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.05"
+   },
+   "entity_refs": [
+    "METRIC:H"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:1B",
+   "knowledge_type": "METRIC",
+   "canonical_key": "1b",
+   "title": "Single",
+   "aliases": [
+    "一垒安打"
+   ],
+   "language": "en",
+   "summary": "A hit on which the batter reaches first base and no more than one base is credited to the hit.",
+   "structured_payload": {
+    "definition": "A hit on which the batter reaches first base and no more than one base is credited to the hit.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "一垒安打",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.06"
+   },
+   "entity_refs": [
+    "METRIC:1B"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:2B",
+   "knowledge_type": "METRIC",
+   "canonical_key": "2b",
+   "title": "Double",
+   "aliases": [
+    "二垒安打"
+   ],
+   "language": "en",
+   "summary": "A hit on which the batter reaches second base, or advances two bases, because of the hit itself and not a fielder's choice or error.",
+   "structured_payload": {
+    "definition": "A hit on which the batter reaches second base, or advances two bases, because of the hit itself and not a fielder's choice or error.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "二垒安打",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.06"
+   },
+   "entity_refs": [
+    "METRIC:2B"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:3B",
+   "knowledge_type": "METRIC",
+   "canonical_key": "3b",
+   "title": "Triple",
+   "aliases": [
+    "三垒安打"
+   ],
+   "language": "en",
+   "summary": "A hit on which the batter reaches third base.",
+   "structured_payload": {
+    "definition": "A hit on which the batter reaches third base.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "三垒安打",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.06"
+   },
+   "entity_refs": [
+    "METRIC:3B"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:HR",
+   "knowledge_type": "METRIC",
+   "canonical_key": "hr",
+   "title": "Home Run",
+   "aliases": [
+    "全垒打"
+   ],
+   "language": "en",
+   "summary": "A fair ball that leaves the playing field in flight over the fence, or a hit that allows the batter to circle the bases without an error or fielder's choice.",
+   "structured_payload": {
+    "definition": "A fair ball that leaves the playing field in flight over the fence, or a hit that allows the batter to circle the bases without an error or fielder's choice.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "全垒打",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.06"
+   },
+   "entity_refs": [
+    "METRIC:HR"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:BB",
+   "knowledge_type": "METRIC",
+   "canonical_key": "bb",
+   "title": "Base on Balls (Walk)",
+   "aliases": [
+    "四坏球保送"
+   ],
+   "language": "en",
+   "summary": "An award of first base after four pitches outside the strike zone; an intentional walk may be signalled without pitching.",
+   "structured_payload": {
+    "definition": "An award of first base after four pitches outside the strike zone; an intentional walk may be signalled without pitching.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "四坏球保送",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.14"
+   },
+   "entity_refs": [
+    "METRIC:BB"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:IBB",
+   "knowledge_type": "METRIC",
+   "canonical_key": "ibb",
+   "title": "Intentional Base on Balls",
+   "aliases": [
+    "故意四坏球"
+   ],
+   "language": "en",
+   "summary": "A base on balls granted deliberately, now signalled without pitches being thrown.",
+   "structured_payload": {
+    "definition": "A base on balls granted deliberately, now signalled without pitches being thrown.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "故意四坏球",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.14(b)"
+   },
+   "entity_refs": [
+    "METRIC:IBB"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:HBP",
+   "knowledge_type": "METRIC",
+   "canonical_key": "hbp",
+   "title": "Hit by Pitch",
+   "aliases": [
+    "触身球"
+   ],
+   "language": "en",
+   "summary": "Award of first base when a pitch hits the batter, unless the batter swung, the pitch was in the strike zone, or the batter did not try to avoid it.",
+   "structured_payload": {
+    "definition": "Award of first base when a pitch hits the batter, unless the batter swung, the pitch was in the strike zone, or the batter did not try to avoid it.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "触身球",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "5.05(b)"
+   },
+   "entity_refs": [
+    "METRIC:HBP"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SO",
+   "knowledge_type": "METRIC",
+   "canonical_key": "so",
+   "title": "Strikeout",
+   "aliases": [
+    "三振"
+   ],
+   "language": "en",
+   "summary": "A time at bat ending in a third strike, whether swinging, looking or on a foul bunt. Also written K.",
+   "structured_payload": {
+    "definition": "A time at bat ending in a third strike, whether swinging, looking or on a foul bunt. Also written K.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "三振",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.15"
+   },
+   "entity_refs": [
+    "METRIC:SO"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:R",
+   "knowledge_type": "METRIC",
+   "canonical_key": "r",
+   "title": "Run",
+   "aliases": [
+    "得分"
+   ],
+   "language": "en",
+   "summary": "A score credited to the player who legally touches home plate.",
+   "structured_payload": {
+    "definition": "A score credited to the player who legally touches home plate.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "得分",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.01"
+   },
+   "entity_refs": [
+    "METRIC:R"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:RBI",
+   "knowledge_type": "METRIC",
+   "canonical_key": "rbi",
+   "title": "Runs Batted In",
+   "aliases": [
+    "打点"
+   ],
+   "language": "en",
+   "summary": "A run driven in by a base hit, sacrifice, groundout, force out or similar; not credited on a run scored because of an error or in specified double-play cases.",
+   "structured_payload": {
+    "definition": "A run driven in by a base hit, sacrifice, groundout, force out or similar; not credited on a run scored because of an error or in specified double-play cases.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "打点",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.04"
+   },
+   "entity_refs": [
+    "METRIC:RBI"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SB",
+   "knowledge_type": "METRIC",
+   "canonical_key": "sb",
+   "title": "Stolen Base",
+   "aliases": [
+    "盗垒"
+   ],
+   "language": "en",
+   "summary": "A runner's advance on a pitch without a hit, out, error or other specified cause.",
+   "structured_payload": {
+    "definition": "A runner's advance on a pitch without a hit, out, error or other specified cause.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "盗垒",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.07"
+   },
+   "entity_refs": [
+    "METRIC:SB"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:CS",
+   "knowledge_type": "METRIC",
+   "canonical_key": "cs",
+   "title": "Caught Stealing",
+   "aliases": [
+    "盗垒失败"
+   ],
+   "language": "en",
+   "summary": "A runner put out attempting to steal or advance on a pitch.",
+   "structured_payload": {
+    "definition": "A runner put out attempting to steal or advance on a pitch.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "盗垒失败",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.07"
+   },
+   "entity_refs": [
+    "METRIC:CS"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SF",
+   "knowledge_type": "METRIC",
+   "canonical_key": "sf",
+   "title": "Sacrifice Fly",
+   "aliases": [
+    "高飞牺牲打"
+   ],
+   "language": "en",
+   "summary": "A fly out that scores a runner who tags up; the batter is not charged an at-bat.",
+   "structured_payload": {
+    "definition": "A fly out that scores a runner who tags up; the batter is not charged an at-bat.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "高飞牺牲打",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.08"
+   },
+   "entity_refs": [
+    "METRIC:SF"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SH",
+   "knowledge_type": "METRIC",
+   "canonical_key": "sh",
+   "title": "Sacrifice Hit (Bunt)",
+   "aliases": [
+    "牺牲触击"
+   ],
+   "language": "en",
+   "summary": "A bunt that advances a runner and results in the batter being put out; not charged an at-bat.",
+   "structured_payload": {
+    "definition": "A bunt that advances a runner and results in the batter being put out; not charged an at-bat.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "牺牲触击",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.08"
+   },
+   "entity_refs": [
+    "METRIC:SH"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:GIDP",
+   "knowledge_type": "METRIC",
+   "canonical_key": "gidp",
+   "title": "Grounded Into Double Play",
+   "aliases": [
+    "双杀打"
+   ],
+   "language": "en",
+   "summary": "A batted ball that results in two outs, at least one of which is a force out; used as a context/negative value input.",
+   "structured_payload": {
+    "definition": "A batted ball that results in two outs, at least one of which is a force out; used as a context/negative value input.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "双杀打",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.11"
+   },
+   "entity_refs": [
+    "METRIC:GIDP"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:TB",
+   "knowledge_type": "METRIC",
+   "canonical_key": "tb",
+   "title": "Total Bases",
+   "aliases": [
+    "垒打数"
+   ],
+   "language": "en",
+   "summary": "The sum of bases reached on hits: one per single, two per double, three per triple, four per home run.",
+   "structured_payload": {
+    "definition": "The sum of bases reached on hits: one per single, two per double, three per triple, four per home run.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "垒打数",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.21"
+   },
+   "entity_refs": [
+    "METRIC:TB"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:AVG",
+   "knowledge_type": "METRIC",
+   "canonical_key": "avg",
+   "title": "Batting Average",
+   "aliases": [
+    "打击率"
+   ],
+   "language": "en",
+   "summary": "Hits divided by at-bats (H/AB). A traditional rate stat that does not count walks or hit-by-pitch.",
+   "structured_payload": {
+    "definition": "Hits divided by at-bats (H/AB). A traditional rate stat that does not count walks or hit-by-pitch.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "打击率",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.21"
+   },
+   "entity_refs": [
+    "METRIC:AVG"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:OBP",
+   "knowledge_type": "METRIC",
+   "canonical_key": "obp",
+   "title": "On-Base Percentage",
+   "aliases": [
+    "上垒率"
+   ],
+   "language": "en",
+   "summary": "How often a batter reaches base per plate appearance, including hits, walks and hit-by-pitch: (H+BB+HBP)/(AB+BB+HBP+SF).",
+   "structured_payload": {
+    "definition": "How often a batter reaches base per plate appearance, including hits, walks and hit-by-pitch: (H+BB+HBP)/(AB+BB+HBP+SF).",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "上垒率",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.21"
+   },
+   "entity_refs": [
+    "METRIC:OBP"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SLG",
+   "knowledge_type": "METRIC",
+   "canonical_key": "slg",
+   "title": "Slugging Percentage",
+   "aliases": [
+    "长打率"
+   ],
+   "language": "en",
+   "summary": "Total bases divided by at-bats (TB/AB); measures power per at-bat.",
+   "structured_payload": {
+    "definition": "Total bases divided by at-bats (TB/AB); measures power per at-bat.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "长打率",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.21"
+   },
+   "entity_refs": [
+    "METRIC:SLG"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:OPS",
+   "knowledge_type": "METRIC",
+   "canonical_key": "ops",
+   "title": "On-Base Plus Slugging",
+   "aliases": [
+    "攻击指数"
+   ],
+   "language": "en",
+   "summary": "OBP + SLG. A simple combined rate stat; it weights OBP and SLG equally, which is not how run value works.",
+   "structured_payload": {
+    "definition": "OBP + SLG. A simple combined rate stat; it weights OBP and SLG equally, which is not how run value works.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "攻击指数",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.21"
+   },
+   "entity_refs": [
+    "METRIC:OPS"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:OPS_PLUS",
+   "knowledge_type": "METRIC",
+   "canonical_key": "ops_plus",
+   "title": "OPS+",
+   "aliases": [
+    "OPS+"
+   ],
+   "language": "en",
+   "summary": "OPS adjusted for ballpark and league, indexed so 100 is league average. A Baseball-Reference-style adjustment; not a FanGraphs metric.",
+   "structured_payload": {
+    "definition": "OPS adjusted for ballpark and league, indexed so 100 is league average. A Baseball-Reference-style adjustment; not a FanGraphs metric.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "OPS+",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.21"
+   },
+   "entity_refs": [
+    "METRIC:OPS_PLUS"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:BABIP",
+   "knowledge_type": "METRIC",
+   "canonical_key": "babip",
+   "title": "Batting Average on Balls In Play",
+   "aliases": [
+    "场内安打率"
+   ],
+   "language": "en",
+   "summary": "(H minus HR) divided by (AB minus K minus HR plus SF). Measures outcomes on balls in play; it is influenced by defence, speed and luck and tends to regress toward a pitcher- or league-specific baseline.",
+   "structured_payload": {
+    "definition": "(H minus HR) divided by (AB minus K minus HR plus SF). Measures outcomes on balls in play; it is influenced by defence, speed and luck and tends to regress toward a pitcher- or league-specific baseline.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "场内安打率",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.21"
+   },
+   "entity_refs": [
+    "METRIC:BABIP"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:ISO",
+   "knowledge_type": "METRIC",
+   "canonical_key": "iso",
+   "title": "Isolated Power",
+   "aliases": [
+    "纯长打率"
+   ],
+   "language": "en",
+   "summary": "SLG minus AVG; measures extra-base power per at-bat.",
+   "structured_payload": {
+    "definition": "SLG minus AVG; measures extra-base power per at-bat.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "纯长打率",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.21"
+   },
+   "entity_refs": [
+    "METRIC:ISO"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:K_PCT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "k_pct",
+   "title": "Strikeout Rate (K%)",
+   "aliases": [
+    "三振率"
+   ],
+   "language": "en",
+   "summary": "Strikeouts divided by plate appearances. More stable than raw strikeout counts.",
+   "structured_payload": {
+    "definition": "Strikeouts divided by plate appearances. More stable than raw strikeout counts.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "三振率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:K_PCT"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:BB_PCT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "bb_pct",
+   "title": "Walk Rate (BB%)",
+   "aliases": [
+    "保送率"
+   ],
+   "language": "en",
+   "summary": "Walks divided by plate appearances.",
+   "structured_payload": {
+    "definition": "Walks divided by plate appearances.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "保送率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:BB_PCT"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:K_BB_PCT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "k_bb_pct",
+   "title": "K-BB%",
+   "aliases": [
+    "三振减保送率"
+   ],
+   "language": "en",
+   "summary": "Strikeout rate minus walk rate; a compact measure of a pitcher's or hitter's strike-zone control and dominance.",
+   "structured_payload": {
+    "definition": "Strikeout rate minus walk rate; a compact measure of a pitcher's or hitter's strike-zone control and dominance.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "standard_stats",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "三振减保送率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:K_BB_PCT"
+   ],
+   "tags": [
+    "glossary",
+    "standard_stats"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:W",
+   "knowledge_type": "TERM",
+   "canonical_key": "W",
+   "title": "Win",
+   "aliases": [
+    "胜投"
+   ],
+   "language": "en",
+   "summary": "Credited to the pitcher who last pitched before his team takes the lead for good, with the starter required to complete five innings in most cases.",
+   "structured_payload": {
+    "definition": "Credited to the pitcher who last pitched before his team takes the lead for good, with the starter required to complete five innings in most cases.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "胜投",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:W"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:L",
+   "knowledge_type": "TERM",
+   "canonical_key": "L",
+   "title": "Loss",
+   "aliases": [
+    "败投"
+   ],
+   "language": "en",
+   "summary": "Charged to the pitcher who puts the opposing team ahead for good and whose team does not tie.",
+   "structured_payload": {
+    "definition": "Charged to the pitcher who puts the opposing team ahead for good and whose team does not tie.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "败投",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:L"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:SV",
+   "knowledge_type": "TERM",
+   "canonical_key": "SV",
+   "title": "Save",
+   "aliases": [
+    "救援成功"
+   ],
+   "language": "en",
+   "summary": "Credited to a finishing reliever who protects a lead under the rule's criteria, including entering with a lead of no more than three runs and pitching at least one inning, or entering with the tying run on base or at bat.",
+   "structured_payload": {
+    "definition": "Credited to a finishing reliever who protects a lead under the rule's criteria, including entering with a lead of no more than three runs and pitching at least one inning, or entering with the tying run on base or at bat.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "救援成功",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:SV"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:HLD",
+   "knowledge_type": "TERM",
+   "canonical_key": "HLD",
+   "title": "Hold",
+   "aliases": [
+    "中继成功"
+   ],
+   "language": "en",
+   "summary": "An unofficial statistic credited to a reliever who enters in a save situation and records at least one out without surrendering the lead, then leaves without finishing the game.",
+   "structured_payload": {
+    "definition": "An unofficial statistic credited to a reliever who enters in a save situation and records at least one out without surrendering the lead, then leaves without finishing the game.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "中继成功",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:HLD"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:BS",
+   "knowledge_type": "TERM",
+   "canonical_key": "BS",
+   "title": "Blown Save",
+   "aliases": [
+    "救援失败"
+   ],
+   "language": "en",
+   "summary": "Charged to a reliever who enters in a save situation and allows the tying or go-ahead run to score.",
+   "structured_payload": {
+    "definition": "Charged to a reliever who enters in a save situation and allows the tying or go-ahead run to score.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "救援失败",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:BS"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:ERA",
+   "knowledge_type": "TERM",
+   "canonical_key": "ERA",
+   "title": "Earned Run Average",
+   "aliases": [
+    "防御率"
+   ],
+   "language": "en",
+   "summary": "Earned runs allowed per nine innings: (ER x 9) / IP. Earned runs exclude runs that score because of an error or passed ball and are reconstructed by the scorer.",
+   "structured_payload": {
+    "definition": "Earned runs allowed per nine innings: (ER x 9) / IP. Earned runs exclude runs that score because of an error or passed ball and are reconstructed by the scorer.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "防御率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:ERA"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:WHIP",
+   "knowledge_type": "TERM",
+   "canonical_key": "WHIP",
+   "title": "Walks plus Hits per Inning Pitched",
+   "aliases": [
+    "每局被上垒率"
+   ],
+   "language": "en",
+   "summary": "(BB + H) / IP. Measures baserunners allowed per inning; it does not weight a walk and a home run equally.",
+   "structured_payload": {
+    "definition": "(BB + H) / IP. Measures baserunners allowed per inning; it does not weight a walk and a home run equally.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "每局被上垒率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:WHIP"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:IP",
+   "knowledge_type": "TERM",
+   "canonical_key": "IP",
+   "title": "Innings Pitched",
+   "aliases": [
+    "投球局数"
+   ],
+   "language": "en",
+   "summary": "Innings recorded by a pitcher, expressed in thirds (for example 6.2 means six and two-thirds innings).",
+   "structured_payload": {
+    "definition": "Innings recorded by a pitcher, expressed in thirds (for example 6.2 means six and two-thirds innings).",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "投球局数",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:IP"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:ERA_PLUS",
+   "knowledge_type": "METRIC",
+   "canonical_key": "era_plus",
+   "title": "ERA+",
+   "aliases": [
+    "防御率+"
+   ],
+   "language": "en",
+   "summary": "ERA adjusted for ballpark and league, indexed so 100 is league average; a Baseball-Reference-style adjustment.",
+   "structured_payload": {
+    "definition": "ERA adjusted for ballpark and league, indexed so 100 is league average; a Baseball-Reference-style adjustment.",
+    "provider": "BR",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "防御率+",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:ERA_PLUS"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_reference"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:FIP",
+   "knowledge_type": "METRIC",
+   "canonical_key": "fip",
+   "title": "Fielding Independent Pitching",
+   "aliases": [
+    "FIP"
+   ],
+   "language": "en",
+   "summary": "A FanGraphs metric expressed on the ERA scale using only strikeouts, walks, hit-by-pitch and home runs, on the premise that balls in play are largely outside the pitcher's control. FIP is provider-specific.",
+   "structured_payload": {
+    "definition": "A FanGraphs metric expressed on the ERA scale using only strikeouts, walks, hit-by-pitch and home runs, on the premise that balls in play are largely outside the pitcher's control. FIP is provider-specific.",
+    "provider": "FG",
+    "unit": "runs per 9 innings",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [
+     "does not measure actual runs allowed; it describes peripheral performance"
+    ],
+    "zh_name": "FIP",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "FEATURE",
+     "location": "feature_engine",
+     "computation": "CALCULATED"
+    }
+   },
+   "entity_refs": [
+    "METRIC:FIP"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:xFIP",
+   "knowledge_type": "METRIC",
+   "canonical_key": "xfip",
+   "title": "Expected Fielding Independent Pitching",
+   "aliases": [
+    "xFIP"
+   ],
+   "language": "en",
+   "summary": "A FanGraphs variant of FIP that replaces the pitcher's actual home-run total with a league-average home-run rate on fly balls, reducing home-run luck.",
+   "structured_payload": {
+    "definition": "A FanGraphs variant of FIP that replaces the pitcher's actual home-run total with a league-average home-run rate on fly balls, reducing home-run luck.",
+    "provider": "FG",
+    "unit": "runs per 9 innings",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "xFIP",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "FEATURE",
+     "location": "feature_engine",
+     "computation": "CALCULATED"
+    }
+   },
+   "entity_refs": [
+    "METRIC:xFIP"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SIERA",
+   "knowledge_type": "METRIC",
+   "canonical_key": "siera",
+   "title": "Skill-Interactive ERA",
+   "aliases": [
+    "SIERA"
+   ],
+   "language": "en",
+   "summary": "A FanGraphs estimator that models the interaction of strikeouts, walks and batted-ball types (ground balls, fly balls, pop-ups) and is scaled to ERA.",
+   "structured_payload": {
+    "definition": "A FanGraphs estimator that models the interaction of strikeouts, walks and batted-ball types (ground balls, fly balls, pop-ups) and is scaled to ERA.",
+    "provider": "FG",
+    "unit": "runs per 9 innings",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "SIERA",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "FEATURE",
+     "location": "feature_engine",
+     "computation": "CALCULATED"
+    }
+   },
+   "entity_refs": [
+    "METRIC:SIERA"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:K9",
+   "knowledge_type": "TERM",
+   "canonical_key": "K9",
+   "title": "Strikeouts per 9 Innings",
+   "aliases": [
+    "K/9"
+   ],
+   "language": "en",
+   "summary": "Strikeouts times nine divided by innings pitched.",
+   "structured_payload": {
+    "definition": "Strikeouts times nine divided by innings pitched.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "K/9",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:K9"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:BB9",
+   "knowledge_type": "TERM",
+   "canonical_key": "BB9",
+   "title": "Walks per 9 Innings",
+   "aliases": [
+    "BB/9"
+   ],
+   "language": "en",
+   "summary": "Walks times nine divided by innings pitched.",
+   "structured_payload": {
+    "definition": "Walks times nine divided by innings pitched.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "BB/9",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:BB9"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:HR9",
+   "knowledge_type": "TERM",
+   "canonical_key": "HR9",
+   "title": "Home Runs per 9 Innings",
+   "aliases": [
+    "HR/9"
+   ],
+   "language": "en",
+   "summary": "Home runs times nine divided by innings pitched.",
+   "structured_payload": {
+    "definition": "Home runs times nine divided by innings pitched.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "HR/9",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:HR9"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:LOB_PCT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "lob_pct",
+   "title": "Left-On-Base Percentage (Strand Rate)",
+   "aliases": [
+    "残垒率"
+   ],
+   "language": "en",
+   "summary": "The share of baserunners a pitcher leaves on base; it varies with sequencing and tends to regress.",
+   "structured_payload": {
+    "definition": "The share of baserunners a pitcher leaves on base; it varies with sequencing and tends to regress.",
+    "provider": "FG",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "残垒率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:LOB_PCT"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:QS",
+   "knowledge_type": "TERM",
+   "canonical_key": "QS",
+   "title": "Quality Start",
+   "aliases": [
+    "优质先发"
+   ],
+   "language": "en",
+   "summary": "A start of at least six innings in which the pitcher allows three or fewer earned runs.",
+   "structured_payload": {
+    "definition": "A start of at least six innings in which the pitcher allows three or fewer earned runs.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "优质先发",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:QS"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:CG",
+   "knowledge_type": "TERM",
+   "canonical_key": "CG",
+   "title": "Complete Game",
+   "aliases": [
+    "完投"
+   ],
+   "language": "en",
+   "summary": "A start in which the pitcher pitches the entire game for his team.",
+   "structured_payload": {
+    "definition": "A start in which the pitcher pitches the entire game for his team.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "完投",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:CG"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:SHO",
+   "knowledge_type": "TERM",
+   "canonical_key": "SHO",
+   "title": "Shutout",
+   "aliases": [
+    "完封"
+   ],
+   "language": "en",
+   "summary": "A complete game in which the pitcher allows no runs.",
+   "structured_payload": {
+    "definition": "A complete game in which the pitcher allows no runs.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "完封",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:SHO"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:GS",
+   "knowledge_type": "TERM",
+   "canonical_key": "GS",
+   "title": "Games Started",
+   "aliases": [
+    "先发场次"
+   ],
+   "language": "en",
+   "summary": "The number of games a pitcher started.",
+   "structured_payload": {
+    "definition": "The number of games a pitcher started.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "pitching",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "先发场次",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "TERM:GS"
+   ],
+   "tags": [
+    "glossary",
+    "pitching",
+    "pitching"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:PO",
+   "knowledge_type": "METRIC",
+   "canonical_key": "po",
+   "title": "Putout",
+   "aliases": [
+    "刺杀"
+   ],
+   "language": "en",
+   "summary": "Credited to the fielder who catches a fly ball or tags or forces a runner.",
+   "structured_payload": {
+    "definition": "Credited to the fielder who catches a fly ball or tags or forces a runner.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "fielding",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "刺杀",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:PO"
+   ],
+   "tags": [
+    "glossary",
+    "fielding",
+    "fielding"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:A",
+   "knowledge_type": "METRIC",
+   "canonical_key": "a",
+   "title": "Assist",
+   "aliases": [
+    "助杀"
+   ],
+   "language": "en",
+   "summary": "Credited to a fielder whose throw or deflection leads to a putout.",
+   "structured_payload": {
+    "definition": "Credited to a fielder whose throw or deflection leads to a putout.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "fielding",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "助杀",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:A"
+   ],
+   "tags": [
+    "glossary",
+    "fielding",
+    "fielding"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:E",
+   "knowledge_type": "METRIC",
+   "canonical_key": "e",
+   "title": "Error",
+   "aliases": [
+    "失误"
+   ],
+   "language": "en",
+   "summary": "Charged when a fielder misplays a ball an ordinary-effort fielder would have handled, allowing a runner to advance.",
+   "structured_payload": {
+    "definition": "Charged when a fielder misplays a ball an ordinary-effort fielder would have handled, allowing a runner to advance.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "fielding",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "失误",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:E"
+   ],
+   "tags": [
+    "glossary",
+    "fielding",
+    "fielding"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:DP",
+   "knowledge_type": "METRIC",
+   "canonical_key": "dp",
+   "title": "Double Play",
+   "aliases": [
+    "双杀"
+   ],
+   "language": "en",
+   "summary": "Two offensive players put out by continuous action without an error between putouts.",
+   "structured_payload": {
+    "definition": "Two offensive players put out by continuous action without an error between putouts.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "fielding",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "双杀",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:DP"
+   ],
+   "tags": [
+    "glossary",
+    "fielding",
+    "fielding"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:FPCT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "fpct",
+   "title": "Fielding Percentage",
+   "aliases": [
+    "守备率"
+   ],
+   "language": "en",
+   "summary": "(Putouts + Assists) / (Putouts + Assists + Errors). A traditional but limited measure because it ignores range.",
+   "structured_payload": {
+    "definition": "(Putouts + Assists) / (Putouts + Assists + Errors). A traditional but limited measure because it ignores range.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "fielding",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "守备率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:FPCT"
+   ],
+   "tags": [
+    "glossary",
+    "fielding",
+    "fielding"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:PB",
+   "knowledge_type": "METRIC",
+   "canonical_key": "pb",
+   "title": "Passed Ball",
+   "aliases": [
+    "捕逸"
+   ],
+   "language": "en",
+   "summary": "A pitch the catcher should have handled, charged to the catcher; runners may advance.",
+   "structured_payload": {
+    "definition": "A pitch the catcher should have handled, charged to the catcher; runners may advance.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "fielding",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "捕逸",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:PB"
+   ],
+   "tags": [
+    "glossary",
+    "fielding",
+    "fielding"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SB_ALLOWED",
+   "knowledge_type": "METRIC",
+   "canonical_key": "sb_allowed",
+   "title": "Stolen Bases Allowed (Catcher)",
+   "aliases": [
+    "被盗垒"
+   ],
+   "language": "en",
+   "summary": "Stolen bases charged against a catcher; used with caught-stealing rate to evaluate catcher defence.",
+   "structured_payload": {
+    "definition": "Stolen bases charged against a catcher; used with caught-stealing rate to evaluate catcher defence.",
+    "provider": "MLB",
+    "unit": "",
+    "category": "fielding",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "被盗垒",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:SB_ALLOWED"
+   ],
+   "tags": [
+    "glossary",
+    "fielding",
+    "fielding"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:UZR",
+   "knowledge_type": "METRIC",
+   "canonical_key": "uzr",
+   "title": "Ultimate Zone Rating",
+   "aliases": [
+    "UZR"
+   ],
+   "language": "en",
+   "summary": "A FanGraphs defensive metric estimating runs saved or lost relative to an average fielder, combining range, arm, double-play and error components. It requires multi-season samples to be stable.",
+   "structured_payload": {
+    "definition": "A FanGraphs defensive metric estimating runs saved or lost relative to an average fielder, combining range, arm, double-play and error components. It requires multi-season samples to be stable.",
+    "provider": "FG",
+    "unit": "",
+    "category": "fielding",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "UZR",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:UZR"
+   ],
+   "tags": [
+    "glossary",
+    "fielding",
+    "fielding"
+   ],
+   "source_refs": [
+    "fangraphs_library"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:DRS",
+   "knowledge_type": "METRIC",
+   "canonical_key": "drs",
+   "title": "Defensive Runs Saved",
+   "aliases": [
+    "DRS"
+   ],
+   "language": "en",
+   "summary": "A Sports Info Solutions metric, published on FanGraphs and elsewhere, estimating runs saved relative to average by a fielder. Provider-specific and noisy in small samples.",
+   "structured_payload": {
+    "definition": "A Sports Info Solutions metric, published on FanGraphs and elsewhere, estimating runs saved relative to average by a fielder. Provider-specific and noisy in small samples.",
+    "provider": "FG",
+    "unit": "",
+    "category": "fielding",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "DRS",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:DRS"
+   ],
+   "tags": [
+    "glossary",
+    "fielding",
+    "fielding"
+   ],
+   "source_refs": [
+    "fangraphs_library"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:TZ",
+   "knowledge_type": "METRIC",
+   "canonical_key": "tz",
+   "title": "Total Zone",
+   "aliases": [
+    "TZ"
+   ],
+   "language": "en",
+   "summary": "A Baseball-Reference defensive metric based on play-by-play and batted-ball data, expressed in runs above or below average.",
+   "structured_payload": {
+    "definition": "A Baseball-Reference defensive metric based on play-by-play and batted-ball data, expressed in runs above or below average.",
+    "provider": "BR",
+    "unit": "",
+    "category": "fielding",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "TZ",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:TZ"
+   ],
+   "tags": [
+    "glossary",
+    "fielding",
+    "fielding"
+   ],
+   "source_refs": [
+    "baseball_reference"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:FRAMING",
+   "knowledge_type": "METRIC",
+   "canonical_key": "framing",
+   "title": "Catcher Framing",
+   "aliases": [
+    "捕手接球偷好球"
+   ],
+   "language": "en",
+   "summary": "Runs saved by a catcher by presenting borderline pitches as strikes, estimated from called-strike probability models. Provider definitions differ.",
+   "structured_payload": {
+    "definition": "Runs saved by a catcher by presenting borderline pitches as strikes, estimated from called-strike probability models. Provider definitions differ.",
+    "provider": "SAVANT",
+    "unit": "",
+    "category": "fielding",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "捕手接球偷好球",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:FRAMING"
+   ],
+   "tags": [
+    "glossary",
+    "fielding",
+    "fielding"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:WOBA",
+   "knowledge_type": "METRIC",
+   "canonical_key": "woba",
+   "title": "wOBA",
+   "aliases": [
+    "wOBA"
+   ],
+   "language": "en",
+   "summary": "Weighted On-Base Average: a rate stat that weights each offensive event (walk, single, extra-base hit) by its run value and scales to OBP. League-average wOBA changes by season.",
+   "structured_payload": {
+    "definition": "Weighted On-Base Average: a rate stat that weights each offensive event (walk, single, extra-base hit) by its run value and scales to OBP. League-average wOBA changes by season.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "wOBA",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:WOBA"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:WRC_PLUS",
+   "knowledge_type": "METRIC",
+   "canonical_key": "wrc_plus",
+   "title": "wRC+",
+   "aliases": [
+    "wRC+"
+   ],
+   "language": "en",
+   "summary": "Weighted Runs Created Plus: offensive value in runs, park- and league-adjusted and indexed so 100 is league average. A 125 wRC+ means 25% more runs created than a league-average hitter would have produced in the same plate appearances.",
+   "structured_payload": {
+    "definition": "Weighted Runs Created Plus: offensive value in runs, park- and league-adjusted and indexed so 100 is league average. A 125 wRC+ means 25% more runs created than a league-average hitter would have produced in the same plate appearances.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "wRC+",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:WRC_PLUS"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:WRAA",
+   "knowledge_type": "METRIC",
+   "canonical_key": "wraa",
+   "title": "wRAA",
+   "aliases": [
+    "wRAA"
+   ],
+   "language": "en",
+   "summary": "Weighted Runs Above Average: the batting component of wOBA expressed in runs above league average, before park adjustment.",
+   "structured_payload": {
+    "definition": "Weighted Runs Above Average: the batting component of wOBA expressed in runs above league average, before park adjustment.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "wRAA",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:WRAA"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:WAR",
+   "knowledge_type": "METRIC",
+   "canonical_key": "war",
+   "title": "WAR (Wins Above Replacement)",
+   "aliases": [
+    "WAR"
+   ],
+   "language": "en",
+   "summary": "A family of estimates of a player's total value in wins over a replacement-level player. There is no single WAR: FanGraphs (fWAR), Baseball-Reference (bWAR) and Baseball Prospectus (WARP) use different defensive, pitching and baserunning inputs and can differ by more than a win. Always name the provider.",
+   "structured_payload": {
+    "definition": "A family of estimates of a player's total value in wins over a replacement-level player. There is no single WAR: FanGraphs (fWAR), Baseball-Reference (bWAR) and Baseball Prospectus (WARP) use different defensive, pitching and baserunning inputs and can differ by more than a win. Always name the provider.",
+    "provider": "Baseball-Reference",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [
+     "provider-specific; never mix with the same-named metric from another provider"
+    ],
+    "zh_name": "WAR",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:WAR"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "baseball_reference",
+    "fangraphs_library"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:FWAR",
+   "knowledge_type": "METRIC",
+   "canonical_key": "fwar",
+   "title": "fWAR",
+   "aliases": [
+    "fWAR"
+   ],
+   "language": "en",
+   "summary": "FanGraphs WAR: uses FanGraphs offensive (wRC+), baserunning and fielding (UZR/DRS blend) inputs and FIP-based pitching runs. Not interchangeable with bWAR.",
+   "structured_payload": {
+    "definition": "FanGraphs WAR: uses FanGraphs offensive (wRC+), baserunning and fielding (UZR/DRS blend) inputs and FIP-based pitching runs. Not interchangeable with bWAR.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [
+     "provider-specific; never mix with the same-named metric from another provider"
+    ],
+    "zh_name": "fWAR",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:FWAR"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:BWAR",
+   "knowledge_type": "METRIC",
+   "canonical_key": "bwar",
+   "title": "bWAR",
+   "aliases": [
+    "bWAR"
+   ],
+   "language": "en",
+   "summary": "Baseball-Reference WAR: uses Baseball-Reference batting runs, DRS/Total Zone defence and a runs-allowed-based pitching model (RA9). Not interchangeable with fWAR.",
+   "structured_payload": {
+    "definition": "Baseball-Reference WAR: uses Baseball-Reference batting runs, DRS/Total Zone defence and a runs-allowed-based pitching model (RA9). Not interchangeable with fWAR.",
+    "provider": "Baseball-Reference",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [
+     "provider-specific; never mix with the same-named metric from another provider"
+    ],
+    "zh_name": "bWAR",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:BWAR"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "baseball_reference",
+    "fangraphs_library"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:WARP",
+   "knowledge_type": "METRIC",
+   "canonical_key": "warp",
+   "title": "WARP",
+   "aliases": [
+    "WARP"
+   ],
+   "language": "en",
+   "summary": "Wins Above Replacement Player, the Baseball Prospectus value metric. Its inputs and replacement level differ from fWAR and bWAR.",
+   "structured_payload": {
+    "definition": "Wins Above Replacement Player, the Baseball Prospectus value metric. Its inputs and replacement level differ from fWAR and bWAR.",
+    "provider": "Baseball Prospectus",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [
+     "provider-specific; never mix with the same-named metric from another provider"
+    ],
+    "zh_name": "WARP",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:WARP"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "baseball_prospectus"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:RE24",
+   "knowledge_type": "METRIC",
+   "canonical_key": "re24",
+   "title": "RE24",
+   "aliases": [
+    "RE24"
+   ],
+   "language": "en",
+   "summary": "The change in run expectancy across the 24 base-out states, summed over a player's events. It measures context-dependent run contribution.",
+   "structured_payload": {
+    "definition": "The change in run expectancy across the 24 base-out states, summed over a player's events. It measures context-dependent run contribution.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "RE24",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:RE24"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:WPA",
+   "knowledge_type": "METRIC",
+   "canonical_key": "wpa",
+   "title": "Win Probability Added",
+   "aliases": [
+    "WPA"
+   ],
+   "language": "en",
+   "summary": "The change in win probability from each event, summed over a player's plate appearances or pitches. It is descriptive and context-dependent, not predictive.",
+   "structured_payload": {
+    "definition": "The change in win probability from each event, summed over a player's plate appearances or pitches. It is descriptive and context-dependent, not predictive.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "WPA",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:WPA"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:LI",
+   "knowledge_type": "METRIC",
+   "canonical_key": "li",
+   "title": "Leverage Index",
+   "aliases": [
+    "LI"
+   ],
+   "language": "en",
+   "summary": "A measure of the pressure of the game state when an event occurs, where 1.0 is average leverage. Used to weight WPA and to evaluate reliever usage.",
+   "structured_payload": {
+    "definition": "A measure of the pressure of the game state when an event occurs, where 1.0 is average leverage. Used to weight WPA and to evaluate reliever usage.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "LI",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:LI"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:CLUTCH",
+   "knowledge_type": "METRIC",
+   "canonical_key": "clutch",
+   "title": "Clutch",
+   "aliases": [
+    "Clutch"
+   ],
+   "language": "en",
+   "summary": "A FanGraphs metric measuring how much better or worse a player performs in high-leverage situations relative to his overall performance; it is unstable and should not be over-interpreted.",
+   "structured_payload": {
+    "definition": "A FanGraphs metric measuring how much better or worse a player performs in high-leverage situations relative to his overall performance; it is unstable and should not be over-interpreted.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "Clutch",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:CLUTCH"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:BSR",
+   "knowledge_type": "METRIC",
+   "canonical_key": "bsr",
+   "title": "Base Running Runs (BsR)",
+   "aliases": [
+    "BsR"
+   ],
+   "language": "en",
+   "summary": "FanGraphs' aggregate baserunning metric, combining stolen-base runs (wSB), ultimate baserunning (UBR) and other components.",
+   "structured_payload": {
+    "definition": "FanGraphs' aggregate baserunning metric, combining stolen-base runs (wSB), ultimate baserunning (UBR) and other components.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "BsR",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:BSR"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:UBR",
+   "knowledge_type": "METRIC",
+   "canonical_key": "ubr",
+   "title": "Ultimate Base Running",
+   "aliases": [
+    "UBR"
+   ],
+   "language": "en",
+   "summary": "The non-stolen-base component of FanGraphs baserunning: advancing on hits, outs, wild pitches and errors, and avoiding outs on the bases.",
+   "structured_payload": {
+    "definition": "The non-stolen-base component of FanGraphs baserunning: advancing on hits, outs, wild pitches and errors, and avoiding outs on the bases.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "UBR",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:UBR"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:WSB",
+   "knowledge_type": "METRIC",
+   "canonical_key": "wsb",
+   "title": "Weighted Stolen Base Runs",
+   "aliases": [
+    "wSB"
+   ],
+   "language": "en",
+   "summary": "The stolen-base component of FanGraphs baserunning, weighting steals and caught-stealings by run value.",
+   "structured_payload": {
+    "definition": "The stolen-base component of FanGraphs baserunning, weighting steals and caught-stealings by run value.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "wSB",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:WSB"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:WGDP",
+   "knowledge_type": "METRIC",
+   "canonical_key": "wgdp",
+   "title": "Weighted Grounded Into Double Play Runs",
+   "aliases": [
+    "wGDP"
+   ],
+   "language": "en",
+   "summary": "The double-play component of FanGraphs baserunning, crediting fast runners and penalising double-play-prone hitters.",
+   "structured_payload": {
+    "definition": "The double-play component of FanGraphs baserunning, crediting fast runners and penalising double-play-prone hitters.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "wGDP",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:WGDP"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SPD",
+   "knowledge_type": "METRIC",
+   "canonical_key": "spd",
+   "title": "Speed Score (Spd)",
+   "aliases": [
+    "Spd"
+   ],
+   "language": "en",
+   "summary": "A FanGraphs composite of stolen-base attempts, success rate, triples and grounded-into-double-play rate.",
+   "structured_payload": {
+    "definition": "A FanGraphs composite of stolen-base attempts, success rate, triples and grounded-into-double-play rate.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "Spd",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:SPD"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:HR_FB",
+   "knowledge_type": "METRIC",
+   "canonical_key": "hr_fb",
+   "title": "HR/FB",
+   "aliases": [
+    "HR/FB"
+   ],
+   "language": "en",
+   "summary": "Home runs divided by fly balls. Pitchers and hitters tend to regress toward their own baselines; a large deviation is often not sustainable.",
+   "structured_payload": {
+    "definition": "Home runs divided by fly balls. Pitchers and hitters tend to regress toward their own baselines; a large deviation is often not sustainable.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "HR/FB",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:HR_FB"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:GB_PCT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "gb_pct",
+   "title": "Ground-Ball Rate (GB%)",
+   "aliases": [
+    "滚地球率"
+   ],
+   "language": "en",
+   "summary": "Ground balls divided by balls in play. A high ground-ball rate reduces home-run risk.",
+   "structured_payload": {
+    "definition": "Ground balls divided by balls in play. A high ground-ball rate reduces home-run risk.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "滚地球率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:GB_PCT"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:FB_PCT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "fb_pct",
+   "title": "Fly-Ball Rate (FB%)",
+   "aliases": [
+    "飞球率"
+   ],
+   "language": "en",
+   "summary": "Fly balls divided by balls in play, excluding line drives and pop-ups by provider convention.",
+   "structured_payload": {
+    "definition": "Fly balls divided by balls in play, excluding line drives and pop-ups by provider convention.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "飞球率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:FB_PCT"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:LD_PCT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "ld_pct",
+   "title": "Line-Drive Rate (LD%)",
+   "aliases": [
+    "平飞球率"
+   ],
+   "language": "en",
+   "summary": "Line drives divided by balls in play; classification depends on the tracking/scoring provider.",
+   "structured_payload": {
+    "definition": "Line drives divided by balls in play; classification depends on the tracking/scoring provider.",
+    "provider": "FanGraphs",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "平飞球率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:LD_PCT"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:HARD_PCT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "hard_pct",
+   "title": "Hard-Hit Rate",
+   "aliases": [
+    "强劲击球率"
+   ],
+   "language": "en",
+   "summary": "The share of batted balls with an exit velocity at or above Statcast's hard-hit threshold (typically 95 mph).",
+   "structured_payload": {
+    "definition": "The share of batted balls with an exit velocity at or above Statcast's hard-hit threshold (typically 95 mph).",
+    "provider": "Baseball Savant",
+    "unit": "",
+    "category": "sabermetrics",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "强劲击球率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:HARD_PCT"
+   ],
+   "tags": [
+    "glossary",
+    "sabermetrics"
+   ],
+   "source_refs": [
+    "baseball_prospectus"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:EXIT_VELOCITY",
+   "knowledge_type": "METRIC",
+   "canonical_key": "exit_velocity",
+   "title": "Exit Velocity",
+   "aliases": [
+    "击球初速"
+   ],
+   "language": "en",
+   "summary": "The speed of the ball off the bat, measured in mph by Statcast. Hard-hit is typically 95+ mph; average exit velocity is descriptive and should be paired with launch angle.",
+   "structured_payload": {
+    "definition": "The speed of the ball off the bat, measured in mph by Statcast. Hard-hit is typically 95+ mph; average exit velocity is descriptive and should be paired with launch angle.",
+    "provider": "Baseball Savant",
+    "unit": "mph",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "击球初速",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:EXIT_VELOCITY"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:LAUNCH_ANGLE",
+   "knowledge_type": "METRIC",
+   "canonical_key": "launch_angle",
+   "title": "Launch Angle",
+   "aliases": [
+    "击球仰角"
+   ],
+   "language": "en",
+   "summary": "The vertical angle of the batted ball off the bat, in degrees. Optimal damage combines high exit velocity with a launch angle in the 10-30 degree range.",
+   "structured_payload": {
+    "definition": "The vertical angle of the batted ball off the bat, in degrees. Optimal damage combines high exit velocity with a launch angle in the 10-30 degree range.",
+    "provider": "Baseball Savant",
+    "unit": "degrees",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "击球仰角",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:LAUNCH_ANGLE"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:BARREL",
+   "knowledge_type": "METRIC",
+   "canonical_key": "barrel",
+   "title": "Barrel",
+   "aliases": [
+    "Barrel"
+   ],
+   "language": "en",
+   "summary": "A batted ball with an exit velocity and launch angle combination that historically produces at least a .500 batting average and 1.500 slugging percentage. The exact thresholds vary by exit velocity.",
+   "structured_payload": {
+    "definition": "A batted ball with an exit velocity and launch angle combination that historically produces at least a .500 batting average and 1.500 slugging percentage. The exact thresholds vary by exit velocity.",
+    "provider": "Baseball Savant",
+    "unit": "count/rate",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "Barrel",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:BARREL"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:HARD_HIT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "hard_hit",
+   "title": "Hard-Hit",
+   "aliases": [
+    "强劲击球"
+   ],
+   "language": "en",
+   "summary": "A batted ball with an exit velocity of 95 mph or higher.",
+   "structured_payload": {
+    "definition": "A batted ball with an exit velocity of 95 mph or higher.",
+    "provider": "Baseball Savant",
+    "unit": "rate",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "强劲击球",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:HARD_HIT"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SWEET_SPOT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "sweet_spot",
+   "title": "Sweet Spot",
+   "aliases": [
+    "甜蜜点"
+   ],
+   "language": "en",
+   "summary": "A batted ball with a launch angle between 8 and 32 degrees, the range that produces the most damage.",
+   "structured_payload": {
+    "definition": "A batted ball with a launch angle between 8 and 32 degrees, the range that produces the most damage.",
+    "provider": "Baseball Savant",
+    "unit": "rate",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "甜蜜点",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:SWEET_SPOT"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:XBA",
+   "knowledge_type": "METRIC",
+   "canonical_key": "xba",
+   "title": "Expected Batting Average (xBA)",
+   "aliases": [
+    "预期打击率"
+   ],
+   "language": "en",
+   "summary": "A Statcast estimate of what a batter's average would be given the exit velocity and launch angle of each batted ball, removing defence and positioning.",
+   "structured_payload": {
+    "definition": "A Statcast estimate of what a batter's average would be given the exit velocity and launch angle of each batted ball, removing defence and positioning.",
+    "provider": "Baseball Savant",
+    "unit": "rate",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "预期打击率",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:XBA"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:XSLG",
+   "knowledge_type": "METRIC",
+   "canonical_key": "xslg",
+   "title": "Expected Slugging (xSLG)",
+   "aliases": [
+    "预期长打率"
+   ],
+   "language": "en",
+   "summary": "The expected slugging percentage from the same batted-ball quality inputs as xBA.",
+   "structured_payload": {
+    "definition": "The expected slugging percentage from the same batted-ball quality inputs as xBA.",
+    "provider": "Baseball Savant",
+    "unit": "rate",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "预期长打率",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:XSLG"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:XWOBA",
+   "knowledge_type": "METRIC",
+   "canonical_key": "xwoba",
+   "title": "Expected wOBA (xwOBA)",
+   "aliases": [
+    "预期wOBA"
+   ],
+   "language": "en",
+   "summary": "Expected wOBA from batted-ball quality plus strikeouts, walks and hit-by-pitch; it removes defence and batted-ball luck.",
+   "structured_payload": {
+    "definition": "Expected wOBA from batted-ball quality plus strikeouts, walks and hit-by-pitch; it removes defence and batted-ball luck.",
+    "provider": "Baseball Savant",
+    "unit": "rate",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "预期wOBA",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:XWOBA"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:XERA",
+   "knowledge_type": "METRIC",
+   "canonical_key": "xera",
+   "title": "Expected ERA (xERA)",
+   "aliases": [
+    "预期防御率"
+   ],
+   "language": "en",
+   "summary": "A Statcast ERA estimator based on expected wOBA allowed, scaled to ERA.",
+   "structured_payload": {
+    "definition": "A Statcast ERA estimator based on expected wOBA allowed, scaled to ERA.",
+    "provider": "Baseball Savant",
+    "unit": "runs/9",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "预期防御率",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:XERA"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:BAT_SPEED",
+   "knowledge_type": "METRIC",
+   "canonical_key": "bat_speed",
+   "title": "Bat Speed",
+   "aliases": [
+    "挥棒速度"
+   ],
+   "language": "en",
+   "summary": "The speed of the bat at the sweet spot, measured in mph. Statcast made bat-tracking metrics publicly available in the 2020s.",
+   "structured_payload": {
+    "definition": "The speed of the bat at the sweet spot, measured in mph. Statcast made bat-tracking metrics publicly available in the 2020s.",
+    "provider": "Baseball Savant",
+    "unit": "mph",
+    "category": "statcast",
+    "availability_years": "2023+ (bat tracking)",
+    "caveats": [],
+    "zh_name": "挥棒速度",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:BAT_SPEED"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SWING_LENGTH",
+   "knowledge_type": "METRIC",
+   "canonical_key": "swing_length",
+   "title": "Swing Length",
+   "aliases": [
+    "挥棒长度"
+   ],
+   "language": "en",
+   "summary": "The distance the bat travels from the start of the swing to contact, in feet. Shorter swings generally allow later decisions.",
+   "structured_payload": {
+    "definition": "The distance the bat travels from the start of the swing to contact, in feet. Shorter swings generally allow later decisions.",
+    "provider": "Baseball Savant",
+    "unit": "feet",
+    "category": "statcast",
+    "availability_years": "2023+",
+    "caveats": [],
+    "zh_name": "挥棒长度",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:SWING_LENGTH"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SPRINT_SPEED",
+   "knowledge_type": "METRIC",
+   "canonical_key": "sprint_speed",
+   "title": "Sprint Speed",
+   "aliases": [
+    "冲刺速度"
+   ],
+   "language": "en",
+   "summary": "Statcast's measure of a runner's top speed, in feet per second, on the fastest one-third of competitive runs.",
+   "structured_payload": {
+    "definition": "Statcast's measure of a runner's top speed, in feet per second, on the fastest one-third of competitive runs.",
+    "provider": "Baseball Savant",
+    "unit": "ft/s",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "冲刺速度",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:SPRINT_SPEED"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:ARM_STRENGTH",
+   "knowledge_type": "METRIC",
+   "canonical_key": "arm_strength",
+   "title": "Arm Strength",
+   "aliases": [
+    "臂力"
+   ],
+   "language": "en",
+   "summary": "The maximum throw speed recorded for a fielder, in mph.",
+   "structured_payload": {
+    "definition": "The maximum throw speed recorded for a fielder, in mph.",
+    "provider": "Baseball Savant",
+    "unit": "mph",
+    "category": "statcast",
+    "availability_years": "2020+",
+    "caveats": [],
+    "zh_name": "臂力",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:ARM_STRENGTH"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:POP_TIME",
+   "knowledge_type": "METRIC",
+   "canonical_key": "pop_time",
+   "title": "Pop Time",
+   "aliases": [
+    "接球到传球时间"
+   ],
+   "language": "en",
+   "summary": "The time from the catcher's receipt of the pitch to the fielder's receipt of the throw at the base, in seconds; the key catcher throwing metric.",
+   "structured_payload": {
+    "definition": "The time from the catcher's receipt of the pitch to the fielder's receipt of the throw at the base, in seconds; the key catcher throwing metric.",
+    "provider": "Baseball Savant",
+    "unit": "seconds",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "接球到传球时间",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:POP_TIME"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:CATCH_PROBABILITY",
+   "knowledge_type": "METRIC",
+   "canonical_key": "catch_probability",
+   "title": "Catch Probability",
+   "aliases": [
+    "接杀概率"
+   ],
+   "language": "en",
+   "summary": "Statcast's estimate of the probability that an average fielder would catch a given batted ball, based on distance, hang time and direction. Five-star catches are the hardest.",
+   "structured_payload": {
+    "definition": "Statcast's estimate of the probability that an average fielder would catch a given batted ball, based on distance, hang time and direction. Five-star catches are the hardest.",
+    "provider": "Baseball Savant",
+    "unit": "probability",
+    "category": "statcast",
+    "availability_years": "2016+",
+    "caveats": [],
+    "zh_name": "接杀概率",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:CATCH_PROBABILITY"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:OAA",
+   "knowledge_type": "METRIC",
+   "canonical_key": "oaa",
+   "title": "Outs Above Average",
+   "aliases": [
+    "OAA"
+   ],
+   "language": "en",
+   "summary": "A Statcast range metric: the difference between outs recorded and expected outs (from catch probability) for a fielder.",
+   "structured_payload": {
+    "definition": "A Statcast range metric: the difference between outs recorded and expected outs (from catch probability) for a fielder.",
+    "provider": "Baseball Savant",
+    "unit": "outs",
+    "category": "statcast",
+    "availability_years": "2016+",
+    "caveats": [],
+    "zh_name": "OAA",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:OAA"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:PITCH_VELOCITY",
+   "knowledge_type": "METRIC",
+   "canonical_key": "pitch_velocity",
+   "title": "Pitch Velocity",
+   "aliases": [
+    "球速"
+   ],
+   "language": "en",
+   "summary": "The speed of a pitch out of the hand, typically reported at release (and, when noted, at the plate).",
+   "structured_payload": {
+    "definition": "The speed of a pitch out of the hand, typically reported at release (and, when noted, at the plate).",
+    "provider": "Baseball Savant",
+    "unit": "mph",
+    "category": "statcast",
+    "availability_years": "2008+ (PITCHf/x), 2015+ (Statcast)",
+    "caveats": [],
+    "zh_name": "球速",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:PITCH_VELOCITY"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SPIN_RATE",
+   "knowledge_type": "METRIC",
+   "canonical_key": "spin_rate",
+   "title": "Spin Rate",
+   "aliases": [
+    "转速"
+   ],
+   "language": "en",
+   "summary": "The rate of rotation of a pitch, in revolutions per minute, measured by the tracking system.",
+   "structured_payload": {
+    "definition": "The rate of rotation of a pitch, in revolutions per minute, measured by the tracking system.",
+    "provider": "Baseball Savant",
+    "unit": "rpm",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "转速",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:SPIN_RATE"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SPIN_AXIS",
+   "knowledge_type": "METRIC",
+   "canonical_key": "spin_axis",
+   "title": "Spin Axis",
+   "aliases": [
+    "旋转轴"
+   ],
+   "language": "en",
+   "summary": "The direction of the pitch's spin axis in degrees; combined with spin rate, it describes the movement profile.",
+   "structured_payload": {
+    "definition": "The direction of the pitch's spin axis in degrees; combined with spin rate, it describes the movement profile.",
+    "provider": "Baseball Savant",
+    "unit": "degrees",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "旋转轴",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:SPIN_AXIS"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:ACTIVE_SPIN",
+   "knowledge_type": "METRIC",
+   "canonical_key": "active_spin",
+   "title": "Active Spin / Spin Efficiency",
+   "aliases": [
+    "有效旋转"
+   ],
+   "language": "en",
+   "summary": "The share of total spin that contributes to the pitch's movement (as opposed to gyro spin), expressed as a percentage.",
+   "structured_payload": {
+    "definition": "The share of total spin that contributes to the pitch's movement (as opposed to gyro spin), expressed as a percentage.",
+    "provider": "Baseball Savant",
+    "unit": "percent",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "有效旋转",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:ACTIVE_SPIN"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:EXTENSION",
+   "knowledge_type": "METRIC",
+   "canonical_key": "extension",
+   "title": "Extension",
+   "aliases": [
+    "出手延伸"
+   ],
+   "language": "en",
+   "summary": "The distance from the pitcher's release point to the front edge of the rubber, in feet; more extension effectively shortens the pitch's travel time.",
+   "structured_payload": {
+    "definition": "The distance from the pitcher's release point to the front edge of the rubber, in feet; more extension effectively shortens the pitch's travel time.",
+    "provider": "Baseball Savant",
+    "unit": "feet",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "出手延伸",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:EXTENSION"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:RELEASE_POINT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "release_point",
+   "title": "Release Point",
+   "aliases": [
+    "出手点"
+   ],
+   "language": "en",
+   "summary": "The horizontal and vertical position of the pitch at release, in feet.",
+   "structured_payload": {
+    "definition": "The horizontal and vertical position of the pitch at release, in feet.",
+    "provider": "Baseball Savant",
+    "unit": "feet",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "出手点",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:RELEASE_POINT"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:IVB",
+   "knowledge_type": "METRIC",
+   "canonical_key": "ivb",
+   "title": "Induced Vertical Break",
+   "aliases": [
+    "垂直位移"
+   ],
+   "language": "en",
+   "summary": "The vertical movement of a pitch attributable to its spin, measured relative to a spinless trajectory (in inches).",
+   "structured_payload": {
+    "definition": "The vertical movement of a pitch attributable to its spin, measured relative to a spinless trajectory (in inches).",
+    "provider": "Baseball Savant",
+    "unit": "inches",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "垂直位移",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:IVB"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:HB",
+   "knowledge_type": "METRIC",
+   "canonical_key": "hb",
+   "title": "Horizontal Break",
+   "aliases": [
+    "水平位移"
+   ],
+   "language": "en",
+   "summary": "The horizontal movement of a pitch attributable to its spin, in inches.",
+   "structured_payload": {
+    "definition": "The horizontal movement of a pitch attributable to its spin, in inches.",
+    "provider": "Baseball Savant",
+    "unit": "inches",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "水平位移",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:HB"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:PLATE_LOCATION",
+   "knowledge_type": "METRIC",
+   "canonical_key": "plate_location",
+   "title": "Plate Location",
+   "aliases": [
+    "进垒点"
+   ],
+   "language": "en",
+   "summary": "The horizontal and vertical position of the pitch as it crosses the plate, in feet; the basis for zone and location metrics.",
+   "structured_payload": {
+    "definition": "The horizontal and vertical position of the pitch as it crosses the plate, in feet; the basis for zone and location metrics.",
+    "provider": "Baseball Savant",
+    "unit": "feet",
+    "category": "statcast",
+    "availability_years": "2015+",
+    "caveats": [],
+    "zh_name": "进垒点",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:PLATE_LOCATION"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:ATTACK_ANGLE",
+   "knowledge_type": "METRIC",
+   "canonical_key": "attack_angle",
+   "title": "Attack Angle",
+   "aliases": [
+    "攻角"
+   ],
+   "language": "en",
+   "summary": "The vertical angle of the bat's path at contact, in degrees; positive for an upward swing.",
+   "structured_payload": {
+    "definition": "The vertical angle of the bat's path at contact, in degrees; positive for an upward swing.",
+    "provider": "Baseball Savant",
+    "unit": "degrees",
+    "category": "statcast",
+    "availability_years": "2023+ (bat tracking)",
+    "caveats": [],
+    "zh_name": "攻角",
+    "zh_name_status": "commonly_used",
+    "source_mapping": {
+     "source_kind": "WEB",
+     "location": "baseball_savant",
+     "computation": "DIRECT"
+    }
+   },
+   "entity_refs": [
+    "METRIC:ATTACK_ANGLE"
+   ],
+   "tags": [
+    "glossary",
+    "statcast"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:FOUR_SEAM_FASTBALL",
+   "knowledge_type": "TERM",
+   "canonical_key": "FOUR_SEAM_FASTBALL",
+   "title": "4-Seam Fastball",
+   "aliases": [
+    "四缝线速球"
+   ],
+   "language": "en",
+   "summary": "A fastball gripped across four seams that produces more spin-induced vertical rise (ride) and less horizontal movement than a two-seamer.",
+   "structured_payload": {
+    "definition": "A fastball gripped across four seams that produces more spin-induced vertical rise (ride) and less horizontal movement than a two-seamer.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "四缝线速球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:FOUR_SEAM_FASTBALL"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:TWO_SEAM_FASTBALL",
+   "knowledge_type": "TERM",
+   "canonical_key": "TWO_SEAM_FASTBALL",
+   "title": "2-Seam Fastball",
+   "aliases": [
+    "二缝线速球"
+   ],
+   "language": "en",
+   "summary": "A fastball gripped along two seams, producing arm-side run and sink.",
+   "structured_payload": {
+    "definition": "A fastball gripped along two seams, producing arm-side run and sink.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "二缝线速球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:TWO_SEAM_FASTBALL"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:SINKER",
+   "knowledge_type": "TERM",
+   "canonical_key": "SINKER",
+   "title": "Sinker",
+   "aliases": [
+    "伸卡球"
+   ],
+   "language": "en",
+   "summary": "A fastball variant with heavy arm-side run and sink; classification overlaps with the two-seamer and differs by tracking provider.",
+   "structured_payload": {
+    "definition": "A fastball variant with heavy arm-side run and sink; classification overlaps with the two-seamer and differs by tracking provider.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "伸卡球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:SINKER"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:CUTTER",
+   "knowledge_type": "TERM",
+   "canonical_key": "CUTTER",
+   "title": "Cutter",
+   "aliases": [
+    "卡特球"
+   ],
+   "language": "en",
+   "summary": "A fastball that breaks toward the glove side with minimal velocity loss.",
+   "structured_payload": {
+    "definition": "A fastball that breaks toward the glove side with minimal velocity loss.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "卡特球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:CUTTER"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:SLIDER",
+   "knowledge_type": "TERM",
+   "canonical_key": "SLIDER",
+   "title": "Slider",
+   "aliases": [
+    "滑球"
+   ],
+   "language": "en",
+   "summary": "A breaking ball with lateral movement and moderate velocity between a curveball and a fastball.",
+   "structured_payload": {
+    "definition": "A breaking ball with lateral movement and moderate velocity between a curveball and a fastball.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "滑球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:SLIDER"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:SWEEPER",
+   "knowledge_type": "TERM",
+   "canonical_key": "SWEEPER",
+   "title": "Sweeper",
+   "aliases": [
+    "横扫滑球"
+   ],
+   "language": "en",
+   "summary": "A slider variant with much more horizontal break and less vertical drop; the classification is provider-dependent and overlapped with sliders before being tracked separately.",
+   "structured_payload": {
+    "definition": "A slider variant with much more horizontal break and less vertical drop; the classification is provider-dependent and overlapped with sliders before being tracked separately.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "横扫滑球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:SWEEPER"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:CURVEBALL",
+   "knowledge_type": "TERM",
+   "canonical_key": "CURVEBALL",
+   "title": "Curveball",
+   "aliases": [
+    "曲球"
+   ],
+   "language": "en",
+   "summary": "A breaking ball with significant downward movement and lower velocity, often with early break.",
+   "structured_payload": {
+    "definition": "A breaking ball with significant downward movement and lower velocity, often with early break.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "曲球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:CURVEBALL"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:KNUCKLE_CURVE",
+   "knowledge_type": "TERM",
+   "canonical_key": "KNUCKLE_CURVE",
+   "title": "Knuckle Curve",
+   "aliases": [
+    "指节曲球"
+   ],
+   "language": "en",
+   "summary": "A curveball thrown with a knuckle grip, often producing tighter spin and later break.",
+   "structured_payload": {
+    "definition": "A curveball thrown with a knuckle grip, often producing tighter spin and later break.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "指节曲球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:KNUCKLE_CURVE"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:CHANGEUP",
+   "knowledge_type": "TERM",
+   "canonical_key": "CHANGEUP",
+   "title": "Changeup",
+   "aliases": [
+    "变速球"
+   ],
+   "language": "en",
+   "summary": "An offspeed pitch thrown with fastball arm action at lower velocity, usually with fade and sink.",
+   "structured_payload": {
+    "definition": "An offspeed pitch thrown with fastball arm action at lower velocity, usually with fade and sink.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "变速球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:CHANGEUP"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:SPLITTER",
+   "knowledge_type": "TERM",
+   "canonical_key": "SPLITTER",
+   "title": "Splitter",
+   "aliases": [
+    "指叉球"
+   ],
+   "language": "en",
+   "summary": "An offspeed pitch that drops sharply near the plate, gripped to reduce spin.",
+   "structured_payload": {
+    "definition": "An offspeed pitch that drops sharply near the plate, gripped to reduce spin.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "指叉球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:SPLITTER"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:FORKBALL",
+   "knowledge_type": "TERM",
+   "canonical_key": "FORKBALL",
+   "title": "Forkball",
+   "aliases": [
+    "叉指球"
+   ],
+   "language": "en",
+   "summary": "A slower split-finger variant with a wider grip and more tumbling action.",
+   "structured_payload": {
+    "definition": "A slower split-finger variant with a wider grip and more tumbling action.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "叉指球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:FORKBALL"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:KNUCKLEBALL",
+   "knowledge_type": "TERM",
+   "canonical_key": "KNUCKLEBALL",
+   "title": "Knuckleball",
+   "aliases": [
+    "蝴蝶球"
+   ],
+   "language": "en",
+   "summary": "A pitch thrown with almost no spin, producing unpredictable movement.",
+   "structured_payload": {
+    "definition": "A pitch thrown with almost no spin, producing unpredictable movement.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "蝴蝶球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:KNUCKLEBALL"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:SLURVE",
+   "knowledge_type": "TERM",
+   "canonical_key": "SLURVE",
+   "title": "Slurve",
+   "aliases": [
+    "滑曲球"
+   ],
+   "language": "en",
+   "summary": "A breaking ball between a slider and a curveball; the label is descriptive and provider-dependent.",
+   "structured_payload": {
+    "definition": "A breaking ball between a slider and a curveball; the label is descriptive and provider-dependent.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "滑曲球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:SLURVE"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:GYRO_SLIDER",
+   "knowledge_type": "TERM",
+   "canonical_key": "GYRO_SLIDER",
+   "title": "Gyro Slider",
+   "aliases": [
+    "陀螺滑球"
+   ],
+   "language": "en",
+   "summary": "A slider with mostly gyroscopic (bullet) spin and little lateral movement, producing a tighter, later break.",
+   "structured_payload": {
+    "definition": "A slider with mostly gyroscopic (bullet) spin and little lateral movement, producing a tighter, later break.",
+    "provider": "",
+    "unit": "",
+    "category": "pitch_types",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "陀螺滑球",
+    "zh_name_status": "commonly_used",
+    "classification_ambiguity": "tracking providers classify borderline pitches differently; treat the label as descriptive"
+   },
+   "entity_refs": [
+    "TERM:GYRO_SLIDER"
+   ],
+   "tags": [
+    "glossary",
+    "pitch_types",
+    "pitching"
+   ],
+   "source_refs": [
+    "baseball_savant",
+    "mlb_glossary"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:O_SWING",
+   "knowledge_type": "METRIC",
+   "canonical_key": "o_swing",
+   "title": "O-Swing% (Chase Rate)",
+   "aliases": [
+    "追打率"
+   ],
+   "language": "en",
+   "summary": "The share of pitches outside the strike zone that the batter swings at.",
+   "structured_payload": {
+    "definition": "The share of pitches outside the strike zone that the batter swings at.",
+    "provider": "FanGraphs/Baseball Savant",
+    "unit": "percent",
+    "category": "plate_discipline",
+    "availability_years": "",
+    "caveats": [
+     "provider definitions of zone and swing can differ by a fraction of a percent"
+    ],
+    "zh_name": "追打率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:O_SWING"
+   ],
+   "tags": [
+    "glossary",
+    "plate_discipline"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "baseball_savant"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:Z_SWING",
+   "knowledge_type": "METRIC",
+   "canonical_key": "z_swing",
+   "title": "Z-Swing%",
+   "aliases": [
+    "好球挥棒率"
+   ],
+   "language": "en",
+   "summary": "The share of pitches inside the strike zone that the batter swings at.",
+   "structured_payload": {
+    "definition": "The share of pitches inside the strike zone that the batter swings at.",
+    "provider": "FanGraphs/Baseball Savant",
+    "unit": "percent",
+    "category": "plate_discipline",
+    "availability_years": "",
+    "caveats": [
+     "provider definitions of zone and swing can differ by a fraction of a percent"
+    ],
+    "zh_name": "好球挥棒率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:Z_SWING"
+   ],
+   "tags": [
+    "glossary",
+    "plate_discipline"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "baseball_savant"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SWING",
+   "knowledge_type": "METRIC",
+   "canonical_key": "swing",
+   "title": "Swing%",
+   "aliases": [
+    "挥棒率"
+   ],
+   "language": "en",
+   "summary": "The share of all pitches that the batter swings at.",
+   "structured_payload": {
+    "definition": "The share of all pitches that the batter swings at.",
+    "provider": "FanGraphs/Baseball Savant",
+    "unit": "percent",
+    "category": "plate_discipline",
+    "availability_years": "",
+    "caveats": [
+     "provider definitions of zone and swing can differ by a fraction of a percent"
+    ],
+    "zh_name": "挥棒率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:SWING"
+   ],
+   "tags": [
+    "glossary",
+    "plate_discipline"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "baseball_savant"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:O_CONTACT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "o_contact",
+   "title": "O-Contact%",
+   "aliases": [
+    "追打contact率"
+   ],
+   "language": "en",
+   "summary": "The share of swings at pitches outside the zone that make contact.",
+   "structured_payload": {
+    "definition": "The share of swings at pitches outside the zone that make contact.",
+    "provider": "FanGraphs/Baseball Savant",
+    "unit": "percent",
+    "category": "plate_discipline",
+    "availability_years": "",
+    "caveats": [
+     "provider definitions of zone and swing can differ by a fraction of a percent"
+    ],
+    "zh_name": "追打contact率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:O_CONTACT"
+   ],
+   "tags": [
+    "glossary",
+    "plate_discipline"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "baseball_savant"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:Z_CONTACT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "z_contact",
+   "title": "Z-Contact%",
+   "aliases": [
+    "好球contact率"
+   ],
+   "language": "en",
+   "summary": "The share of swings at pitches inside the zone that make contact.",
+   "structured_payload": {
+    "definition": "The share of swings at pitches inside the zone that make contact.",
+    "provider": "FanGraphs/Baseball Savant",
+    "unit": "percent",
+    "category": "plate_discipline",
+    "availability_years": "",
+    "caveats": [
+     "provider definitions of zone and swing can differ by a fraction of a percent"
+    ],
+    "zh_name": "好球contact率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:Z_CONTACT"
+   ],
+   "tags": [
+    "glossary",
+    "plate_discipline"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "baseball_savant"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:CONTACT",
+   "knowledge_type": "METRIC",
+   "canonical_key": "contact",
+   "title": "Contact%",
+   "aliases": [
+    "contact率"
+   ],
+   "language": "en",
+   "summary": "The share of swings that make contact.",
+   "structured_payload": {
+    "definition": "The share of swings that make contact.",
+    "provider": "FanGraphs/Baseball Savant",
+    "unit": "percent",
+    "category": "plate_discipline",
+    "availability_years": "",
+    "caveats": [
+     "provider definitions of zone and swing can differ by a fraction of a percent"
+    ],
+    "zh_name": "contact率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:CONTACT"
+   ],
+   "tags": [
+    "glossary",
+    "plate_discipline"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "baseball_savant"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:ZONE",
+   "knowledge_type": "METRIC",
+   "canonical_key": "zone",
+   "title": "Zone%",
+   "aliases": [
+    "好球带比例"
+   ],
+   "language": "en",
+   "summary": "The share of pitches that are in the strike zone.",
+   "structured_payload": {
+    "definition": "The share of pitches that are in the strike zone.",
+    "provider": "FanGraphs/Baseball Savant",
+    "unit": "percent",
+    "category": "plate_discipline",
+    "availability_years": "",
+    "caveats": [
+     "provider definitions of zone and swing can differ by a fraction of a percent"
+    ],
+    "zh_name": "好球带比例",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:ZONE"
+   ],
+   "tags": [
+    "glossary",
+    "plate_discipline"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "baseball_savant"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:F_STRIKE",
+   "knowledge_type": "METRIC",
+   "canonical_key": "f_strike",
+   "title": "F-Strike% (First-Pitch Strike)",
+   "aliases": [
+    "首球好球率"
+   ],
+   "language": "en",
+   "summary": "The share of plate appearances that begin with a strike.",
+   "structured_payload": {
+    "definition": "The share of plate appearances that begin with a strike.",
+    "provider": "FanGraphs/Baseball Savant",
+    "unit": "percent",
+    "category": "plate_discipline",
+    "availability_years": "",
+    "caveats": [
+     "provider definitions of zone and swing can differ by a fraction of a percent"
+    ],
+    "zh_name": "首球好球率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:F_STRIKE"
+   ],
+   "tags": [
+    "glossary",
+    "plate_discipline"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "baseball_savant"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:SWSTR",
+   "knowledge_type": "METRIC",
+   "canonical_key": "swstr",
+   "title": "SwStr% (Swinging-Strike Rate)",
+   "aliases": [
+    "挥空率"
+   ],
+   "language": "en",
+   "summary": "The share of pitches that are swung at and missed.",
+   "structured_payload": {
+    "definition": "The share of pitches that are swung at and missed.",
+    "provider": "FanGraphs/Baseball Savant",
+    "unit": "percent",
+    "category": "plate_discipline",
+    "availability_years": "",
+    "caveats": [
+     "provider definitions of zone and swing can differ by a fraction of a percent"
+    ],
+    "zh_name": "挥空率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:SWSTR"
+   ],
+   "tags": [
+    "glossary",
+    "plate_discipline"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "baseball_savant"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:CSW",
+   "knowledge_type": "METRIC",
+   "canonical_key": "csw",
+   "title": "CSW% (Called Strike + Whiff)",
+   "aliases": [
+    "好球+挥空率"
+   ],
+   "language": "en",
+   "summary": "The share of pitches that are either called strikes or swinging strikes; a compact measure of a pitcher's ability to earn strikes.",
+   "structured_payload": {
+    "definition": "The share of pitches that are either called strikes or swinging strikes; a compact measure of a pitcher's ability to earn strikes.",
+    "provider": "FanGraphs/Baseball Savant",
+    "unit": "percent",
+    "category": "plate_discipline",
+    "availability_years": "",
+    "caveats": [
+     "provider definitions of zone and swing can differ by a fraction of a percent"
+    ],
+    "zh_name": "好球+挥空率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:CSW"
+   ],
+   "tags": [
+    "glossary",
+    "plate_discipline"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "baseball_savant"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "METRIC:WHIFF",
+   "knowledge_type": "METRIC",
+   "canonical_key": "whiff",
+   "title": "Whiff Rate",
+   "aliases": [
+    "挥空率"
+   ],
+   "language": "en",
+   "summary": "The share of swings that miss, equivalent to 1 minus contact rate; provider conventions can differ slightly.",
+   "structured_payload": {
+    "definition": "The share of swings that miss, equivalent to 1 minus contact rate; provider conventions can differ slightly.",
+    "provider": "FanGraphs/Baseball Savant",
+    "unit": "percent",
+    "category": "plate_discipline",
+    "availability_years": "",
+    "caveats": [
+     "provider definitions of zone and swing can differ by a fraction of a percent"
+    ],
+    "zh_name": "挥空率",
+    "zh_name_status": "commonly_used"
+   },
+   "entity_refs": [
+    "METRIC:WHIFF"
+   ],
+   "tags": [
+    "glossary",
+    "plate_discipline"
+   ],
+   "source_refs": [
+    "fangraphs_library",
+    "baseball_savant"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:QUALIFIED_HITTER",
+   "knowledge_type": "TERM",
+   "canonical_key": "QUALIFIED_HITTER",
+   "title": "Qualified Hitter",
+   "aliases": [
+    "qualified batter",
+    "合格打者"
+   ],
+   "language": "en",
+   "summary": "A hitter who meets the league's minimum plate-appearance standard for rate-stat leaderboards: 3.1 plate appearances per team game played. A player who falls short may still lead the league in a rate category if the missing plate appearances would not change the result (the Rule 9.22 replacement rule).",
+   "structured_payload": {
+    "definition": "A hitter who meets the league's minimum plate-appearance standard for rate-stat leaderboards: 3.1 plate appearances per team game played. A player who falls short may still lead the league in a rate category if the missing plate appearances would not change the result (the Rule 9.22 replacement rule).",
+    "provider": "",
+    "unit": "",
+    "category": "qualification",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "合格打者",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.22"
+   },
+   "entity_refs": [
+    "TERM:QUALIFIED_HITTER"
+   ],
+   "tags": [
+    "glossary",
+    "qualification",
+    "qualification"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:QUALIFIED_PITCHER",
+   "knowledge_type": "TERM",
+   "canonical_key": "QUALIFIED_PITCHER",
+   "title": "Qualified Pitcher",
+   "aliases": [
+    "qualified pitcher",
+    "合格投手"
+   ],
+   "language": "en",
+   "summary": "A pitcher who meets the league's minimum innings standard: one inning pitched per team game played. Rate-stat titles are awarded under Rule 9.22, which allows a shortfall to be made up hypothetically.",
+   "structured_payload": {
+    "definition": "A pitcher who meets the league's minimum innings standard: one inning pitched per team game played. Rate-stat titles are awarded under Rule 9.22, which allows a shortfall to be made up hypothetically.",
+    "provider": "",
+    "unit": "",
+    "category": "qualification",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "合格投手",
+    "zh_name_status": "commonly_used",
+    "rule_reference": "9.22"
+   },
+   "entity_refs": [
+    "TERM:QUALIFIED_PITCHER"
+   ],
+   "tags": [
+    "glossary",
+    "qualification",
+    "qualification"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:LEADERBOARD_QUALIFICATION",
+   "knowledge_type": "TERM",
+   "canonical_key": "LEADERBOARD_QUALIFICATION",
+   "title": "Leaderboard Qualification",
+   "aliases": [
+    "leaderboard minimum",
+    "排行榜资格"
+   ],
+   "language": "en",
+   "summary": "The minimum playing time a data provider requires before including a player on a rate-stat leaderboard. MLB, FanGraphs, Baseball-Reference and Statcast use different defaults, so the same player can appear on one leaderboard and not another.",
+   "structured_payload": {
+    "definition": "The minimum playing time a data provider requires before including a player on a rate-stat leaderboard. MLB, FanGraphs, Baseball-Reference and Statcast use different defaults, so the same player can appear on one leaderboard and not another.",
+    "provider": "",
+    "unit": "",
+    "category": "qualification",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "排行榜资格",
+    "zh_name_status": "commonly_used",
+    "rule_reference": ""
+   },
+   "entity_refs": [
+    "TERM:LEADERBOARD_QUALIFICATION"
+   ],
+   "tags": [
+    "glossary",
+    "qualification",
+    "qualification"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:MINIMUM_PA",
+   "knowledge_type": "TERM",
+   "canonical_key": "MINIMUM_PA",
+   "title": "Minimum Plate Appearances",
+   "aliases": [
+    "最少打席"
+   ],
+   "language": "en",
+   "summary": "A configurable threshold for a hitting sample. MLB's championship standard is 3.1 PA per team game; a custom analysis can use any threshold and must state it.",
+   "structured_payload": {
+    "definition": "A configurable threshold for a hitting sample. MLB's championship standard is 3.1 PA per team game; a custom analysis can use any threshold and must state it.",
+    "provider": "",
+    "unit": "",
+    "category": "qualification",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "最少打席",
+    "zh_name_status": "commonly_used",
+    "rule_reference": ""
+   },
+   "entity_refs": [
+    "TERM:MINIMUM_PA"
+   ],
+   "tags": [
+    "glossary",
+    "qualification",
+    "qualification"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:MINIMUM_IP",
+   "knowledge_type": "TERM",
+   "canonical_key": "MINIMUM_IP",
+   "title": "Minimum Innings Pitched",
+   "aliases": [
+    "最少投球局数"
+   ],
+   "language": "en",
+   "summary": "A configurable threshold for a pitching sample. MLB's championship standard is one inning per team game; a custom analysis can use any threshold and must state it.",
+   "structured_payload": {
+    "definition": "A configurable threshold for a pitching sample. MLB's championship standard is one inning per team game; a custom analysis can use any threshold and must state it.",
+    "provider": "",
+    "unit": "",
+    "category": "qualification",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "最少投球局数",
+    "zh_name_status": "commonly_used",
+    "rule_reference": ""
+   },
+   "entity_refs": [
+    "TERM:MINIMUM_IP"
+   ],
+   "tags": [
+    "glossary",
+    "qualification",
+    "qualification"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "TERM:CUSTOM_SAMPLE_THRESHOLD",
+   "knowledge_type": "TERM",
+   "canonical_key": "CUSTOM_SAMPLE_THRESHOLD",
+   "title": "Custom Sample Threshold",
+   "aliases": [
+    "自定义样本阈值"
+   ],
+   "language": "en",
+   "summary": "An analysis-specific minimum sample chosen for a question. It is not the same as official qualification; conflating the two is a common error.",
+   "structured_payload": {
+    "definition": "An analysis-specific minimum sample chosen for a question. It is not the same as official qualification; conflating the two is a common error.",
+    "provider": "",
+    "unit": "",
+    "category": "qualification",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "自定义样本阈值",
+    "zh_name_status": "commonly_used",
+    "rule_reference": ""
+   },
+   "entity_refs": [
+    "TERM:CUSTOM_SAMPLE_THRESHOLD"
+   ],
+   "tags": [
+    "glossary",
+    "qualification",
+    "qualification"
+   ],
+   "source_refs": [
+    "mlb_official_rules",
+    "mlb_glossary",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:SCALE_20_80",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "SCALE_20_80",
+   "title": "20-80 Scouting Scale",
+   "aliases": [
+    "20-80评分制"
+   ],
+   "language": "en",
+   "summary": "The industry scouting scale in which 50 is major-league average, 20 is well below average and 80 is elite. Present and future grades are often reported separately. It is a convention, not an official statistic.",
+   "structured_payload": {
+    "definition": "The industry scouting scale in which 50 is major-league average, 20 is well below average and 80 is elite. Present and future grades are often reported separately. It is a convention, not an official statistic.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "20-80评分制",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:SCALE_20_80"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:HIT_TOOL",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "HIT_TOOL",
+   "title": "Hit Tool",
+   "aliases": [
+    "打击工具"
+   ],
+   "language": "en",
+   "summary": "A scouting grade for a player's ability to make consistent contact and control the strike zone.",
+   "structured_payload": {
+    "definition": "A scouting grade for a player's ability to make consistent contact and control the strike zone.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "打击工具",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:HIT_TOOL"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:RAW_POWER",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "RAW_POWER",
+   "title": "Raw Power",
+   "aliases": [
+    "原始力量"
+   ],
+   "language": "en",
+   "summary": "A scouting grade for a player's pure batted-ball power in batting practice, independent of game translation.",
+   "structured_payload": {
+    "definition": "A scouting grade for a player's pure batted-ball power in batting practice, independent of game translation.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "原始力量",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:RAW_POWER"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:GAME_POWER",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "GAME_POWER",
+   "title": "Game Power",
+   "aliases": [
+    "实战力量"
+   ],
+   "language": "en",
+   "summary": "A scouting grade for how raw power translates into game production, including approach and swing decisions.",
+   "structured_payload": {
+    "definition": "A scouting grade for how raw power translates into game production, including approach and swing decisions.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "实战力量",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:GAME_POWER"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:SPEED_TOOL",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "SPEED_TOOL",
+   "title": "Speed Tool",
+   "aliases": [
+    "速度工具"
+   ],
+   "language": "en",
+   "summary": "A scouting grade for footspeed and its baseball application.",
+   "structured_payload": {
+    "definition": "A scouting grade for footspeed and its baseball application.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "速度工具",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:SPEED_TOOL"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:FIELD_TOOL",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "FIELD_TOOL",
+   "title": "Fielding Tool",
+   "aliases": [
+    "守备工具"
+   ],
+   "language": "en",
+   "summary": "A scouting grade for defensive range, hands, instincts and reliability.",
+   "structured_payload": {
+    "definition": "A scouting grade for defensive range, hands, instincts and reliability.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "守备工具",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:FIELD_TOOL"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:ARM_TOOL",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "ARM_TOOL",
+   "title": "Arm Tool",
+   "aliases": [
+    "臂力工具"
+   ],
+   "language": "en",
+   "summary": "A scouting grade for arm strength and accuracy.",
+   "structured_payload": {
+    "definition": "A scouting grade for arm strength and accuracy.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "臂力工具",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:ARM_TOOL"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:CONTROL",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "CONTROL",
+   "title": "Control",
+   "aliases": [
+    "控球"
+   ],
+   "language": "en",
+   "summary": "A pitcher's ability to throw strikes (the walk dimension). Not the same as command.",
+   "structured_payload": {
+    "definition": "A pitcher's ability to throw strikes (the walk dimension). Not the same as command.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "控球",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:CONTROL"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:COMMAND",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "COMMAND",
+   "title": "Command",
+   "aliases": [
+    "command"
+   ],
+   "language": "en",
+   "summary": "A pitcher's ability to locate pitches within the strike zone and to specific quadrants, beyond simply throwing strikes.",
+   "structured_payload": {
+    "definition": "A pitcher's ability to locate pitches within the strike zone and to specific quadrants, beyond simply throwing strikes.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "command",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:COMMAND"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:PITCH_SHAPE",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "PITCH_SHAPE",
+   "title": "Pitch Shape",
+   "aliases": [
+    "球路形状"
+   ],
+   "language": "en",
+   "summary": "The movement, spin and velocity profile of a pitch, described by induced break, spin axis and release characteristics.",
+   "structured_payload": {
+    "definition": "The movement, spin and velocity profile of a pitch, described by induced break, spin axis and release characteristics.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "球路形状",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:PITCH_SHAPE"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:TUNNELING",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "TUNNELING",
+   "title": "Tunneling",
+   "aliases": [
+    "隧道效应"
+   ],
+   "language": "en",
+   "summary": "The strategy of releasing different pitches from a similar trajectory so they appear identical until late, degrading the hitter's decision time.",
+   "structured_payload": {
+    "definition": "The strategy of releasing different pitches from a similar trajectory so they appear identical until late, degrading the hitter's decision time.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "隧道效应",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:TUNNELING"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:SEQUENCING",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "SEQUENCING",
+   "title": "Sequencing",
+   "aliases": [
+    "配球"
+   ],
+   "language": "en",
+   "summary": "The order and location pattern in which a pitcher uses his pitches across an at-bat, batter and game.",
+   "structured_payload": {
+    "definition": "The order and location pattern in which a pitcher uses his pitches across an at-bat, batter and game.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "配球",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:SEQUENCING"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:PLATOON_SPLIT",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "PLATOON_SPLIT",
+   "title": "Platoon Split",
+   "aliases": [
+    "左右打者差异"
+   ],
+   "language": "en",
+   "summary": "The performance difference between a hitter or pitcher against same-handed and opposite-handed opponents.",
+   "structured_payload": {
+    "definition": "The performance difference between a hitter or pitcher against same-handed and opposite-handed opponents.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "左右打者差异",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:PLATOON_SPLIT"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:TIMES_THROUGH_ORDER",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "TIMES_THROUGH_ORDER",
+   "title": "Times Through the Order",
+   "aliases": [
+    "打线轮次效应"
+   ],
+   "language": "en",
+   "summary": "The tendency for pitchers to perform worse as the lineup sees them a second and third time, which drives bullpen usage.",
+   "structured_payload": {
+    "definition": "The tendency for pitchers to perform worse as the lineup sees them a second and third time, which drives bullpen usage.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "打线轮次效应",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:TIMES_THROUGH_ORDER"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:PITCH_MIX",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "PITCH_MIX",
+   "title": "Pitch Mix",
+   "aliases": [
+    "球种配比"
+   ],
+   "language": "en",
+   "summary": "The share of each pitch type a pitcher throws.",
+   "structured_payload": {
+    "definition": "The share of each pitch type a pitcher throws.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "球种配比",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:PITCH_MIX"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:ARSENAL",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "ARSENAL",
+   "title": "Arsenal",
+   "aliases": [
+    "武器库"
+   ],
+   "language": "en",
+   "summary": "The complete set of pitches a pitcher throws.",
+   "structured_payload": {
+    "definition": "The complete set of pitches a pitcher throws.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "武器库",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:ARSENAL"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:SWING_DECISION",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "SWING_DECISION",
+   "title": "Swing Decision",
+   "aliases": [
+    "挥棒决策"
+   ],
+   "language": "en",
+   "summary": "Whether a hitter chooses to swing at a given pitch, evaluated against expected value rather than simply balls and strikes.",
+   "structured_payload": {
+    "definition": "Whether a hitter chooses to swing at a given pitch, evaluated against expected value rather than simply balls and strikes.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "挥棒决策",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:SWING_DECISION"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:BAT_TO_BALL",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "BAT_TO_BALL",
+   "title": "Bat-to-Ball",
+   "aliases": [
+    "击球能力"
+   ],
+   "language": "en",
+   "summary": "A hitter's ability to make contact; the complement of swing-and-miss.",
+   "structured_payload": {
+    "definition": "A hitter's ability to make contact; the complement of swing-and-miss.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "击球能力",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:BAT_TO_BALL"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:CONTACT_QUALITY",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "CONTACT_QUALITY",
+   "title": "Contact Quality",
+   "aliases": [
+    "击球质量"
+   ],
+   "language": "en",
+   "summary": "How well a batted ball is struck, measured by exit velocity and launch angle rather than outcome.",
+   "structured_payload": {
+    "definition": "How well a batted ball is struck, measured by exit velocity and launch angle rather than outcome.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "击球质量",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:CONTACT_QUALITY"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:STUFF",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "STUFF",
+   "title": "Stuff",
+   "aliases": [
+    "球质"
+   ],
+   "language": "en",
+   "summary": "The quality of a pitcher's raw pitches, independent of location; modeled by metrics such as Stuff+.",
+   "structured_payload": {
+    "definition": "The quality of a pitcher's raw pitches, independent of location; modeled by metrics such as Stuff+.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "球质",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:STUFF"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "CONCEPT:PITCHABILITY",
+   "knowledge_type": "SCOUTING_CONCEPT",
+   "canonical_key": "PITCHABILITY",
+   "title": "Pitchability",
+   "aliases": [
+    "投球智慧"
+   ],
+   "language": "en",
+   "summary": "A scouting term for a pitcher's ability to get hitters out without premium stuff, through command, sequencing and deception.",
+   "structured_payload": {
+    "definition": "A scouting term for a pitcher's ability to get hitters out without premium stuff, through command, sequencing and deception.",
+    "provider": "",
+    "unit": "",
+    "category": "scouting",
+    "availability_years": "",
+    "caveats": [],
+    "zh_name": "投球智慧",
+    "zh_name_status": "commonly_used",
+    "note": "scouting / analytical concept, not a rule or an official statistic"
+   },
+   "entity_refs": [
+    "CONCEPT:PITCHABILITY"
+   ],
+   "tags": [
+    "glossary",
+    "scouting",
+    "scouting"
+   ],
+   "source_refs": [
+    "mlb_pipeline",
+    "fangraphs_library"
+   ],
+   "source_authority": "OFFICIAL",
+   "effective_from": null,
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "LOW",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  }
+ ],
+ "relations": []
+}

@@ -1,0 +1,14 @@
+import sys,json,duckdb,psycopg2
+sys.path.insert(0,'/home/158112/baseball_agent/baseball_agent')
+from app.config import settings as s
+sources=[('PARQUET',duckdb.connect(),f"read_parquet('{s.parquet_archive_path}/mlb_statcast_2023.parquet')")]
+c=psycopg2.connect(host=s.postgres_host,port=s.postgres_port,dbname=s.postgres_db,user=s.postgres_user,password=s.postgres_password,connect_timeout=5)
+sources.append(('POSTGRES',c.cursor(),'statcast_pitches'))
+for label,cursor,table in sources:
+ for operator in ('>','>='):
+  for balls in ('balls IN (0,1,2,3)','balls IN (0,1,2)'):
+   where=f"strikes=2 AND {balls} AND release_speed {operator} 95 AND pitch_type IN ('FF','SI','FC','FA') AND launch_speed IS NOT NULL"
+   for band in ('plate_z >= sz_top-.25','plate_z BETWEEN sz_top-.25 AND sz_top'):
+    cursor.execute(f'SELECT count(*),count(*) FILTER(WHERE {band}),avg(launch_speed) FILTER(WHERE {band}),count(*) FILTER(WHERE {band} AND description=\'hit_into_play\'),avg(launch_speed) FILTER(WHERE {band} AND description=\'hit_into_play\') FROM {table} WHERE {where}')
+    print(json.dumps([label,operator,balls,band,cursor.fetchall()],default=str),flush=True)
+c.close()

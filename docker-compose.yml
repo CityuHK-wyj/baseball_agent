@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  baseball_db:
+    image: pgvector/pgvector:pg16  # 自带向量扩展的Postgres，为以后的Agent做准备
+    container_name: baseball_postgres
+    ports:
+      - "127.0.0.1:5433:5432"
+    environment:
+      POSTGRES_USER: baseball_admin
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?Set a local administrator password}
+      POSTGRES_DB: baseball_analytics
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

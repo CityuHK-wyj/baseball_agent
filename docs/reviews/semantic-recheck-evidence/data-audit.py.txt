@@ -1,0 +1,21 @@
+import sys,json,duckdb
+from pathlib import Path
+sys.path.insert(0,str(Path.cwd()))
+from app.config import settings as s
+mapping=json.loads(Path('.runtime/game_type_map.json').read_text())
+def show(label,cur,table):
+ queries={
+  'summary':f'SELECT count(*),count(game_type),min(game_date),max(game_date),count(distinct game_pk) FROM {table}',
+  'types':f'SELECT game_type,count(*) FROM {table} GROUP BY game_type ORDER BY game_type',
+  'events_measured':f'SELECT events,description,count(*),min(launch_speed),max(launch_speed) FROM {table} WHERE events IS NOT NULL AND launch_speed IS NOT NULL GROUP BY events,description ORDER BY events,description',
+  'game_map':f'SELECT game_pk,min(game_type),max(game_type) FROM {table} GROUP BY game_pk',
+  'duplicates':f'SELECT (SELECT count(*) FROM {table})-(SELECT count(*) FROM (SELECT DISTINCT * FROM {table}) d)',
+ }
+ for name,sql in queries.items():
+  cur.execute(sql);rows=cur.fetchall()
+  if name=='game_map': rows={'games':len(rows),'mismatches':[(g,a,b,mapping.get(str(g))) for g,a,b in rows if a!=b or a!=mapping.get(str(g))]}
+  print(json.dumps({'source':label,'check':name,'result':rows},default=str),flush=True)
+d=duckdb.connect(config={'threads':2});show('PARQUET',d,f"read_parquet('{s.parquet_archive_path}/mlb_statcast_*.parquet')")
+import psycopg2
+c=psycopg2.connect(host=s.postgres_host,port=s.postgres_port,dbname=s.postgres_db,user=s.postgres_user,password=s.postgres_password,connect_timeout=5)
+show('POSTGRES',c.cursor(),'statcast_pitches');c.close()

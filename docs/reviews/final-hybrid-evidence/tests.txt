@@ -1,0 +1,5 @@
+'LOAD httpfs' contains unsupported syntax. Falling back to parsing as a 'Command'.
+----------------------------------------------------------------------
+Ran 479 tests in 20.240s
+
+OK

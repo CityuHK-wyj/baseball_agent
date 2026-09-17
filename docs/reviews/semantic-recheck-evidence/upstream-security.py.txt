@@ -1,0 +1,18 @@
+import json,sys,requests,psycopg2
+from pathlib import Path
+sys.path.insert(0,str(Path.cwd()))
+from app.config import settings as s
+cached=json.loads(Path('.runtime/game_type_map.json').read_text())
+for year in range(2015,2027):
+ r=requests.get('https://statsapi.mlb.com/api/v1/schedule',params={'sportId':1,'startDate':f'{year}-01-01','endDate':f'{year}-12-31'},timeout=30)
+ r.raise_for_status()
+ games={str(g['gamePk']):g['gameType'] for d in r.json().get('dates',[]) for g in d['games']}
+ mismatches=[(g,t,cached.get(g)) for g,t in games.items() if g in cached and cached[g]!=t]
+ print(json.dumps({'year':year,'fresh_games':len(games),'cached_matches':sum(g in cached and cached[g]==t for g,t in games.items()),'mismatches':mismatches}),flush=True)
+c=psycopg2.connect(host=s.postgres_host,port=s.postgres_port,dbname=s.postgres_db,user=s.postgres_user,password=s.postgres_password,connect_timeout=5)
+cur=c.cursor();cur.execute("SELECT current_user,current_setting('transaction_read_only')");print(json.dumps({'runtime':cur.fetchall()}),flush=True)
+for name,sql in [('CREATE','CREATE TABLE public.semantic_review_probe(x int)'),('INSERT','INSERT INTO statcast_pitches(game_pk) SELECT -1 WHERE false'),('UPDATE','UPDATE statcast_pitches SET game_pk=game_pk WHERE false'),('DELETE','DELETE FROM statcast_pitches WHERE false'),('DROP','DROP TABLE IF EXISTS public.semantic_review_probe')]:
+ try:cur.execute(sql);print(json.dumps({'probe':name,'result':'UNEXPECTED_SUCCESS'}),flush=True)
+ except Exception as e:print(json.dumps({'probe':name,'result':type(e).__name__,'sqlstate':e.pgcode}),flush=True)
+ finally:c.rollback()
+c.close()

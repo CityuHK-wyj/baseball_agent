@@ -1,0 +1,18 @@
+{"year": 2015, "fresh_games": 2969, "cached_matches": 2969, "mismatches": []}
+{"year": 2016, "fresh_games": 2967, "cached_matches": 2967, "mismatches": []}
+{"year": 2017, "fresh_games": 3020, "cached_matches": 3020, "mismatches": []}
+{"year": 2018, "fresh_games": 2969, "cached_matches": 2969, "mismatches": []}
+{"year": 2019, "fresh_games": 2965, "cached_matches": 2965, "mismatches": []}
+{"year": 2020, "fresh_games": 1300, "cached_matches": 1300, "mismatches": []}
+{"year": 2021, "fresh_games": 2885, "cached_matches": 2885, "mismatches": []}
+{"year": 2022, "fresh_games": 2752, "cached_matches": 2752, "mismatches": []}
+{"year": 2023, "fresh_games": 2963, "cached_matches": 2963, "mismatches": []}
+{"year": 2024, "fresh_games": 2959, "cached_matches": 2959, "mismatches": []}
+{"year": 2025, "fresh_games": 2961, "cached_matches": 2961, "mismatches": []}
+{"year": 2026, "fresh_games": 2973, "cached_matches": 2973, "mismatches": []}
+{"runtime": [["baseball_readonly", "on"]]}
+{"probe": "CREATE", "result": "ReadOnlySqlTransaction", "sqlstate": "25006"}
+{"probe": "INSERT", "result": "ReadOnlySqlTransaction", "sqlstate": "25006"}
+{"probe": "UPDATE", "result": "ReadOnlySqlTransaction", "sqlstate": "25006"}
+{"probe": "DELETE", "result": "ReadOnlySqlTransaction", "sqlstate": "25006"}
+{"probe": "DROP", "result": "ReadOnlySqlTransaction", "sqlstate": "25006"}

@@ -1,0 +1,52 @@
+[
+  {
+    "window": "2023",
+    "statuses": [
+      "COMPLETE"
+    ],
+    "objective_count": 1,
+    "sources": [
+      [
+        "PARQUET"
+      ]
+    ],
+    "responses": [
+      "Objective objective-2023-01-01..2023-12-31-dd60bb6f97d64a4a98be0684a048c382: COMPLETE\n- [ACCEPTABLE] statcast-parquet-requirement-a424efa2d6c4424cab4e4a9437a83b39 from parquet-archive: ACCEPTABLE (5 rows): Minor limitations are acceptable for description.\nResult:\nbatter | batter_name | batted_balls | avg_exit_velocity_mph | max_exit_velocity_mph\n-----------------------------------------------------------------------------------\n668800 |  | 3 | 102.3 | 104.9\n443558 |  | 3 | 96.3 | 108.4\n672275 |  | 6 | 95.9 | 101.7\n680574 |  | 8 | 94.9 | 107.8\n641856 |  | 3 | 93.8 | 105.6\n(qualification: >= 3 qualifying batted balls)\nLimitations: Observed coverage is 64% of the required range"
+    ]
+  },
+  {
+    "window": "2025",
+    "statuses": [
+      "COMPLETE"
+    ],
+    "objective_count": 1,
+    "sources": [
+      [
+        "POSTGRES"
+      ]
+    ],
+    "responses": [
+      "Objective objective-2025-01-01..2025-12-31-28776fba564f4ccc940b96f175d7e380: COMPLETE\n- [ACCEPTABLE] statcast-postgres-requirement-fcc292a36cb94dc183b01dd79317c10d from postgres-baseball_analytics: ACCEPTABLE (5 rows): Minor limitations are acceptable for description.\nResult:\nbatter | batter_name | batted_balls | avg_exit_velocity_mph | max_exit_velocity_mph\n-----------------------------------------------------------------------------------\n596142 | S\u00e1nchez, Gary | 3 | 104.3 | 112.4\n683002 | Henderson, Gunnar | 7 | 98.5 | 109.2\n701350 | Anthony, Roman | 3 | 97.8 | 107.7\n672515 | Moreno, Gabriel | 3 | 96.4 | 98.9\n669236 | Jackson, Jeremiah | 3 | 95.2 | 105.0\n(qualification: >= 3 qualifying batted balls)\nLimitations: Observed coverage is 64% of the required range"
+    ]
+  },
+  {
+    "window": "2023 vs 2024",
+    "statuses": [
+      "COMPLETE",
+      "COMPLETE"
+    ],
+    "objective_count": 2,
+    "sources": [
+      [
+        "PARQUET"
+      ],
+      [
+        "POSTGRES"
+      ]
+    ],
+    "responses": [
+      "Objective objective-2023-01-01..2023-12-31-7b218a9886a94189901525787975ffe6: COMPLETE\n- [ACCEPTABLE] statcast-parquet-requirement-dc6fbcbf687a415ba3a1451eb408a848 from parquet-archive: ACCEPTABLE (5 rows): Minor limitations are acceptable for description.\nResult:\nbatter | batter_name | batted_balls | avg_exit_velocity_mph | max_exit_velocity_mph\n-----------------------------------------------------------------------------------\n668800 |  | 3 | 102.3 | 104.9\n443558 |  | 3 | 96.3 | 108.4\n672275 |  | 6 | 95.9 | 101.7\n680574 |  | 8 | 94.9 | 107.8\n641856 |  | 3 | 93.8 | 105.6\n(qualification: >= 3 qualifying batted balls)\n- Exit Velocity: The speed of the ball off the bat, measured in mph by Statcast. Hard-hit is typically 95+ mph; average exit velocity is descriptive and should be paired with launch angle. [authority=OFFICIAL; effective=None..None; verified=VERIFIED; freshness=MENTION_MATCH,TOKEN_OVERLAP,OFFICIAL_SOURCE,FRESH; sources=baseball_savant] (knowledge:METRIC:EXIT_VELOCITY)\nLimitations: Observed coverage is 64% of the required range",
+      "Objective objective-2024-01-01..2024-12-31-cde8feb9fd264e93ae4eeb4b0bf265b9: COMPLETE\n- [ACCEPTABLE] statcast-postgres-requirement-204bb99723e54cf58d5ee51fbeb6f7ce from postgres-baseball_analytics: ACCEPTABLE (5 rows): Minor limitations are acceptable for description.\nResult:\nbatter | batter_name | batted_balls | avg_exit_velocity_mph | max_exit_velocity_mph\n-----------------------------------------------------------------------------------\n671213 | Casas, Triston | 3 | 98.3 | 101.8\n665489 | Guerrero, Vladimir | 4 | 94.7 | 105.0\n657041 | Thomas, Lane | 5 | 94.6 | 100.0\n621020 | Swanson, Dansby | 3 | 93.8 | 96.2\n650559 | De la cruz, Bryan | 8 | 93.7 | 102.6\n(qualification: >= 3 qualifying batted balls)\n- Exit Velocity: The speed of the ball off the bat, measured in mph by Statcast. Hard-hit is typically 95+ mph; average exit velocity is descriptive and should be paired with launch angle. [authority=OFFICIAL; effective=None..None; verified=VERIFIED; freshness=MENTION_MATCH,TOKEN_OVERLAP,OFFICIAL_SOURCE,FRESH; sources=baseball_savant] (knowledge:METRIC:EXIT_VELOCITY)\nLimitations: Observed coverage is 63% of the required range"
+    ]
+  }
+]

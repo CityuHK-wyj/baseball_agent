@@ -1,0 +1,3144 @@
+{
+ "domain": "community",
+ "sources": [
+  {
+   "source_id": "fangraphs",
+   "name": "FanGraphs",
+   "root_url": "https://blogs.fangraphs.com/",
+   "publisher": "",
+   "source_type": "ANALYTICS",
+   "authority_level": "TRUSTED_ANALYTICS",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": "2026-09-15",
+   "active": true,
+   "best_for": [
+    "advanced_metrics",
+    "wrc_plus",
+    "woba",
+    "fwar",
+    "prospects",
+    "analysis"
+   ],
+   "limitations": [],
+   "notes": "feed reachable with a post dated Mon, 14 Sep 2026 22:11:05 +0000"
+  },
+  {
+   "source_id": "baseball_prospectus",
+   "name": "Baseball Prospectus",
+   "root_url": "https://www.baseballprospectus.com/",
+   "publisher": "",
+   "source_type": "ANALYTICS",
+   "authority_level": "TRUSTED_ANALYTICS",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": "2026-09-15",
+   "active": true,
+   "best_for": [
+    "advanced_metrics",
+    "warp",
+    "drc_plus",
+    "prospects",
+    "analysis"
+   ],
+   "limitations": [],
+   "notes": "feed reachable with a post dated Mon, 14 Sep 2026 13:12:27 +0000"
+  },
+  {
+   "source_id": "baseball_america",
+   "name": "Baseball America",
+   "root_url": "https://www.baseballamerica.com/",
+   "publisher": "",
+   "source_type": "MEDIA",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "prospects",
+    "draft",
+    "international_scouting"
+   ],
+   "limitations": [],
+   "notes": "automated request returned HTTP 403; activity not verified"
+  },
+  {
+   "source_id": "pitcher_list",
+   "name": "Pitcher List",
+   "root_url": "https://pitcherlist.com/",
+   "publisher": "",
+   "source_type": "ANALYTICS",
+   "authority_level": "TRUSTED_ANALYTICS",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "pitching",
+    "pitch_design",
+    "fantasy"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "mlb_trade_rumors",
+   "name": "MLB Trade Rumors",
+   "root_url": "https://www.mlbtraderumors.com/",
+   "publisher": "",
+   "source_type": "MEDIA",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": "2026-09-15",
+   "active": true,
+   "best_for": [
+    "transactions",
+    "rumors",
+    "cba_analysis"
+   ],
+   "limitations": [],
+   "notes": "feed reachable with a post dated Tue, 15 Sep 2026 00:40:36 +0000"
+  },
+  {
+   "source_id": "driveline",
+   "name": "Driveline Baseball",
+   "root_url": "https://www.drivelinebaseball.com/",
+   "publisher": "",
+   "source_type": "ANALYTICS",
+   "authority_level": "TRUSTED_ANALYTICS",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "pitching",
+    "player_development",
+    "biomechanics"
+   ],
+   "limitations": [],
+   "notes": "site reachable 2026-09-15; no feed date extracted"
+  },
+  {
+   "source_id": "tread_athletics",
+   "name": "Tread Athletics",
+   "root_url": "https://treadathletics.com/",
+   "publisher": "",
+   "source_type": "ANALYTICS",
+   "authority_level": "TRUSTED_ANALYTICS",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "pitching",
+    "player_development"
+   ],
+   "limitations": [],
+   "notes": "site reachable 2026-09-15; no feed date extracted"
+  },
+  {
+   "source_id": "dodgers_digest",
+   "name": "Dodgers Digest",
+   "root_url": "https://dodgersdigest.com/",
+   "publisher": "",
+   "source_type": "MEDIA",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": "2026-09-15",
+   "active": true,
+   "best_for": [
+    "dodgers",
+    "analysis",
+    "prospects"
+   ],
+   "limitations": [],
+   "notes": "feed reachable with a post dated Tue, 15 Sep 2026 00:58:48 +0000"
+  },
+  {
+   "source_id": "dodgers_nation",
+   "name": "Dodgers Nation",
+   "root_url": "https://dodgersnation.com/",
+   "publisher": "",
+   "source_type": "MEDIA",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "dodgers",
+    "news"
+   ],
+   "limitations": [],
+   "notes": "automated request returned HTTP 403; activity not verified"
+  },
+  {
+   "source_id": "true_blue_la",
+   "name": "True Blue LA",
+   "root_url": "https://www.truebluela.com/",
+   "publisher": "",
+   "source_type": "MEDIA",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": "2026-09-15",
+   "active": true,
+   "best_for": [
+    "dodgers",
+    "analysis"
+   ],
+   "limitations": [],
+   "notes": "feed reachable with a post dated 2026-09-15T01:11:17+00:00"
+  },
+  {
+   "source_id": "dodger_blue",
+   "name": "Dodger Blue",
+   "root_url": "https://dodgerblue.com/",
+   "publisher": "",
+   "source_type": "MEDIA",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": "2026-09-15",
+   "active": true,
+   "best_for": [
+    "dodgers",
+    "news"
+   ],
+   "limitations": [],
+   "notes": "feed reachable with a post dated Tue, 15 Sep 2026 00:56:37 +0000"
+  },
+  {
+   "source_id": "sportsv",
+   "name": "運動視界 Sports Vision",
+   "root_url": "https://www.sportsv.net/",
+   "publisher": "",
+   "source_type": "MEDIA",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "zh",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "mlb",
+    "npb",
+    "cpbl",
+    "analysis"
+   ],
+   "limitations": [],
+   "notes": "site reachable 2026-09-15; no feed date extracted"
+  },
+  {
+   "source_id": "yakyu_cosmopolitan",
+   "name": "Yakyu Cosmopolitan",
+   "root_url": "https://www.yakyucosmo.com/",
+   "publisher": "",
+   "source_type": "MEDIA",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "npb",
+    "japanese_baseball",
+    "mlb_bridge"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "jomboy_media",
+   "name": "Jomboy Media",
+   "root_url": "https://jomboymedia.com/",
+   "publisher": "",
+   "source_type": "VIDEO",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "breakdowns",
+    "news",
+    "culture"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "foolish_baseball",
+   "name": "Foolish Baseball",
+   "root_url": "https://www.youtube.com/@FoolishBaseball",
+   "publisher": "",
+   "source_type": "VIDEO",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "analytics",
+    "history",
+    "player_profiles"
+   ],
+   "limitations": [],
+   "notes": "site reachable 2026-09-15; no feed date extracted"
+  },
+  {
+   "source_id": "pitching_ninja",
+   "name": "Pitching Ninja (Rob Friedman)",
+   "root_url": "https://twitter.com/PitchingNinja",
+   "publisher": "",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "pitching",
+    "pitch_design",
+    "highlights"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "effectively_wild",
+   "name": "Effectively Wild",
+   "root_url": "https://blogs.fangraphs.com/category/effectively-wild/",
+   "publisher": "",
+   "source_type": "PODCAST",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "analysis",
+    "history",
+    "culture"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "cespedes_family_bbq",
+   "name": "Cespedes Family BBQ",
+   "root_url": "https://www.cespedesfamilybbq.com/",
+   "publisher": "",
+   "source_type": "PODCAST",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "culture",
+    "analysis",
+    "interview"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "sabr",
+   "name": "SABR",
+   "root_url": "https://sabr.org/",
+   "publisher": "",
+   "source_type": "REFERENCE",
+   "authority_level": "AUTHORITATIVE_REFERENCE",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "history",
+    "research",
+    "biography",
+    "rules_history"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "the_hardball_times",
+   "name": "The Hardball Times",
+   "root_url": "https://tht.fangraphs.com/",
+   "publisher": "",
+   "source_type": "ANALYTICS",
+   "authority_level": "TRUSTED_ANALYTICS",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "history",
+    "analysis",
+    "sabermetrics"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "just_baseball",
+   "name": "Just Baseball",
+   "root_url": "https://www.justbaseball.com/",
+   "publisher": "",
+   "source_type": "MEDIA",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "analysis",
+    "prospects",
+    "rankings"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "baseball_is_dead",
+   "name": "Baseball Is Dead",
+   "root_url": "https://www.youtube.com/@BaseballIsDead",
+   "publisher": "",
+   "source_type": "VIDEO",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "culture",
+    "analysis"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "talks_baseball",
+   "name": "Talkin' Baseball",
+   "root_url": "https://www.youtube.com/@TalkinBaseball_",
+   "publisher": "",
+   "source_type": "VIDEO",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "news",
+    "culture",
+    "highlights"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "baseball_doesnt_exist",
+   "name": "Baseball Doesn't Exist",
+   "root_url": "https://www.youtube.com/@BaseballDoesntExist",
+   "publisher": "",
+   "source_type": "VIDEO",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "history",
+    "stories"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "fangraphs_prospects",
+   "name": "FanGraphs Prospects",
+   "root_url": "https://blogs.fangraphs.com/category/prospects/",
+   "publisher": "",
+   "source_type": "ANALYTICS",
+   "authority_level": "TRUSTED_ANALYTICS",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "prospects",
+    "rankings",
+    "scouting"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "mlb_pipeline",
+   "name": "MLB Pipeline",
+   "root_url": "https://www.mlb.com/pipeline",
+   "publisher": "",
+   "source_type": "REFERENCE",
+   "authority_level": "OFFICIAL",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "prospects",
+    "draft",
+    "international_signing"
+   ],
+   "limitations": [],
+   "notes": "automated request returned HTTP 403; activity not verified"
+  },
+  {
+   "source_id": "spotrac",
+   "name": "Spotrac",
+   "root_url": "https://www.spotrac.com/mlb/",
+   "publisher": "",
+   "source_type": "ANALYTICS",
+   "authority_level": "TRUSTED_ANALYTICS",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "contracts",
+    "payroll",
+    "cbt"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "reddit_baseball",
+   "name": "r/baseball",
+   "root_url": "https://www.reddit.com/r/baseball/",
+   "publisher": "",
+   "source_type": "FORUM",
+   "authority_level": "COMMUNITY",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "discussion",
+    "sentiment",
+    "fan_terminology"
+   ],
+   "limitations": [],
+   "notes": "automated request returned HTTP 403; activity not verified"
+  },
+  {
+   "source_id": "reddit_dodgers",
+   "name": "r/Dodgers",
+   "root_url": "https://www.reddit.com/r/Dodgers/",
+   "publisher": "",
+   "source_type": "FORUM",
+   "authority_level": "COMMUNITY",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": "2026-09-15",
+   "active": true,
+   "best_for": [
+    "dodgers",
+    "discussion",
+    "sentiment"
+   ],
+   "limitations": [],
+   "notes": "feed reachable with a post dated 2026-09-15T03:13:24+00:00"
+  },
+  {
+   "source_id": "reddit_fantasybaseball",
+   "name": "r/fantasybaseball",
+   "root_url": "https://www.reddit.com/r/fantasybaseball/",
+   "publisher": "",
+   "source_type": "FORUM",
+   "authority_level": "COMMUNITY",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "fantasy",
+    "discussion"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "reddit_npb",
+   "name": "r/NPB",
+   "root_url": "https://www.reddit.com/r/NPB/",
+   "publisher": "",
+   "source_type": "FORUM",
+   "authority_level": "COMMUNITY",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "npb",
+    "japanese_baseball"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "blogs_fangraphs_community",
+   "name": "FanGraphs Community",
+   "root_url": "https://community.fangraphs.com/",
+   "publisher": "",
+   "source_type": "FORUM",
+   "authority_level": "COMMUNITY",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "community_analysis",
+    "sabermetrics"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "the_athletic",
+   "name": "The Athletic (baseball)",
+   "root_url": "https://theathletic.com/",
+   "publisher": "",
+   "source_type": "MEDIA",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "analysis",
+    "beat_reporting",
+    "prospects"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "baseball_reference_bullpen",
+   "name": "Baseball-Reference Bullpen",
+   "root_url": "https://www.baseball-reference.com/bullpen/",
+   "publisher": "",
+   "source_type": "REFERENCE",
+   "authority_level": "AUTHORITATIVE_REFERENCE",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "history",
+    "reference"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "fangraphs_glossary",
+   "name": "FanGraphs Sabermetrics Library",
+   "root_url": "https://library.fangraphs.com/",
+   "publisher": "",
+   "source_type": "GLOSSARY",
+   "authority_level": "TRUSTED_ANALYTICS",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "metric_definitions",
+    "sabermetrics"
+   ],
+   "limitations": [],
+   "notes": "site reachable 2026-09-15; no feed date extracted"
+  },
+  {
+   "source_id": "baseball_savant",
+   "name": "Baseball Savant",
+   "root_url": "https://baseballsavant.mlb.com/",
+   "publisher": "",
+   "source_type": "ANALYTICS",
+   "authority_level": "OFFICIAL",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "statcast",
+    "exit_velocity",
+    "expected_stats",
+    "defense"
+   ],
+   "limitations": [],
+   "notes": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it"
+  },
+  {
+   "source_id": "analyst_eno_sarris",
+   "name": "Eno Sarris",
+   "root_url": "",
+   "publisher": "The Athletic",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "pitching",
+    "Statcast",
+    "player development"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_ben_clemens",
+   "name": "Ben Clemens",
+   "root_url": "",
+   "publisher": "FanGraphs",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "analysis",
+    "metrics"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_dan_szymborski",
+   "name": "Dan Szymborski",
+   "root_url": "",
+   "publisher": "FanGraphs",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "ZiPS projections",
+    "analysis"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_eric_longenhagen",
+   "name": "Eric Longenhagen",
+   "root_url": "",
+   "publisher": "FanGraphs",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "prospect evaluation",
+    "scouting"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_kiley_mcdaniel",
+   "name": "Kiley McDaniel",
+   "root_url": "",
+   "publisher": "ESPN",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "prospects",
+    "draft",
+    "scouting"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_keith_law",
+   "name": "Keith Law",
+   "root_url": "",
+   "publisher": "The Athletic",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "prospects",
+    "scouting"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_jay_jaffe",
+   "name": "Jay Jaffe",
+   "root_url": "",
+   "publisher": "FanGraphs",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "Hall of Fame",
+    "JAWS",
+    "history"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_mike_petriello",
+   "name": "Mike Petriello",
+   "root_url": "",
+   "publisher": "MLB.com",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "Statcast",
+    "research"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_sarah_langs",
+   "name": "Sarah Langs",
+   "root_url": "",
+   "publisher": "MLB.com",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "research",
+    "historical notes"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_alex_chamberlain",
+   "name": "Alex Chamberlain",
+   "root_url": "",
+   "publisher": "FanGraphs",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "pitch data",
+    "pitching"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_lance_brozdowski",
+   "name": "Lance Brozdowski",
+   "root_url": "",
+   "publisher": "independent",
+   "source_type": "SOCIAL",
+   "authority_level": "COMMUNITY",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "pitching",
+    "player development"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_kyle_boddy",
+   "name": "Kyle Boddy",
+   "root_url": "",
+   "publisher": "Driveline",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "pitching",
+    "player development"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "analyst_chris_clegg",
+   "name": "Chris Clegg",
+   "root_url": "",
+   "publisher": "independent",
+   "source_type": "SOCIAL",
+   "authority_level": "COMMUNITY",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "prospects",
+    "fantasy"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "creator_japan_times",
+   "name": "The Japan Times (baseball)",
+   "root_url": "",
+   "publisher": "The Japan Times",
+   "source_type": "SOCIAL",
+   "authority_level": "TRUSTED_MEDIA",
+   "language": "en",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "NPB",
+    "Japanese baseball"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  },
+  {
+   "source_id": "creator_ptt_baseball",
+   "name": "PTT Baseball board",
+   "root_url": "",
+   "publisher": "PTT",
+   "source_type": "SOCIAL",
+   "authority_level": "COMMUNITY",
+   "language": "zh",
+   "refresh_policy": "COMMUNITY",
+   "last_checked": null,
+   "active": true,
+   "best_for": [
+    "Chinese-language baseball discussion"
+   ],
+   "limitations": [],
+   "notes": "public professional identity only; activity not re-verified in the 2026-09-15 sweep"
+  }
+ ],
+ "items": [
+  {
+   "knowledge_id": "COMMUNITY:fangraphs",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:fangraphs",
+   "title": "FanGraphs",
+   "aliases": [],
+   "language": "en",
+   "summary": "FanGraphs covers advanced_metrics, wrc_plus, woba, fwar, prospects, analysis (articles, leaderboards, podcasts).",
+   "structured_payload": {
+    "url": "https://blogs.fangraphs.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "advanced_metrics",
+     "wrc_plus",
+     "woba",
+     "fwar",
+     "prospects",
+     "analysis"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles, leaderboards, podcasts",
+    "activity_status": "active",
+    "activity_evidence": "feed reachable with a post dated Mon, 14 Sep 2026 22:11:05 +0000",
+    "authority_category": "TRUSTED_ANALYTICS"
+   },
+   "entity_refs": [
+    "COMMUNITY:fangraphs"
+   ],
+   "tags": [
+    "community",
+    "analytics"
+   ],
+   "source_refs": [
+    "fangraphs"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:baseball_prospectus",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:baseball_prospectus",
+   "title": "Baseball Prospectus",
+   "aliases": [],
+   "language": "en",
+   "summary": "Baseball Prospectus covers advanced_metrics, warp, drc_plus, prospects, analysis (articles, annual).",
+   "structured_payload": {
+    "url": "https://www.baseballprospectus.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "advanced_metrics",
+     "warp",
+     "drc_plus",
+     "prospects",
+     "analysis"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles, annual",
+    "activity_status": "active",
+    "activity_evidence": "feed reachable with a post dated Mon, 14 Sep 2026 13:12:27 +0000",
+    "authority_category": "TRUSTED_ANALYTICS"
+   },
+   "entity_refs": [
+    "COMMUNITY:baseball_prospectus"
+   ],
+   "tags": [
+    "community",
+    "analytics"
+   ],
+   "source_refs": [
+    "baseball_prospectus"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:baseball_america",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:baseball_america",
+   "title": "Baseball America",
+   "aliases": [],
+   "language": "en",
+   "summary": "Baseball America covers prospects, draft, international_scouting (articles, rankings).",
+   "structured_payload": {
+    "url": "https://www.baseballamerica.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "prospects",
+     "draft",
+     "international_scouting"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles, rankings",
+    "activity_status": "blocked_to_automation",
+    "activity_evidence": "automated request returned HTTP 403; activity not verified",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:baseball_america"
+   ],
+   "tags": [
+    "community",
+    "media"
+   ],
+   "source_refs": [
+    "baseball_america"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:pitcher_list",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:pitcher_list",
+   "title": "Pitcher List",
+   "aliases": [],
+   "language": "en",
+   "summary": "Pitcher List covers pitching, pitch_design, fantasy (articles, rankings).",
+   "structured_payload": {
+    "url": "https://pitcherlist.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "pitching",
+     "pitch_design",
+     "fantasy"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles, rankings",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_ANALYTICS"
+   },
+   "entity_refs": [
+    "COMMUNITY:pitcher_list"
+   ],
+   "tags": [
+    "community",
+    "analytics"
+   ],
+   "source_refs": [
+    "pitcher_list"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:mlb_trade_rumors",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:mlb_trade_rumors",
+   "title": "MLB Trade Rumors",
+   "aliases": [],
+   "language": "en",
+   "summary": "MLB Trade Rumors covers transactions, rumors, cba_analysis (articles).",
+   "structured_payload": {
+    "url": "https://www.mlbtraderumors.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "transactions",
+     "rumors",
+     "cba_analysis"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles",
+    "activity_status": "active",
+    "activity_evidence": "feed reachable with a post dated Tue, 15 Sep 2026 00:40:36 +0000",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:mlb_trade_rumors"
+   ],
+   "tags": [
+    "community",
+    "media"
+   ],
+   "source_refs": [
+    "mlb_trade_rumors"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:driveline",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:driveline",
+   "title": "Driveline Baseball",
+   "aliases": [],
+   "language": "en",
+   "summary": "Driveline Baseball covers pitching, player_development, biomechanics (research, training).",
+   "structured_payload": {
+    "url": "https://www.drivelinebaseball.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "pitching",
+     "player_development",
+     "biomechanics"
+    ],
+    "teams_covered": [
+     "MLB-wide",
+     "amateur"
+    ],
+    "language": "en",
+    "content_type": "research, training",
+    "activity_status": "reachable",
+    "activity_evidence": "site reachable 2026-09-15; no feed date extracted",
+    "authority_category": "TRUSTED_ANALYTICS"
+   },
+   "entity_refs": [
+    "COMMUNITY:driveline"
+   ],
+   "tags": [
+    "community",
+    "analytics"
+   ],
+   "source_refs": [
+    "driveline"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:tread_athletics",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:tread_athletics",
+   "title": "Tread Athletics",
+   "aliases": [],
+   "language": "en",
+   "summary": "Tread Athletics covers pitching, player_development (training, research).",
+   "structured_payload": {
+    "url": "https://treadathletics.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "pitching",
+     "player_development"
+    ],
+    "teams_covered": [
+     "MLB-wide",
+     "amateur"
+    ],
+    "language": "en",
+    "content_type": "training, research",
+    "activity_status": "reachable",
+    "activity_evidence": "site reachable 2026-09-15; no feed date extracted",
+    "authority_category": "TRUSTED_ANALYTICS"
+   },
+   "entity_refs": [
+    "COMMUNITY:tread_athletics"
+   ],
+   "tags": [
+    "community",
+    "analytics"
+   ],
+   "source_refs": [
+    "tread_athletics"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:dodgers_digest",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:dodgers_digest",
+   "title": "Dodgers Digest",
+   "aliases": [],
+   "language": "en",
+   "summary": "Dodgers Digest covers dodgers, analysis, prospects (articles, podcast).",
+   "structured_payload": {
+    "url": "https://dodgersdigest.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "dodgers",
+     "analysis",
+     "prospects"
+    ],
+    "teams_covered": [
+     "LAD"
+    ],
+    "language": "en",
+    "content_type": "articles, podcast",
+    "activity_status": "active",
+    "activity_evidence": "feed reachable with a post dated Tue, 15 Sep 2026 00:58:48 +0000",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:dodgers_digest"
+   ],
+   "tags": [
+    "community",
+    "media"
+   ],
+   "source_refs": [
+    "dodgers_digest"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:dodgers_nation",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:dodgers_nation",
+   "title": "Dodgers Nation",
+   "aliases": [],
+   "language": "en",
+   "summary": "Dodgers Nation covers dodgers, news (articles).",
+   "structured_payload": {
+    "url": "https://dodgersnation.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "dodgers",
+     "news"
+    ],
+    "teams_covered": [
+     "LAD"
+    ],
+    "language": "en",
+    "content_type": "articles",
+    "activity_status": "blocked_to_automation",
+    "activity_evidence": "automated request returned HTTP 403; activity not verified",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:dodgers_nation"
+   ],
+   "tags": [
+    "community",
+    "media"
+   ],
+   "source_refs": [
+    "dodgers_nation"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:true_blue_la",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:true_blue_la",
+   "title": "True Blue LA",
+   "aliases": [],
+   "language": "en",
+   "summary": "True Blue LA covers dodgers, analysis (articles, community).",
+   "structured_payload": {
+    "url": "https://www.truebluela.com/",
+    "platform": "SB Nation",
+    "publisher": "",
+    "main_topics": [
+     "dodgers",
+     "analysis"
+    ],
+    "teams_covered": [
+     "LAD"
+    ],
+    "language": "en",
+    "content_type": "articles, community",
+    "activity_status": "active",
+    "activity_evidence": "feed reachable with a post dated 2026-09-15T01:11:17+00:00",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:true_blue_la"
+   ],
+   "tags": [
+    "community",
+    "media"
+   ],
+   "source_refs": [
+    "true_blue_la"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:dodger_blue",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:dodger_blue",
+   "title": "Dodger Blue",
+   "aliases": [],
+   "language": "en",
+   "summary": "Dodger Blue covers dodgers, news (articles).",
+   "structured_payload": {
+    "url": "https://dodgerblue.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "dodgers",
+     "news"
+    ],
+    "teams_covered": [
+     "LAD"
+    ],
+    "language": "en",
+    "content_type": "articles",
+    "activity_status": "active",
+    "activity_evidence": "feed reachable with a post dated Tue, 15 Sep 2026 00:56:37 +0000",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:dodger_blue"
+   ],
+   "tags": [
+    "community",
+    "media"
+   ],
+   "source_refs": [
+    "dodger_blue"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:sportsv",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:sportsv",
+   "title": "運動視界 Sports Vision",
+   "aliases": [],
+   "language": "zh",
+   "summary": "運動視界 Sports Vision covers mlb, npb, cpbl, analysis (articles).",
+   "structured_payload": {
+    "url": "https://www.sportsv.net/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "mlb",
+     "npb",
+     "cpbl",
+     "analysis"
+    ],
+    "teams_covered": [
+     "MLB-wide",
+     "NPB",
+     "CPBL"
+    ],
+    "language": "zh",
+    "content_type": "articles",
+    "activity_status": "reachable",
+    "activity_evidence": "site reachable 2026-09-15; no feed date extracted",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:sportsv"
+   ],
+   "tags": [
+    "community",
+    "media"
+   ],
+   "source_refs": [
+    "sportsv"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:yakyu_cosmopolitan",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:yakyu_cosmopolitan",
+   "title": "Yakyu Cosmopolitan",
+   "aliases": [],
+   "language": "en",
+   "summary": "Yakyu Cosmopolitan covers npb, japanese_baseball, mlb_bridge (articles, newsletter).",
+   "structured_payload": {
+    "url": "https://www.yakyucosmo.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "npb",
+     "japanese_baseball",
+     "mlb_bridge"
+    ],
+    "teams_covered": [
+     "NPB",
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles, newsletter",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:yakyu_cosmopolitan"
+   ],
+   "tags": [
+    "community",
+    "media"
+   ],
+   "source_refs": [
+    "yakyu_cosmopolitan"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:jomboy_media",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:jomboy_media",
+   "title": "Jomboy Media",
+   "aliases": [],
+   "language": "en",
+   "summary": "Jomboy Media covers breakdowns, news, culture (video, podcast).",
+   "structured_payload": {
+    "url": "https://jomboymedia.com/",
+    "platform": "YouTube",
+    "publisher": "",
+    "main_topics": [
+     "breakdowns",
+     "news",
+     "culture"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "video, podcast",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:jomboy_media"
+   ],
+   "tags": [
+    "community",
+    "video"
+   ],
+   "source_refs": [
+    "jomboy_media"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:foolish_baseball",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:foolish_baseball",
+   "title": "Foolish Baseball",
+   "aliases": [],
+   "language": "en",
+   "summary": "Foolish Baseball covers analytics, history, player_profiles (video essays).",
+   "structured_payload": {
+    "url": "https://www.youtube.com/@FoolishBaseball",
+    "platform": "YouTube",
+    "publisher": "",
+    "main_topics": [
+     "analytics",
+     "history",
+     "player_profiles"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "video essays",
+    "activity_status": "reachable",
+    "activity_evidence": "site reachable 2026-09-15; no feed date extracted",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:foolish_baseball"
+   ],
+   "tags": [
+    "community",
+    "video"
+   ],
+   "source_refs": [
+    "foolish_baseball"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:pitching_ninja",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:pitching_ninja",
+   "title": "Pitching Ninja (Rob Friedman)",
+   "aliases": [],
+   "language": "en",
+   "summary": "Pitching Ninja (Rob Friedman) covers pitching, pitch_design, highlights (video clips, analysis).",
+   "structured_payload": {
+    "url": "https://twitter.com/PitchingNinja",
+    "platform": "X/Twitter, YouTube",
+    "publisher": "",
+    "main_topics": [
+     "pitching",
+     "pitch_design",
+     "highlights"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "video clips, analysis",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:pitching_ninja"
+   ],
+   "tags": [
+    "community",
+    "social"
+   ],
+   "source_refs": [
+    "pitching_ninja"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:effectively_wild",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:effectively_wild",
+   "title": "Effectively Wild",
+   "aliases": [],
+   "language": "en",
+   "summary": "Effectively Wild covers analysis, history, culture (podcast).",
+   "structured_payload": {
+    "url": "https://blogs.fangraphs.com/category/effectively-wild/",
+    "platform": "podcast",
+    "publisher": "",
+    "main_topics": [
+     "analysis",
+     "history",
+     "culture"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "podcast",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:effectively_wild"
+   ],
+   "tags": [
+    "community",
+    "podcast"
+   ],
+   "source_refs": [
+    "effectively_wild"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:cespedes_family_bbq",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:cespedes_family_bbq",
+   "title": "Cespedes Family BBQ",
+   "aliases": [],
+   "language": "en",
+   "summary": "Cespedes Family BBQ covers culture, analysis, interview (podcast).",
+   "structured_payload": {
+    "url": "https://www.cespedesfamilybbq.com/",
+    "platform": "podcast",
+    "publisher": "",
+    "main_topics": [
+     "culture",
+     "analysis",
+     "interview"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "podcast",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:cespedes_family_bbq"
+   ],
+   "tags": [
+    "community",
+    "podcast"
+   ],
+   "source_refs": [
+    "cespedes_family_bbq"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:sabr",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:sabr",
+   "title": "SABR",
+   "aliases": [],
+   "language": "en",
+   "summary": "SABR covers history, research, biography, rules_history (research articles, journals).",
+   "structured_payload": {
+    "url": "https://sabr.org/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "history",
+     "research",
+     "biography",
+     "rules_history"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "research articles, journals",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "AUTHORITATIVE_REFERENCE"
+   },
+   "entity_refs": [
+    "COMMUNITY:sabr"
+   ],
+   "tags": [
+    "community",
+    "reference"
+   ],
+   "source_refs": [
+    "sabr"
+   ],
+   "source_authority": "AUTHORITATIVE_REFERENCE",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:the_hardball_times",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:the_hardball_times",
+   "title": "The Hardball Times",
+   "aliases": [],
+   "language": "en",
+   "summary": "The Hardball Times covers history, analysis, sabermetrics (articles).",
+   "structured_payload": {
+    "url": "https://tht.fangraphs.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "history",
+     "analysis",
+     "sabermetrics"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_ANALYTICS"
+   },
+   "entity_refs": [
+    "COMMUNITY:the_hardball_times"
+   ],
+   "tags": [
+    "community",
+    "analytics"
+   ],
+   "source_refs": [
+    "the_hardball_times"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:just_baseball",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:just_baseball",
+   "title": "Just Baseball",
+   "aliases": [],
+   "language": "en",
+   "summary": "Just Baseball covers analysis, prospects, rankings (articles, video).",
+   "structured_payload": {
+    "url": "https://www.justbaseball.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "analysis",
+     "prospects",
+     "rankings"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles, video",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:just_baseball"
+   ],
+   "tags": [
+    "community",
+    "media"
+   ],
+   "source_refs": [
+    "just_baseball"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:baseball_is_dead",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:baseball_is_dead",
+   "title": "Baseball Is Dead",
+   "aliases": [],
+   "language": "en",
+   "summary": "Baseball Is Dead covers culture, analysis (video, podcast).",
+   "structured_payload": {
+    "url": "https://www.youtube.com/@BaseballIsDead",
+    "platform": "YouTube",
+    "publisher": "",
+    "main_topics": [
+     "culture",
+     "analysis"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "video, podcast",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:baseball_is_dead"
+   ],
+   "tags": [
+    "community",
+    "video"
+   ],
+   "source_refs": [
+    "baseball_is_dead"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:talks_baseball",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:talks_baseball",
+   "title": "Talkin' Baseball",
+   "aliases": [],
+   "language": "en",
+   "summary": "Talkin' Baseball covers news, culture, highlights (video).",
+   "structured_payload": {
+    "url": "https://www.youtube.com/@TalkinBaseball_",
+    "platform": "YouTube",
+    "publisher": "",
+    "main_topics": [
+     "news",
+     "culture",
+     "highlights"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "video",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:talks_baseball"
+   ],
+   "tags": [
+    "community",
+    "video"
+   ],
+   "source_refs": [
+    "talks_baseball"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:baseball_doesnt_exist",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:baseball_doesnt_exist",
+   "title": "Baseball Doesn't Exist",
+   "aliases": [],
+   "language": "en",
+   "summary": "Baseball Doesn't Exist covers history, stories (video essays).",
+   "structured_payload": {
+    "url": "https://www.youtube.com/@BaseballDoesntExist",
+    "platform": "YouTube",
+    "publisher": "",
+    "main_topics": [
+     "history",
+     "stories"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "video essays",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:baseball_doesnt_exist"
+   ],
+   "tags": [
+    "community",
+    "video"
+   ],
+   "source_refs": [
+    "baseball_doesnt_exist"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:fangraphs_prospects",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:fangraphs_prospects",
+   "title": "FanGraphs Prospects",
+   "aliases": [],
+   "language": "en",
+   "summary": "FanGraphs Prospects covers prospects, rankings, scouting (articles, rankings).",
+   "structured_payload": {
+    "url": "https://blogs.fangraphs.com/category/prospects/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "prospects",
+     "rankings",
+     "scouting"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles, rankings",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_ANALYTICS"
+   },
+   "entity_refs": [
+    "COMMUNITY:fangraphs_prospects"
+   ],
+   "tags": [
+    "community",
+    "analytics"
+   ],
+   "source_refs": [
+    "fangraphs_prospects"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:mlb_pipeline",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:mlb_pipeline",
+   "title": "MLB Pipeline",
+   "aliases": [],
+   "language": "en",
+   "summary": "MLB Pipeline covers prospects, draft, international_signing (articles, rankings).",
+   "structured_payload": {
+    "url": "https://www.mlb.com/pipeline",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "prospects",
+     "draft",
+     "international_signing"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles, rankings",
+    "activity_status": "blocked_to_automation",
+    "activity_evidence": "automated request returned HTTP 403; activity not verified",
+    "authority_category": "OFFICIAL"
+   },
+   "entity_refs": [
+    "COMMUNITY:mlb_pipeline"
+   ],
+   "tags": [
+    "community",
+    "reference"
+   ],
+   "source_refs": [
+    "mlb_pipeline"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:spotrac",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:spotrac",
+   "title": "Spotrac",
+   "aliases": [],
+   "language": "en",
+   "summary": "Spotrac covers contracts, payroll, cbt (contract data).",
+   "structured_payload": {
+    "url": "https://www.spotrac.com/mlb/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "contracts",
+     "payroll",
+     "cbt"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "contract data",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_ANALYTICS"
+   },
+   "entity_refs": [
+    "COMMUNITY:spotrac"
+   ],
+   "tags": [
+    "community",
+    "analytics"
+   ],
+   "source_refs": [
+    "spotrac"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:reddit_baseball",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:reddit_baseball",
+   "title": "r/baseball",
+   "aliases": [],
+   "language": "en",
+   "summary": "r/baseball covers discussion, sentiment, fan_terminology (discussion).",
+   "structured_payload": {
+    "url": "https://www.reddit.com/r/baseball/",
+    "platform": "Reddit",
+    "publisher": "",
+    "main_topics": [
+     "discussion",
+     "sentiment",
+     "fan_terminology"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "discussion",
+    "activity_status": "blocked_to_automation",
+    "activity_evidence": "automated request returned HTTP 403; activity not verified",
+    "authority_category": "COMMUNITY"
+   },
+   "entity_refs": [
+    "COMMUNITY:reddit_baseball"
+   ],
+   "tags": [
+    "community",
+    "forum"
+   ],
+   "source_refs": [
+    "reddit_baseball"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:reddit_dodgers",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:reddit_dodgers",
+   "title": "r/Dodgers",
+   "aliases": [],
+   "language": "en",
+   "summary": "r/Dodgers covers dodgers, discussion, sentiment (discussion).",
+   "structured_payload": {
+    "url": "https://www.reddit.com/r/Dodgers/",
+    "platform": "Reddit",
+    "publisher": "",
+    "main_topics": [
+     "dodgers",
+     "discussion",
+     "sentiment"
+    ],
+    "teams_covered": [
+     "LAD"
+    ],
+    "language": "en",
+    "content_type": "discussion",
+    "activity_status": "active",
+    "activity_evidence": "feed reachable with a post dated 2026-09-15T03:13:24+00:00",
+    "authority_category": "COMMUNITY"
+   },
+   "entity_refs": [
+    "COMMUNITY:reddit_dodgers"
+   ],
+   "tags": [
+    "community",
+    "forum"
+   ],
+   "source_refs": [
+    "reddit_dodgers"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:reddit_fantasybaseball",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:reddit_fantasybaseball",
+   "title": "r/fantasybaseball",
+   "aliases": [],
+   "language": "en",
+   "summary": "r/fantasybaseball covers fantasy, discussion (discussion).",
+   "structured_payload": {
+    "url": "https://www.reddit.com/r/fantasybaseball/",
+    "platform": "Reddit",
+    "publisher": "",
+    "main_topics": [
+     "fantasy",
+     "discussion"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "discussion",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "COMMUNITY"
+   },
+   "entity_refs": [
+    "COMMUNITY:reddit_fantasybaseball"
+   ],
+   "tags": [
+    "community",
+    "forum"
+   ],
+   "source_refs": [
+    "reddit_fantasybaseball"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:reddit_npb",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:reddit_npb",
+   "title": "r/NPB",
+   "aliases": [],
+   "language": "en",
+   "summary": "r/NPB covers npb, japanese_baseball (discussion).",
+   "structured_payload": {
+    "url": "https://www.reddit.com/r/NPB/",
+    "platform": "Reddit",
+    "publisher": "",
+    "main_topics": [
+     "npb",
+     "japanese_baseball"
+    ],
+    "teams_covered": [
+     "NPB"
+    ],
+    "language": "en",
+    "content_type": "discussion",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "COMMUNITY"
+   },
+   "entity_refs": [
+    "COMMUNITY:reddit_npb"
+   ],
+   "tags": [
+    "community",
+    "forum"
+   ],
+   "source_refs": [
+    "reddit_npb"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:blogs_fangraphs_community",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:blogs_fangraphs_community",
+   "title": "FanGraphs Community",
+   "aliases": [],
+   "language": "en",
+   "summary": "FanGraphs Community covers community_analysis, sabermetrics (community blogs).",
+   "structured_payload": {
+    "url": "https://community.fangraphs.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "community_analysis",
+     "sabermetrics"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "community blogs",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "COMMUNITY"
+   },
+   "entity_refs": [
+    "COMMUNITY:blogs_fangraphs_community"
+   ],
+   "tags": [
+    "community",
+    "forum"
+   ],
+   "source_refs": [
+    "blogs_fangraphs_community"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:the_athletic",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:the_athletic",
+   "title": "The Athletic (baseball)",
+   "aliases": [],
+   "language": "en",
+   "summary": "The Athletic (baseball) covers analysis, beat_reporting, prospects (articles).",
+   "structured_payload": {
+    "url": "https://theathletic.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "analysis",
+     "beat_reporting",
+     "prospects"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "TRUSTED_MEDIA"
+   },
+   "entity_refs": [
+    "COMMUNITY:the_athletic"
+   ],
+   "tags": [
+    "community",
+    "media"
+   ],
+   "source_refs": [
+    "the_athletic"
+   ],
+   "source_authority": "TRUSTED_MEDIA",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:baseball_reference_bullpen",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:baseball_reference_bullpen",
+   "title": "Baseball-Reference Bullpen",
+   "aliases": [],
+   "language": "en",
+   "summary": "Baseball-Reference Bullpen covers history, reference (encyclopedia).",
+   "structured_payload": {
+    "url": "https://www.baseball-reference.com/bullpen/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "history",
+     "reference"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "encyclopedia",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "AUTHORITATIVE_REFERENCE"
+   },
+   "entity_refs": [
+    "COMMUNITY:baseball_reference_bullpen"
+   ],
+   "tags": [
+    "community",
+    "reference"
+   ],
+   "source_refs": [
+    "baseball_reference_bullpen"
+   ],
+   "source_authority": "AUTHORITATIVE_REFERENCE",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:fangraphs_glossary",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:fangraphs_glossary",
+   "title": "FanGraphs Sabermetrics Library",
+   "aliases": [],
+   "language": "en",
+   "summary": "FanGraphs Sabermetrics Library covers metric_definitions, sabermetrics (reference).",
+   "structured_payload": {
+    "url": "https://library.fangraphs.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "metric_definitions",
+     "sabermetrics"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "reference",
+    "activity_status": "reachable",
+    "activity_evidence": "site reachable 2026-09-15; no feed date extracted",
+    "authority_category": "TRUSTED_ANALYTICS"
+   },
+   "entity_refs": [
+    "COMMUNITY:fangraphs_glossary"
+   ],
+   "tags": [
+    "community",
+    "glossary"
+   ],
+   "source_refs": [
+    "fangraphs_glossary"
+   ],
+   "source_authority": "TRUSTED_ANALYTICS",
+   "as_of": "2026-09-15",
+   "last_verified_at": "2026-09-15T00:00:00+00:00",
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "VERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:baseball_savant",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:baseball_savant",
+   "title": "Baseball Savant",
+   "aliases": [],
+   "language": "en",
+   "summary": "Baseball Savant covers statcast, exit_velocity, expected_stats, defense (data, leaderboards).",
+   "structured_payload": {
+    "url": "https://baseballsavant.mlb.com/",
+    "platform": "website",
+    "publisher": "",
+    "main_topics": [
+     "statcast",
+     "exit_velocity",
+     "expected_stats",
+     "defense"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "data, leaderboards",
+    "activity_status": "unverified",
+    "activity_evidence": "reachability sweep on 2026-09-15 returned 'ConnectTimeout'; re-verify before relying on it",
+    "authority_category": "OFFICIAL"
+   },
+   "entity_refs": [
+    "COMMUNITY:baseball_savant"
+   ],
+   "tags": [
+    "community",
+    "analytics"
+   ],
+   "source_refs": [
+    "baseball_savant"
+   ],
+   "source_authority": "OFFICIAL",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_eno_sarris",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_eno_sarris",
+   "title": "Eno Sarris",
+   "aliases": [],
+   "language": "en",
+   "summary": "Eno Sarris (The Athletic) covers pitching, Statcast, player development.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "The Athletic",
+    "main_topics": [
+     "pitching",
+     "Statcast",
+     "player development"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_eno_sarris"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_eno_sarris"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_ben_clemens",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_ben_clemens",
+   "title": "Ben Clemens",
+   "aliases": [],
+   "language": "en",
+   "summary": "Ben Clemens (FanGraphs) covers analysis, metrics.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "FanGraphs",
+    "main_topics": [
+     "analysis",
+     "metrics"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_ben_clemens"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_ben_clemens"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_dan_szymborski",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_dan_szymborski",
+   "title": "Dan Szymborski",
+   "aliases": [],
+   "language": "en",
+   "summary": "Dan Szymborski (FanGraphs) covers ZiPS projections, analysis.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "FanGraphs",
+    "main_topics": [
+     "ZiPS projections",
+     "analysis"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_dan_szymborski"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_dan_szymborski"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_eric_longenhagen",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_eric_longenhagen",
+   "title": "Eric Longenhagen",
+   "aliases": [],
+   "language": "en",
+   "summary": "Eric Longenhagen (FanGraphs) covers prospect evaluation, scouting.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "FanGraphs",
+    "main_topics": [
+     "prospect evaluation",
+     "scouting"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_eric_longenhagen"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_eric_longenhagen"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_kiley_mcdaniel",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_kiley_mcdaniel",
+   "title": "Kiley McDaniel",
+   "aliases": [],
+   "language": "en",
+   "summary": "Kiley McDaniel (ESPN) covers prospects, draft, scouting.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "ESPN",
+    "main_topics": [
+     "prospects",
+     "draft",
+     "scouting"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_kiley_mcdaniel"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_kiley_mcdaniel"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_keith_law",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_keith_law",
+   "title": "Keith Law",
+   "aliases": [],
+   "language": "en",
+   "summary": "Keith Law (The Athletic) covers prospects, scouting.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "The Athletic",
+    "main_topics": [
+     "prospects",
+     "scouting"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_keith_law"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_keith_law"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_jay_jaffe",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_jay_jaffe",
+   "title": "Jay Jaffe",
+   "aliases": [],
+   "language": "en",
+   "summary": "Jay Jaffe (FanGraphs) covers Hall of Fame, JAWS, history.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "FanGraphs",
+    "main_topics": [
+     "Hall of Fame",
+     "JAWS",
+     "history"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_jay_jaffe"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_jay_jaffe"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_mike_petriello",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_mike_petriello",
+   "title": "Mike Petriello",
+   "aliases": [],
+   "language": "en",
+   "summary": "Mike Petriello (MLB.com) covers Statcast, research.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "MLB.com",
+    "main_topics": [
+     "Statcast",
+     "research"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_mike_petriello"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_mike_petriello"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_sarah_langs",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_sarah_langs",
+   "title": "Sarah Langs",
+   "aliases": [],
+   "language": "en",
+   "summary": "Sarah Langs (MLB.com) covers research, historical notes.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "MLB.com",
+    "main_topics": [
+     "research",
+     "historical notes"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_sarah_langs"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_sarah_langs"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_alex_chamberlain",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_alex_chamberlain",
+   "title": "Alex Chamberlain",
+   "aliases": [],
+   "language": "en",
+   "summary": "Alex Chamberlain (FanGraphs) covers pitch data, pitching.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "FanGraphs",
+    "main_topics": [
+     "pitch data",
+     "pitching"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_alex_chamberlain"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_alex_chamberlain"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_lance_brozdowski",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_lance_brozdowski",
+   "title": "Lance Brozdowski",
+   "aliases": [],
+   "language": "en",
+   "summary": "Lance Brozdowski (independent) covers pitching, player development.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "independent",
+    "main_topics": [
+     "pitching",
+     "player development"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_lance_brozdowski"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_lance_brozdowski"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_kyle_boddy",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_kyle_boddy",
+   "title": "Kyle Boddy",
+   "aliases": [],
+   "language": "en",
+   "summary": "Kyle Boddy (Driveline) covers pitching, player development.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "Driveline",
+    "main_topics": [
+     "pitching",
+     "player development"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_kyle_boddy"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_kyle_boddy"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:analyst_chris_clegg",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:analyst_chris_clegg",
+   "title": "Chris Clegg",
+   "aliases": [],
+   "language": "en",
+   "summary": "Chris Clegg (independent) covers prospects, fantasy.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "independent",
+    "main_topics": [
+     "prospects",
+     "fantasy"
+    ],
+    "teams_covered": [
+     "MLB-wide"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:analyst_chris_clegg"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "analyst_chris_clegg"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:creator_japan_times",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:creator_japan_times",
+   "title": "The Japan Times (baseball)",
+   "aliases": [],
+   "language": "en",
+   "summary": "The Japan Times (baseball) (The Japan Times) covers NPB, Japanese baseball.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "The Japan Times",
+    "main_topics": [
+     "NPB",
+     "Japanese baseball"
+    ],
+    "teams_covered": [
+     "NPB"
+    ],
+    "language": "en",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:creator_japan_times"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "creator_japan_times"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  },
+  {
+   "knowledge_id": "COMMUNITY:creator_ptt_baseball",
+   "knowledge_type": "COMMUNITY_CREATOR",
+   "canonical_key": "community:creator_ptt_baseball",
+   "title": "PTT Baseball board",
+   "aliases": [],
+   "language": "zh",
+   "summary": "PTT Baseball board (PTT) covers Chinese-language baseball discussion.",
+   "structured_payload": {
+    "url": "",
+    "platform": "public web/social",
+    "publisher": "PTT",
+    "main_topics": [
+     "Chinese-language baseball discussion"
+    ],
+    "teams_covered": [
+     "MLB-wide",
+     "CPBL"
+    ],
+    "language": "zh",
+    "content_type": "articles / posts",
+    "activity_status": "unverified",
+    "activity_evidence": "not probed in the 2026-09-15 sweep",
+    "authority_category": "community_creator"
+   },
+   "entity_refs": [
+    "COMMUNITY:creator_ptt_baseball"
+   ],
+   "tags": [
+    "community",
+    "individual"
+   ],
+   "source_refs": [
+    "creator_ptt_baseball"
+   ],
+   "source_authority": "COMMUNITY",
+   "as_of": "2026-09-15",
+   "last_verified_at": null,
+   "freshness_policy": "COMMUNITY",
+   "verification_status": "UNVERIFIED",
+   "status": "ACTIVE"
+  }
+ ],
+ "relations": []
+}

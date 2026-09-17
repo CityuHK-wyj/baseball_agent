@@ -1,0 +1,6 @@
+{"runtime": [["baseball_readonly", "on"]]}
+{"probe": "CREATE", "result": "ReadOnlySqlTransaction", "sqlstate": "25006"}
+{"probe": "INSERT", "result": "ReadOnlySqlTransaction", "sqlstate": "25006"}
+{"probe": "UPDATE", "result": "ReadOnlySqlTransaction", "sqlstate": "25006"}
+{"probe": "DELETE", "result": "ReadOnlySqlTransaction", "sqlstate": "25006"}
+{"probe": "DROP", "result": "ReadOnlySqlTransaction", "sqlstate": "25006"}

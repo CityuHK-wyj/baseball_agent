@@ -1,0 +1,6 @@
+[PASS] config.llm: credential present; extractor=deepseek-chat reviewer=deepseek-chat
+[PASS] postgres.readonly: host=127.0.0.1:5433 db=baseball_analytics user=baseball_readonly read_only=on statcast_rows=2196186
+[PASS] parquet.archive: 9 files; mlb_statcast_2023.parquet rows=754636
+[PASS] knowledge.store: 605 items at /home/158112/baseball_agent/baseball_agent/.runtime/knowledge.db
+[PASS] llm.reachability: reachable models: deepseek-chat
+RESULT: PASS
