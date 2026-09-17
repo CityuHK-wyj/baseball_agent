@@ -1,35 +1,50 @@
-# Artifact Runtime (v0.3)
+# Artifact Runtime (v0.4)
 
-> Flexible cognition, composable evidence, deterministic actions.
+> Flexible cognition, composable evidence, deterministic actions, frozen invariants.
 
-The artifact runtime is the center of Baseball Agent v0.3. It replaces the
+The artifact runtime is the center of Baseball Agent. It replaces the
 `SemanticCandidate` / `Requirement -> Tool` center with a Goal → Need graph → Planner →
 Tool → Artifact → references → re-plan → Sufficiency judge → Response loop.
 
 Code lives under `app/artifact_runtime/`, contracts under `app/models/artifact_runtime.py`.
-The decision record is `docs/adr/0025-artifact-runtime.md`.
+Decision records: `docs/adr/0025-artifact-runtime.md` (v0.3 direction) and
+`docs/adr/0026-v0.4-runtime-invariants.md` (frozen correctness rules).
 
 ## Architecture
 
 ```
-Conversation
-   ↓  ReferenceStore (user message, spans, conversation messages)
-Goal
-   ↓  Need graph (dynamic, dependency-ordered)
-Planner  ──────────────────────────────────────────────┐
-   ↓  ToolRequest (objective + input_refs + structured) │ re-evaluation
-Tool / Compute                                          │
-   ↓                                                     │
-Artifact (exports + provenance + requested/actual scope)│
-   ↓  Artifact references                                │
-Planner re-evaluation ───────────────────────────────────┘
+Interaction / Conversation
+   ↓  ReferenceStore (user message, spans, clarification Q/A)
+Goal understanding
    ↓
-Coverage / Sufficiency judge
+Immutable User Obligations  (frozen baseline)
    ↓
-Claims (support_refs)
+Planner
    ↓
-Response composer
+Need / Artifact graph  (dependencies + explicit input bindings)
+   ↓
+Action Admission  (truthful capability + budget)
+   ↓
+Tools / Data / Web / ACTIVE Knowledge / Compute
+   ↓
+ToolOutcome  (durable taxonomy; every attempt has an outcome)
+   ↓
+Artifact + References  (typed/versioned exports)
+   ↓
+Deterministic Validation  (Safe IR + SchemaCatalog + AST guard)
+   ↓
+Scope Verification  (Requested / Declared / Verified)
+   ↓
+Independent Judge  (contextual; runs on every candidate)
+   ↓
+Need / Goal State Projection
+   ├── insufficient  → Planner re-plan (gaps + attempts)
+   └── sufficient/limited → Grounded Claims → Response
 ```
+
+Cross-cutting: Safe Analytical IR, SchemaCatalog, read-only SQL / DuckDB, permissions and
+budget, durable persistence, redacted observability (append-only event journal), Shared
+Knowledge governance.
 
 ## Goal model
 
