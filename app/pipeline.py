@@ -44,6 +44,9 @@ class PipelineResult(ArtifactContract):
     responses: tuple[str, ...] = ()
     response_packages: tuple[ResponsePackage, ...] = ()
     runs: tuple[RunResult, ...] = ()
+    # Bounded, structured semantic observability: extractor, parser version, fallback
+    # reason and the constraint summary. Never raw model text or credentials.
+    semantic_trace: tuple[str, ...] = ()
 
 
 ToolFactory = Callable[[tuple[ArtifactRequirement, ...]], Tool]
@@ -102,6 +105,7 @@ class AnalysisPipeline:
         if run_id is not None and self._recorder is not None and self._recorder.has_run(run_id):
             raise ValueError("Run already exists; answer its pending request or inspect resume state")
         semantic = self._semantic.normalize(raw_query, constraints=constraints, mentions=mentions)
+        trace = semantic.notes
         if semantic.needs_clarification:
             effective_run_id = run_id or self._id_factory("run")
             if self._recorder is not None:
@@ -113,11 +117,13 @@ class AnalysisPipeline:
                                           pending_request_refs=(request.clarification_id,))
             return PipelineResult(raw_query=raw_query, needs_clarification=True,
                                   clarifications=semantic.clarifications,
-                                  objectives=semantic.objectives, run_ids=(effective_run_id,))
+                                  objectives=semantic.objectives, run_ids=(effective_run_id,),
+                                  semantic_trace=trace)
         if not semantic.objectives:
-            return PipelineResult(raw_query=raw_query)
+            return PipelineResult(raw_query=raw_query, semantic_trace=trace)
 
-        return self._prepare_objectives(raw_query, semantic.objectives, run_id)
+        return self._prepare_objectives(raw_query, semantic.objectives, run_id).model_copy(
+            update={"semantic_trace": trace})
 
     def _prepare_objectives(self, raw_query: str, objectives: tuple[AnalysisObjective, ...],
                             run_id: str | None) -> PipelineResult:

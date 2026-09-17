@@ -26,25 +26,44 @@ class SemanticNormalizer:
     def __init__(self, extractor: ObjectiveExtractor, entity_resolver: EntityResolver,
                  dictionary: EntityDictionary | None = None,
                  id_factory: Callable[[str], str] | None = None,
-                 today: Callable[[], date] = date.today) -> None:
+                 today: Callable[[], date] = date.today,
+                 semantic_parser=None) -> None:
         self._extractor = extractor
         self._today = today
         self._resolver = entity_resolver
         self._dictionary = dictionary or EntityDictionary()
         self._id_factory = id_factory or (lambda prefix: f"{prefix}-{abs(hash(prefix))}")
+        # Optional hybrid semantic parser. When present it is the single source of
+        # analytical constraints, so deterministic and LLM extraction share one validated
+        # path. When absent the deterministic parser is used directly (legacy seam).
+        self._semantic_parser = semantic_parser
 
     def normalize(self, raw_query: str, constraints: Iterable[Constraint] = (),
                   mentions: Iterable[str] | None = None) -> SemanticResult:
         supplied = tuple(constraints)
         inferred = ()
         windows = self._date_windows(raw_query, supplied)
-        analytics = extract_analytical_constraints(raw_query)
+        semantic_failure = ""
+        semantic_notes: list[str] = []
+        if self._semantic_parser is not None:
+            parsed = self._semantic_parser.parse(raw_query)
+            analytics_constraints = parsed.constraints
+            location_wording_requested = parsed.location_wording_requested
+            semantic_failure = parsed.clarification_reason
+            semantic_notes.append(
+                f"semantic parser: {parsed.extractor} ({parsed.parser_version})")
+            if parsed.fallback_reason:
+                semantic_notes.append(f"semantic fallback: {parsed.fallback_reason}")
+        else:
+            analytics = extract_analytical_constraints(raw_query)
+            analytics_constraints = analytics.constraints
+            location_wording_requested = analytics.location_wording_requested
         surface_mentions = tuple(mentions) if mentions is not None else self._scan_mentions(raw_query)
 
         entities: list[Entity] = []
         clarifications: list[ClarificationRequest] = []
         unresolved: list[str] = []
-        notes: list[str] = []
+        notes: list[str] = list(semantic_notes)
         for mention in surface_mentions:
             resolution = self._resolver.resolve(mention)
             if resolution.canonical is not None:
@@ -55,8 +74,17 @@ class SemanticNormalizer:
             if request is not None:
                 clarifications.append(request)
 
-        if analytics.location_wording_requested and not any(
-                c.kind == "LOCATION" for c in (*supplied, *analytics.constraints)):
+        if semantic_failure:
+            clarifications.append(ClarificationRequest(
+                clarification_id=self._id_factory("clarification"), kind="MEANING",
+                question="The analytics semantics of this request could not be resolved "
+                         "safely. Please restate the metric, threshold and population "
+                         "explicitly.",
+                reason=f"semantic_{semantic_failure.casefold()}",
+                affected_ref="analytics_semantics"))
+
+        if location_wording_requested and not any(
+                c.kind == "LOCATION" for c in (*supplied, *analytics_constraints)):
             options = tuple(
                 ClarificationOption(option_id=f"loc-{index}", label=label, value=value,
                                     rationale=rationale)
@@ -70,7 +98,7 @@ class SemanticNormalizer:
                 options=options, recommended_option_id=options[0].option_id,
                 affected_ref="pitch_location"))
 
-        objectives = self._build_objectives(raw_query, supplied, analytics.constraints,
+        objectives = self._build_objectives(raw_query, supplied, analytics_constraints,
                                             entities, windows)
         if clarifications:
             notes.append("Objectives are provisional until clarifications are answered.")

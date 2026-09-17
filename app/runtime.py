@@ -23,8 +23,11 @@ from app.persistence.recorder import RunRecorder
 from app.persistence.store import SqliteOperationalStore
 from app.pipeline import AnalysisPipeline
 from app.semantic.entity_resolver import EntityResolver
+from app.semantic.hybrid_parser import HybridSemanticParser
 from app.semantic.normalizer import SemanticNormalizer
 from app.semantic.objective_extractor import RuleBasedObjectiveExtractor
+from app.semantic.semantic_extractor import (DeterministicSemanticExtractor,
+                                             LLMSemanticExtractor)
 from app.semantic.requirement_decomposer import RuleBasedRequirementDecomposer
 from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, ZONE_UPPER_OUTSIDE,
                                         ZONE_UPPER_THIRD, FieldMappingRegistry)
@@ -40,7 +43,8 @@ from app.semantic.evidence import RuleBasedEvidenceExtractor
 def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=None,
                    persist: bool = True, demo: bool = False, empty: bool = False,
                    tool_factory=None, capabilities=(), metric_registry=None, schema_registry=None,
-                   web_fetcher=None, evidence_extractor=None, web_cost="FREE", today=None):
+                   web_fetcher=None, evidence_extractor=None, web_cost="FREE", today=None,
+                   semantic_extractor=None, llm_provider=None, semantic_parser=None):
     ids = lambda prefix: f"{prefix}-{uuid4().hex}"
     root = Path(runtime_dir) if runtime_dir is not None else settings.operational_store_path.parent
     owned = []
@@ -134,8 +138,21 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
             result.update(injected if isinstance(injected, dict) else {injected.name: injected})
         return result
     registry = ArtifactRegistry()
+    # Analytical semantics always pass through the deterministic validator. The primary
+    # extractor is LLM-backed only when a provider is configured; otherwise the
+    # high-confidence deterministic extractor is used, with itself as the safe fallback.
+    if semantic_parser is None:
+        if semantic_extractor is not None:
+            primary = semantic_extractor
+        elif llm_provider is not None:
+            primary = LLMSemanticExtractor(llm_provider, settings.llm_semantic_model,
+                                           settings.llm_request_timeout_seconds)
+        else:
+            primary = DeterministicSemanticExtractor()
+        semantic_parser = HybridSemanticParser(extractor=primary)
     result = AnalysisPipeline(
         SemanticNormalizer(RuleBasedObjectiveExtractor(ids), EntityResolver(dictionary, ids), dictionary, ids,
+                           semantic_parser=semantic_parser,
                            **({"today": today} if today is not None else {})),
         RuleBasedRequirementDecomposer(ids), RuleBasedPlanner(id_factory=ids),
         Router(all_capabilities, id_factory=ids), AssessmentService(registry, RuleBasedJudge(), ids), registry,
