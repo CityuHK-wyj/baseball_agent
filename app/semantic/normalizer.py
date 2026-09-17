@@ -52,8 +52,16 @@ class SemanticNormalizer:
             semantic_failure = parsed.clarification_reason
             semantic_notes.append(
                 f"semantic parser: {parsed.extractor} ({parsed.parser_version})")
+            if parsed.summary:
+                semantic_notes.append("semantic constraints: " + ",".join(parsed.summary))
+            if parsed.ambiguities:
+                semantic_notes.append(
+                    "semantic ambiguities: " + ",".join(item.kind for item in parsed.ambiguities))
             if parsed.fallback_reason:
                 semantic_notes.append(f"semantic fallback: {parsed.fallback_reason}")
+            if parsed.clarification_reason:
+                semantic_notes.append(
+                    f"semantic validation: {parsed.clarification_reason}")
         else:
             analytics = extract_analytical_constraints(raw_query)
             analytics_constraints = analytics.constraints

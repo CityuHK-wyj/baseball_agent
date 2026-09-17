@@ -16,6 +16,9 @@ from app.models.contracts import (CountConstraint, NumericConstraint,
 from app.models.semantic_candidate import (CandidateConstraint, EvidenceSpan,
                                            SemanticCandidate)
 from app.semantic.hybrid_parser import HybridSemanticParser
+from app.semantic.entity_resolver import EntityDictionary, EntityResolver
+from app.semantic.normalizer import SemanticNormalizer
+from app.semantic.objective_extractor import RuleBasedObjectiveExtractor
 from app.semantic.semantic_extractor import (DeterministicSemanticExtractor,
                                              LLMSemanticExtractor, SemanticProviderError,
                                              SemanticSchemaError, SemanticVocabulary)
@@ -310,6 +313,31 @@ class HybridParserTests(unittest.TestCase):
         self.assertEqual(
             next(item for item in result.constraints
                  if isinstance(item, QualificationConstraint)).min_batted_balls, 20)
+
+
+class NormalizerObservabilityTests(unittest.TestCase):
+    def _normalizer(self):
+        ids = lambda prefix: f"{prefix}-trace"  # noqa: E731
+        dictionary = EntityDictionary()
+        return SemanticNormalizer(
+            RuleBasedObjectiveExtractor(id_factory=ids),
+            EntityResolver(dictionary, id_factory=ids), dictionary, id_factory=ids,
+            semantic_parser=HybridSemanticParser())
+
+    def test_trace_records_extractor_version_and_constraint_summary(self):
+        result = self._normalizer().normalize(
+            "top 5 by maximum exit velocity on fastballs at least 95 mph, at least 100 BBE in 2023")
+        notes = "\n".join(result.notes)
+        self.assertIn("semantic parser: deterministic (hybrid-semantic-v1)", notes)
+        self.assertIn("semantic constraints:", notes)
+        self.assertIn("RANKING:ranking", notes)
+        # The trace is bounded and never contains raw model text or credentials.
+        self.assertNotIn("sk-", notes)
+
+    def test_trace_records_ambiguity_kind(self):
+        result = self._normalizer().normalize(
+            "top 5 by exit velocity on high fastballs in 2023")
+        self.assertIn("semantic ambiguities: location.upper_edge", "\n".join(result.notes))
 
 
 if __name__ == "__main__":
