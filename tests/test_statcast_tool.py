@@ -307,6 +307,21 @@ class StatcastToolTests(unittest.TestCase):
         self.assertNotIn("balls IN", main)
         self.assertNotIn("strikes IN", main)
 
+    def test_empty_source_result_is_zero_rows_not_a_query_failure(self):
+        class EmptyExecutor(RecordingExecutor):
+            def execute_with_rows(self, sql):
+                self.statements.append(sql)
+                if "MIN(" in sql:
+                    return ToolResult.ok(len(self.observed)), self.observed
+                if "player_dictionary" in sql:
+                    return ToolResult.ok(0), []
+                return ToolResult(status="EMPTY"), ()
+
+        result = ParquetStatcastTool([requirement()], FieldMappingRegistry(),
+                                     EmptyExecutor()).execute(task())
+        self.assertEqual(result.status, "OK")
+        self.assertEqual(result.artifact.row_count, 0)
+
     def test_default_qualification_is_frozen_not_hidden(self):
         executor = RecordingExecutor(rows=[(1, 30, 90.0, 95.0)])
         tool = ParquetStatcastTool([requirement()], FieldMappingRegistry(), executor)

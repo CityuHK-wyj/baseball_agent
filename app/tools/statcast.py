@@ -373,6 +373,10 @@ class ParquetStatcastTool(StatcastAnalyticsTool):
 
     def _query(self, sql: str) -> list[tuple] | None:
         result, rows = self._executor.execute_with_rows(sql)
+        if result.status == "EMPTY":
+            # Zero matching rows is a real (empty) answer, not a query failure. The
+            # objective must be assessed as an empty ranking, never as source breakage.
+            return []
         if result.status != "OK":
             return None
         return list(rows)
@@ -414,6 +418,10 @@ class PostgresStatcastTool(StatcastAnalyticsTool):
 
     def _query(self, sql: str) -> list[tuple] | None:
         result, rows = self._executor.execute_with_rows(sql)
+        if result.status == "EMPTY":
+            # Zero matching rows is a real (empty) answer, not a query failure. The
+            # objective must be assessed as an empty ranking, never as source breakage.
+            return []
         if result.status != "OK":
             return None
         return list(rows)

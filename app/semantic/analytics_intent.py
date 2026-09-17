@@ -13,9 +13,10 @@ word is preserved rather than defaulted away.
 import re
 from dataclasses import dataclass
 
-from app.models.contracts import (DEFAULT_EVENT_POPULATION, DEFAULT_GAME_TYPES, Constraint,
-                                  CountConstraint, CountState, LocationConstraint,
-                                  NumericConstraint, PitchTypeConstraint, PopulationConstraint,
+from app.models.contracts import (DEFAULT_EVENT_POPULATION, DEFAULT_GAME_TYPES,
+                                  DEFAULT_RANKING_LIMIT, Constraint, CountConstraint,
+                                  CountState, LocationConstraint, NumericConstraint,
+                                  PitchTypeConstraint, PopulationConstraint,
                                   QualificationConstraint, RankingConstraint)
 from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, ZONE_UPPER_OUTSIDE,
                                         ZONE_UPPER_THIRD)
@@ -81,6 +82,8 @@ _OPERATOR_TOKENS: dict[str, str] = {
 }
 
 _RANKING_RE = re.compile(r"\b(?P<dir>top|bottom)\s+(?P<limit>\d+)\b", re.IGNORECASE)
+# Explicit ranking verb without N, for example "rank hitters by maximum exit velocity".
+_RANK_VERB_RE = re.compile(r"\brank(?:ed|s|ing)?\b", re.IGNORECASE)
 # Explicit ranking clause markers. The metric after the marker owns the ranking, so a
 # filtered metric mentioned earlier in the sentence cannot steal it.
 _RANKING_MARKER_RE = re.compile(r"\b(?:ranked|sorted|ordered)\s+by\b|\bby\b", re.IGNORECASE)
@@ -208,17 +211,25 @@ def _velocity_constraints(raw_query: str) -> list[NumericConstraint]:
 
 def _ranking_constraint(lowered: str) -> RankingConstraint | None:
     ranking = _RANKING_RE.search(lowered)
-    if ranking is None:
-        return None
-    direction = "ASC" if ranking.group("dir").casefold() == "bottom" else "DESC"
-    limit = int(ranking.group("limit"))
-    marker = _RANKING_MARKER_RE.search(lowered, ranking.end())
-    clause_start = marker.end() if marker is not None else ranking.end()
-    metric_match = _RANKING_METRIC_RE.search(lowered, clause_start)
-    if metric_match is None:
-        # No metric after an explicit marker: fall back to the text after "top N" so a
-        # terse "top 5 exit velocity" still resolves, matching the previous behavior.
-        metric_match = _RANKING_METRIC_RE.search(lowered, ranking.end())
+    if ranking is not None:
+        direction = "ASC" if ranking.group("dir").casefold() == "bottom" else "DESC"
+        limit = int(ranking.group("limit"))
+        marker = _RANKING_MARKER_RE.search(lowered, ranking.end())
+        clause_start = marker.end() if marker is not None else ranking.end()
+        metric_match = _RANKING_METRIC_RE.search(lowered, clause_start)
+        if metric_match is None:
+            # No metric after an explicit marker: fall back to the text after "top N" so a
+            # terse "top 5 exit velocity" still resolves, matching the previous behavior.
+            metric_match = _RANKING_METRIC_RE.search(lowered, ranking.end())
+    else:
+        # "rank hitters by maximum exit velocity" has no explicit N. Use the documented
+        # default limit rather than dropping the ranking entirely.
+        verb = _RANK_VERB_RE.search(lowered)
+        marker = _RANKING_MARKER_RE.search(lowered, verb.end()) if verb is not None else None
+        if marker is None:
+            return None
+        direction, limit = "DESC", DEFAULT_RANKING_LIMIT
+        metric_match = _RANKING_METRIC_RE.search(lowered, marker.end())
     if metric_match is None:
         return None
     aggregation_word = (metric_match.group("agg") or "").casefold()

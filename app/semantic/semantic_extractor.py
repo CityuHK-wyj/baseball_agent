@@ -171,6 +171,12 @@ class DeterministicSemanticExtractor:
                 evidence=_evidence(raw_query, span, patterns))
         if kind == "RANKING":
             span = _first_span((_ai._RANKING_RE.pattern,), raw_query)
+            if span is None:
+                # "rank hitters by maximum exit velocity" has no explicit N.
+                verb = _first_span((_ai._RANK_VERB_RE.pattern,), raw_query)
+                metric_span = _first_span((_ai._RANKING_METRIC_RE.pattern,), raw_query)
+                if verb is not None and metric_span is not None:
+                    span = (verb[0], metric_span[1])
             return CandidateConstraint(
                 kind="RANKING", metric_key=constraint.metric_key,
                 aggregation=constraint.aggregation, direction=constraint.direction,

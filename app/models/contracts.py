@@ -195,6 +195,9 @@ DEFAULT_EVENT_POPULATION: str = "BATTED_BALL"
 # A documented ranking qualification when the user does not request one. The semantic
 # layer owns this default so the physical adapter never substitutes a hidden value.
 DEFAULT_MIN_BATTED_BALLS = 3
+# A documented default ranking size for explicit ranking language that omits N
+# (for example "rank hitters by maximum exit velocity").
+DEFAULT_RANKING_LIMIT = 5
 
 
 class PopulationConstraint(_Constraint):

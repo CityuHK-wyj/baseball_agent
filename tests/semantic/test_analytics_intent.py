@@ -234,6 +234,12 @@ class AnalyticsIntentTests(unittest.TestCase):
         count = CountConstraint(strikes=2, balls=(0, 1, 2, 3), origin="SYSTEM_INFERRED")
         self.assertEqual(count.exact_states, ((0, 2), (1, 2), (2, 2), (3, 2)))
 
+    def test_rank_verb_without_n_uses_the_documented_default_limit(self):
+        ranking = _ranking(
+            "During 2023, rank hitters by maximum exit velocity requiring at least 20 batted balls")
+        self.assertEqual((ranking.metric_key, ranking.aggregation, ranking.limit),
+                         ("exit_velocity", "MAX", 5))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -37,6 +37,8 @@
    "expect": {"ranking": ["exit_velocity", "AVG"], "numeric": [], "qualification": null, "population": ["REGULAR_SEASON"], "count_states": null, "clarification": false}},
   {"id": "explicit_max", "query": "top 5 by maximum exit velocity in 2023",
    "expect": {"ranking": ["exit_velocity", "MAX"], "numeric": [], "qualification": null, "population": ["REGULAR_SEASON"], "count_states": null, "clarification": false}},
+  {"id": "rank_verb_default_limit", "query": "During 2023, rank hitters by maximum exit velocity requiring at least 20 batted balls",
+   "expect": {"ranking": ["exit_velocity", "MAX"], "numeric": [], "qualification": 20, "population": ["REGULAR_SEASON"], "count_states": null, "clarification": false}},
   {"id": "contradictory_aggregation", "mode": "candidate", "query": "top 5 by maximum exit velocity and average exit velocity",
    "candidate": {"constraints": [
      {"kind": "RANKING", "metric_key": "exit_velocity", "aggregation": "MAX", "direction": "DESC", "limit": 5, "evidence": {"text": "maximum exit velocity"}},
