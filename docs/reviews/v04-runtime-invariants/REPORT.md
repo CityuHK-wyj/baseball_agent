@@ -12,17 +12,14 @@ persistence and governance boundaries are preserved. No merge, tag or release wa
 
 ## Commit list
 
-- `feat(runtime): split requested/declared/verified scope with dimension verification`
-- `feat(runtime): freeze user obligations and check Planner work against them`
-- `feat(runtime): independent Judge, state projection and durable ToolOutcome taxonomy`
-- `feat(runtime): explicit Artifact bindings and typed/versioned export contracts`
-- `fix(ir): validate aliases, implement accepted semantics, compile the window`
-- `feat(runtime): append-only redacted event journal and trace projection`
-- `feat(persistence): durable identity, execution intent and surfaced persistence errors`
-- `feat(knowledge): ACTIVE-only retrieval, structured conflicts, provenance-preserving promotion`
-- `fix(web): redirect validation and bounded streaming`
-- `test(runtime): v0.4 architectural invariant suite`
-- `docs(runtime): ADR 0026, architecture diagram, responsibility migration map, stop report`
+Implementation commits since the review checkpoint `0ee26ea`:
+
+- `f3842aa feat(models): v0.4 scope verification, obligations, ToolOutcome, export contracts`
+- `a669389 feat(runtime): verified scope, independent judge, explicit bindings, faithful IR`
+- `9a24191 feat(knowledge,cli): ACTIVE-only retrieval, structured conflicts, persistence wiring`
+- `e7700ff test(runtime): v0.4 architectural invariant suite`
+- `943288b docs(runtime): ADR 0026, architecture diagram, migration map, stop report`
+- `docs: record v0.4 implementation SHA` (tip; the audited SHA below)
 
 ## Actual runtime architecture (as implemented)
 
@@ -270,5 +267,5 @@ yet wired).
 
 ## New independent audit SHA
 
-Point the next Codex audit at the tip of `pi/v0.4-runtime-invariants` (recorded in the
-final commit message / see `git log -1`). Do not audit `main`.
+Audit the tip commit of `pi/v0.4-runtime-invariants`, recorded as
+`V0_4_IMPLEMENTATION_SHA_PLACEHOLDER`. Do not audit `main`.
