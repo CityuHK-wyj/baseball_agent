@@ -188,3 +188,43 @@ S, E, A) that makes the analytical population's game-type filter reproducible.
 **Planner Terminal Latch**: The guard that prevents re-invoking a terminal Planner unless an external condition (new artifact, source, permission or user constraint) changes.
 
 **Stop Reason**: The recorded reason planning ended for a run: COMPLETE, MAX_ROUNDS, BUDGET_EXHAUSTED, NO_RECOVERABLE_PATH, POLICY_BLOCKED or NO_PROGRESS.
+
+## Artifact runtime vocabulary (v0.3)
+
+**Artifact Runtime**: The v0.3 runtime center: Conversation -> Goal -> Need graph ->
+Planner -> Tool/Compute -> Artifact -> References -> re-plan -> Sufficiency judge ->
+Response. See `docs/adr/0025-artifact-runtime.md` and `docs/artifact-runtime.md`.
+
+**Goal**: The user's desired outcome plus explicit constraints preserved by reference.
+
+**Need**: Information still required to satisfy a Goal; free-form objective and
+expected information, partially structured scope and capabilities, dynamic dependencies.
+
+**Artifact (runtime)**: A reusable tool output with structured data, bounded text,
+reusable `exports`, provenance, references, requested/actual scope and lineage.
+
+**Export**: A reusable machine-consumable Artifact output (for example `PLAYER_ID_SET`,
+`STATISTICAL_RESULT`, `WEB_EVIDENCE`, `DERIVED_MEASURE`). Tools compose by export
+capability, never by hard-coded direction.
+
+**Reference**: A stable pointer back to original information (user span, Artifact,
+Artifact export, Web evidence span, Knowledge entry, derived computation, ...) used
+instead of repeated lossy summaries.
+
+**Requested Scope vs Actual Scope**: What a Need asks for versus what an Artifact
+actually covers. A difference is an explicit coverage gap and never silently satisfies
+the Need; evidence aggregated over a broader window than requested is a gap.
+
+**Coverage Assessment**: The sufficiency result binding a Goal and Need to entity,
+temporal, population, measure and quality coverage, supported claims and missing needs.
+
+**Safe Analytical IR**: The bounded, validated intermediate representation of a local
+analytical calculation, compiled deterministically into SQL after SchemaCatalog
+validation and before the read-only AST guard.
+
+**Schema Catalog**: The trusted set of allowed tables, fields, types, meanings, roles,
+grain, coverage and operations used to validate analytical identifiers.
+
+**Candidate Knowledge**: A runtime-discovered knowledge proposal with scope, evidence and
+provenance. It is never retrieval-authoritative; only administrator review promotes it to
+ACTIVE Shared Knowledge.
