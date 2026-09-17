@@ -99,6 +99,8 @@ class KnowledgeRetriever:
             return False
         if query.language is not None and item.language != query.language:
             return False
+        if query.community is not None and query.community not in item.tags:
+            return False
         if query.as_of is not None and not item.is_current_on(today):
             return False
         if (query.as_of is not None and item.as_of is not None and query.as_of < item.as_of

@@ -108,7 +108,12 @@ def _build_agent(args):
 
 def _build_runtime(args):
     from app.artifact_runtime.factory import build_runtime
-    return build_runtime(use_llm=not getattr(args, "no_llm", False))
+    from app.persistence.store import SqliteOperationalStore
+
+    # Normal product CLI wires durable persistence: the advertised runtime is resumable.
+    settings.operational_store_path.parent.mkdir(parents=True, exist_ok=True)
+    store = SqliteOperationalStore(settings.operational_store_path)
+    return build_runtime(use_llm=not getattr(args, "no_llm", False), store=store)
 
 
 def _print_runtime_trace(trace) -> None:
@@ -134,6 +139,14 @@ def _print_runtime_trace(trace) -> None:
         capability = request.capability if request else "-"
         print(f"  #{decision.iteration} need={decision.need_id} tool={capability} "
               f"input_refs={list(request.input_refs) if request else []}")
+    print("Tool outcomes")
+    for attempt in getattr(trace, "attempts", ()):
+        print(f"  {attempt.capability} need={attempt.need_id or '-'} "
+              f"status={attempt.status} code={attempt.outcome_code} "
+              f"retryable={attempt.retryable} detail={attempt.detail[:120]}")
+    print("Recovery / notes")
+    for step in trace.steps:
+        print(f"  {step}")
     print("Artifacts")
     for summary in trace.artifact_summaries:
         print(f"  - {summary}")
@@ -147,6 +160,16 @@ def _print_runtime_trace(trace) -> None:
               f"entity={assessment.entity_coverage} temporal={assessment.temporal_coverage} "
               f"measure={assessment.measure_coverage} gaps={list(assessment.gaps)}")
     print(f"  core_goal_supported={trace.coverage.get('core_goal_supported')}")
+    if trace.obligation_coverage:
+        print("User obligations")
+        for obligation in (trace.goal.obligations if trace.goal else ()):
+            state = trace.obligation_coverage.get(obligation.obligation_id, "MISSING")
+            print(f"  [{state}] {obligation.kind}: {obligation.description}")
+    if getattr(trace, "events", ()):
+        print("Event journal (projection)")
+        for event in trace.events[-40:]:
+            print(f"  {event.event_type} need={event.need_id or '-'} "
+                  f"attempt={event.attempt_id or '-'} :: {event.detail[:160]}")
     if trace.claims:
         print("Claims")
         for claim in trace.claims:
