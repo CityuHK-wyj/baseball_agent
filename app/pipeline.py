@@ -26,6 +26,7 @@ from app.models.contracts import (AnalysisObjective, ArtifactRequirement, Catego
 from app.models.interaction import (InteractionRecord, PermissionAnswer, PermissionRequest,
                                     ConstraintRevisionRequest, ConstraintRevisionAnswer)
 from app.models.reports import ResponsePackage
+from app.models.understanding import SemanticUnderstanding
 from app.persistence.recorder import RunRecorder
 from app.semantic.normalizer import SemanticNormalizer
 from app.semantic.requirement_decomposer import RequirementDecomposer
@@ -47,6 +48,8 @@ class PipelineResult(ArtifactContract):
     # Bounded, structured semantic observability: extractor, parser version, fallback
     # reason and the constraint summary. Never raw model text or credentials.
     semantic_trace: tuple[str, ...] = ()
+    # Open-world interpretation is exposed for the CLI/trace, not for execution.
+    understanding: SemanticUnderstanding | None = None
 
 
 ToolFactory = Callable[[tuple[ArtifactRequirement, ...]], Tool]
@@ -118,15 +121,17 @@ class AnalysisPipeline:
             return PipelineResult(raw_query=raw_query, needs_clarification=True,
                                   clarifications=semantic.clarifications,
                                   objectives=semantic.objectives, run_ids=(effective_run_id,),
-                                  semantic_trace=trace)
+                                  semantic_trace=trace, understanding=semantic.understanding)
         if not semantic.objectives:
-            return PipelineResult(raw_query=raw_query, semantic_trace=trace)
+            return PipelineResult(raw_query=raw_query, semantic_trace=trace,
+                                  understanding=semantic.understanding)
 
-        return self._prepare_objectives(raw_query, semantic.objectives, run_id).model_copy(
-            update={"semantic_trace": trace})
+        return self._prepare_objectives(raw_query, semantic.objectives, run_id,
+                                        understanding=semantic.understanding).model_copy(
+            update={"semantic_trace": trace, "understanding": semantic.understanding})
 
     def _prepare_objectives(self, raw_query: str, objectives: tuple[AnalysisObjective, ...],
-                            run_id: str | None) -> PipelineResult:
+                            run_id: str | None, understanding=None) -> PipelineResult:
         for objective in objectives:
             sources = hard_sources(objective)
             for requirement in self._decomposer.decompose(objective):
@@ -196,7 +201,7 @@ class AnalysisPipeline:
                     return PipelineResult(raw_query=raw_query, objectives=objectives,
                                           run_ids=(effective_run_id,), permissions=(request,))
 
-        return self._run_objectives(raw_query, objectives, run_id)
+        return self._run_objectives(raw_query, objectives, run_id, understanding=understanding)
 
     def resume_constraint_revision(self, run_id: str, answer: ConstraintRevisionAnswer) -> PipelineResult:
         if self._recorder is None:
@@ -345,7 +350,7 @@ class AnalysisPipeline:
 
     def _run_objectives(self, raw_query: str, objectives: tuple[AnalysisObjective, ...],
                         run_id: str | None, router: Router | None = None,
-                        authorized_objective: str | None = None) -> PipelineResult:
+                        authorized_objective: str | None = None, understanding=None) -> PipelineResult:
         requirements: list[ArtifactRequirement] = []
         effective_run_id = run_id or self._id_factory("run")
         if self._recorder:
@@ -388,7 +393,7 @@ class AnalysisPipeline:
             restored = self._recorder.restore_objective(effective_run_id, objective.objective_id,
                 tuple(item.requirement_id for item in objective_requirements)) if self._recorder else None
             result = orchestrator.run(objective, objective_requirements, confirmed_intent=raw_query,
-                                      restored=restored)
+                                      restored=restored, understanding=understanding)
             run_ids.append(result.run_id)
             statuses.append(result.objective_state.status)
             packages.append(result.response_package)

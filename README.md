@@ -77,7 +77,8 @@ python3 -m app.cli ask "top 5 by maximum exit velocity on fastballs at least 95 
   (rules, transactions, bilingual glossary and metrics, all 30 teams, ballparks, players,
   awards, trusted sources and the community directory) behind `ContextService`.
 
-Status: **v0.1.0 RELEASED — DUAL_SEMANTIC_RUNTIME**. The dual semantic runtime is
+Status: **v0.1.0 RELEASED — DUAL_SEMANTIC_RUNTIME**; **v0.2 open-world runtime on
+`pi/v0.2-open-world-runtime`**. The dual semantic runtime is
 integrated: independent extractor and reviewer roles, a first-class `SemanticReconciler`,
 narrow lexical anchors, a deterministic validator and durable review reuse. The nine
 demonstrated adversarial containment failures now clarify or reject instead of reaching
@@ -88,6 +89,16 @@ vertical slice runs end to end against the historical Parquet archive and live P
 ranking + explicit population/qualification). See [docs/usage.md](docs/usage.md) for the
 runnable commands and [the dual semantic review](docs/reviews/v01-dual-semantic-runtime.md)
 for gate evidence and remaining gaps.
+
+**v0.2 open-world runtime.** Cognition is permissive; execution is strict. A partially
+structured `SemanticUnderstanding` (free-form goal/brief/strategy plus typed facts) travels
+with the raw query into the Planner, unknown concepts become routing signals rather than
+failures, web research is a first-class recovery path, and every PostgreSQL/DuckDB
+execution is compiled into a closed typed `SQLAnalysisRequest` before any SQL is built.
+See [ADR 0023](docs/adr/0023-open-world-cognition-strict-action-boundaries.md). Users can
+ask `太鼓达人今年战绩如何？`, `2023和2025，Freddie Freeman面对高区快速球的EV有什么变化？`,
+`今年道奇打者里谁最擅长处理高区快速球？` and `最近30天Ohtani和Judge谁打得更好？` without the
+parser raising or the run failing on an unknown enum.
 
 ## Architecture
 

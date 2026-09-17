@@ -25,6 +25,7 @@ from app.models.contracts import (DEFAULT_RANKING_LIMIT, Constraint, CountConstr
 from app.models.semantic_candidate import (CandidateConstraint, SemanticAmbiguity,
                                            SemanticCandidate, SemanticProvenance)
 from app.models.semantic_review import SemanticReviewResult
+from app.models.understanding import SemanticUnderstanding
 from app.semantic.lexical_anchors import extract_lexical_anchors
 from app.semantic.semantic_extractor import SemanticVocabulary
 from app.semantic.semantic_reconciler import reconcile_with_anchors
@@ -76,6 +77,9 @@ class SemanticParseResult:
     summary: tuple[str, ...] = ()
     # The structured dual-review outcome, when dual review ran. Never hidden reasoning.
     review: SemanticReviewResult | None = None
+    # Open-world interpretation. It accompanies the canonical typed constraints so the
+    # Planner can reason from natural-language meaning as well as typed facts.
+    understanding: SemanticUnderstanding | None = None
 
     @property
     def failed_closed(self) -> bool:
@@ -339,9 +343,51 @@ def validate_candidate(candidate: SemanticCandidate, raw_query: str,
     location_ambiguous = anchors.location_ambiguity or any(
         ambiguity.kind.startswith("location") for ambiguity in candidate.ambiguities)
     summary = tuple(f"{item.kind}:{item.key}" for item in deduped)
+    understanding = _build_understanding(candidate, raw_query, deduped)
     return SemanticParseResult(
         constraints=deduped, provenance=tuple(provenance),
         ambiguities=tuple(candidate.ambiguities), extractor=candidate.extractor,
         fallback_reason=fallback_reason,
         location_wording_requested=location_ambiguous,
-        summary=summary)
+        summary=summary, understanding=understanding)
+
+
+def _derive_brief(constraints: tuple[Constraint, ...]) -> str:
+    """A deterministic, human-readable brief used when the model supplies none."""
+    if not constraints:
+        return ""
+    parts: list[str] = []
+    for item in constraints:
+        if isinstance(item, RankingConstraint):
+            parts.append(f"rank by {item.aggregation} {item.metric_key} ({item.direction} {item.limit})")
+        elif isinstance(item, NumericConstraint):
+            parts.append(f"{item.key} {item.operator} {item.value:g} {item.unit}")
+        elif isinstance(item, CountConstraint):
+            parts.append(f"count {item.exact_states}")
+        elif isinstance(item, PitchTypeConstraint):
+            parts.append(f"{item.family} pitches")
+        elif isinstance(item, LocationConstraint):
+            parts.append(f"location {item.definition}")
+        elif isinstance(item, QualificationConstraint):
+            parts.append(f"minimum {item.min_batted_balls} batted balls")
+        elif isinstance(item, PopulationConstraint):
+            parts.append(f"population {', '.join(item.game_types)}/{item.event_population}")
+    return "; ".join(parts)
+
+
+def _build_understanding(candidate: SemanticCandidate, raw_query: str,
+                         constraints: tuple[Constraint, ...]) -> SemanticUnderstanding:
+    """Project an extractor candidate into the open-world understanding contract."""
+    return SemanticUnderstanding(
+        raw_query=raw_query,
+        user_goal=candidate.user_goal or raw_query,
+        semantic_brief=candidate.semantic_brief or _derive_brief(constraints),
+        planner_notes=candidate.planner_notes,
+        analysis_strategy=candidate.analysis_strategy,
+        known_constraints=constraints,
+        candidate_entity_mentions=tuple(candidate.entity_mentions),
+        unresolved_concepts=tuple(candidate.unresolved_concepts),
+        search_hints=tuple(candidate.search_hints),
+        ambiguities=tuple(ambiguity.kind for ambiguity in candidate.ambiguities),
+        interpretations=tuple(candidate.interpretations),
+    )

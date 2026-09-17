@@ -37,6 +37,9 @@ _AMBIGUOUS_LOCATION_CUES: tuple[str, ...] = (
     # 'high fastball' has several defensible readings (upper third, batter-relative
     # upper edge, or the upper outside quadrants). It must clarify, not guess.
     r"\bhigh\s+(?:fastballs?|heat|pitches?|four-seamers?)\b",
+    # Bilingual equivalents. '高区' ('high zone') and '上缘' ('upper edge') are exactly
+    # the material upper-location ambiguity in Chinese.
+    r"高区", r"高區", r"高位置", r"上缘", r"上緣", r"高位", r"偏上",
 )
 
 # Generic two-strike wording. Explicit counts (``0-2``) are handled separately and are

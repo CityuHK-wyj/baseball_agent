@@ -39,6 +39,10 @@ class Executor:
     def register(self, tool: Tool) -> None:
         self._tools[tool.name] = tool
 
+    @property
+    def tool_names(self) -> tuple[str, ...]:
+        return tuple(self._tools)
+
     def run(self, task: AgentTask, routing: RoutingDecision) -> ExecutionOutcome:
         execution_id = self._id_factory("execution")
         if routing.selected_tool is None or routing.selected_tool not in self._tools:

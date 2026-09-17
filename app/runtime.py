@@ -22,6 +22,7 @@ from app.persistence.artifacts import LocalFilesystemArtifactStorage
 from app.persistence.recorder import RunRecorder
 from app.persistence.store import SqliteOperationalStore
 from app.pipeline import AnalysisPipeline
+from app.semantic.entity_recovery import EntityRecovery
 from app.semantic.entity_resolver import EntityResolver
 from app.semantic.hybrid_parser import HybridSemanticParser
 from app.semantic.normalizer import SemanticNormalizer
@@ -43,10 +44,20 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
                    persist: bool = True, demo: bool = False, empty: bool = False,
                    tool_factory=None, capabilities=(), metric_registry=None, schema_registry=None,
                    web_fetcher=None, evidence_extractor=None, web_cost="FREE", today=None,
-                   semantic_extractor=None, llm_provider=None, semantic_parser=None):
+                   semantic_extractor=None, llm_provider=None, semantic_parser=None,
+                   web_search=None):
     ids = lambda prefix: f"{prefix}-{uuid4().hex}"
     root = Path(runtime_dir) if runtime_dir is not None else settings.operational_store_path.parent
     owned = []
+    # Derive a provider-agnostic live web backend from configuration when the caller did
+    # not inject one. Without an endpoint, web recovery stays interface-only.
+    if (web_fetcher is None and web_search is None and settings.web_search_endpoint
+            and settings.web_search_api_key):
+        from app.tools.web_fetch import HttpJsonSearchBackend, WebResearchFetcher
+        backend = HttpJsonSearchBackend(settings.web_search_endpoint,
+                                        settings.web_search_api_key)
+        web_search = lambda query: backend.search(query)  # noqa: E731
+        web_fetcher = WebResearchFetcher(backend)
     if knowledge is None:
         path = root / "knowledge.db" if runtime_dir is not None else settings.knowledge_store_path
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -106,7 +117,7 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
     if web_fetcher is not None:
         all_capabilities += (ToolCapability(tool="web-evidence", source_kind="WEB", cost=web_cost,
             supported_artifact_types=("EVIDENCE",),
-            supported_data_keys=("injury_status", "salary", "news_claim")),)
+            supported_data_keys=("injury_status", "salary", "news_claim", "entity_alias")),)
     if demo:
         all_capabilities += (ToolCapability(tool="synthetic", source_kind="SYNTHETIC",
                              supported_artifact_types=("TABLE", "EVIDENCE", "FEATURE")),)
@@ -137,6 +148,9 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
             result.update(injected if isinstance(injected, dict) else {injected.name: injected})
         return result
     registry = ArtifactRegistry()
+    resolver = EntityResolver(dictionary, ids)
+    recovery = (EntityRecovery(dictionary, resolver, web_search)
+                if web_search is not None else None)
     # Analytical semantics always pass through the deterministic validator. When a
     # provider is configured, the dual architecture runs two independent, differently
     # prompted model calls (extractor + reviewer) and reconciles them; otherwise the
@@ -157,8 +171,10 @@ def build_pipeline(*, runtime_dir: Path | None = None, knowledge=None, recorder=
         else:
             semantic_parser = HybridSemanticParser(extractor=DeterministicSemanticExtractor())
     result = AnalysisPipeline(
-        SemanticNormalizer(RuleBasedObjectiveExtractor(ids), EntityResolver(dictionary, ids), dictionary, ids,
+        SemanticNormalizer(RuleBasedObjectiveExtractor(ids), resolver, dictionary, ids,
                            semantic_parser=semantic_parser,
+                           entity_recovery=recovery,
+                           web_recovery_available=web_fetcher is not None,
                            **({"today": today} if today is not None else {})),
         RuleBasedRequirementDecomposer(ids), RuleBasedPlanner(id_factory=ids),
         Router(all_capabilities, id_factory=ids), AssessmentService(registry, RuleBasedJudge(), ids), registry,

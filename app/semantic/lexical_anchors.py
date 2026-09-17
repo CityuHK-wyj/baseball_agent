@@ -161,13 +161,26 @@ def _population_anchor(raw_query: str) -> PopulationAnchor | None:
     return PopulationAnchor(game_types=game_types, event_population=event, text=raw_query)
 
 
+# Chinese/bilingual analytical cues. The deterministic parser cannot prove typed
+# constraints from these, but their presence means the request is analytical and must be
+# routed through the open-world (LLM-assisted) semantic path rather than silently treated
+# as a plain knowledge question. High-confidence literal facts remain the only anchors.
+_CJK_ANALYTICAL_CUES: tuple[str, ...] = (
+    "快速球", "高区", "高區", "球速", "出速", "本垒打", "全壘打", "全垒打", "三振",
+    "保送", "打击率", "打擊率", "上垒率", "上壘率", "长打率", "長打率", "打点", "打點",
+    "打得", "打的", "更好", "最擅长", "最擅長", "变化", "變化", "面对", "面對",
+    "表现", "表現", "战绩", "戰績", "球员", "球員",
+)
+
+
 def extract_lexical_anchors(raw_query: str) -> LexicalAnchors:
     """Extract the bounded lexical facts of ``raw_query``. Never raises."""
     intent = _ai.extract_analytical_constraints(raw_query)
     location_ambiguity = any(re.search(cue, raw_query, re.IGNORECASE)
                              for cue in _ai._AMBIGUOUS_LOCATION_CUES)
     population = _population_anchor(raw_query)
-    has_cue = bool(intent.constraints) or location_ambiguity or population is not None
+    cjk_cue = any(cue in raw_query for cue in _CJK_ANALYTICAL_CUES)
+    has_cue = bool(intent.constraints) or location_ambiguity or population is not None or cjk_cue
     return LexicalAnchors(
         constraints=tuple(intent.constraints),
         ranking_limits=_ranking_limits(raw_query),

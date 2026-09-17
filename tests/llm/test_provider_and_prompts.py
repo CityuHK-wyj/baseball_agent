@@ -30,7 +30,7 @@ class PromptTests(unittest.TestCase):
             template.render()
 
     def test_template_identity_is_versioned(self):
-        self.assertEqual(PLANNER_PROMPT.identity(), "planner.decide@v1")
+        self.assertEqual(PLANNER_PROMPT.identity(), "planner.decide@v2")
 
     def test_parse_json_object_handles_fences_and_rejects_garbage(self):
         self.assertEqual(parse_json_object('```json\n{"a": 1}\n```'), {"a": 1})

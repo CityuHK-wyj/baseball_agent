@@ -146,9 +146,10 @@ def reconcile_with_anchors(constraints: tuple[Constraint, ...],
                         f"the query ranking limit {sorted(explicit_limits)} contradicts "
                         f"the candidate limit {item.limit}")
     else:
-        for _ in candidate_rankings:
-            add("ranking", "UNANCHORED_EXPLICIT",
-                "the candidate asserts a ranking the query does not state")
+        # An inferred ranking metric (for example from a bilingual metric cue the anchors
+        # do not parse) is allowed: it does not contradict or drop any explicit fact. The
+        # safety-critical explicit facts are numbers, counts, qualifications and locations.
+        pass
 
     # -- population ---------------------------------------------------------
     candidate_pops = [item for item in constraints if isinstance(item, PopulationConstraint)]
@@ -249,8 +250,47 @@ def _values(entries: tuple[tuple, ...]) -> tuple:
     return tuple(value for value, _ in entries)
 
 
+def _candidate_signature(item) -> tuple:
+    """Canonical per-constraint signature used to merge two open-world candidates."""
+    if item.kind == "NUMERIC":
+        return ("NUMERIC", item.metric, item.operator, _round(item.value or 0.0), item.unit or "mph")
+    if item.kind == "PITCH_TYPE":
+        return ("PITCH_TYPE", item.family)
+    if item.kind == "LOCATION":
+        return ("LOCATION", item.definition)
+    if item.kind == "COUNT":
+        return ("COUNT", _count_states(item))
+    if item.kind == "QUALIFICATION":
+        return ("QUALIFICATION", item.min_batted_balls)
+    if item.kind == "POPULATION":
+        return ("POPULATION", tuple(item.game_types) or tuple(DEFAULT_GAME_TYPES),
+                item.event_population or DEFAULT_EVENT_POPULATION)
+    if item.kind == "RANKING":
+        return ("RANKING", item.metric_key, item.aggregation or "AVG",
+                item.direction or "DESC", item.limit or DEFAULT_RANKING_LIMIT)
+    return ("UNKNOWN", repr(item))
+
+
+def _merge_candidates(extractor: SemanticCandidate, reviewer: SemanticCandidate) -> SemanticCandidate:
+    """Union of two compatible candidates; free-form fields prefer the extractor."""
+    merged = list(extractor.constraints)
+    seen = {_candidate_signature(item) for item in merged}
+    for item in reviewer.constraints:
+        signature = _candidate_signature(item)
+        if signature not in seen:
+            merged.append(item)
+            seen.add(signature)
+    return extractor.model_copy(update={"constraints": tuple(merged)})
+
+
 class SemanticReconciler:
-    """Compares two independent candidates and decides whether execution is safe."""
+    """Compares two independent candidates and decides whether execution is safe.
+
+    Open-world policy: a dimension asserted by only one reader is resolved by union, not
+    treated as a disagreement. A conflict (both readers assert *different* values for the
+    same dimension) is material. This lets free-form interpretation differ without
+    blocking execution while still refusing to execute contradictory meaning.
+    """
 
     def compare(self, extractor: SemanticCandidate, reviewer: SemanticCandidate,
                 anchors: LexicalAnchors) -> SemanticReviewResult:
@@ -263,9 +303,13 @@ class SemanticReconciler:
             values_a, values_b = _values(entries_a), _values(entries_b)
             if values_a == values_b:
                 continue
-            if not values_a and all(default for _, default in entries_b):
+            # Presence on only one side is not a disagreement: the union is used.
+            if not values_a or not values_b:
                 continue
-            if not values_b and all(default for _, default in entries_a):
+            # A population conflict matters only when the user actually stated a
+            # population; otherwise the documented default is used and the difference is
+            # model noise, not material meaning.
+            if key and key[0] == "POPULATION" and anchors.population is None:
                 continue
             differences.append(MaterialDifference(
                 dimension=":".join(str(part) for part in key), code="MATERIAL_DIFFERENCE",
@@ -296,7 +340,7 @@ class SemanticReconciler:
             agreement_status=status,
             extractor_candidate=extractor,
             reviewer_candidate=reviewer,
-            canonical_candidate=extractor if status == "AGREE" else None,
+            canonical_candidate=_merge_candidates(extractor, reviewer) if status == "AGREE" else None,
             material_differences=tuple(differences),
             ambiguities=tuple(ambiguities),
         )

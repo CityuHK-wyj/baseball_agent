@@ -10,12 +10,12 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from app.models.artifacts import ArtifactContract
-from app.models.contracts import (DEFAULT_MIN_BATTED_BALLS, AnalysisObjective,
-                                  ArtifactDescriptor, ArtifactRequirement, CountConstraint,
-                                  LeagueStateSnapshot, LocationConstraint,
-                                  PitchTypeConstraint, QualificationConstraint,
-                                  QualificationRule, RankingConstraint, SampleAdequacyRule,
-                                  TimeRange)
+from app.models.contracts import (DEFAULT_MIN_BATTED_BALLS, DEFAULT_RANKING_LIMIT,
+                                  AnalysisObjective, ArtifactDescriptor, ArtifactRequirement,
+                                  CountConstraint, LeagueStateSnapshot, LocationConstraint,
+                                  NumericConstraint, PitchTypeConstraint,
+                                  QualificationConstraint, QualificationRule,
+                                  RankingConstraint, SampleAdequacyRule, TimeRange)
 from app.models.metrics import MetricDefinition
 from app.models.schema import SchemaTable
 
@@ -128,6 +128,19 @@ class RuleBasedRequirementDecomposer:
         never substitute its own default.
         """
         ranking = next((item for item in objective.constraints if isinstance(item, RankingConstraint)), None)
+        constraints = objective.constraints
+        if ranking is None:
+            # Open-world metric mentions (for example a bilingual 'EV' cue) may arrive as
+            # a metric/filter without an explicit ranking. Freeze a documented implicit
+            # average ranking so the requirement is self-consistent and routable instead
+            # of silently unexecutable.
+            implicit_metric = next(
+                (item.key for item in objective.constraints if isinstance(item, NumericConstraint)),
+                "exit_velocity")
+            ranking = RankingConstraint(metric_key=implicit_metric, aggregation="AVG",
+                                       direction="DESC", limit=DEFAULT_RANKING_LIMIT,
+                                       origin="SYSTEM_INFERRED")
+            constraints = (*objective.constraints, ranking)
         location = next((item for item in objective.constraints if isinstance(item, LocationConstraint)), None)
         pitch_type = next((item for item in objective.constraints if isinstance(item, PitchTypeConstraint)), None)
         count = next((item for item in objective.constraints if isinstance(item, CountConstraint)), None)
@@ -151,12 +164,12 @@ class RuleBasedRequirementDecomposer:
         time_range = windows[0] if windows else None
         population_scope = "player" if any(
             entity.entity_type == "PLAYER" for entity in objective.entities) else "league"
-        metric_key = ranking.metric_key if ranking is not None else "exit_velocity"
+        metric_key = ranking.metric_key
         descriptor = ArtifactDescriptor(
             artifact_type="TABLE",
             entities=objective.entities,
             data_keys=(metric_key, "batter"),
-            constraints=objective.constraints,
+            constraints=constraints,
             granularity="player_rank",
             time_range=time_range,
             population_scope=population_scope)
@@ -166,7 +179,10 @@ class RuleBasedRequirementDecomposer:
             requirement_id=self._id_factory("requirement"), objective_ref=objective.objective_id,
             description=description, descriptor=descriptor, origin="INITIAL",
             base_criticality="CORE", evidence_purpose="DESCRIPTIVE",
-            min_row_count=ranking.limit if ranking is not None else None,
+            # The ranking limit caps result size; it is not a minimum population. Sample
+            # adequacy for a ranking is enforced by the SQL qualification on batted
+            # balls, so a single-player result is not spuriously penalized as low sample.
+            min_row_count=None,
             qualification_rule=QualificationRule(kind="CUSTOM",
                                                  min_batted_balls=min_batted_balls))
         return (requirement,)

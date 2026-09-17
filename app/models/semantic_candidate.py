@@ -16,6 +16,7 @@ from typing import Literal
 from pydantic import Field
 
 from app.models.contracts import Contract, CountState, Name
+from app.models.understanding import MAX_FREE_TEXT
 
 Operator = Literal["EQ", "GT", "GTE", "LT", "LTE"]
 Aggregation = Literal["AVG", "MAX", "MIN", "SUM"]
@@ -86,12 +87,29 @@ class SemanticAmbiguity(Contract):
 
 
 class SemanticCandidate(Contract):
-    """Closed extractor output. Extras are forbidden so a model cannot smuggle fields."""
+    """Extractor output.
+
+    The *typed* constraint surface stays closed (extras are forbidden so a model cannot
+    smuggle executable fields). Alongside it, the v0.2 open-world runtime allows free-form
+    interpretation: an explicit user goal, a semantic brief, planner guidance, an
+    analysis strategy, unresolved concepts, entity mentions and search hints. These are
+    interpretation aids, never executable semantics and never physical identifiers.
+    """
 
     constraints: tuple[CandidateConstraint, ...] = ()
     ambiguities: tuple[SemanticAmbiguity, ...] = ()
     extractor: str = "deterministic"
     model: str = ""
+
+    # -- open-world interpretation (free-form) ------------------------------
+    user_goal: str = Field(default="", max_length=MAX_FREE_TEXT)
+    semantic_brief: str = Field(default="", max_length=MAX_FREE_TEXT)
+    planner_notes: str = Field(default="", max_length=MAX_FREE_TEXT)
+    analysis_strategy: str = Field(default="", max_length=MAX_FREE_TEXT)
+    entity_mentions: tuple[str, ...] = ()
+    unresolved_concepts: tuple[str, ...] = ()
+    search_hints: tuple[str, ...] = ()
+    interpretations: tuple[str, ...] = ()
 
 
 class SemanticProvenance(Contract):

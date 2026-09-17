@@ -18,9 +18,12 @@ class ResponseComposer(Protocol):
 
 class DeterministicResponseComposer:
     def compose(self, package: ResponsePackage) -> str:
-        lines = [f"Objective {package.objective_ref}: {package.objective_status}"]
+        lines = [self._headline(package.objective_status),
+                 f"Objective {package.objective_ref}: {package.objective_status}"]
         for item in package.accepted_evidence:
             lines.append(f"- [{item.level}] {item.artifact_ref} from {item.source}: {item.summary}")
+            if item.text_excerpt:
+                lines.append(f"    {item.text_excerpt[:400]}")
         if package.objective_result:
             lines.append("Result:")
             lines.append(self._render_result(package.objective_result))
@@ -28,11 +31,27 @@ class DeterministicResponseComposer:
             if item.kind == "SCHEMA":
                 continue  # raw physical columns are internal, not user-facing facts
             lines.append(f"- {item.title}: {item.content} ({item.provenance_ref or item.source})")
+        if package.assumptions:
+            lines.append("Assumptions: " + "; ".join(package.assumptions))
         if package.limitations:
             lines.append("Limitations: " + "; ".join(package.limitations))
-        if package.unresolved_items:
+        if package.unresolved_explanations:
+            lines.append("Still missing:")
+            for explanation in package.unresolved_explanations:
+                lines.append(f"- {explanation}")
+        elif package.unresolved_items:
             lines.append("Unresolved: " + ", ".join(package.unresolved_items))
         return "\n".join(lines)
+
+    @staticmethod
+    def _headline(status: str) -> str:
+        if status == "COMPLETE":
+            return "Here is the answer."
+        if status == "LIMITED":
+            return "Here is a bounded answer; some parts remain unresolved."
+        if status == "FAILED":
+            return "I could not produce a reliable answer with the available tools."
+        return "Working answer."
 
     @staticmethod
     def _render_result(result_json: str) -> str:

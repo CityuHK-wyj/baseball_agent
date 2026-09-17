@@ -52,6 +52,12 @@ class Settings:
     knowledge_source_path: Path = field(default_factory=lambda: Path(
         os.getenv("KNOWLEDGE_SOURCE_PATH", str(PROJECT_ROOT / "knowledge" / "sources"))
     ))
+    # Optional live web recovery. When blank, web recovery is interface-only and the
+    # runtime reports that it is not configured rather than pretending unknown -> web.
+    web_search_endpoint: str | None = field(
+        default_factory=lambda: os.getenv("WEB_SEARCH_ENDPOINT") or None)
+    web_search_api_key: str | None = field(
+        default_factory=lambda: os.getenv("WEB_SEARCH_API_KEY"), repr=False)
 
 
 settings = Settings()

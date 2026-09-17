@@ -21,6 +21,7 @@ from app.models.contracts import (ArtifactRequirement, CategoryConstraint, Count
                                   PopulationConstraint, RankingConstraint, TimeRange)
 from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE, FieldMappingRegistry,
                                         UPPER_EDGE_BAND_FEET)
+from app.semantic.sql_compiler import compile_requirement
 
 # A stable, documented ranking qualification used only when neither the user nor the
 # frozen Requirement supplies one. It is surfaced in the payload, never silently applied.
@@ -62,6 +63,11 @@ class StatcastAnalyticsTool:
         requirement = self._by_id.get(task.requirement_refs[0])
         if requirement is None:
             return ToolResult.no_data()
+        # Strict action boundary: compile the open-world requirement into the closed typed
+        # SQL contract. A failure is a structured planning signal, never a silent guess.
+        compiled = compile_requirement(requirement, self.source_kind)
+        if not compiled.ok:
+            return ToolResult.failure(compiled.detail, retryable=False, error_code=compiled.code)
         try:
             ranking = self._ranking(requirement)
         except UnavailablePhysicalFields as error:
@@ -116,6 +122,7 @@ class StatcastAnalyticsTool:
             "applied_constraints": [item.model_dump(mode="json") for item in requirement.descriptor.constraints],
             "min_batted_balls": min_batted_balls,
             "population": population.model_dump(mode="json") if population else None,
+            "compiled_sql_request": compiled.request.model_dump(mode="json"),
             "observed_time_range": observed_range.model_dump(mode="json") if observed_range else None,
             "source_kind": self.source_kind,
         }, ensure_ascii=False).encode()

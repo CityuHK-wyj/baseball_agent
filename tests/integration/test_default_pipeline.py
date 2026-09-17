@@ -25,9 +25,11 @@ class DefaultPipelineTests(unittest.TestCase):
             # "Judge 2023 vs 2024" is now a deterministic two-window comparison.
             comparison = subject.analyze("Judge 2023 vs 2024")
             self.assertEqual(len(comparison.objectives), 2)
+            # Malformed or ambiguous temporal language must never escape as an uncaught
+            # parser exception; it is handled into a bounded interpretation instead.
             for query in ("Judge近0天", "Judge 2024-03-01 to 2024-02-28"):
-                with self.assertRaises(ValueError):
-                    subject.analyze(query)
+                result = subject.analyze(query)
+                self.assertIsInstance(result.objectives, tuple)
 
     def test_recent_date_window_survives_restart(self):
         with tempfile.TemporaryDirectory() as directory:

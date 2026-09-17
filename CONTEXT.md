@@ -53,6 +53,37 @@ SQL or credentials.
 extractor and reviewer, the Semantic Reconciler, the deterministic Semantic Validator and
 fail-safe provider-failure policy. It is the only source of analytical constraints for an
 objective; a single model may never both propose and approve meaning.
+
+**Open-World Semantic Understanding**: The v0.2 permissive interpretation of one request.
+It keeps high-confidence typed facts (entities, time hints, constraints) and adds
+first-class free-form meaning (`user_goal`, `semantic_brief`, `planner_notes`,
+`analysis_strategy`) plus uncertainties (unresolved concepts, search hints, recovery
+codes). It is an interpretation aid for the Planner, never executable semantics; only the
+SQL action boundary is closed and typed.
+
+**Recovery Code**: A structured signal that a concept is unknown or local coverage is
+insufficient (`UNKNOWN_ENTITY`, `UNKNOWN_METRIC`, `MISSING_LOCAL_DATA`, …). It routes work
+to entity resolution, Shared Knowledge, web research or re-planning. The governing
+invariant is `UNKNOWN != FAILED`.
+
+**Analysis Strategy**: A bounded, documented multi-indicator plan for a vague analytical
+goal such as “better”, “most skilled” or “recent form”. It exists so a natural concept is
+not forced into a single predefined metric.
+
+**SQLAnalysisRequest**: The strict, closed, typed contract required before any privileged
+PostgreSQL/DuckDB execution. It contains only validated structured information (entities,
+time ranges, metric, aggregation, typed filters, qualification, grouping, limit,
+population) and no arbitrary SQL, identifiers or fragments. Open-world plans are compiled
+into it; a compilation failure returns a recovery code to the Planner.
+
+**Free-Form Task Objective**: A natural-language `objective`/`instructions`/
+`expected_evidence` on an `AgentTask`, alongside typed structured inputs. It lets the
+Planner express web-research, entity-resolution or multi-metric work without collapsing
+the task into fixed enum values.
+
+**Unstructured Artifact Content**: The `text_content` an `Artifact` may carry alongside its
+structured payload (for example extracted web text). The Judge decides whether it
+satisfies a Requirement; `Collected != Accepted` remains invariant.
 - **Baseball Agent**: The tool-calling application that interprets an analytics request and coordinates data retrieval and response generation.
 - **Hot data**: Recent Statcast data stored in PostgreSQL. The current configured coverage is 2024–2026.
 - **Cold data**: Historical Statcast data stored as Parquet and queried through DuckDB. The current configured coverage is 2015–2023.

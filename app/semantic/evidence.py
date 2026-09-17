@@ -56,11 +56,17 @@ def _first_year(text: str) -> str:
 
 def evidence_to_artifact(evidence: Evidence, raw_artifact_id: str,
                          descriptor: ArtifactDescriptor | None = None) -> Artifact:
-    """Wrap structured evidence as a unified EVIDENCE artifact with lineage to the raw result."""
+    """Wrap structured evidence as a unified EVIDENCE artifact with lineage to the raw result.
+
+    Structured claims stay structured; the supporting text is retained as unstructured
+    ``text_content`` so the Judge and Response can use it without forcing web material
+    into an analytics schema.
+    """
     descriptor = descriptor or ArtifactDescriptor(artifact_type="EVIDENCE", data_keys=("claim",),
                                                   granularity="claim", population_scope="web")
+    text = "\n".join(claim.support or claim.claim for claim in evidence.claims)
     return Artifact(
         artifact_id=evidence.evidence_id, descriptor=descriptor,
         payload_ref=f"evidence://{evidence.evidence_id}",
         provenance=evidence.provenance, lineage=(raw_artifact_id,),
-        row_count=len(evidence.claims))
+        row_count=len(evidence.claims), text_content=text[:20000])

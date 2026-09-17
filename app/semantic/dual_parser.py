@@ -132,10 +132,19 @@ class DualSemanticParser:
                 **{**base, "outcome": "SINGLE_REVIEW", "agreement_status": status},
                 extractor_candidate=candidate_a, reviewer_candidate=candidate_b,
                 notes=("Only one semantic reader was available; no independent model "
-                       "approval. Deterministic high-confidence path only.",),)
-            # A single model's candidate is never sufficient on its own: use the
-            # deterministic high-confidence path only when it proves every explicit
-            # restriction, otherwise clarify.
+                       "approval. Its candidate is used only if the deterministic "
+                       "validator and lexical anchors accept it.",),)
+            # Open-world policy: a single reader's validated candidate may continue, but
+            # only after the deterministic validator and anchors accept it. The validator
+            # remains the authority; the missing independent reader is recorded, not
+            # silently ignored.
+            available = candidate_a if candidate_a is not None else candidate_b
+            parsed, _error = self._validate(available, raw_query)
+            if parsed is not None and not parsed.failed_closed:
+                if parsed.location_wording_requested:
+                    return replace(parsed, extractor="dual", review=review)
+                self._save(key, review.model_copy(update={"canonical_candidate": available}))
+                return replace(parsed, extractor="dual", review=review)
             return self._with_fallback(raw_query, review, key)
 
         notes = ("Both semantic readers were unavailable; refusing to guess.",)
@@ -210,6 +219,7 @@ class DualSemanticParser:
             location_wording_requested=any(kind.startswith("location")
                                            for kind in review.ambiguities),
             summary=summary, review=review,
+            understanding=(parsed.understanding if parsed is not None else None),
             ambiguities=review.extractor_candidate.ambiguities
             if review.extractor_candidate is not None else ())
 

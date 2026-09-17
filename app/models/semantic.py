@@ -2,6 +2,7 @@
 
 from app.models.clarification import ClarificationRequest
 from app.models.contracts import AnalysisObjective, Contract, Name
+from app.models.understanding import SemanticUnderstanding
 
 
 class SemanticResult(Contract):
@@ -10,6 +11,9 @@ class SemanticResult(Contract):
     clarifications: tuple[ClarificationRequest, ...] = ()
     unresolved_mentions: tuple[Name, ...] = ()
     notes: tuple[str, ...] = ()
+    # Open-world interpretation travels with the normalized result. It is not executable
+    # semantics; it exists so the Planner is not an information bottleneck.
+    understanding: SemanticUnderstanding | None = None
 
     @property
     def needs_clarification(self) -> bool:

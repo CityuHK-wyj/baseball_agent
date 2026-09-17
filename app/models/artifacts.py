@@ -10,6 +10,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.models.contracts import ArtifactDescriptor, Name, TimeRange
+from app.models.understanding import MAX_FREE_TEXT
 
 
 def utcnow() -> datetime:
@@ -31,7 +32,12 @@ class Provenance(ArtifactContract):
 
 
 class Artifact(ArtifactContract):
-    """An immutable produced result. Payload lives outside the state graph."""
+    """An immutable produced result. Payload lives outside the state graph.
+
+    ``text_content`` carries unstructured evidence (for example extracted web text)
+    alongside the structured payload reference. A web artifact is not forced into a
+    Statcast schema; the Judge decides whether its text satisfies a Requirement.
+    """
 
     artifact_id: Name
     descriptor: ArtifactDescriptor
@@ -41,6 +47,7 @@ class Artifact(ArtifactContract):
     row_count: int | None = Field(default=None, ge=0)
     observed_time_range: TimeRange | None = None
     integrity: Literal["OK", "MALFORMED", "CORRUPTED"] = "OK"
+    text_content: str = Field(default="", max_length=MAX_FREE_TEXT)
     created_at: datetime = Field(default_factory=utcnow)
 
 

@@ -92,9 +92,14 @@ class SemanticNormalizerTests(unittest.TestCase):
                    for obj in result.objectives]
         self.assertEqual(windows, [("2026-08-18", "2026-09-16"), ("2026-07-19", "2026-08-17")])
 
-    def test_ambiguous_multiple_years_still_fail_closed(self):
-        with self.assertRaises(ValueError):
-            normalizer().normalize("Judge 2023 and 2024 performance")
+    def test_multiple_years_become_a_comparison_without_raising(self):
+        result = normalizer().normalize("Judge 2023 and 2024 performance")
+        self.assertFalse(result.needs_clarification)
+        windows = [next(c.values for c in obj.constraints if c.key == "date_range")
+                   for obj in result.objectives]
+        self.assertEqual(len(windows), 2)
+        self.assertEqual(windows[0], ("2023-01-01", "2023-12-31"))
+        self.assertEqual(windows[1], ("2024-01-01", "2024-12-31"))
 
 
 if __name__ == "__main__":

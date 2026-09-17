@@ -58,6 +58,9 @@ class AcceptedEvidence(ArtifactContract):
     payload_ref: Name
     source_kind: Literal["POSTGRES", "PARQUET", "WEB", "FEATURE", "SYNTHETIC"]
     source: Name
+    # Unstructured evidence excerpt (for example web text) travels with the accepted
+    # artifact so the Response Agent can express it without a SQL-shaped schema.
+    text_excerpt: str = ""
 
 
 class ResponsePackage(ArtifactContract):
@@ -73,5 +76,10 @@ class ResponsePackage(ArtifactContract):
     limitations: tuple[Name, ...] = ()
     optional_gaps: tuple[Name, ...] = ()
     unresolved_items: tuple[Name, ...] = ()
+    # Human-readable explanations. Internal ids may remain for debugging, but a user
+    # must never receive only an opaque ``requirement-<uuid>``.
+    unresolved_explanations: tuple[str, ...] = ()
+    assumptions: tuple[str, ...] = ()
     response_preferences: tuple[Name, ...] = ()
+    response_notes: str = ""
     created_at: datetime = Field(default_factory=utcnow)

@@ -12,7 +12,8 @@ from collections.abc import Callable
 from time import monotonic
 
 from app.agent.executor import ExecutionOutcome, Executor
-from app.agent.planner import Planner, PlannerContext, PlannerTerminalLatch
+from app.agent.planner import (Planner, PlannerContext, PlannerTerminalLatch,
+                               supporting_requirement)
 from app.agent.registry import ArtifactRegistry
 from app.agent.response import build_response_package
 from app.agent.routing import Router, constraint_capability_keys
@@ -100,6 +101,13 @@ class Orchestrator:
             attempts=sum(len(item.attempts) for item in executions),
             budget_spent=self._budget - max(budget, 0))
 
+    @staticmethod
+    def _recovery_signals(executions: list[ExecutionOutcome]) -> tuple[str, ...]:
+        """Structured tool-level recovery codes. UNKNOWN is routing information."""
+        codes = [attempt.error_code for outcome in executions for attempt in outcome.attempts
+                 if attempt.error_code]
+        return tuple(dict.fromkeys(codes))
+
     def _retrieve_context(self, request: ContextRequest) -> tuple:
         if self._context_service is None:
             return ()
@@ -168,7 +176,8 @@ class Orchestrator:
     def run(self, objective: AnalysisObjective,
             initial_requirements: tuple[ArtifactRequirement, ...],
             confirmed_intent: str = "",
-            restored: RestoredRun | None = None) -> RunResult:
+            restored: RestoredRun | None = None,
+            understanding=None) -> RunResult:
         from app.models.requirements import RequirementCatalog
         catalog = RequirementCatalog((objective,), initial_requirements)
         requirements = tuple(catalog.initial_requirements) + tuple(catalog.supporting_requirements)
@@ -233,7 +242,11 @@ class Orchestrator:
                     request_id=f"planner-{run_id}-{round_index}", purpose="PLANNER",
                     query=objective.raw_query,
                     kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS, run_id=run_id)),
-                prior_plan_count=len(decisions), planner_terminal=self._latch.latched)
+                prior_plan_count=len(decisions), planner_terminal=self._latch.latched,
+                raw_query=confirmed_intent or objective.raw_query,
+                understanding=understanding,
+                web_recovery_available="web-evidence" in self._executor.tool_names,
+                recovery_signals=self._recovery_signals(executions))
             decision = self._planner.decide(context)
             decisions.append(decision)
             metrics.record("PLAN", subject_ref=decision.decision_id, agent="PLANNER",
@@ -247,6 +260,18 @@ class Orchestrator:
                     self._recorder.checkpoint(run_id, "PLANNER_TERMINAL",
                                               terminal_condition=condition)
                 break
+
+            # Materialize any Planner-created supporting requirements before executing the
+            # tasks that reference them. The immutable initial baseline is never edited.
+            for need in decision.supporting_needs:
+                requirement = supporting_requirement(need)
+                if requirement.requirement_id in by_id:
+                    continue
+                catalog.add_supporting(requirement)
+                requirements = (*requirements, requirement)
+                by_id[requirement.requirement_id] = requirement
+                states[requirement.requirement_id] = RequirementState(
+                    requirement_ref=requirement.requirement_id)
 
             if self._recorder is not None:
                 self._recorder.checkpoint(run_id, "PLAN_ACCEPTED",
@@ -375,7 +400,8 @@ class Orchestrator:
             context_items=self._retrieve_context(ContextRequest(
                 request_id=f"response-{run_id}", purpose="RESPONSE",
                 query=objective.raw_query,
-                kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS, run_id=run_id)))
+                kinds=KNOWLEDGE_KINDS, max_items=MAX_CONTEXT_ITEMS, run_id=run_id)),
+            understanding=understanding)
         result_preview = self._project_accepted_result(response, executions)
         if result_preview:
             response = response.model_copy(update={"objective_result": result_preview})

@@ -65,25 +65,39 @@ def _print_result(result, as_json: bool) -> int:
         print(json.dumps({"needs_clarification": result.needs_clarification,
                           "objective_statuses": list(result.objective_statuses),
                           "responses": list(result.responses),
+                          "understanding": (result.understanding.model_dump(mode="json")
+                                            if result.understanding is not None else None),
                           "clarifications": [item.model_dump(mode="json") for item in result.clarifications],
                           "permissions": [item.model_dump(mode="json") for item in result.permissions],
                           "constraint_revisions": [item.model_dump(mode="json") for item in result.constraint_revisions],
                           "run_ids": list(result.run_ids)}, indent=2, ensure_ascii=False))
         return 0
     if result.needs_clarification:
-        print(f"run_id={result.run_ids[0]}")
-        print("Clarification required:")
+        print("I need one clarification before I can continue.")
         for request in result.clarifications:
-            print(f"  request_id={request.clarification_id} Q: {request.question}  (reason: {request.reason})")
+            print(f"Q: {request.question}")
+            print(f"   (why: {request.reason})")
             for option in request.options:
                 marker = "*" if option.option_id == request.recommended_option_id else " "
                 print(f"   {marker} [{option.option_id}] {option.label} -> {option.value}")
+            if request.options:
+                print(f"   reply with: python3 -m app.cli answer --run-id {result.run_ids[0]} "
+                      f"--request-id {request.clarification_id} --choice <option>")
+            else:
+                print(f"   run_id={result.run_ids[0]} request_id={request.clarification_id}")
         return 0
     for request in (*result.permissions, *result.constraint_revisions):
-        print(f"run_id={result.run_ids[0]} WAITING_FOR_USER {request.model_dump_json()}")
-    for status, response in zip(result.objective_statuses, result.responses):
-        print(f"=== {status} ===")
+        print("I need one decision before I can continue.")
+        print(f"  {request.model_dump_json()}")
+        print(f"  run_id={result.run_ids[0]}")
+    for index, (status, response) in enumerate(zip(result.objective_statuses, result.responses)):
+        if index:
+            print()
         print(response)
+        package = result.response_packages[index] if index < len(result.response_packages) else None
+        if package is not None and package.accepted_evidence:
+            sources = sorted({item.source_kind for item in package.accepted_evidence})
+            print(f"Data coverage: {', '.join(sources)}")
     return 0
 
 
@@ -91,7 +105,15 @@ def command_ask(args) -> int:
     pipeline = build_pipeline(persist=args.persist, empty=args.empty, demo=args.demo,
                               use_llm=False if args.no_llm else None)
     try:
-        result = pipeline.analyze(args.query, mentions=tuple(args.mention) if args.mention else None)
+        try:
+            result = pipeline.analyze(args.query, mentions=tuple(args.mention) if args.mention else None)
+        except (ValueError, RuntimeError) as error:
+            # User language must never escape as an uncaught parser/semantic exception.
+            print("I could not safely interpret that request, so I stopped instead of "
+                  "guessing.")
+            print(f"Reason: {type(error).__name__}: {error}")
+            print("Try naming the player, the season/date range and the metric explicitly.")
+            return 1
         if args.trace:
             _print_semantic_trace(pipeline, result)
         return _print_result(result, args.json)
@@ -100,18 +122,53 @@ def command_ask(args) -> int:
 
 
 def _print_semantic_trace(pipeline, result) -> None:
-    """Print structured semantic decisions only; never hidden model reasoning."""
-    print("--- semantic trace ---")
+    """Print the open-world architecture trace. Never hidden model reasoning."""
+    print("--- trace ---")
+    print(f"Raw Query: {result.raw_query}")
+    print("Semantic Understanding")
+    printed: set[str] = set()
+    if result.understanding is None:
+        print("  (none)")
+    else:
+        for line in result.understanding.summary():
+            print(f"  {line}")
+            printed.add(line)
+        if result.understanding.known_constraints:
+            constraints = ", ".join(f"{item.kind}:{item.key}"
+                                     for item in result.understanding.known_constraints)
+            print(f"  structured_facts: {constraints}")
     for note in result.semantic_trace:
-        print(f"  {note}")
+        if note in printed:
+            continue
+        print(f"  note: {note}")
     for index, objective in enumerate(result.objectives):
         constraints = ", ".join(f"{item.kind}:{item.key}" for item in objective.constraints)
         print(f"  canonical semantics[{index}]: {constraints or 'none'}")
-    for index, status in enumerate(result.objective_statuses):
-        print(f"  objective[{index}] status={status}")
-    for index, package in enumerate(result.response_packages):
-        sources = sorted({item.source_kind for item in package.accepted_evidence})
-        print(f"  response[{index}] accepted_sources={sources or ['none']}")
+    for run in result.runs:
+        print("Planner")
+        for decision in run.planning_decisions:
+            print(f"  {decision.kind} round={decision.round} tasks={len(decision.tasks)} "
+                  f"reason={decision.terminal_reason or '-'} :: {decision.rationale}")
+            for task in decision.tasks:
+                print(f"    task[{task.task_type}] {task.description}")
+                if task.objective:
+                    print(f"      objective: {task.objective}")
+        print("Tool calls")
+        for routing in run.routing_decisions:
+            print(f"  task={routing.task_ref} tool={routing.selected_tool or 'BLOCKED'} "
+                  f":: {routing.rationale}")
+        print("SQL Boundary")
+        for outcome in run.executions:
+            for attempt in outcome.attempts:
+                if attempt.error_code:
+                    print(f"  attempt={attempt.attempt_id} status={attempt.status} "
+                          f"code={attempt.error_code} :: {attempt.safe_error_summary}")
+        print("Artifacts")
+        for assessment in run.assessments:
+            print(f"  artifact={assessment.artifact_ref} level={assessment.final_level} "
+                  f":: {assessment.assessment_summary}")
+        print(f"Final state: {run.objective_state.status} "
+              f"({run.completion_report.stop_reason})")
 
 
 def command_answer(args) -> int:

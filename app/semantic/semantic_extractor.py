@@ -23,6 +23,7 @@ from app.llm.prompts import SEMANTIC_PROMPT, SEMANTIC_REVIEW_PROMPT
 from app.llm.provider import ModelProvider, ProviderError
 from app.models.semantic_candidate import (CandidateConstraint, EvidenceSpan,
                                            SemanticAmbiguity, SemanticCandidate)
+from app.models.understanding import MAX_FREE_TEXT
 from app.semantic import analytics_intent as _ai
 from app.semantic.field_mapping import (BATTER_RELATIVE_UPPER_EDGE,
                                         DEFAULT_LOCATION_DEFINITIONS, ZONE_UPPER_OUTSIDE,
@@ -279,12 +280,21 @@ def _normalize_constraint_fields(constraint: dict, raw_query: str) -> None:
     """Accept structural field-name variants without inventing semantics.
 
     Grounding is still enforced by the deterministic validator against the query; this
-    only lets a model reuse a value it already produced under the wrong label.
+    only lets a model reuse a value it already produced under the wrong label or casing.
     """
     _normalize_origin(constraint)
     _normalize_evidence(constraint.get("evidence"), raw_query)
+    for field in ("kind", "operator", "aggregation", "direction", "event_population"):
+        value = constraint.get(field)
+        if isinstance(value, str):
+            constraint[field] = value.strip().upper()
+    if isinstance(constraint.get("game_types"), list):
+        constraint["game_types"] = [str(item).strip().upper()
+                                    for item in constraint["game_types"]]
     if constraint.get("kind") == "RANKING" and not constraint.get("metric_key"):
-        constraint["metric_key"] = constraint.get("metric")
+        constraint["metric_key"] = constraint.get("metric") or constraint.get("key")
+    if constraint.get("kind") == "NUMERIC" and not constraint.get("metric"):
+        constraint["metric"] = constraint.get("key") or constraint.get("metric_key")
 
 
 def _normalize_candidate_payload(payload: dict, raw_query: str) -> dict:
@@ -295,7 +305,113 @@ def _normalize_candidate_payload(payload: dict, raw_query: str) -> dict:
     for ambiguity in payload.get("ambiguities") or ():
         if isinstance(ambiguity, dict):
             _normalize_evidence(ambiguity.get("evidence"), raw_query)
+    _normalize_free_form(payload)
     return payload
+
+
+def _coerce_text(value) -> str:
+    """Coerce an open-world free-form value to a bounded string.
+
+    Models naturally return small objects (for example ``{name, type}`` for an entity
+    mention). Free-form fields must not reject the whole interpretation because of that
+    shape; the closed *typed* constraints remain strict.
+    """
+    if isinstance(value, str):
+        return value[:MAX_FREE_TEXT]
+    if isinstance(value, dict):
+        for key in ("name", "title", "description", "text", "summary", "claim",
+                    "question", "value", "label"):
+            if isinstance(value.get(key), str):
+                return value[key][:MAX_FREE_TEXT]
+        return json.dumps(value, ensure_ascii=False)[:MAX_FREE_TEXT]
+    if isinstance(value, (list, tuple)):
+        return "; ".join(_coerce_text(item) for item in value)[:MAX_FREE_TEXT]
+    if value is None:
+        return ""
+    return str(value)[:MAX_FREE_TEXT]
+
+
+def _normalize_free_form(payload: dict) -> None:
+    for field in ("user_goal", "semantic_brief", "planner_notes", "analysis_strategy"):
+        if field in payload and not isinstance(payload[field], str):
+            payload[field] = _coerce_text(payload[field])
+    for field in ("entity_mentions", "unresolved_concepts", "search_hints", "interpretations"):
+        if field not in payload or payload[field] is None:
+            continue
+        value = payload[field]
+        items = value if isinstance(value, (list, tuple)) else [value]
+        payload[field] = [_coerce_text(item) for item in items if _coerce_text(item)]
+
+
+def _validate_constraints(raw_constraints, vocabulary: SemanticVocabulary
+                          ) -> tuple[CandidateConstraint, ...]:
+    """Validate constraints individually. A structurally malformed constraint is dropped;
+    an invalid *origin* is a semantic vocabulary violation and is still rejected.
+
+    A constraint that parses but uses a value outside the closed vocabulary (for example a
+    free-form location definition) is dropped from the proposal rather than nullifying the
+    whole interpretation. The deterministic validator and lexical anchors remain the
+    authority over whatever survives; an explicit fact the model dropped still fails
+    anchoring.
+    """
+    valid: list[CandidateConstraint] = []
+    for raw in raw_constraints or ():
+        if not isinstance(raw, dict):
+            continue
+        try:
+            item = CandidateConstraint.model_validate(raw)
+        except ValidationError as error:
+            invalid_origin = any(
+                error_info.get("loc") and "origin" in error_info["loc"]
+                for error_info in error.errors())
+            if invalid_origin:
+                raise SemanticSchemaError(
+                    "constraint origin is not in the closed origin vocabulary") from None
+            # Otherwise drop the malformed constraint and keep the rest.
+            continue
+        if _constraint_in_vocabulary(item, vocabulary):
+            valid.append(item)
+    return tuple(valid)
+
+
+def _constraint_in_vocabulary(item: CandidateConstraint,
+                             vocabulary: SemanticVocabulary) -> bool:
+    if item.kind == "NUMERIC":
+        return (item.metric in vocabulary.metrics and item.operator in vocabulary.operators
+                and (item.unit or "mph") in vocabulary.units and item.value is not None)
+    if item.kind == "PITCH_TYPE":
+        return item.family in vocabulary.pitch_families
+    if item.kind == "LOCATION":
+        return item.definition in vocabulary.locations
+    if item.kind == "COUNT":
+        if item.states:
+            return all(state.balls <= vocabulary.max_balls and state.strikes <= vocabulary.max_strikes
+                       for state in item.states)
+        return (item.strikes is not None and item.strikes <= vocabulary.max_strikes
+                and all(ball <= vocabulary.max_balls for ball in (item.balls or (0,))))
+    if item.kind == "QUALIFICATION":
+        return bool(item.min_batted_balls and item.min_batted_balls > 0)
+    if item.kind == "POPULATION":
+        game_types = item.game_types or ("REGULAR_SEASON",)
+        return (all(game in vocabulary.game_types for game in game_types)
+                and (item.event_population or "BATTED_BALL") in vocabulary.event_populations)
+    if item.kind == "RANKING":
+        return (item.metric_key in vocabulary.metrics
+                and (item.aggregation or "AVG") in vocabulary.aggregations
+                and (item.direction or "DESC") in vocabulary.directions)
+    return False
+
+
+def _validate_ambiguities(raw_ambiguities) -> tuple[SemanticAmbiguity, ...]:
+    valid: list[SemanticAmbiguity] = []
+    for raw in raw_ambiguities or ():
+        if not isinstance(raw, dict):
+            continue
+        try:
+            valid.append(SemanticAmbiguity.model_validate(raw))
+        except ValidationError:
+            continue
+    return tuple(valid)
 
 
 class LLMSemanticExtractor:
@@ -329,6 +445,9 @@ class LLMSemanticExtractor:
         payload["extractor"] = self.name
         payload["model"] = response.model or self._model
         try:
+            payload["constraints"] = _validate_constraints(payload.get("constraints"),
+                                                            vocabulary)
+            payload["ambiguities"] = _validate_ambiguities(payload.get("ambiguities"))
             return SemanticCandidate.model_validate(payload)
         except ValidationError as error:
             raise SemanticSchemaError(
