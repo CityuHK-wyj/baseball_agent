@@ -66,6 +66,15 @@ def backfill_parquet(archive_dir: Path, mapping: dict[int, str]) -> int:
     try:
         connection.execute("CREATE TABLE game_type_map(game_pk BIGINT PRIMARY KEY, game_type VARCHAR)")
         connection.executemany("INSERT INTO game_type_map VALUES (?, ?)", list(mapping.items()))
+        # Validate every file before replacing any of them. An incomplete cached
+        # schedule must not erase existing game types or leave a partial rewrite.
+        for path in files:
+            missing = connection.execute(
+                "SELECT COUNT(*) FROM read_parquet(?) p LEFT JOIN game_type_map g "
+                "USING (game_pk) WHERE g.game_type IS NULL OR g.game_type = ''",
+                [str(path)]).fetchone()[0]
+            if missing:
+                raise ValueError(f"game type mapping missing for {missing} rows in {path.name}")
         updated = 0
         for path in files:
             columns = [row[0] for row in connection.execute(
