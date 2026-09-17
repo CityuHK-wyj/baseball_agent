@@ -9,6 +9,23 @@ Baseball Agent answers baseball analytics questions by selecting an appropriate 
 ## Glossary
 
 - **Analytics request**: A user's question about baseball performance, players, teams, seasons, or pitch events.
+
+**Semantic Candidate**: The closed, typed proposal an extractor emits for one analytics
+request: canonical metrics, operators, aggregation, count states, population and
+qualification, each with evidence. It is not executable semantics; the semantic validator
+must accept it before it can reach planning.
+
+**Semantic Provenance**: The evidence text (and optional source offsets) connecting one
+extracted constraint back to the user's query. Reused by numeric-ownership checks,
+contradiction detection and audit.
+
+**Semantic Validator**: The deterministic authority that validates a Semantic Candidate
+against the closed vocabulary, grounds its evidence, detects contradictions and numeric
+cross-binding, and only then emits canonical typed constraints.
+
+**Hybrid Semantic Parser**: The pipeline stage combining deterministic lexical cues, an
+interchangeable (deterministic or LLM-backed) extractor, the deterministic validator and a
+safe fallback. It is the only source of analytical constraints for an objective.
 - **Baseball Agent**: The tool-calling application that interprets an analytics request and coordinates data retrieval and response generation.
 - **Hot data**: Recent Statcast data stored in PostgreSQL. The current configured coverage is 2024–2026.
 - **Cold data**: Historical Statcast data stored as Parquet and queried through DuckDB. The current configured coverage is 2015–2023.

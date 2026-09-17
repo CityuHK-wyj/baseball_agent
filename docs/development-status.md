@@ -1,5 +1,17 @@
 # Development status
 
+Latest work (2026-09-18): **HYBRID_SEMANTIC_LAYER_READY — READY_FOR_CODEX_REVIEW** on
+`pi/v0.1-llm-semantic-parser`, branched from
+`codex/v0.1-semantic-recheck @ eae9875e86632f509b0351ea31da040ef151bc7e`.
+[Implementation report](reviews/v01-hybrid-semantic-layer.md). 471 tests pass with no
+skips; the original blocker gate, the Codex NL-to-SQL trace and the new hybrid semantic
+gate all exit 0 with no unresolved blockers. This is a review candidate, not adoption or
+release approval: `main` is untouched and no tag exists. Live LLM extraction is
+`UNVERIFIED_LIVE` because no provider credential is configured here.
+
+The prior independent verdict remains the authoritative blocked baseline until Codex
+re-reviews this branch:
+
 Current independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
 `codex/v0.1-semantic-recheck`. [Semantic re-review](reviews/v01-semantic-recheck.md)
 records the remaining five compositional failures, regression-backed fixes, and live evidence.

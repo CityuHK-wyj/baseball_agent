@@ -1,5 +1,16 @@
 # Baseball Agent
 
+Latest work (2026-09-18): **HYBRID_SEMANTIC_LAYER_READY — READY_FOR_CODEX_REVIEW** on
+`pi/v0.1-llm-semantic-parser`, branched from
+`codex/v0.1-semantic-recheck @ eae9875e86632f509b0351ea31da040ef151bc7e`.
+[Implementation report](docs/reviews/v01-hybrid-semantic-layer.md). 471 tests pass with no
+skips; the original blocker gate, the Codex NL-to-SQL trace and the new hybrid semantic
+gate all exit 0. This is a review candidate, not adoption or release approval: `main` is
+untouched and no tag exists. Live LLM extraction is `UNVERIFIED_LIVE` here.
+
+The prior independent verdict remains the authoritative blocked baseline until Codex
+re-reviews this branch:
+
 Current independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
 `codex/v0.1-semantic-recheck`. [Semantic re-review](docs/reviews/v01-semantic-recheck.md)
 records the remaining five compositional failures, regression-backed fixes, and live evidence.
@@ -23,6 +34,12 @@ exactly which blog decisions are implemented.
 - **Semantic normalization** — entity resolution with aliases/nicknames, clarification on
   ambiguity, constraint authority, and objective extraction (no re-parsing of intent by
   the Planner).
+- **Hybrid semantic parsing** — a constrained LLM (or deterministic) extractor proposes a
+  closed, typed, provenance-carrying `SemanticCandidate`; a deterministic validator is the
+  authority that grounds evidence, blocks numeric cross-binding and contradictions, and
+  fails closed or clarifies instead of executing a weaker interpretation. Includes exact
+  compound count states (`0-2 or 1-1` is `{(0,2),(1,1)}`). See
+  [ADR 0021](docs/adr/0021-constrained-hybrid-semantic-parsing.md).
 - **Requirement decomposition** — a narrow Requirement Decomposer turns an objective into
   semantic-atomic, immutable Initial Requirements.
 - **Planning** — a Planner that returns `PLAN` / `REPLAN` / `STOP_PLANNING` with a
