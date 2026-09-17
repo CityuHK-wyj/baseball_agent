@@ -33,6 +33,9 @@ _AMBIGUOUS_LOCATION_CUES: tuple[str, ...] = (
     r"\bupper\s+edge\b", r"\btop\s+of\s+the\s+strike\s+zone\b", r"\bupper\s+part\b",
     r"\bhigh\s+in\s+the\s+zone\b", r"\bupper\s+zone\b", r"\bup\s+in\s+the\s+zone\b",
     r"\bjust\s+above\b", r"\babove\s+the\s+strike\s+zone\b", r"\babove\s+the\s+zone\b",
+    # 'high fastball' has several defensible readings (upper third, batter-relative
+    # upper edge, or the upper outside quadrants). It must clarify, not guess.
+    r"\bhigh\s+(?:fastballs?|heat|pitches?|four-seamers?)\b",
 )
 
 # Generic two-strike wording. Explicit counts (``0-2``) are handled separately and are
