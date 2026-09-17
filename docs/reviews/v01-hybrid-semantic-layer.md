@@ -18,6 +18,7 @@ release approval.
 | `899a00e` | Route analytical semantics through the hybrid validator |
 | `31fa09b` | Semantic evaluation corpus and compositional hybrid gate |
 | `05928f9` | Rank-by phrasing and empty-result diagnostics; live compound E2E |
+| `079da57` | Bounded semantic constraint summary in the trace |
 
 ## Architecture
 
@@ -160,7 +161,7 @@ the adapter now distinguishes `EMPTY` from `SOURCE_QUERY_FAILED`.
 
 ## Verification status
 
-- Regression suite: **471 tests, OK, no skips** (includes live PostgreSQL and Parquet
+- Regression suite: **473 tests, OK, no skips** (includes live PostgreSQL and Parquet
   integration when credentials/archive exist).
 - `docs/reviews/v01-reproduce-blockers.py`: exit 0, `unresolved_blockers=[]`.
 - `docs/reviews/semantic-recheck-evidence/intent-trace.py`: exit 0 after the mixed-count
