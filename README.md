@@ -1,22 +1,12 @@
 # Baseball Agent
 
-Latest work (2026-09-18): **HYBRID_SEMANTIC_LAYER_READY — READY_FOR_CODEX_REVIEW** on
-`pi/v0.1-llm-semantic-parser`, branched from
-`codex/v0.1-semantic-recheck @ eae9875e86632f509b0351ea31da040ef151bc7e`.
-[Implementation report](docs/reviews/v01-hybrid-semantic-layer.md). 473 tests pass with no
-skips; the original blocker gate, the Codex NL-to-SQL trace and the new hybrid semantic
-gate all exit 0. This is a review candidate, not adoption or release approval: `main` is
-untouched and no tag exists. Live LLM extraction is `UNVERIFIED_LIVE` here.
-
-The prior independent verdict remains the authoritative blocked baseline until Codex
-re-reviews this branch:
-
-Current independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
-`codex/v0.1-semantic-recheck`. [Semantic re-review](docs/reviews/v01-semantic-recheck.md)
-records the remaining five compositional failures, regression-backed fixes, and live evidence.
-Baseline: 432 tests; corrected review: 435 tests, no skips. The original blocker gate
-passes, but the expanded NL-to-SQL release gate fails. No main adoption or tag is authorized
-while those P1 defects remain. Repair-checkpoint claims below are not release approval.
+Current independent verdict: **FINAL_REVIEW_BLOCKED** on
+`codex/v0.1-final-hybrid-review`, reviewing Pi `ebdccc75793ebd2cf448e1b199f2a16109e5ca7e`.
+[Final hybrid review](docs/reviews/v01-final-hybrid-review.md): 479 tests pass, but nine new adversarial cases fail.
+Real DeepSeek extraction and PostgreSQL/Parquet execution are LIVE_VERIFIED;
+semantic containment and partial fallback fidelity fail. The original/compositional
+blockers are repaired. Main and tags remain untouched. Web Evidence and Operational
+PostgreSQL remain UNVERIFIED_LIVE; generalized temporal NLP and RAG remain DEFERRED.
 
 An explainable, verifiable MLB analytics agent. It turns a natural-language baseball
 question into a set of analysis objectives, decomposes them into information

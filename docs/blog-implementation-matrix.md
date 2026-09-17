@@ -1,6 +1,14 @@
 # Blog implementation matrix
 
-Current independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
+Current independent verdict: **FINAL_REVIEW_BLOCKED** on
+`codex/v0.1-final-hybrid-review`, reviewing Pi `ebdccc75793ebd2cf448e1b199f2a16109e5ca7e`.
+[Final hybrid review](reviews/v01-final-hybrid-review.md): 479 tests pass, but nine new adversarial cases fail.
+Real DeepSeek extraction and PostgreSQL/Parquet execution are LIVE_VERIFIED;
+semantic containment and partial fallback fidelity fail. The original/compositional
+blockers are repaired. Main and tags remain untouched. Web Evidence and Operational
+PostgreSQL remain UNVERIFIED_LIVE; generalized temporal NLP and RAG remain DEFERRED.
+
+Historical independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
 `codex/v0.1-semantic-recheck`. [Semantic re-review](reviews/v01-semantic-recheck.md)
 records the remaining five compositional failures, regression-backed fixes, and live evidence.
 Baseline: 432 tests; corrected review: 435 tests, no skips. The original blocker gate
@@ -22,7 +30,7 @@ Status values:
 This file is maintained as implementation proceeds. It is the evidence for
 "which blog designs are actually implemented", not a wish list.
 
-Current review: **FINAL_REVIEW_BLOCKED** on
+Historical review: **FINAL_REVIEW_BLOCKED** on
 `pi/v0.1-semantic-fixes`, based exactly on the reviewed `codex/v0.1-final-review`
 checkpoint. 432 tests pass. See [independent final review](reviews/v01-final-review.md)
 for the blocked baseline and

@@ -1,5 +1,9 @@
 # Hybrid semantic layer — implementation report
 
+Independent re-review: **FINAL_REVIEW_BLOCKED**. The claims below are historical
+implementation claims; [the final hybrid review](v01-final-hybrid-review.md) records
+real-model containment counterexamples despite passing representative cases.
+
 Branch: `pi/v0.1-llm-semantic-parser`, created from
 `codex/v0.1-semantic-recheck @ eae9875e86632f509b0351ea31da040ef151bc7e`.
 The exact reviewed tree at the start is `64c1d4f3c7bed1e91b4b5fc8f0760e7179313662`.

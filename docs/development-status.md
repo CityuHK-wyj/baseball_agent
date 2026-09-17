@@ -1,6 +1,14 @@
 # Development status
 
-Latest work (2026-09-18): **HYBRID_SEMANTIC_LAYER_LIVE_VERIFIED — READY_FOR_CODEX_REVIEW** on
+Current independent verdict: **FINAL_REVIEW_BLOCKED** on
+`codex/v0.1-final-hybrid-review`, reviewing Pi `ebdccc75793ebd2cf448e1b199f2a16109e5ca7e`.
+[Final hybrid review](reviews/v01-final-hybrid-review.md): 479 tests pass, but nine new adversarial cases fail.
+Real DeepSeek extraction and PostgreSQL/Parquet execution are LIVE_VERIFIED;
+semantic containment and partial fallback fidelity fail. The original/compositional
+blockers are repaired. Main and tags remain untouched. Web Evidence and Operational
+PostgreSQL remain UNVERIFIED_LIVE; generalized temporal NLP and RAG remain DEFERRED.
+
+Builder checkpoint (2026-09-18; superseded by the review above): **HYBRID_SEMANTIC_LAYER_LIVE_VERIFIED — READY_FOR_CODEX_REVIEW** on
 `pi/v0.1-llm-semantic-parser`, branched from
 `codex/v0.1-semantic-recheck @ eae9875e86632f509b0351ea31da040ef151bc7e`.
 [Implementation report](reviews/v01-hybrid-semantic-layer.md). 479 tests pass with no
@@ -11,10 +19,9 @@ gate all exit 0 with no unresolved blockers. Live LLM semantic extraction is
 `reviews/semantic-hybrid-evidence/live-llm-semantic.jsonl`. This is a review candidate,
 not adoption or release approval: `main` is untouched and no tag exists.
 
-The prior independent verdict remains the authoritative blocked baseline until Codex
-re-reviews this branch:
+Prior review history (superseded by the review above):
 
-Current independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
+Historical independent verdict (2026-09-17): **FINAL_REVIEW_BLOCKED** on
 `codex/v0.1-semantic-recheck`. [Semantic re-review](reviews/v01-semantic-recheck.md)
 records the remaining five compositional failures, regression-backed fixes, and live evidence.
 Baseline: 432 tests; corrected review: 435 tests, no skips. The original blocker gate
