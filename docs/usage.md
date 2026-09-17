@@ -230,3 +230,45 @@ python3 docs/reviews/dual-semantic-live-evidence.py
 * The narrow compound query legitimately returns zero qualifying rows at the requested
   minimum; that is reported as `FAILED`, not a data error.
 * Report artifacts do not include pitch-grain reconciliation against upstream feeds.
+
+## 9. v0.2 LLM-first conversational runtime
+
+This is the preferred interface. The LLM understands the question, plans tool use,
+researches when local data is missing, and writes a natural answer; SQL/filesystem/network
+and permissions stay strictly guarded.
+
+```bash
+python3 -m app.cli chat                 # multi-turn conversation (recommended)
+python3 -m app.cli ask "太鼓达人今年战绩如何？"
+python3 -m app.cli ask "最近30天Ohtani和Judge谁打得更好？" --trace
+python3 -m app.cli doctor
+```
+
+`chat` manages run/request ids internally. Clarifications are answered naturally
+(`按个人好球带上缘`, or just `3`). Follow-ups such as `那去年呢？` reuse the conversation
+context. `--trace` prints the structured runtime trace (cognition plan, tool calls,
+compiled `SQLAnalysisRequest`, evidence, final state) and never hidden model reasoning.
+The `--legacy` flag on `ask` still runs the deterministic requirement/ semantic pipeline.
+
+Live tools used by the runtime:
+
+* **Web research** — DuckDuckGo Lite + page reading; unstructured, sourced evidence.
+* **Batting / pitching stats** — live season/date-range lines (PA, AVG, OBP, SLG, OPS, HR,
+  BB, SO; W-L, ERA, WHIP, SO, IP, SO9).
+* **Local analytics** — the strict Statcast `SQLAnalysisRequest` path (Parquet 2015–2023,
+  PostgreSQL 2024–2026).
+* **Entity lookup** — local dictionary → MLB StatsAPI people search → evidence text.
+
+Candidate knowledge (runtime discoveries such as a community nickname) is **not** written
+into Shared Knowledge automatically. Review it as an administrator:
+
+```bash
+python3 -m app.cli knowledge candidates
+python3 -m app.cli knowledge review <candidate-id> --approve --ingest
+python3 -m app.cli knowledge review <candidate-id> --reject
+```
+
+Live-verification classification (see the stop report): `LIVE_VERIFIED` for web research,
+batting/pitching stats, PostgreSQL and Parquet analytics, and conversational clarification;
+`DEMO_ONLY` for synthetic analytics; `UNIT_VERIFIED`/`INTEGRATION_VERIFIED` as labelled in
+the test suite. `--demo` success is never reported as real feature success.

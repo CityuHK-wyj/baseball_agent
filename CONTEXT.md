@@ -84,6 +84,31 @@ the task into fixed enum values.
 **Unstructured Artifact Content**: The `text_content` an `Artifact` may carry alongside its
 structured payload (for example extracted web text). The Judge decides whether it
 satisfies a Requirement; `Collected != Accepted` remains invariant.
+
+**LLM-First Runtime**: The v0.2 conversational architecture in which the LLM is the
+primary cognition layer (understanding, planning, research, explanation) and strictness
+is applied only at privileged action boundaries. Semantic parsing is an input to the
+Planner, never a mandatory gate; `UNKNOWN` is a routing signal, not a failure.
+
+**Conversation Session**: The mutable application-service state for one user session:
+messages, current status, pending clarification, recent entities and accepted context.
+Follow-ups such as “那去年呢？” resolve against this context.
+
+**Run Status**: The user-facing lifecycle state — `PENDING`, `RUNNING`, `WAITING_FOR_USER`,
+`COMPLETE`, `LIMITED`, `FAILED`. `WAITING_FOR_USER` is a first-class state for a genuine
+clarification, never `FAILED`.
+
+**Candidate Knowledge**: A runtime discovery (for example a community nickname found by web
+research) recorded with provenance and status `CANDIDATE`. Runtime agents cannot promote
+it into authoritative Shared Knowledge; an administrator must approve it.
+
+**Live Web Research Tool**: A first-class Planner tool that performs real public search and
+bounded page reading, returning unstructured, sourced evidence. It is not forced into a SQL
+schema and is not auto-promoted into Shared Knowledge.
+
+**Batting/Pitching Stats Tool**: Live capability returning season or date-range rate stats
+(PA, AVG, OBP, SLG, OPS, HR, BB, SO; W-L, ERA, WHIP, SO, IP) from a live source, so vague
+“who is better / why is he strong” questions have real numbers.
 - **Baseball Agent**: The tool-calling application that interprets an analytics request and coordinates data retrieval and response generation.
 - **Hot data**: Recent Statcast data stored in PostgreSQL. The current configured coverage is 2024–2026.
 - **Cold data**: Historical Statcast data stored as Parquet and queried through DuckDB. The current configured coverage is 2015–2023.

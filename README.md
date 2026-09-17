@@ -100,6 +100,20 @@ ask `太鼓达人今年战绩如何？`, `2023和2025，Freddie Freeman面对高
 `今年道奇打者里谁最擅长处理高区快速球？` and `最近30天Ohtani和Judge谁打得更好？` without the
 parser raising or the run failing on an unknown enum.
 
+**v0.2 LLM-first runtime (current).** The runtime is now a conversational baseball agent:
+the LLM understands the question, decides what to do, researches with live tools, and
+explains the answer, while SQL/filesystem/network/permissions stay strictly guarded. New
+capabilities: live web research (DuckDuckGo Lite + page reading), live batting/pitching
+stats, entity lookup (local → MLB registry → evidence), candidate-knowledge governance,
+and an interactive `chat` mode with natural clarification and follow-ups. See
+[ADR 0024](docs/adr/0024-llm-first-cognition-strict-action-boundaries.md).
+
+```bash
+python3 -m app.cli chat                 # multi-turn conversation
+python3 -m app.cli ask "太鼓达人今年战绩如何？" --trace
+python3 -m app.cli ask "DFA是什么意思？"
+```
+
 ## Architecture
 
 ```mermaid

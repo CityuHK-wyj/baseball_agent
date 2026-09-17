@@ -101,7 +101,126 @@ def _print_result(result, as_json: bool) -> int:
     return 0
 
 
+def _build_agent(args):
+    from app.agent.factory import build_agent
+    return build_agent(use_llm=not getattr(args, "no_llm", False))
+
+
+def _print_agent_trace(trace) -> None:
+    """Structured LLM-first runtime trace. Never hidden model chain-of-thought."""
+    if trace is None:
+        print("--- trace --- (none)")
+        return
+    print("--- trace ---")
+    print(f"Raw Query: {trace.raw_query}")
+    plan = trace.plan
+    print("Cognition")
+    if plan is not None:
+        print(f"  user_goal: {plan.user_goal}")
+        print(f"  understanding: {plan.understanding}")
+        print(f"  analysis_strategy: {plan.analysis_strategy}")
+        if plan.assumptions:
+            print(f"  assumptions: {'; '.join(plan.assumptions)}")
+        if plan.unresolved:
+            print(f"  unresolved: {'; '.join(plan.unresolved)}")
+        print(f"  planner_source: {plan.source}")
+        if plan.clarification:
+            print(f"  clarification: {plan.clarification.question}")
+    if trace.tool_calls:
+        print("Tools")
+        for call in trace.tool_calls:
+            print(f"  {call}")
+    if trace.sql_requests:
+        print("SQL Boundary (compiled SQLAnalysisRequest)")
+        for request in trace.sql_requests:
+            print(f"  {request[:400]}")
+    if trace.steps:
+        print("Recovery / notes")
+        for step in trace.steps:
+            print(f"  {step}")
+    if trace.evidence:
+        print("Evidence")
+        for summary in trace.evidence:
+            print(f"  - {summary[:160]}")
+    print(f"Final state: {trace.status}")
+
+
 def command_ask(args) -> int:
+    if getattr(args, "legacy", False) or getattr(args, "demo", False) \
+            or getattr(args, "empty", False):
+        # Synthetic/demo analytics and the persisted requirement pipeline stay on the
+        # legacy deterministic path; they never masquerade as live capability.
+        return _command_ask_legacy(args)
+    agent = _build_agent(args)
+    try:
+        conversation = agent.start_conversation()
+        result = agent.send_message(conversation.conversation_id, args.query)
+        if args.trace:
+            _print_agent_trace(result.trace)
+        if getattr(args, "json", False):
+            print(json.dumps({"status": result.status, "answer": result.answer,
+                              "pending_clarification": (
+                                  result.pending_clarification.model_dump(mode="json")
+                                  if result.pending_clarification else None),
+                              "evidence": [item.model_dump(mode="json")
+                                           for item in result.evidence]},
+                             ensure_ascii=False, indent=2))
+            return 0
+        print(result.answer)
+        if result.pending_clarification is not None:
+            for index, option in enumerate(result.pending_clarification.options, 1):
+                print(f"  {index}. {option}")
+            print("  (answer naturally with: python3 -m app.cli chat)")
+        return 0
+    finally:
+        agent.close()
+
+
+def command_chat(args) -> int:
+    agent = _build_agent(args)
+    try:
+        conversation = agent.start_conversation()
+        print("Baseball Agent — ask a baseball question in Chinese or English (Ctrl-D to exit).")
+        while True:
+            try:
+                text = input("你: ").strip()
+            except (EOFError, KeyboardInterrupt):
+                print()
+                break
+            if not text:
+                continue
+            if text.casefold() in ("exit", "quit", ":q"):
+                break
+            if conversation.status == "WAITING_FOR_USER":
+                mapped = _map_choice(conversation, text)
+                result = agent.respond_to_clarification(conversation.conversation_id, mapped)
+            else:
+                result = agent.send_message(conversation.conversation_id, text)
+            if getattr(args, "trace", False):
+                _print_agent_trace(result.trace)
+            print(f"Agent: {result.answer}")
+            if result.pending_clarification is not None:
+                for index, option in enumerate(result.pending_clarification.options, 1):
+                    print(f"  {index}. {option}")
+        return 0
+    finally:
+        agent.close()
+
+
+def _map_choice(conversation, text: str) -> str:
+    """Let a user answer a clarification with a number instead of pasting option text."""
+    pending = conversation.pending_clarification
+    if pending is None or not pending.options:
+        return text
+    token = text.strip().rstrip(".、)）")
+    if token.isdigit():
+        index = int(token) - 1
+        if 0 <= index < len(pending.options):
+            return pending.options[index]
+    return text
+
+
+def _command_ask_legacy(args) -> int:
     pipeline = build_pipeline(persist=args.persist, empty=args.empty, demo=args.demo,
                               use_llm=False if args.no_llm else None)
     try:
@@ -413,22 +532,73 @@ def command_doctor(args) -> int:
     return 1 if report.failed else 0
 
 
+def _open_candidates():
+    from app.knowledge.candidates import CandidateKnowledgeStore
+    path = settings.operational_store_path.parent / "candidate_knowledge.db"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return CandidateKnowledgeStore(path)
+
+
+def command_knowledge_candidates(args) -> int:
+    store = _open_candidates()
+    try:
+        items = store.list(status=args.status)
+        for item in items:
+            print(f"{item.candidate_id}  [{item.status}] {item.surface} = {item.meaning[:120]}")
+            if item.evidence:
+                print(f"    evidence: {item.evidence[0][:160]}")
+        print(f"total={len(items)}")
+        return 0
+    finally:
+        store.close()
+
+
+def command_knowledge_review(args) -> int:
+    store = _open_candidates()
+    try:
+        candidate = store.review(args.candidate_id, approve=args.approve)
+        print(f"{candidate.candidate_id} -> {candidate.status}")
+        if args.approve and args.ingest:
+            base = _open_knowledge()
+            try:
+                from app.models.knowledge import KnowledgeItem
+                base.store.upsert_item(KnowledgeItem(
+                    knowledge_id=f"CANDIDATE:{candidate.candidate_id}",
+                    canonical_key=candidate.surface, knowledge_type="ALIAS",
+                    title=candidate.surface, aliases=(candidate.surface,),
+                    summary=candidate.meaning or candidate.context,
+                    source_authority="COMMUNITY"))
+                print("ingested into Shared Knowledge")
+            finally:
+                base.store.close()
+        return 0
+    finally:
+        store.close()
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="baseball-agent", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
 
-    ask = sub.add_parser("ask", help="run one analysis request (offline by default)")
+    ask = sub.add_parser("ask", help="ask one baseball question (LLM-first conversational runtime)")
     ask.add_argument("query")
     ask.add_argument("--mention", action="append", help="explicit entity mention (repeatable)")
     ask.add_argument("--empty", action="store_true", help="simulate a source returning no rows")
     ask.add_argument("--demo", action="store_true", help="explicitly enable synthetic analytics")
     ask.add_argument("--persist", action="store_true", help="persist to the operational store")
     ask.add_argument("--no-llm", action="store_true",
-                     help="force the deterministic high-confidence semantic path")
+                     help="use the deterministic fallback planner instead of the LLM")
+    ask.add_argument("--legacy", action="store_true",
+                     help="use the legacy requirement/semantic pipeline")
     ask.add_argument("--trace", action="store_true",
-                     help="print structured semantic decisions (no model reasoning)")
+                     help="print structured runtime decisions (no model reasoning)")
     ask.add_argument("--json", action="store_true")
     ask.set_defaults(func=command_ask)
+
+    chat = sub.add_parser("chat", help="interactive multi-turn conversation")
+    chat.add_argument("--no-llm", action="store_true", help="deterministic fallback planner")
+    chat.add_argument("--trace", action="store_true")
+    chat.set_defaults(func=command_chat)
 
     answer = sub.add_parser("answer", help="answer a persisted request and resume the same run")
     answer.add_argument("--run-id", required=True)
@@ -497,6 +667,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     kvalidate = ksub.add_parser("validate", help="validate committed seed packs")
     kvalidate.set_defaults(func=command_knowledge_validate)
+
+    kcandidates = ksub.add_parser("candidates", help="list runtime-proposed candidate knowledge")
+    kcandidates.add_argument("--status", choices=("CANDIDATE", "APPROVED", "REJECTED"))
+    kcandidates.set_defaults(func=command_knowledge_candidates)
+
+    kreview = ksub.add_parser("review", help="approve/reject a candidate (admin action)")
+    kreview.add_argument("candidate_id")
+    group = kreview.add_mutually_exclusive_group(required=True)
+    group.add_argument("--approve", action="store_true")
+    group.add_argument("--reject", dest="approve", action="store_false")
+    kreview.add_argument("--ingest", action="store_true",
+                         help="with --approve, also write it into Shared Knowledge")
+    kreview.set_defaults(func=command_knowledge_review)
     return parser
 
 
