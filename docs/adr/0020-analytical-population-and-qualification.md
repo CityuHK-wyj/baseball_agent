@@ -27,7 +27,10 @@ lost intent.
   `event_population` (`BATTED_BALL`, `MEASURED_CONTACT`, `ALL_PITCHES`). The deterministic
   parser emits it for every analytical query, so the analyzed population is explicit on
   the objective, the requirement descriptor and the artifact. The v0.1 default is regular
-  season over fair batted-ball events (`events IS NOT NULL`).
+  season over balls classified by the provider as in play
+  (`description = 'hit_into_play'`). The final re-review corrected the original
+  `events IS NOT NULL` implementation: events represents plate-appearance outcomes,
+  including strikeouts, walks and truncated foul contacts, and is not a contact filter.
 - `QualificationConstraint` (kind `QUALIFICATION`) carries an explicit user threshold.
   The Requirement Decomposer freezes it, together with the documented default
   (`DEFAULT_MIN_BATTED_BALLS = 3`), into `QualificationRule.min_batted_balls`. The adapter
@@ -66,3 +69,16 @@ lost intent.
   rejected by R2.
 - Rename zones 11-12 to an "above the zone" predicate: rejected; the numbered zones do
   not implement that geometry.
+
+## Re-review correction — 2026-09-17
+
+MEASURED_CONTACT explicitly requires non-null launch_speed independently of the ranking
+metric. ALL_PITCHES adds no event filter. Every aggregation still requires a non-null
+value of the requested metric; therefore EV rankings and eligibility counts operate on
+observed EV values, without imputing zero for missing measurements. BATTED_BALL uses the
+provider's hit_into_play classification, retaining sacrifices and fielding outcomes while
+excluding terminal strikeouts/walks/HBP and foul contacts. This is an executable event
+classification, not an independent reconstruction of fair/foul territory from coordinates.
+Frozen QualificationRule takes precedence over every adapter fallback setting. Incomplete
+Parquet game-type mappings now fail before any archive replacement. Parser composition
+still has release blockers; see the semantic re-review report.

@@ -63,6 +63,60 @@ def task():
 
 
 class StatcastToolTests(unittest.TestCase):
+    def test_adapter_configuration_cannot_override_frozen_qualification(self):
+        required = requirement_with([QualificationConstraint(min_batted_balls=20)])
+        executor = RecordingExecutor(rows=[(1, 30, 90.0, 95.0)])
+        result = ParquetStatcastTool([required], FieldMappingRegistry(), executor,
+                                    min_batted_balls=1).execute(task())
+        self.assertIn("HAVING COUNT(*) >= 20", executor.statements[0])
+        self.assertEqual(json.loads(result.payload)["min_batted_balls"], 20)
+
+    def test_population_is_independent_of_ranking_metric_and_terminal_events(self):
+        import duckdb
+        connection = duckdb.connect()
+        self.addCleanup(connection.close)
+        connection.execute("""CREATE TABLE pitches AS
+            SELECT 1 AS batter, DATE '2023-06-01' AS game_date,
+                   96.0 AS release_speed, events, description, launch_speed, game_type
+            FROM (VALUES
+                ('single', 'hit_into_play', 100.0, 'R'),
+                ('sac_fly', 'hit_into_play', 90.0, 'R'),
+                ('field_error', 'hit_into_play', 110.0, 'R'),
+                ('strikeout', 'swinging_strike', NULL, 'R'),
+                ('walk', 'ball', NULL, 'R'),
+                ('hit_by_pitch', 'hit_by_pitch', NULL, 'R'),
+                ('truncated_pa', 'foul', 100.0, 'R'),
+                (NULL, 'foul', 80.0, 'R'),
+                ('field_out', 'hit_into_play', NULL, 'R'),
+                ('single', 'hit_into_play', 100.0, 'S'),
+                ('single', 'hit_into_play', 100.0, 'UNKNOWN'),
+                ('single', 'hit_into_play', 100.0, NULL),
+                ('sac_bunt', 'hit_into_play', 80.0, 'R'))
+            AS sample(events, description, launch_speed, game_type)""")
+
+        class FixtureExecutor:
+            def execute_with_rows(self, sql):
+                rows = connection.execute(sql).fetchall()
+                return ToolResult.ok(len(rows)), rows
+
+        class FixtureTool(ParquetStatcastTool):
+            def _from_clause(self):
+                return "pitches"
+
+        for metric, expected in (("pitch_velocity", (5, 6, 10)),
+                                 ("exit_velocity", (4, 6, 6))):
+            for population, count in zip(("BATTED_BALL", "MEASURED_CONTACT", "ALL_PITCHES"), expected):
+                with self.subTest(metric=metric, population=population):
+                    objective = AnalysisObjective(objective_id="o1", raw_query="population audit",
+                        description="population audit", constraints=(
+                            RankingConstraint(metric_key=metric, limit=5),
+                            PopulationConstraint(event_population=population),
+                            QualificationConstraint(min_batted_balls=1)))
+                    required = RuleBasedRequirementDecomposer(id_factory=lambda p: f"{p}-1").decompose(objective)[0]
+                    result = FixtureTool([required], FieldMappingRegistry(), FixtureExecutor()).execute(task())
+                    self.assertEqual(result.status, "OK")
+                    self.assertEqual(json.loads(result.payload)["rows"][0][2], count)
+
     def test_entity_date_and_valid_count_bounds_filter_actual_rows(self):
         import duckdb
         from app.models.contracts import Entity
@@ -112,6 +166,8 @@ class StatcastToolTests(unittest.TestCase):
 
         requirement_ = RuleBasedRequirementDecomposer(id_factory=lambda p: f"{p}-1").decompose(
             analytics_objective(definition=BATTER_RELATIVE_UPPER_EDGE))[0]
+        requirement_ = requirement_.model_copy(update={"qualification_rule":
+            requirement_.qualification_rule.model_copy(update={"min_batted_balls": 1})})
         connection = duckdb.connect()
         self.addCleanup(connection.close)
         connection.execute("""CREATE TABLE pitches AS
@@ -254,7 +310,7 @@ class StatcastToolTests(unittest.TestCase):
         ParquetStatcastTool([requirement_], FieldMappingRegistry(), executor).execute(task())
         main = executor.statements[0]
         self.assertIn("game_type IN ('R')", main)
-        self.assertIn("events IS NOT NULL", main)
+        self.assertIn("description = 'hit_into_play'", main)
 
     def test_postseason_population_uses_postseason_codes(self):
         requirement_ = requirement_with(

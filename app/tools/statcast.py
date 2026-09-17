@@ -55,8 +55,7 @@ class StatcastAnalyticsTool:
         self._by_id = {item.requirement_id: item for item in requirements}
         self._field_mapping = field_mapping
         self._player_names = dict(player_names or {})
-        # None means "use the Requirement's frozen qualification rule"; an explicit value
-        # is a test/injection override, never a hidden production default.
+        # Legacy fallback only; no adapter setting may override a frozen rule.
         self._min_batted_balls = min_batted_balls
 
     def execute(self, task) -> ToolResult:
@@ -141,11 +140,11 @@ class StatcastAnalyticsTool:
         raise UnavailablePhysicalFields("no ranking constraint")
 
     def _qualification_threshold(self, requirement: ArtifactRequirement) -> int:
-        if self._min_batted_balls is not None:
-            return int(self._min_batted_balls)
         rule = requirement.qualification_rule
         if rule is not None and rule.min_batted_balls is not None:
             return int(rule.min_batted_balls)
+        if self._min_batted_balls is not None:
+            return int(self._min_batted_balls)
         return DEFAULT_MIN_BATTED_BALLS
 
     def _population(self, requirement: ArtifactRequirement) -> PopulationConstraint | None:
@@ -229,10 +228,19 @@ class StatcastAnalyticsTool:
                 code_list = ", ".join(_quote(code) for code in dict.fromkeys(codes))
                 clauses.append(f"{game_field} IN ({code_list})")
         if constraint.event_population == "BATTED_BALL":
-            if self._physical_field("events") is None:
-                missing.add("events")
+            if self._physical_field("description") is None:
+                missing.add("description")
             else:
-                clauses.append("events IS NOT NULL")
+                # events marks a completed plate appearance, including walks,
+                # strikeouts and truncated foul contacts. Use the pitch result.
+                clauses.append("description = 'hit_into_play'")
+        elif constraint.event_population == "MEASURED_CONTACT":
+            field = self._field_mapping.physical_field("exit_velocity", self.source_kind)
+            if field is None or not self._physical_column_available(field):
+                missing.add("exit_velocity")
+            else:
+                # Contact measurement is independent of the metric being ranked.
+                clauses.append(f"{field} IS NOT NULL")
 
     def _apply_location(self, constraint: LocationConstraint, clauses: list[str],
                         missing: set[str]) -> None:
