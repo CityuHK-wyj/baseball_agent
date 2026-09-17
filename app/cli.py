@@ -106,6 +106,55 @@ def _build_agent(args):
     return build_agent(use_llm=not getattr(args, "no_llm", False))
 
 
+def _build_runtime(args):
+    from app.artifact_runtime.factory import build_runtime
+    return build_runtime(use_llm=not getattr(args, "no_llm", False))
+
+
+def _print_runtime_trace(trace) -> None:
+    """Structured artifact-runtime trace. Never hidden model chain-of-thought."""
+    if trace is None:
+        print("--- trace --- (none)")
+        return
+    print("--- trace ---")
+    print(f"Raw Query: {trace.raw_query}")
+    print("Goal")
+    if trace.goal is not None:
+        print(f"  statement: {trace.goal.statement}")
+        print(f"  constraints: {'; '.join(trace.goal.constraints) or '(none)'}")
+        print(f"  scope: {trace.goal.scope.model_dump() if trace.goal.scope else '(none)'}")
+    print("Needs")
+    for need in trace.needs:
+        print(f"  [{need.criticality}] {need.need_id} -> {need.proposed_capability} "
+              f"({need.status})")
+        print(f"      objective: {need.objective}")
+    print("Planner iterations")
+    for decision in trace.decisions:
+        request = decision.request
+        capability = request.capability if request else "-"
+        print(f"  #{decision.iteration} need={decision.need_id} tool={capability} "
+              f"input_refs={list(request.input_refs) if request else []}")
+    print("Artifacts")
+    for summary in trace.artifact_summaries:
+        print(f"  - {summary}")
+    if trace.sql_statements:
+        print("SQL boundary (compiled, read-only)")
+        for sql in trace.sql_statements:
+            print(f"  {sql[:400]}")
+    print("Coverage assessment")
+    for assessment in trace.assessments:
+        print(f"  need={assessment.need_id} verdict={assessment.verdict} "
+              f"entity={assessment.entity_coverage} temporal={assessment.temporal_coverage} "
+              f"measure={assessment.measure_coverage} gaps={list(assessment.gaps)}")
+    print(f"  core_goal_supported={trace.coverage.get('core_goal_supported')}")
+    if trace.claims:
+        print("Claims")
+        for claim in trace.claims:
+            print(f"  - {claim.text[:160]}")
+            print(f"      support: {list(claim.support_refs)}")
+    print(f"Final state: {trace.status}")
+
+
 def _print_agent_trace(trace) -> None:
     """Structured LLM-first runtime trace. Never hidden model chain-of-thought."""
     if trace is None:
@@ -151,19 +200,19 @@ def command_ask(args) -> int:
         # Synthetic/demo analytics and the persisted requirement pipeline stay on the
         # legacy deterministic path; they never masquerade as live capability.
         return _command_ask_legacy(args)
-    agent = _build_agent(args)
+    agent = _build_runtime(args)
     try:
-        conversation = agent.start_conversation()
-        result = agent.send_message(conversation.conversation_id, args.query)
+        conversation_id = agent.start_conversation()
+        result = agent.send_message(conversation_id, args.query)
         if args.trace:
-            _print_agent_trace(result.trace)
+            _print_runtime_trace(result.trace)
         if getattr(args, "json", False):
             print(json.dumps({"status": result.status, "answer": result.answer,
                               "pending_clarification": (
                                   result.pending_clarification.model_dump(mode="json")
                                   if result.pending_clarification else None),
-                              "evidence": [item.model_dump(mode="json")
-                                           for item in result.evidence]},
+                              "claims": [item.model_dump(mode="json")
+                                         for item in result.claims]},
                              ensure_ascii=False, indent=2))
             return 0
         print(result.answer)
@@ -177,9 +226,9 @@ def command_ask(args) -> int:
 
 
 def command_chat(args) -> int:
-    agent = _build_agent(args)
+    agent = _build_runtime(args)
     try:
-        conversation = agent.start_conversation()
+        conversation_id = agent.start_conversation()
         print("Baseball Agent — ask a baseball question in Chinese or English (Ctrl-D to exit).")
         while True:
             try:
@@ -191,13 +240,14 @@ def command_chat(args) -> int:
                 continue
             if text.casefold() in ("exit", "quit", ":q"):
                 break
+            conversation = agent.get_conversation(conversation_id)
             if conversation.status == "WAITING_FOR_USER":
                 mapped = _map_choice(conversation, text)
-                result = agent.respond_to_clarification(conversation.conversation_id, mapped)
+                result = agent.respond_to_clarification(conversation_id, mapped)
             else:
-                result = agent.send_message(conversation.conversation_id, text)
+                result = agent.send_message(conversation_id, text)
             if getattr(args, "trace", False):
-                _print_agent_trace(result.trace)
+                _print_runtime_trace(result.trace)
             print(f"Agent: {result.answer}")
             if result.pending_clarification is not None:
                 for index, option in enumerate(result.pending_clarification.options, 1):
@@ -539,6 +589,102 @@ def _open_candidates():
     return CandidateKnowledgeStore(path)
 
 
+def _open_governance():
+    from app.knowledge.governance import KnowledgeGovernance
+    candidates = _open_candidates()
+    base = _open_knowledge()
+    return KnowledgeGovernance(candidates, base), candidates, base
+
+
+def command_knowledge_inspect(args) -> int:
+    gov, candidates, base = _open_governance()
+    try:
+        report = gov.inspect(args.candidate_id)
+        candidate = report["candidate"]
+        print(json.dumps(candidate.model_dump(mode="json"), indent=2, ensure_ascii=False))
+        conflicts = list(report["conflicts"])
+        print("conflicts:")
+        for conflict in conflicts or ["(none)"]:
+            print(f"  - {conflict}")
+        return 0
+    except KeyError as error:
+        print(str(error), file=sys.stderr)
+        return 1
+    finally:
+        candidates.close()
+        base.store.close()
+
+
+def command_knowledge_approve(args) -> int:
+    from app.knowledge.governance import GovernanceError
+    gov, candidates, base = _open_governance()
+    try:
+        try:
+            item = gov.approve(args.candidate_id, admin=args.admin,
+                               supersede=args.supersede, note=args.note or "")
+        except (KeyError, GovernanceError) as error:
+            print(f"cannot approve: {error}", file=sys.stderr)
+            return 1
+        print(f"{args.candidate_id} -> ACTIVE knowledge {item.knowledge_id}")
+        return 0
+    finally:
+        candidates.close()
+        base.store.close()
+
+
+def command_knowledge_edit_approve(args) -> int:
+    from app.knowledge.candidates import CandidateScope
+    from app.knowledge.governance import GovernanceError
+    gov, candidates, base = _open_governance()
+    try:
+        candidate = candidates.get(args.candidate_id)
+        if candidate is None:
+            print(f"Unknown candidate {args.candidate_id!r}", file=sys.stderr)
+            return 1
+        edits: dict = {}
+        if args.meaning:
+            edits["meaning"] = args.meaning
+        if args.proposed_type:
+            edits["proposed_type"] = args.proposed_type
+        if args.language:
+            edits["language"] = args.language
+        scope = candidate.scope or CandidateScope()
+        scope_changes = {}
+        for field in ("domain", "community", "authority"):
+            value = getattr(args, field, None)
+            if value:
+                scope_changes[field] = value
+        if scope_changes:
+            edits["scope"] = scope.model_copy(update=scope_changes)
+        try:
+            item = gov.approve(args.candidate_id, admin=args.admin, edits=edits,
+                               supersede=args.supersede, note=args.note or "")
+        except (KeyError, GovernanceError) as error:
+            print(f"cannot approve: {error}", file=sys.stderr)
+            return 1
+        print(f"{args.candidate_id} -> ACTIVE knowledge {item.knowledge_id}")
+        return 0
+    finally:
+        candidates.close()
+        base.store.close()
+
+
+def command_knowledge_reject(args) -> int:
+    gov, candidates, base = _open_governance()
+    try:
+        try:
+            updated = gov.reject(args.candidate_id, reason=args.reason or "",
+                                 admin=args.admin)
+        except KeyError as error:
+            print(str(error), file=sys.stderr)
+            return 1
+        print(f"{updated.candidate_id} -> {updated.status}")
+        return 0
+    finally:
+        candidates.close()
+        base.store.close()
+
+
 def command_knowledge_candidates(args) -> int:
     store = _open_candidates()
     try:
@@ -669,8 +815,42 @@ def build_parser() -> argparse.ArgumentParser:
     kvalidate.set_defaults(func=command_knowledge_validate)
 
     kcandidates = ksub.add_parser("candidates", help="list runtime-proposed candidate knowledge")
-    kcandidates.add_argument("--status", choices=("CANDIDATE", "APPROVED", "REJECTED"))
+    kcandidates.add_argument("--status", choices=("CANDIDATE", "UNDER_REVIEW", "APPROVED",
+                                                   "ACTIVE", "REJECTED", "RETIRED", "SUPERSEDED"))
     kcandidates.set_defaults(func=command_knowledge_candidates)
+
+    kinspect = ksub.add_parser("inspect", help="show one candidate with evidence and conflicts")
+    kinspect.add_argument("candidate_id")
+    kinspect.set_defaults(func=command_knowledge_inspect)
+
+    kapprove = ksub.add_parser("approve", help="administrator: promote a candidate to ACTIVE")
+    kapprove.add_argument("candidate_id")
+    kapprove.add_argument("--admin", default="administrator")
+    kapprove.add_argument("--supersede", action="store_true",
+                          help="explicitly supersede conflicting existing knowledge")
+    kapprove.add_argument("--note", default="")
+    kapprove.set_defaults(func=command_knowledge_approve)
+
+    kedit = ksub.add_parser("edit-approve", help="administrator: edit then promote to ACTIVE")
+    kedit.add_argument("candidate_id")
+    kedit.add_argument("--meaning")
+    kedit.add_argument("--type", dest="proposed_type")
+    kedit.add_argument("--language")
+    kedit.add_argument("--domain")
+    kedit.add_argument("--community")
+    kedit.add_argument("--authority", choices=("OFFICIAL", "AUTHORITATIVE_REFERENCE",
+                                                 "TRUSTED_ANALYTICS", "TRUSTED_MEDIA",
+                                                 "COMMUNITY", "UNVERIFIED"))
+    kedit.add_argument("--admin", default="administrator")
+    kedit.add_argument("--supersede", action="store_true")
+    kedit.add_argument("--note", default="")
+    kedit.set_defaults(func=command_knowledge_edit_approve)
+
+    kreject = ksub.add_parser("reject", help="administrator: reject a candidate")
+    kreject.add_argument("candidate_id")
+    kreject.add_argument("--reason", default="")
+    kreject.add_argument("--admin", default="administrator")
+    kreject.set_defaults(func=command_knowledge_reject)
 
     kreview = ksub.add_parser("review", help="approve/reject a candidate (admin action)")
     kreview.add_argument("candidate_id")
