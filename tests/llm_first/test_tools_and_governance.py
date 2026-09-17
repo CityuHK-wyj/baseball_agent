@@ -4,7 +4,7 @@ import unittest
 
 from app.knowledge.candidates import CandidateKnowledge, CandidateKnowledgeStore
 from app.tools.batting import (BattingLine, BattingStatsTool, batting_evidence,
-                               select_players, select_team)
+                               select_players, select_players_by_id, select_team)
 from app.tools.web_research import WebResearchTool, WebSearchResult
 
 
@@ -65,12 +65,16 @@ class BattingStatsTests(unittest.TestCase):
         selected = select_players(self._lines(), ("ohtani", "Judge"))
         self.assertEqual({line.name for line in selected}, {"Shohei Ohtani", "Aaron Judge"})
 
-    def test_select_team_flags_shared_city(self):
+    def test_select_team_refuses_shared_city_population(self):
+        # The architecture intentionally changed: a BRef city is shared by two clubs and
+        # must not be used to infer a team population. Callers use a PLAYER_ID_SET.
         rows = select_team(self._lines(), "Los Angeles Dodgers")
+        self.assertEqual(rows, ())
+        self.assertEqual(select_team(self._lines(), "New York Yankees"), ())
+
+    def test_select_players_by_id_is_the_authoritative_filter(self):
+        rows = select_players_by_id(self._lines(), ("660271", "605141"))
         self.assertEqual({line.name for line in rows}, {"Shohei Ohtani", "Mookie Betts"})
-        evidence = batting_evidence(rows, title="t", source_label="bref",
-                                    caveats=("shared city",))
-        self.assertIn("shared city", evidence.summary)
 
     def test_evidence_contains_real_rate_stats(self):
         evidence = batting_evidence(self._lines(), title="t", source_label="bref",
