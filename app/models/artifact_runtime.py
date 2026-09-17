@@ -60,9 +60,13 @@ RefType = Literal[
     "CLARIFICATION_ANSWER",
     "TOOL_REQUEST",
     "TOOL_RESULT",
+    "TOOL_ATTEMPT",
     "CLAIM",
     "GOAL",
     "NEED",
+    "OBLIGATION",
+    "SCOPE_VERIFICATION",
+    "EXECUTION_RECEIPT",
 ]
 
 
@@ -98,13 +102,20 @@ class Scope(_Envelope):
     """
 
     entities: tuple[str, ...] = ()
+    canonical_entities: tuple[str, ...] = ()
     population: PopulationKind = ""
+    membership_basis: str = ""  # official_roster / active_roster / observed_participants
     time_range: TimeRange | None = None
     seasons: tuple[int, ...] = ()
     game_types: tuple[str, ...] = ()
     metric: str = ""
+    measurement: str = ""
+    unit: str = ""
+    aggregation: str = ""
+    qualification: str = ""
     event_population: str = ""
     source_coverage: tuple[str, ...] = ()
+    as_of: str = ""
     note: str = ""
 
     def temporal_key(self) -> tuple[str, str] | None:
@@ -153,12 +164,64 @@ class EvidenceSource(_Envelope):
     authority: str = ""
 
 
+# Scope dimensions are explicit so verification can be contextual and per-dimension
+# instead of a single opaque score. Unknown stays UNKNOWN; it never becomes coverage.
+ScopeDimension = Literal[
+    "entity", "population", "membership", "time", "season", "game_type",
+    "event_population", "measure", "aggregation", "qualification", "source_coverage",
+]
+ScopeVerificationStatus = Literal["VERIFIED", "PARTIAL", "MISMATCH", "UNKNOWN"]
+
+
+class ScopeVerification(_Envelope):
+    """Deterministic, dimension-level proof of what evidence actually establishes.
+
+    This is deliberately *separate* from a Tool's declared scope. A Tool can declare any
+    scope it likes; only a verifier observing execution/provider evidence can raise a
+    dimension to ``VERIFIED``. ``UNKNOWN`` is never treated as full coverage.
+    """
+
+    dimension: ScopeDimension
+    status: ScopeVerificationStatus
+    requested: str = ""
+    observed: str = ""
+    evidence_refs: tuple[str, ...] = ()
+    verifier: str = ""
+    source_snapshot: str = ""
+    limitations: tuple[str, ...] = ()
+    verified_at: datetime = Field(default_factory=utcnow)
+
+    @property
+    def hard_mismatch(self) -> bool:
+        return self.status == "MISMATCH"
+
+
+class ExportContract(_Envelope):
+    """Typed/versioned contract for one Artifact export.
+
+    ``ArtifactExport.value: Any`` alone is not a semantic contract. The contract records
+    schema/version, entity namespace, role, grain, unit, cardinality and column schema so a
+    downstream consumer can validate compatibility instead of guessing by convention.
+    """
+
+    schema_name: str = ""
+    version: int = 1
+    entity_namespace: str = ""  # MLBAM / TEAM_ID / NONE ...
+    role: str = ""  # e.g. PLAYER_ID_SET / TABLE / SCALAR / EVIDENCE
+    grain: str = ""
+    unit: str = ""
+    cardinality: str = "UNKNOWN"  # SCALAR / SET / TABLE
+    column_schema: tuple[tuple[str, str], ...] = ()
+    scope: Scope | None = None
+    required: bool = False
+
+
 class ArtifactExport(_Envelope):
     """A reusable machine-consumable output of an Artifact.
 
     ``value`` carries the structured payload (a list of ids, a mapping, a number).
     ``text`` carries bounded free-form content. ``references`` point back to the
-    evidence that produced it.
+    evidence that produced it. ``contract`` is the typed/versioned compatibility promise.
     """
 
     export_id: str
@@ -169,6 +232,9 @@ class ArtifactExport(_Envelope):
     references: tuple[str, ...] = ()
     confidence: float = 0.5
     metadata: dict[str, Any] = Field(default_factory=dict)
+    contract: ExportContract | None = None
+    derived_from: tuple[str, ...] = ()  # exact upstream export ids, not just artifact ids
+    accepted: bool = True
 
 
 class RuntimeArtifact(_Envelope):
@@ -187,12 +253,31 @@ class RuntimeArtifact(_Envelope):
     provenance: tuple[EvidenceSource, ...] = ()
     references: tuple[str, ...] = ()
     requested_scope: Scope | None = None
-    actual_scope: Scope | None = None
+    actual_scope: Scope | None = None  # the Tool's DECLARED scope (never trusted alone)
+    scope_verifications: tuple[ScopeVerification, ...] = ()
     lineage: tuple[str, ...] = ()
     confidence: float = 0.5
     status: ArtifactStatus = "OK"
     metadata: dict[str, Any] = Field(default_factory=dict)
     created_at: datetime = Field(default_factory=utcnow)
+
+    @property
+    def declared_scope(self) -> Scope | None:
+        """What the producing Tool/provider claims it returned."""
+        return self.actual_scope
+
+    def verification(self, dimension: str) -> ScopeVerification | None:
+        for item in self.scope_verifications:
+            if item.dimension == dimension:
+                return item
+        return None
+
+    def dimension_status(self, dimension: str) -> str:
+        item = self.verification(dimension)
+        return item.status if item is not None else "UNKNOWN"
+
+    def has_hard_mismatch(self) -> bool:
+        return any(item.hard_mismatch for item in self.scope_verifications)
 
     def export(self, export_type: str) -> ArtifactExport | None:
         for item in self.exports:
@@ -213,18 +298,77 @@ NeedStatus = Literal[
     "OPEN", "IN_PROGRESS", "SATISFIED", "PARTIAL", "BLOCKED", "FAILED"]
 Criticality = Literal["CORE", "OPTIONAL"]
 
+# Structured, durable taxonomy for every attempted action. No attempted action may
+# disappear: even a failure with no Artifact is a first-class outcome.
+ToolOutcomeCode = Literal[
+    "SUCCESS",
+    "EMPTY_RESULT",
+    "UNSUPPORTED_CAPABILITY",
+    "INPUT_UNRESOLVED",
+    "INPUT_INCOMPATIBLE",
+    "INVALID_IR",
+    "UNKNOWN_FIELD",
+    "SCOPE_MISMATCH",
+    "COVERAGE_UNAVAILABLE",
+    "SOURCE_TRANSIENT",
+    "POLICY_BLOCKED",
+    "MODEL_UNAVAILABLE",
+    "INTERNAL_FAILURE",
+    "INTERRUPTED",
+    "UNCERTAIN",
+]
+AttemptStatus = Literal["SUCCEEDED", "FAILED", "INTERRUPTED", "UNCERTAIN"]
+
+
+class ToolAttempt(BaseModel):
+    """Durable record of one attempted action. Written before *and* after execution."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    attempt_id: str
+    request_id: str = ""
+    need_id: str = ""
+    capability: str = ""
+    status: AttemptStatus = "FAILED"
+    outcome_code: ToolOutcomeCode = "INTERNAL_FAILURE"
+    detail: str = ""
+    artifact_ids: tuple[str, ...] = ()
+    binding_ids: tuple[str, ...] = ()
+    retryable: bool = False
+    external_effect_possible: bool = False
+    started_at: datetime = Field(default_factory=utcnow)
+    finished_at: datetime | None = None
+
+
+class InputBinding(_Envelope):
+    """Explicit binding of one downstream input to an exact upstream export.
+
+    Prevents ambient export injection: a downstream action must name the exact
+    Artifact/export it consumes, and the binding records which Need produced it.
+    """
+
+    binding_id: str
+    name: str
+    export_type: str
+    source_need_id: str = ""
+    source_artifact_id: str = ""
+    source_export_id: str = ""
+    ref_id: str = ""
+    required: bool = True
+
 
 class Need(BaseModel):
     """Information still required to satisfy the Goal.
 
     ``objective`` and ``expected_information`` are intentionally free-form. The planner
     may create Needs dynamically at runtime; dependencies are expressed through
-    ``depends_on`` and ``input_refs`` rather than a fixed workflow.
+    ``depends_on`` and ``input_bindings`` rather than a fixed workflow.
     """
 
     model_config = ConfigDict(extra="forbid")
 
     need_id: str
+    revision: int = 1
     objective: str = ""
     expected_information: str = ""
     required_scope: Scope | None = None
@@ -232,11 +376,17 @@ class Need(BaseModel):
     proposed_capability: str = ""
     parameters: dict[str, Any] = Field(default_factory=dict)
     input_refs: tuple[str, ...] = ()
+    input_bindings: tuple[InputBinding, ...] = ()
     depends_on: tuple[str, ...] = ()
     status: NeedStatus = "OPEN"
     criticality: Criticality = "CORE"
+    supporting: bool = False
+    satisfies_obligations: tuple[str, ...] = ()
+    route_of: str = ""  # alternative route: the original Need this substitutes
+    equivalence_note: str = ""
     linked_artifacts: tuple[str, ...] = ()
     unsatisfied_inputs: tuple[str, ...] = ()
+    attempts: tuple[ToolAttempt, ...] = ()
     note: str = ""
 
 
@@ -245,18 +395,57 @@ class Goal(BaseModel):
 
     Explicit user information is preserved *by reference* (``constraint_refs``) so a
     tool that cannot support it reports a gap instead of silently dropping it.
+    ``obligations`` is the frozen baseline the Planner's Needs are evaluated against.
     """
 
     model_config = ConfigDict(extra="forbid")
 
     goal_id: str
+    revision: int = 1
+    parent_goal_id: str = ""
     statement: str = ""
     scope: Scope | None = None
+    obligations: tuple["UserObligation", ...] = ()
+    inherited_obligations: tuple[str, ...] = ()
+    changed_obligations: tuple[str, ...] = ()
     constraint_refs: tuple[str, ...] = ()
     constraints: tuple[str, ...] = ()
     ambiguity_notes: tuple[str, ...] = ()
     source_refs: tuple[str, ...] = ()
+    clarification_refs: tuple[str, ...] = ()
     created_at: datetime = Field(default_factory=utcnow)
+
+
+# Kinds of explicit user obligation. Deliberately coarse: semantic flexibility stays in
+# the Planner; these are only the baseline facts COMPLETE must be shown to cover.
+ObligationKind = Literal[
+    "ENTITY", "POPULATION", "MEMBERSHIP", "TIME", "SEASON", "GAME_TYPE",
+    "METRIC", "QUALIFICATION", "RANKING", "GROUPING", "COMPARISON",
+    "CLAIM_TYPE", "EXPLANATION",
+]
+ObligationStatus = Literal["OPEN", "COVERED", "PARTIAL", "MISSING"]
+
+
+class UserObligation(BaseModel):
+    """Immutable, frozen representation of an explicit user requirement.
+
+    Derived from the user message / confirmed clarification and referenced back to its
+    source span. Planner Needs are checked against this set; the Planner cannot lower or
+    delete an obligation to reach COMPLETE.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    obligation_id: str
+    kind: ObligationKind
+    description: str
+    value: str = ""
+    source_ref: str = ""
+    origin: str = "USER_EXPLICIT"  # or USER_CONFIRMED
+    status: ObligationStatus = "OPEN"
+
+
+Goal.model_rebuild()
 
 
 # ---------------------------------------------------------------------------
@@ -288,6 +477,38 @@ class CoverageAssessment(_Envelope):
     verdict: CoverageVerdict = "UNSATISFIED"
     reasons: tuple[str, ...] = ()
     gaps: tuple[str, ...] = ()
+    dimension_statuses: dict[str, str] = Field(default_factory=dict)
+    judge_outcome: str = "UNAVAILABLE"
+    assessment_available: bool = False
+    independent: bool = True
+    verified_artifact_ids: tuple[str, ...] = ()
+    supporting_artifact_ids: tuple[str, ...] = ()
+
+
+JudgeVerdict = Literal["SATISFIED", "PARTIAL", "UNSATISFIED", "IRRELEVANT",
+                       "UNAVAILABLE"]
+
+
+class JudgeAssessment(_Envelope):
+    """Independent contextual assessment of apparently sufficient evidence.
+
+    Separate from deterministic verification. The Judge may downgrade an apparently
+    matching candidate, but may never override a deterministic hard mismatch, and a Judge
+    outage is an explicit ``UNAVAILABLE`` condition rather than automatic success.
+    """
+
+    assessment_id: str
+    goal_id: str
+    need_id: str = ""
+    outcome: JudgeVerdict = "UNAVAILABLE"
+    helpful: bool = False
+    interpretation_justified: bool = False
+    claim_type_supported: bool = False
+    joint_support: tuple[str, ...] = ()
+    missing_information: tuple[str, ...] = ()
+    reasons: tuple[str, ...] = ()
+    judge: str = ""
+    independent: bool = True
 
 
 # ---------------------------------------------------------------------------
@@ -295,15 +516,25 @@ class CoverageAssessment(_Envelope):
 # ---------------------------------------------------------------------------
 
 
+# Evidence requirements differ by claim type: a statistical change alone must not support
+# a causal explanation.
+ClaimType = Literal[
+    "OBSERVED_FACT", "DERIVED_CALCULATION", "COMPARISON", "REPORTED_EXPLANATION",
+    "HYPOTHESIS", "CAUSAL_CLAIM",
+]
+
+
 class Claim(_Envelope):
     """One answerable statement with explicit support references.
 
     Prevents fluent unsupported synthesis: every important claim can be traced through
-    derived Artifacts back to original evidence.
+    derived Artifacts back to original evidence, and its claim type constrains what
+    evidence counts as support.
     """
 
     claim_id: str
     text: str
+    claim_type: ClaimType = "OBSERVED_FACT"
     support_refs: tuple[str, ...] = ()
     confidence: float = 0.5
     scope: Scope | None = None
@@ -331,13 +562,33 @@ class ToolRequest(_Envelope):
 
 
 class ToolCapabilityContract(_Envelope):
-    """What a tool accepts and produces, expressed in export-type capability names."""
+    """What a tool accepts and produces, expressed in export-type capability names.
+
+    Truthfulness matters: a tool must be able to declare important restrictions so the
+    Planner never proposes a structurally impossible action, and so the Tool can reject
+    unsupported inputs defensively. Fields default to the *most permissive* value only
+    when the adapter genuinely supports the general case.
+    """
 
     name: str
     accepts: tuple[str, ...] = ()
     produces: tuple[str, ...] = ()
     description: str = ""
     cost: int = 1
+    # Truthful restriction vocabulary.
+    temporal_modes: tuple[str, ...] = ("ARBITRARY",)  # CURRENT_ONLY / SEASON / ARBITRARY_DATE_RANGE / HISTORICAL
+    population_modes: tuple[str, ...] = ()  # active_roster / official_roster / observed_participants
+    game_types: tuple[str, ...] = ()  # empty = provider does not distinguish game types
+    entity_namespace: str = ""  # MLBAM / TEAM_ID / NONE
+    supported_measures: tuple[str, ...] = ()
+    required_bindings: tuple[str, ...] = ()
+    required_inputs: tuple[str, ...] = ()
+    availability: str = "AVAILABLE"  # AVAILABLE / CONFIG_REQUIRED / UNAVAILABLE
+    authority: str = "DERIVED"  # AUTHORITATIVE / DERIVED / OBSERVED / NONE
+    max_cost: int = 1
+
+    def supports_temporal(self, mode: str) -> bool:
+        return mode in self.temporal_modes or "ARBITRARY" in self.temporal_modes
 
 
 # ---------------------------------------------------------------------------
@@ -402,6 +653,36 @@ class SemanticBrief(_Envelope):
     source: str = "llm"
 
 
+class RuntimeEvent(_Envelope):
+    """One append-only, redacted runtime event.
+
+    Every important transition is reconstructable from this journal: goal interpreted /
+    revised, need created / revised, binding selected, action admitted / rejected, IR
+    validated / rejected, compile outcome, execution started / outcome, artifact
+    registered, scope verified, judge assessment, state transition, replan, claim
+    accepted / rejected, terminal decision, checkpoint, persistence error.
+
+    Never contains hidden chain-of-thought, prompts, credentials or unrestricted
+    payloads: ``detail`` is a bounded safe summary.
+    """
+
+    event_id: str
+    event_type: str
+    conversation_id: str = ""
+    run_id: str = ""
+    turn: int = 0
+    goal_id: str = ""
+    goal_revision: int = 0
+    need_id: str = ""
+    need_revision: int = 0
+    request_id: str = ""
+    attempt_id: str = ""
+    parent_refs: tuple[str, ...] = ()
+    detail: str = ""
+    data: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
 class RuntimeTrace(_Envelope):
     """Structured, reviewable trace of the artifact runtime. Never hidden CoT."""
 
@@ -413,6 +694,9 @@ class RuntimeTrace(_Envelope):
     assessments: tuple[CoverageAssessment, ...] = ()
     coverage: dict[str, Any] = Field(default_factory=dict)
     claims: tuple[Claim, ...] = ()
+    events: tuple[RuntimeEvent, ...] = ()
+    attempts: tuple[ToolAttempt, ...] = ()
+    obligation_coverage: dict[str, str] = Field(default_factory=dict)
     steps: tuple[str, ...] = ()
     tool_calls: tuple[str, ...] = ()
     sql_statements: tuple[str, ...] = ()

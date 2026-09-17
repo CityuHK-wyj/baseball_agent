@@ -140,9 +140,12 @@ class KnowledgeQuery(ArtifactContract):
     entity_refs: tuple[Name, ...] = ()
     tags: tuple[Name, ...] = ()
     language: KnowledgeLanguage | None = None
+    community: Name | None = None
     as_of: date | None = None
     authority_floor: AuthorityLevel | None = None
-    statuses: tuple[KnowledgeStatus, ...] = ("ACTIVE", "HISTORICAL")
+    # Normal authoritative retrieval is ACTIVE-only. HISTORICAL/contextual material must
+    # be requested explicitly (with as_of where relevant), never as unconditional truth.
+    statuses: tuple[KnowledgeStatus, ...] = ("ACTIVE",)
     max_items: int = Field(default=10, ge=1)
 
 
