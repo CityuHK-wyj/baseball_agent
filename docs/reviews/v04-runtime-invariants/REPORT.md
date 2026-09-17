@@ -1,6 +1,7 @@
 # Baseball Agent v0.4 — runtime invariants stop report
 
-Branch: `pi/v0.4-runtime-invariants` (created from the independent review checkpoint
+Branch: `pi/v0.4-runtime-invariants`  
+Implementation SHA: `5627c748ce9d78b1d6ab7c25fadc6649ce3aeb5d` (created from the independent review checkpoint
 `codex/v0.3-architecture-review @ 0ee26ead9f3f5812f39e79c1b8c03ed420a360de`).
 
 Status: **`V0_4_RUNTIME_INVARIANTS_IMPLEMENTED — READY_FOR_INDEPENDENT_REVIEW`**.
@@ -268,4 +269,4 @@ yet wired).
 ## New independent audit SHA
 
 Audit the tip commit of `pi/v0.4-runtime-invariants`, recorded as
-`V0_4_IMPLEMENTATION_SHA_PLACEHOLDER`. Do not audit `main`.
+`5627c748ce9d78b1d6ab7c25fadc6649ce3aeb5d`. Do not audit `main`.
