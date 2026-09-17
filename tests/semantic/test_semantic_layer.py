@@ -9,8 +9,9 @@ Two layers are tested separately:
 import json
 import unittest
 
+from app.llm.prompts import SEMANTIC_PROMPT
 from app.llm.provider import FakeModelProvider, ProviderError, ProviderTimeout
-from app.models.contracts import (CountConstraint, NumericConstraint,
+from app.models.contracts import (DEFAULT_RANKING_LIMIT, CountConstraint, NumericConstraint,
                                   PopulationConstraint, QualificationConstraint,
                                   RankingConstraint)
 from app.models.semantic_candidate import (CandidateConstraint, EvidenceSpan,
@@ -183,6 +184,27 @@ class ValidatorTests(unittest.TestCase):
         self.assertEqual(len(populations), 1)
         self.assertEqual(populations[0].game_types, ("EXHIBITION",))
 
+    def test_exit_velocity_over_all_pitches_is_rejected_recoverably(self):
+        candidate = SemanticCandidate(constraints=(
+            CandidateConstraint(kind="RANKING", metric_key="exit_velocity", aggregation="MAX",
+                                direction="DESC", limit=5,
+                                evidence=EvidenceSpan(text="maximum exit velocity")),
+            CandidateConstraint(kind="POPULATION", game_types=("REGULAR_SEASON",),
+                                event_population="ALL_PITCHES",
+                                evidence=EvidenceSpan(text="all pitches")),))
+        with self.assertRaises(SemanticValidationError) as caught:
+            self._validate(candidate,
+                           "rank hitters by maximum exit velocity over all pitches")
+        self.assertEqual(caught.exception.code, "INCOMPATIBLE_EVENT_POPULATION")
+        self.assertTrue(caught.exception.recoverable)
+
+    def test_absent_ranking_limit_uses_the_documented_default(self):
+        candidate = SemanticCandidate(constraints=(
+            CandidateConstraint(kind="RANKING", metric_key="exit_velocity", aggregation="MAX",
+                                direction="DESC", evidence=EvidenceSpan(text="rank hitters")),))
+        result = self._validate(candidate, "rank hitters by maximum exit velocity")
+        self.assertEqual(_canonical(result, RankingConstraint).limit, DEFAULT_RANKING_LIMIT)
+
     def test_absent_population_receives_a_documented_default_after_validation(self):
         candidate = SemanticCandidate(constraints=(
             CandidateConstraint(kind="RANKING", metric_key="exit_velocity", aggregation="MAX",
@@ -260,6 +282,61 @@ class LLMExtractorTests(unittest.TestCase):
         prompt = provider.calls[0][1]
         for physical in ("release_speed", "launch_speed", "SELECT", "read_parquet"):
             self.assertNotIn(physical, prompt)
+
+    def test_prompt_publishes_the_closed_origin_vocabulary(self):
+        prompt = SEMANTIC_PROMPT.render(
+            query="q", vocabulary_json=self.vocabulary.as_prompt_json())
+        self.assertIn("USER_EXPLICIT", prompt)
+        self.assertIn("\"origins\"", self.vocabulary.as_prompt_json())
+
+    def test_observed_live_shape_is_normalized_then_validated(self):
+        # Shape observed from the live model: a casually spelled origin, null fields for
+        # inapplicable keys, a ranking metric under ``metric`` and no stated limit.
+        provider = FakeModelProvider(responses=[json.dumps({"constraints": [
+            {"kind": "NUMERIC", "metric": "pitch_velocity", "operator": "GTE",
+             "value": 95, "unit": "mph", "origin": "explicit",
+             "states": None, "balls": None, "game_types": None,
+             "evidence": {"text": "fastballs at least 95 mph"}},
+            {"kind": "RANKING", "metric": "exit_velocity", "aggregation": "MAX",
+             "direction": "DESC", "origin": "user",
+             "evidence": {"text": "rank hitters by maximum exit velocity"}},
+            {"kind": "QUALIFICATION", "min_batted_balls": 100, "origin": "explicit",
+             "evidence": {"text": "at least 100 BBE"}},
+        ], "ambiguities": []})])
+        query = ("On fastballs at least 95 mph, rank hitters by maximum exit velocity "
+                 "with at least 100 BBE.")
+        parsed = HybridSemanticParser(extractor=LLMSemanticExtractor(
+            provider, "test-model")).parse(query)
+        self.assertEqual(parsed.extractor, "llm")
+        self.assertEqual(parsed.fallback_reason, "")
+        self.assertEqual(parsed.clarification_reason, "")
+        numeric = _canonical(parsed, NumericConstraint)
+        self.assertEqual((numeric.key, numeric.operator, numeric.value),
+                         ("pitch_velocity", "GTE", 95.0))
+        ranking = _canonical(parsed, RankingConstraint)
+        self.assertEqual((ranking.metric_key, ranking.aggregation, ranking.limit),
+                         ("exit_velocity", "MAX", DEFAULT_RANKING_LIMIT))
+        self.assertEqual(_canonical(parsed, QualificationConstraint).min_batted_balls, 100)
+
+    def test_drifting_offsets_are_reconciled_against_the_query(self):
+        query = ("On fastballs at least 95 mph, rank hitters by maximum exit velocity "
+                 "with at least 100 BBE.")
+        provider = FakeModelProvider(responses=[json.dumps({"constraints": [
+            {"kind": "QUALIFICATION", "min_batted_balls": 100, "origin": "USER_EXPLICIT",
+             "evidence": {"text": "at least 100 BBE", "start": 999, "end": 1014}},
+        ]})])
+        candidate = LLMSemanticExtractor(provider, "test-model").extract(
+            query, self.vocabulary)
+        evidence = candidate.constraints[0].evidence
+        self.assertEqual(query[evidence.start:evidence.end], "at least 100 BBE")
+
+    def test_unknown_origin_is_still_rejected(self):
+        provider = FakeModelProvider(responses=[json.dumps({"constraints": [
+            {"kind": "QUALIFICATION", "min_batted_balls": 20, "origin": "guessed",
+             "evidence": {"text": "20 BBE"}}]})])
+        with self.assertRaises(SemanticSchemaError):
+            LLMSemanticExtractor(provider, "test-model").extract(
+                "at least 20 BBE", self.vocabulary)
 
 
 # -- Hybrid fallback ---------------------------------------------------------

@@ -19,6 +19,7 @@ release approval.
 | `31fa09b` | Semantic evaluation corpus and compositional hybrid gate |
 | `05928f9` | Rank-by phrasing and empty-result diagnostics; live compound E2E |
 | `079da57` | Bounded semantic constraint summary in the trace |
+| `delivery` | Live LLM semantic verification and the live-only defect fixes it exposed |
 
 ## Architecture
 
@@ -84,6 +85,32 @@ examples.
 - If the fallback cannot prove an explicit analytics request, the parser fails closed with
   `SEMANTIC_UNAVAILABLE` rather than executing a weaker interpretation.
 - A provider failure cannot make an explicit user constraint disappear.
+
+### Live-only defects found and fixed
+
+The first real provider calls (`deepseek-chat`) exposed four interface defects that the
+mocked tests could not. All are fixed with regression coverage in
+`tests/semantic/test_semantic_layer.py`:
+
+1. The prompt never published the closed `origin` vocabulary, so the model emitted
+   `explicit`/`user`. `SemanticVocabulary` now exposes `origins` and the prompt requires
+   `USER_EXPLICIT`; the extractor also maps casual origin spellings onto the closed set.
+2. The model emits every key with `null` for inapplicable fields, which the frozen tuple
+   fields rejected. The extractor now drops `null` recursively, so absent and `null` mean
+   the same default.
+3. The prompt listed all candidate keys flat, so the model put a ranking metric in
+   `metric` instead of `metric_key`. The prompt now names the applicable fields per kind;
+   the extractor reuses an already-produced value under the correct field name.
+4. Model-supplied character offsets drifted. `evidence.text` remains the grounding
+   source; the extractor recomputes offsets from that text, and the validator still
+   rejects any text not present in the query.
+
+One repeated-run difference was a genuine semantic defect: the model sometimes proposed
+`event_population = ALL_PITCHES` while ranking by exit velocity. Exit velocity is only
+defined on contact, so `_check_contradictions` now rejects that combination recoverably
+(`INCOMPATIBLE_EVENT_POPULATION`) and the deterministic extractor supplies the batted-ball
+population. The validator also gives a rank request without a stated count the documented
+`DEFAULT_RANKING_LIMIT`, matching the deterministic extractor.
 
 ## Exact compound count semantics
 
@@ -161,7 +188,7 @@ the adapter now distinguishes `EMPTY` from `SOURCE_QUERY_FAILED`.
 
 ## Verification status
 
-- Regression suite: **473 tests, OK, no skips** (includes live PostgreSQL and Parquet
+- Regression suite: **479 tests, OK, no skips** (includes live PostgreSQL and Parquet
   integration when credentials/archive exist).
 - `docs/reviews/v01-reproduce-blockers.py`: exit 0, `unresolved_blockers=[]`.
 - `docs/reviews/semantic-recheck-evidence/intent-trace.py`: exit 0 after the mixed-count
@@ -175,13 +202,40 @@ the adapter now distinguishes `EMPTY` from `SOURCE_QUERY_FAILED`.
   LIVE_VERIFIED (see `live-hybrid-e2e.jsonl` and the integration tests).
 - SQLite operational store, crash resume, Artifact reuse and frozen qualification
   thresholds: TESTED_OFFLINE/regression in the suite.
+- Live LLM semantic extraction: **LIVE_VERIFIED** with a real `DEEPSEEK_API_KEY`
+  (see `live-llm-semantic.jsonl` and `live-llm-semantic.py`). The provider is
+  `OpenAICompatibleProvider` at `https://api.deepseek.com`; the recorded harness runs use
+  `deepseek-chat`, plus a separate run of the configured default `deepseek-v4-pro` on the
+  compound and ambiguous cases. Every required case below was accepted by the
+  deterministic validator through the LLM extractor (`fallback_reason == ""`):
+
+  | Case | Canonical result |
+  | --- | --- |
+  | fastballs >= 95, MAX EV, >= 100 BBE | `pitch_velocity GTE 95`; `exit_velocity/MAX/DESC`; `min_batted_balls 100` |
+  | average EV, >= 20 BBE | no numeric filter; `exit_velocity/AVG/DESC`; `min_batted_balls 20` |
+  | exhibition games, MAX EV | `game_types ('EXHIBITION',)`, no regular-season override |
+  | 0-2 or 1-1 counts, MAX EV | exact states `{(0,2),(1,1)}`, no cartesian widening |
+  | 2025 compound | `2025`, `REGULAR_SEASON`, `pitch_velocity GTE 95`, exact counts, `BATTER_RELATIVE_UPPER_EDGE`, `exit_velocity/MAX/DESC`, `min_batted_balls 20`, batted-ball population |
+
+  The compound query was extracted three independent times; all three accepted outputs
+  normalized to the same canonical meaning. `Show me hitters against high fastballs.`
+  reached the normal CONSTRAINT clarification with the three defensible location options
+  (`deepseek-v4-pro` produced the `location.upper_edge` ambiguity directly; `deepseek-chat`
+  fell back deterministically after proposing an unfilled location, which still clarifies).
+  No explicit constraint can be weakened by a provider failure: the mocked
+  provider-error path still falls back to the deterministic extractor with all explicit
+  constraints preserved (`test_provider_failure_falls_back_without_dropping_constraints`).
+
+### Provider latency observation
+
+The configured default model `deepseek-v4-pro` answers the semantic prompt in roughly
+44 seconds, above the default `LLM_TIMEOUT_SECONDS=30`. It validates correctly once the
+request timeout is raised; the default timeout degrades safely to the deterministic
+extractor rather than silently weakening semantics. This is an operational tuning point,
+not a correctness defect, and the default model is configuration-driven.
 
 ## Remaining
 
-- **UNVERIFIED_LIVE**: live LLM extraction. No `DEEPSEEK_API_KEY` is configured in this
-  environment, so the real model path was not called. It is covered by mocked
-  structured-output tests (`FakeModelProvider`) only. This must not be confused with live
-  model verification.
 - **UNVERIFIED_LIVE**: Web Evidence and Operational PostgreSQL (unchanged from the prior
   review).
 - **DEFERRED**: generalized temporal NLP, same-period-last-year language, RAG/pgvector,

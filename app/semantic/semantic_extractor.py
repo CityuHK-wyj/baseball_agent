@@ -49,6 +49,8 @@ class SemanticVocabulary:
     operators: tuple[str, ...] = ("EQ", "GT", "GTE", "LT", "LTE")
     aggregations: tuple[str, ...] = ("AVG", "MAX", "MIN", "SUM")
     directions: tuple[str, ...] = ("ASC", "DESC")
+    origins: tuple[str, ...] = ("USER_EXPLICIT", "USER_CONFIRMED", "CONTEXT_INFERRED",
+                                "SYSTEM_INFERRED", "SYSTEM_DEFAULT")
     game_types: tuple[str, ...] = ("REGULAR_SEASON", "POSTSEASON", "SPRING_TRAINING",
                                    "EXHIBITION")
     event_populations: tuple[str, ...] = ("BATTED_BALL", "MEASURED_CONTACT", "ALL_PITCHES")
@@ -66,6 +68,7 @@ class SemanticVocabulary:
             "operators": self.operators,
             "aggregations": self.aggregations,
             "directions": self.directions,
+            "origins": self.origins,
             "game_types": self.game_types,
             "event_populations": self.event_populations,
             "location_definitions": self.locations,
@@ -207,6 +210,93 @@ class DeterministicSemanticExtractor:
 
 # -- LLM extractor -----------------------------------------------------------
 
+# The provider returns JSON, so the model sometimes spells origin casually. Map the
+# observed synonyms onto the closed origin vocabulary; an unknown value is left as-is
+# so the closed schema still rejects it.
+_ORIGIN_SYNONYMS: dict[str, str] = {
+    "user": "USER_EXPLICIT",
+    "explicit": "USER_EXPLICIT",
+    "user_stated": "USER_EXPLICIT",
+    "user_confirmed": "USER_CONFIRMED",
+    "confirmed": "USER_CONFIRMED",
+    "context_inferred": "CONTEXT_INFERRED",
+    "inferred": "SYSTEM_INFERRED",
+    "system_inferred": "SYSTEM_INFERRED",
+    "default": "SYSTEM_DEFAULT",
+    "system_default": "SYSTEM_DEFAULT",
+}
+
+
+def _drop_nulls(value):
+    """Recursively drop ``None`` values so absent and null mean the same thing.
+
+    The candidate schema defaults every inapplicable field, so a model that emits all
+    keys with ``null`` for the irrelevant ones must not fail schema validation.
+    """
+    if isinstance(value, dict):
+        return {key: _drop_nulls(item) for key, item in value.items() if item is not None}
+    if isinstance(value, list):
+        return [_drop_nulls(item) for item in value]
+    return value
+
+
+def _normalize_origin(constraint: dict) -> None:
+    origin = constraint.get("origin")
+    if isinstance(origin, str):
+        key = origin.strip().casefold().replace("-", "_").replace(" ", "_")
+        if key in _ORIGIN_SYNONYMS:
+            constraint["origin"] = _ORIGIN_SYNONYMS[key]
+
+
+def _normalize_evidence(evidence, raw_query: str) -> None:
+    """Reconcile model-supplied offsets with the query.
+
+    ``evidence.text`` is the grounding source; offsets are derived provenance. A model
+    often reports the right text with drifting offsets, so recompute them from the text
+    when they disagree. The deterministic validator still rejects any text that is not
+    actually present in the query.
+    """
+    if not isinstance(evidence, dict):
+        return
+    text = evidence.get("text")
+    if not isinstance(text, str) or not text:
+        return
+    start, end = evidence.get("start"), evidence.get("end")
+    if isinstance(start, int) and isinstance(end, int) \
+            and 0 <= start <= end <= len(raw_query) \
+            and raw_query[start:end].casefold() == text.casefold():
+        return
+    found = raw_query.casefold().find(text.casefold())
+    if found >= 0:
+        evidence["start"] = found
+        evidence["end"] = found + len(text)
+    else:
+        evidence.pop("start", None)
+        evidence.pop("end", None)
+
+
+def _normalize_constraint_fields(constraint: dict, raw_query: str) -> None:
+    """Accept structural field-name variants without inventing semantics.
+
+    Grounding is still enforced by the deterministic validator against the query; this
+    only lets a model reuse a value it already produced under the wrong label.
+    """
+    _normalize_origin(constraint)
+    _normalize_evidence(constraint.get("evidence"), raw_query)
+    if constraint.get("kind") == "RANKING" and not constraint.get("metric_key"):
+        constraint["metric_key"] = constraint.get("metric")
+
+
+def _normalize_candidate_payload(payload: dict, raw_query: str) -> dict:
+    payload = _drop_nulls(payload)
+    for constraint in payload.get("constraints") or ():
+        if isinstance(constraint, dict):
+            _normalize_constraint_fields(constraint, raw_query)
+    for ambiguity in payload.get("ambiguities") or ():
+        if isinstance(ambiguity, dict):
+            _normalize_evidence(ambiguity.get("evidence"), raw_query)
+    return payload
+
 
 class LLMSemanticExtractor:
     """Constrained extraction through the provider-agnostic ``ModelProvider`` seam."""
@@ -235,6 +325,7 @@ class LLMSemanticExtractor:
             raise SemanticSchemaError("Model output must be a JSON object")
         payload = {key: value for key, value in data.items()
                    if key not in ("extractor", "model")}
+        payload = _normalize_candidate_payload(payload, raw_query)
         payload["extractor"] = self.name
         payload["model"] = response.model or self._model
         try:

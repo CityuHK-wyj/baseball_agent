@@ -18,10 +18,10 @@ from dataclasses import dataclass
 
 import re
 
-from app.models.contracts import (Constraint, CountConstraint, LocationConstraint,
-                                  NumericConstraint, PitchTypeConstraint,
-                                  PopulationConstraint, QualificationConstraint,
-                                  RankingConstraint)
+from app.models.contracts import (DEFAULT_RANKING_LIMIT, Constraint, CountConstraint,
+                                  LocationConstraint, NumericConstraint,
+                                  PitchTypeConstraint, PopulationConstraint,
+                                  QualificationConstraint, RankingConstraint)
 from app.models.semantic_candidate import (CandidateConstraint, SemanticAmbiguity,
                                            SemanticCandidate, SemanticProvenance)
 from app.semantic.semantic_extractor import SemanticVocabulary
@@ -33,7 +33,7 @@ RECOVERABLE_CODES = frozenset({
     "UNSUPPORTED_DIRECTION", "UNSUPPORTED_LOCATION", "UNSUPPORTED_PITCH_FAMILY",
     "UNSUPPORTED_GAME_TYPE", "UNSUPPORTED_EVENT_POPULATION", "UNSUPPORTED_UNIT",
     "UNSUPPORTED_KIND", "EVIDENCE_NOT_GROUNDED", "EVIDENCE_SPAN_MISMATCH",
-    "UNGROUNDED_EXPLICIT", "EVIDENCE_METRIC_MISMATCH",
+    "UNGROUNDED_EXPLICIT", "EVIDENCE_METRIC_MISMATCH", "INCOMPATIBLE_EVENT_POPULATION",
 })
 
 # A numeric metric must not be grounded in a qualification-unit phrase, and its metric
@@ -192,7 +192,10 @@ def _canonical(candidate: CandidateConstraint, vocabulary: SemanticVocabulary) -
         if direction not in vocabulary.directions:
             raise SemanticValidationError("UNSUPPORTED_DIRECTION",
                                           f"unsupported direction {direction!r}")
-        limit = _require(candidate.limit, "limit", "RANKING")
+        # A rank request without a stated count keeps the documented default, exactly as
+        # the deterministic extractor does; the validator is where absent dimensions get
+        # their default.
+        limit = candidate.limit or DEFAULT_RANKING_LIMIT
         return RankingConstraint(metric_key=metric_key, aggregation=aggregation,
                                  direction=direction, limit=int(limit), origin=origin)
     raise SemanticValidationError("UNSUPPORTED_KIND", f"unsupported kind {candidate.kind!r}")
@@ -233,6 +236,19 @@ def _check_ownership(candidates: tuple[CandidateConstraint, ...]) -> None:
 
 
 def _check_contradictions(candidates: tuple[CandidateConstraint, ...]) -> None:
+    # Exit velocity is only defined on contact. A proposal that ranks by exit velocity
+    # over every pitch is not a defensible meaning, so it is rejected (recoverably) and
+    # the deterministic extractor supplies the batted-ball population.
+    uses_exit_velocity = any(
+        (item.kind == "NUMERIC" and item.metric == "exit_velocity")
+        or (item.kind == "RANKING" and item.metric_key == "exit_velocity")
+        for item in candidates)
+    event_populations = {item.event_population for item in candidates
+                         if item.kind == "POPULATION"}
+    if uses_exit_velocity and "ALL_PITCHES" in event_populations:
+        raise SemanticValidationError(
+            "INCOMPATIBLE_EVENT_POPULATION",
+            "exit velocity is only defined on batted balls, not all pitches")
     rankings = [c for c in candidates if c.kind == "RANKING"]
     ranking_signatures = {(c.metric_key, c.aggregation or "AVG") for c in rankings}
     if len(rankings) > 1 and len(ranking_signatures) > 1:

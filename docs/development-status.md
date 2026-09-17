@@ -1,13 +1,15 @@
 # Development status
 
-Latest work (2026-09-18): **HYBRID_SEMANTIC_LAYER_READY — READY_FOR_CODEX_REVIEW** on
+Latest work (2026-09-18): **HYBRID_SEMANTIC_LAYER_LIVE_VERIFIED — READY_FOR_CODEX_REVIEW** on
 `pi/v0.1-llm-semantic-parser`, branched from
 `codex/v0.1-semantic-recheck @ eae9875e86632f509b0351ea31da040ef151bc7e`.
-[Implementation report](reviews/v01-hybrid-semantic-layer.md). 473 tests pass with no
+[Implementation report](reviews/v01-hybrid-semantic-layer.md). 479 tests pass with no
 skips; the original blocker gate, the Codex NL-to-SQL trace and the new hybrid semantic
-gate all exit 0 with no unresolved blockers. This is a review candidate, not adoption or
-release approval: `main` is untouched and no tag exists. Live LLM extraction is
-`UNVERIFIED_LIVE` because no provider credential is configured here.
+gate all exit 0 with no unresolved blockers. Live LLM semantic extraction is
+`LIVE_VERIFIED` against the real provider (`deepseek-chat`, plus the configured default
+`deepseek-v4-pro`), with recorded evidence in
+`reviews/semantic-hybrid-evidence/live-llm-semantic.jsonl`. This is a review candidate,
+not adoption or release approval: `main` is untouched and no tag exists.
 
 The prior independent verdict remains the authoritative blocked baseline until Codex
 re-reviews this branch:
@@ -40,6 +42,7 @@ statements remain in Git history; they are not current capability claims.
 | Zones 11-12 | IMPLEMENTED, TESTED_OFFLINE | Named/described upper outside quadrants, not a strict above-sz_top predicate |
 | Explicit qualification | IMPLEMENTED, TESTED_OFFLINE, LIVE_VERIFIED | Frozen `QualificationRule`; explicit threshold survives restart/source change |
 | Population | IMPLEMENTED, TESTED_OFFLINE, LIVE_VERIFIED | Regular-season fair batted balls default; explicit postseason/Spring Training/contact/pitches |
+| LLM semantic extraction | LIVE_VERIFIED: 5/5 required cases plus the clarification lifecycle through real DeepSeek calls | Model output is validator-gated; latency above the default timeout falls back safely |
 | Routing and multi-objective results | TESTED_OFFLINE, LIVE_VERIFIED | Declared coverage overlap, not completeness proof; dates outside coverage fail closed |
 | Crash recovery and interaction consumption | IMPLEMENTED, TESTED_OFFLINE | Uncertain external execution fails closed; no distributed exactly-once guarantee |
 | Shared Knowledge and context isolation | IMPLEMENTED, TESTED_OFFLINE | 51 community seed items/sources; broad external freshness sweep not repeated |
