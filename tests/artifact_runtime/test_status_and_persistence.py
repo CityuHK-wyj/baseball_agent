@@ -13,7 +13,7 @@ from tests.artifact_runtime.test_composition import _local_ir
 
 
 class TerminalStateTests(unittest.TestCase):
-    def test_wrong_scope_evidence_is_limited_not_complete(self):
+    def test_wrong_scope_evidence_is_not_complete(self):
         need = Need(need_id="sql", objective="2025 window",
                     proposed_capability="local_analytics",
                     preferred_capabilities=("STATISTICAL_RESULT",),
@@ -23,8 +23,9 @@ class TerminalStateTests(unittest.TestCase):
         runtime, _ = build_test_runtime(
             needs=(need,), executor=RecordingExecutor(rows=((660271, 0.62, 40, 65),)))
         result = runtime.send_message(runtime.start_conversation(), "2025 hard hit")
-        self.assertEqual(result.status, "LIMITED")
+        self.assertNotEqual(result.status, "COMPLETE")
         self.assertFalse(result.coverage.core_goal_supported)
+        self.assertFalse(result.claims)
         self.assertTrue(result.coverage.gaps)
 
     def test_invalid_ir_with_no_recovery_is_failed(self):

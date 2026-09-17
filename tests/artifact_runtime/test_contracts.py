@@ -8,7 +8,7 @@ from app.artifact_runtime.references import ReferenceStore, UnknownReference
 from app.artifact_runtime.scope import compare_scope
 from app.artifact_runtime.sufficiency import CoverageJudge
 from app.models.artifact_runtime import (ArtifactExport, EvidenceSource, Goal, Need,
-                                         RuntimeArtifact, Scope)
+                                         RuntimeArtifact, Scope, ScopeVerification)
 from app.models.contracts import TimeRange
 
 
@@ -151,12 +151,28 @@ class SufficiencyTests(unittest.TestCase):
 
     def test_matching_artifact_completes_the_core_goal(self):
         need = self._need(Scope(entities=("Yankees",), seasons=(2025,), metric="OPS"))
-        artifact = _artifact("a1", actual_scope=need.required_scope)
+        # Verified scope must come from independent evidence, not a declared scope alone.
+        artifact = _artifact("a1", actual_scope=need.required_scope).model_copy(update={
+            "scope_verifications": (
+                ScopeVerification(dimension="entity", status="VERIFIED",
+                                  verifier="test", evidence_refs=("a1",)),
+                ScopeVerification(dimension="season", status="VERIFIED",
+                                  verifier="test", evidence_refs=("a1",)),
+                ScopeVerification(dimension="measure", status="VERIFIED",
+                                  verifier="test", evidence_refs=("a1",)),
+            )})
         judge = CoverageJudge()
         assessment = judge.assess_need(self._goal(), need, (artifact,))
         coverage = judge.summarize(self._goal(), (need,), (assessment,))
         self.assertEqual(assessment.verdict, "SATISFIED")
         self.assertTrue(coverage.core_goal_supported)
+
+    def test_declared_scope_alone_cannot_complete_a_core_goal(self):
+        # A Tool echoing the requested scope is not independent evidence.
+        need = self._need(Scope(entities=("Yankees",), seasons=(2025,), metric="OPS"))
+        artifact = _artifact("a1", actual_scope=need.required_scope)
+        assessment = CoverageJudge().assess_need(self._goal(), need, (artifact,))
+        self.assertNotEqual(assessment.verdict, "SATISFIED")
 
     def test_a_previously_produced_artifact_cannot_satisfy_a_new_need(self):
         need = self._need(Scope(seasons=(2025,)))
