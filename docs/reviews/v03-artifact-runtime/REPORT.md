@@ -9,7 +9,8 @@ tagged. Holdout cases were NOT supplied to the implementation.
 
 - Branch: `pi/v0.3-artifact-runtime` (created from the audit branch).
 - Base: `7c3b6bd` (v0.2 LLM-first runtime) plus the preserved v0.2 audit artifacts.
-- Implementation SHA: see `git rev-parse HEAD` on the branch (recorded after commit).
+- Implementation SHA: `10ba81a0f684dedd949f37b8ede6b9b7cff94283` (implementation +
+  report commit; the exact audit SHA is the final HEAD recorded in the handoff).
 - `main` was not modified during development.
 
 Commit list (before this report commit):
