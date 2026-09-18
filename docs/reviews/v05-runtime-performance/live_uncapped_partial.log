@@ -1,0 +1,8 @@
+[live] live_simple_local
+  [llm] semantic start model=deepseek-v4-pro prompt_chars=1262 timeout=60.0
+  [llm] semantic done 92.4s out_chars=1423 tokens(in=383, out=3351)
+  [llm] planning start model=deepseek-v4-pro prompt_chars=11374 timeout=60.0
+  [llm] planning done 710.8s out_chars=2530 tokens(in=3341, out=15856)
+  [llm] planning start model=deepseek-v4-pro prompt_chars=12670 timeout=60.0
+  [llm] planning done 368.7s out_chars=2584 tokens(in=3675, out=11895)
+  [llm] planning start model=deepseek-v4-pro prompt_chars=14029 timeout=60.0

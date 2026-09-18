@@ -1,0 +1,14 @@
+[
+  {
+    "conversation_id": "conv-5abbdeae4ffc4a37a0ba3bad533136ca",
+    "status": "WAITING_FOR_USER",
+    "clarification_question": "Do you mean pitches thrown by Pirates pitchers only, or all pitches thrown in Pirates games by both teams?",
+    "options": [
+      "Pirates pitchers only",
+      "All pitches in Pirates games (both teams)"
+    ],
+    "kind": "GENERAL",
+    "goal_statement": null,
+    "obligations": []
+  }
+]

@@ -1,0 +1,310 @@
+{
+  "tools": [
+    {
+      "name": "shared_knowledge",
+      "implementation_class": "app.artifact_runtime.tools_evidence.KnowledgeTool",
+      "accepts": [
+        "SEARCH_QUERY"
+      ],
+      "produces": [
+        "KNOWLEDGE_CANDIDATE"
+      ],
+      "description": "Curated ACTIVE baseball rules, terms, teams, players, awards.",
+      "cost": 1,
+      "availability": "AVAILABLE",
+      "authority": "AUTHORITATIVE",
+      "temporal_modes": [
+        "ARBITRARY"
+      ],
+      "population_modes": [],
+      "game_types": [],
+      "entity_namespace": "",
+      "supported_measures": [],
+      "required_inputs": [],
+      "implementation": "app.artifact_runtime.tools_evidence.KnowledgeTool",
+      "underlying": "KnowledgeBase.search -> KnowledgeRetriever (SQLite; deterministic token ranking)",
+      "external": "none (local SQLite knowledge store)",
+      "security": "status/source governance; ACTIVE-only by default",
+      "outcome_codes": [
+        "(none=success)",
+        "KNOWLEDGE_UNAVAILABLE",
+        "MISSING_QUERY",
+        "EMPTY_RESULT"
+      ]
+    },
+    {
+      "name": "web_research",
+      "implementation_class": "app.artifact_runtime.tools_evidence.WebResearchTool",
+      "accepts": [
+        "SEARCH_QUERY",
+        "ENTITY_CONTEXT",
+        "STATISTICAL_RESULT",
+        "ANOMALY_SIGNAL",
+        "DERIVED_MEASURE"
+      ],
+      "produces": [
+        "WEB_EVIDENCE"
+      ],
+      "description": "Live web search plus page reading for unknown references and news.",
+      "cost": 2,
+      "availability": "CONFIG_REQUIRED",
+      "authority": "OBSERVED",
+      "temporal_modes": [
+        "ARBITRARY"
+      ],
+      "population_modes": [],
+      "game_types": [],
+      "entity_namespace": "",
+      "supported_measures": [],
+      "required_inputs": [],
+      "implementation": "app.artifact_runtime.tools_evidence.WebResearchTool",
+      "underlying": "app.tools.web_research.WebResearchTool (DuckDuckGo Lite -> Bing; PageReader; bounded body, manual redirects)",
+      "external": "public HTTP(S) search + page fetch",
+      "security": "SSRF guard (_host_is_safe), http(s) only, 400KB cap, redirect re-check",
+      "outcome_codes": [
+        "(none=success)",
+        "WEB_RESEARCH_UNAVAILABLE",
+        "WEB_NO_RESULTS",
+        "MISSING_QUERY",
+        "EMPTY_RESULT"
+      ]
+    },
+    {
+      "name": "entity_resolution",
+      "implementation_class": "app.artifact_runtime.tools_evidence.EntityResolutionTool",
+      "accepts": [
+        "ENTITY_MENTION"
+      ],
+      "produces": [
+        "ENTITY_MAPPING",
+        "PLAYER_ID_SET"
+      ],
+      "description": "Resolve unknown references to canonical MLB entities.",
+      "cost": 1,
+      "availability": "AVAILABLE",
+      "authority": "DERIVED",
+      "temporal_modes": [
+        "ARBITRARY"
+      ],
+      "population_modes": [],
+      "game_types": [],
+      "entity_namespace": "MLBAM",
+      "supported_measures": [],
+      "required_inputs": [],
+      "implementation": "app.artifact_runtime.tools_evidence.EntityResolutionTool",
+      "underlying": "EntityLookup (local dictionary -> MLB StatsAPI people search -> evidence scan)",
+      "external": "statsapi.mlb.com people search (no SSRF guard on this path)",
+      "security": "ambiguity preserved; never silently chooses the first candidate",
+      "outcome_codes": [
+        "(none=success)",
+        "MISSING_ENTITY_MENTION",
+        "ENTITY_RESOLUTION_UNAVAILABLE",
+        "IDENTITY_AMBIGUOUS",
+        "INPUT_UNRESOLVED"
+      ]
+    },
+    {
+      "name": "evidence_entities",
+      "implementation_class": "app.artifact_runtime.tools_evidence.EvidenceEntityTool",
+      "accepts": [
+        "WEB_EVIDENCE",
+        "KNOWLEDGE_CANDIDATE"
+      ],
+      "produces": [
+        "ENTITY_MAPPING",
+        "PLAYER_ID_SET"
+      ],
+      "description": "Extract canonical player entities from referenced evidence text.",
+      "cost": 1,
+      "availability": "AVAILABLE",
+      "authority": "DERIVED",
+      "temporal_modes": [
+        "ARBITRARY"
+      ],
+      "population_modes": [],
+      "game_types": [],
+      "entity_namespace": "MLBAM",
+      "supported_measures": [],
+      "required_inputs": [],
+      "implementation": "app.artifact_runtime.tools_evidence.EvidenceEntityTool",
+      "underlying": "EntityLookup scan/resolve over accepted grounded evidence text",
+      "external": "statsapi.mlb.com people search (via EntityLookup, English names)",
+      "security": "only accepted OK/PARTIAL grounded artifacts; spans recorded",
+      "outcome_codes": [
+        "(none=success)",
+        "ENTITY_RESOLUTION_UNAVAILABLE",
+        "INPUT_INCOMPATIBLE",
+        "IDENTITY_AMBIGUOUS",
+        "INPUT_UNRESOLVED"
+      ]
+    },
+    {
+      "name": "roster",
+      "implementation_class": "app.artifact_runtime.tools_evidence.RosterTool",
+      "accepts": [
+        "TEAM_NAME",
+        "SEARCH_QUERY"
+      ],
+      "produces": [
+        "TEAM_ROSTER",
+        "PLAYER_ID_SET"
+      ],
+      "description": "Team -> current active roster and canonical player ids (no history).",
+      "cost": 2,
+      "availability": "AVAILABLE",
+      "authority": "AUTHORITATIVE_ACTIVE_ONLY",
+      "temporal_modes": [
+        "CURRENT_ONLY"
+      ],
+      "population_modes": [
+        "active_roster"
+      ],
+      "game_types": [],
+      "entity_namespace": "MLBAM",
+      "supported_measures": [],
+      "required_inputs": [],
+      "implementation": "app.artifact_runtime.tools_evidence.RosterTool",
+      "underlying": "app.artifact_runtime.roster.MLBTeamRosterProvider -> statsapi.mlb.com /teams and /teams/{id}/roster?rosterType=active",
+      "external": "statsapi.mlb.com (requests, 12s timeout, no SSRF guard on this path)",
+      "security": "current-active roster only; explicit rejection of season/date scope",
+      "outcome_codes": [
+        "(none=success)",
+        "MISSING_TEAM",
+        "UNSUPPORTED_CAPABILITY",
+        "ROSTER_UNAVAILABLE",
+        "ROSTER_EMPTY"
+      ]
+    },
+    {
+      "name": "batting_stats",
+      "implementation_class": "app.artifact_runtime.tools_analytics.BattingTool",
+      "accepts": [
+        "PLAYER_NAME",
+        "PLAYER_ID_SET",
+        "SEASON",
+        "DATE_RANGE"
+      ],
+      "produces": [
+        "STATISTICAL_RESULT",
+        "RANKED_ENTITY_SET"
+      ],
+      "description": "Live batting lines by season or explicit date range.",
+      "cost": 1,
+      "availability": "AVAILABLE",
+      "authority": "SOURCE_BACKED",
+      "temporal_modes": [
+        "SEASON",
+        "ARBITRARY_DATE_RANGE"
+      ],
+      "population_modes": [],
+      "game_types": [
+        "REGULAR_SEASON"
+      ],
+      "entity_namespace": "",
+      "supported_measures": [
+        "AVG",
+        "OBP",
+        "SLG",
+        "OPS",
+        "HR",
+        "RBI",
+        "SB",
+        "H",
+        "BB",
+        "SO"
+      ],
+      "required_inputs": [],
+      "implementation": "app.artifact_runtime.tools_analytics.BattingTool",
+      "underlying": "app.tools.batting.BattingStatsTool (pybaseball / Baseball Reference)",
+      "external": "Baseball Reference via pybaseball (network)",
+      "security": "only provider-supported measures; no silent downgrade to OPS",
+      "outcome_codes": [
+        "(none=success)",
+        "BATTING_STATS_TOOL_UNAVAILABLE",
+        "UNSUPPORTED_OPERATION",
+        "BATTING_STATS_UNAVAILABLE",
+        "INVALID_TIME_RANGE",
+        "EMPTY_RESULT"
+      ]
+    },
+    {
+      "name": "local_analytics",
+      "implementation_class": "app.artifact_runtime.tools_analytics.LocalAnalyticsTool",
+      "accepts": [
+        "PLAYER_ID_SET",
+        "DATE_RANGE",
+        "ANALYTICAL_QUERY"
+      ],
+      "produces": [
+        "STATISTICAL_RESULT",
+        "RANKED_ENTITY_SET",
+        "DERIVED_MEASURE"
+      ],
+      "description": "Strict read-only Statcast analytics over catalog-approved fields.",
+      "cost": 2,
+      "availability": "AVAILABLE",
+      "authority": "DERIVED",
+      "temporal_modes": [
+        "ARBITRARY"
+      ],
+      "population_modes": [],
+      "game_types": [],
+      "entity_namespace": "",
+      "supported_measures": [],
+      "required_inputs": [],
+      "implementation": "app.artifact_runtime.tools_analytics.LocalAnalyticsTool",
+      "underlying": "Safe Analytical IR -> SchemaCatalog validation -> deterministic SQL compiler -> SQL AST guard -> DuckDB (PARQUET) / PostgreSQL (POSTGRES)",
+      "external": "local Parquet archive; PostgreSQL hot store",
+      "security": "closed IR, catalog allowlist, read-only SQL guard, read-only role, row cap",
+      "outcome_codes": [
+        "(none=success)",
+        "MISSING_ANALYTICAL_QUERY",
+        "INVALID_IR",
+        "UNKNOWN_FIELD",
+        "MISSING_ENTITY_SET",
+        "EXECUTOR_UNAVAILABLE",
+        "SOURCE_QUERY_FAILED/error_code",
+        "EMPTY_RESULT"
+      ]
+    },
+    {
+      "name": "compute",
+      "implementation_class": "app.artifact_runtime.tools_analytics.ComputeTool",
+      "accepts": [
+        "STATISTICAL_RESULT",
+        "DERIVED_MEASURE",
+        "RANKED_ENTITY_SET"
+      ],
+      "produces": [
+        "DERIVED_MEASURE",
+        "STATISTICAL_RESULT",
+        "RANKED_ENTITY_SET"
+      ],
+      "description": "Comparisons, differences, rates, ranking over aggregated artifacts.",
+      "cost": 1,
+      "availability": "AVAILABLE",
+      "authority": "DERIVED",
+      "temporal_modes": [
+        "ARBITRARY"
+      ],
+      "population_modes": [],
+      "game_types": [],
+      "entity_namespace": "",
+      "supported_measures": [],
+      "required_inputs": [],
+      "implementation": "app.artifact_runtime.tools_analytics.ComputeTool",
+      "underlying": "pure-Python arithmetic over aggregated Artifact exports (no eval/SQL)",
+      "external": "none",
+      "security": "typed numeric reads only; unknown op -> UNSUPPORTED_OPERATION",
+      "outcome_codes": [
+        "(none=success)",
+        "COMPUTE_INPUT_MISSING",
+        "COMPUTE_INPUT_EMPTY",
+        "UNSUPPORTED_COMPUTE_OPERATION",
+        "EMPTY_RESULT"
+      ]
+    }
+  ],
+  "tool_count": 8,
+  "note": "Registry inspected from the product composition root."
+}
