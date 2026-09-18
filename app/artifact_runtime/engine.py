@@ -1043,10 +1043,13 @@ def _match_clarification_option(pending, text: str):
 
 
 def _latency_summary(conversation: RuntimeConversation) -> dict[str, float]:
-    """Aggregate native LATENCY events into a phase -> total-ms map."""
+    """Aggregate this turn's native LATENCY events into a phase -> total-ms map."""
     summary: dict[str, float] = {}
+    current_turn = conversation.turns
     for event in conversation.events.all():
         if event.event_type != "LATENCY" or not event.phase:
+            continue
+        if event.turn != current_turn:
             continue
         summary[event.phase] = round(
             summary.get(event.phase, 0.0) + float(event.duration_ms or 0.0), 3)

@@ -64,8 +64,13 @@ class OpenAICompatibleProvider:
                       if stream is None else stream)
         effort = (reasoning_effort if reasoning_effort is not None
                   else getattr(self._config, "llm_reasoning_effort", None))
+        # Bound the SDK per-operation timeout by the end-to-end deadline as well, so a
+        # stall *before* the first streamed token cannot outlive the deadline.
+        client_timeout = timeout
+        if deadline_seconds is not None:
+            client_timeout = min(timeout, deadline_seconds)
         client = OpenAI(api_key=self._config.deepseek_api_key,
-                        base_url=self._config.deepseek_base_url, timeout=timeout)
+                        base_url=self._config.deepseek_base_url, timeout=client_timeout)
         start = time.perf_counter()
         try:
             if use_stream:

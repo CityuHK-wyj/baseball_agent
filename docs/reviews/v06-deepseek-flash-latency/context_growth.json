@@ -1,0 +1,490 @@
+{
+  "model_roles": {
+    "semantic": {
+      "component": "app.artifact_runtime.planner.LLMSemanticInterpreter",
+      "model": "deepseek-flash",
+      "max_tokens": 1024,
+      "receives_history": true,
+      "receives_artifacts": false,
+      "receives_attempts": false
+    },
+    "planner_initial": {
+      "component": "app.artifact_runtime.planner.LLMPlanner.initial_needs",
+      "model": "deepseek-flash",
+      "max_tokens": 2048,
+      "receives_history": false,
+      "receives_artifacts": true,
+      "receives_attempts": true
+    },
+    "planner_replan": {
+      "component": "app.artifact_runtime.planner.LLMPlanner.add_needs",
+      "model": "deepseek-flash",
+      "max_tokens": 2048,
+      "receives_history": false,
+      "receives_artifacts": true,
+      "receives_attempts": true
+    },
+    "response": {
+      "component": "app.artifact_runtime.response.LLMResponseComposer",
+      "model": "deepseek-flash",
+      "max_tokens": 1024,
+      "receives_history": false,
+      "receives_artifacts": true,
+      "receives_attempts": false
+    },
+    "judge": {
+      "component": "app.artifact_runtime.sufficiency.CoverageJudge (deterministic)",
+      "model": null,
+      "max_tokens": 0,
+      "receives_history": false,
+      "receives_artifacts": true,
+      "receives_attempts": false
+    }
+  },
+  "deterministic_growth": {
+    "turns": [
+      {
+        "turn": 1,
+        "status": "COMPLETE",
+        "history_chars": 358,
+        "messages": 2,
+        "artifacts": 1,
+        "attempts": 1,
+        "semantic_prompt_chars": 1543,
+        "planner_prompt_chars": 10576,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 358
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 1,
+        "attempt_views": 1,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 163,
+        "chars_feedback": 187,
+        "chars_context_total": 6523
+      },
+      {
+        "turn": 2,
+        "status": "COMPLETE",
+        "history_chars": 678,
+        "messages": 4,
+        "artifacts": 2,
+        "attempts": 2,
+        "semantic_prompt_chars": 1863,
+        "planner_prompt_chars": 10854,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 678
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 2,
+        "attempt_views": 2,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 317,
+        "chars_feedback": 311,
+        "chars_context_total": 6801
+      },
+      {
+        "turn": 3,
+        "status": "COMPLETE",
+        "history_chars": 998,
+        "messages": 6,
+        "artifacts": 3,
+        "attempts": 3,
+        "semantic_prompt_chars": 2183,
+        "planner_prompt_chars": 11132,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 998
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 3,
+        "attempt_views": 3,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 471,
+        "chars_feedback": 435,
+        "chars_context_total": 7079
+      },
+      {
+        "turn": 4,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 8,
+        "artifacts": 4,
+        "attempts": 4,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 11410,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 4,
+        "attempt_views": 4,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 625,
+        "chars_feedback": 559,
+        "chars_context_total": 7357
+      },
+      {
+        "turn": 5,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 10,
+        "artifacts": 5,
+        "attempts": 5,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 11688,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 5,
+        "attempt_views": 5,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 779,
+        "chars_feedback": 683,
+        "chars_context_total": 7635
+      },
+      {
+        "turn": 6,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 12,
+        "artifacts": 6,
+        "attempts": 6,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 11966,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 6,
+        "attempt_views": 6,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 933,
+        "chars_feedback": 807,
+        "chars_context_total": 7913
+      },
+      {
+        "turn": 7,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 14,
+        "artifacts": 7,
+        "attempts": 7,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 12244,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 7,
+        "attempt_views": 7,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 1087,
+        "chars_feedback": 931,
+        "chars_context_total": 8191
+      },
+      {
+        "turn": 8,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 16,
+        "artifacts": 8,
+        "attempts": 8,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 12522,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 8,
+        "attempt_views": 8,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 1241,
+        "chars_feedback": 1055,
+        "chars_context_total": 8469
+      },
+      {
+        "turn": 9,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 18,
+        "artifacts": 9,
+        "attempts": 9,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 12800,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 9,
+        "attempt_views": 9,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 1395,
+        "chars_feedback": 1179,
+        "chars_context_total": 8747
+      },
+      {
+        "turn": 10,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 20,
+        "artifacts": 10,
+        "attempts": 10,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 13082,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 10,
+        "attempt_views": 10,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 1552,
+        "chars_feedback": 1304,
+        "chars_context_total": 9029
+      },
+      {
+        "turn": 11,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 22,
+        "artifacts": 11,
+        "attempts": 11,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 13363,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 11,
+        "attempt_views": 11,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 1708,
+        "chars_feedback": 1429,
+        "chars_context_total": 9310
+      },
+      {
+        "turn": 12,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 24,
+        "artifacts": 12,
+        "attempts": 12,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 13644,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 12,
+        "attempt_views": 12,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 1864,
+        "chars_feedback": 1554,
+        "chars_context_total": 9591
+      },
+      {
+        "turn": 13,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 26,
+        "artifacts": 13,
+        "attempts": 13,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 13801,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 13,
+        "attempt_views": 13,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 2020,
+        "chars_feedback": 1555,
+        "chars_context_total": 9748
+      },
+      {
+        "turn": 14,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 28,
+        "artifacts": 14,
+        "attempts": 14,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 13958,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 14,
+        "attempt_views": 14,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 2176,
+        "chars_feedback": 1556,
+        "chars_context_total": 9905
+      },
+      {
+        "turn": 15,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 30,
+        "artifacts": 15,
+        "attempts": 15,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 14115,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 15,
+        "attempt_views": 15,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 2332,
+        "chars_feedback": 1557,
+        "chars_context_total": 10062
+      },
+      {
+        "turn": 16,
+        "status": "COMPLETE",
+        "history_chars": 1318,
+        "messages": 32,
+        "artifacts": 16,
+        "attempts": 16,
+        "semantic_prompt_chars": 2503,
+        "planner_prompt_chars": 14272,
+        "planner_duplication": {
+          "query_in_planner_prompt": 1,
+          "query_in_planner_context": 0,
+          "history_chars": 1318
+        },
+        "capability_views": 8,
+        "schema_tables": 4,
+        "available_exports": 16,
+        "attempt_views": 16,
+        "chars_capabilities": 1894,
+        "chars_schema": 4279,
+        "chars_available_exports": 2488,
+        "chars_feedback": 1558,
+        "chars_context_total": 10219
+      }
+    ],
+    "sample_turns": [
+      1,
+      2,
+      4,
+      8,
+      12,
+      16
+    ]
+  },
+  "live_input_scaling": {
+    "model": "deepseek-flash",
+    "samples": [
+      {
+        "prompt_chars": 852,
+        "prompt_tokens": 134,
+        "completion_tokens": 5,
+        "reasoning_tokens": 0,
+        "duration_seconds": 2.3454,
+        "first_token_seconds": 2.2538,
+        "output_chars": 12
+      },
+      {
+        "prompt_chars": 2052,
+        "prompt_tokens": 311,
+        "completion_tokens": 5,
+        "reasoning_tokens": 0,
+        "duration_seconds": 3.6977,
+        "first_token_seconds": 3.6969,
+        "output_chars": 12
+      },
+      {
+        "prompt_chars": 6052,
+        "prompt_tokens": 899,
+        "completion_tokens": 5,
+        "reasoning_tokens": 0,
+        "duration_seconds": 1.6956,
+        "first_token_seconds": 1.6246,
+        "output_chars": 12
+      },
+      {
+        "prompt_chars": 12052,
+        "prompt_tokens": 1781,
+        "completion_tokens": 5,
+        "reasoning_tokens": 0,
+        "duration_seconds": 1.6504,
+        "first_token_seconds": 1.5885,
+        "output_chars": 12
+      },
+      {
+        "prompt_chars": 24052,
+        "prompt_tokens": 3545,
+        "completion_tokens": 5,
+        "reasoning_tokens": 0,
+        "duration_seconds": 1.9431,
+        "first_token_seconds": 1.9274,
+        "output_chars": 12
+      }
+    ]
+  }
+}
