@@ -95,19 +95,28 @@ def build_runtime(*, runtime_dir: Path | None = None, use_llm: bool = True,
         if provider is not None:
             interpreter = LLMSemanticInterpreter(
                 provider, settings.llm_semantic_model,
-                timeout=max(settings.llm_request_timeout_seconds, 60.0))
+                timeout=max(settings.llm_request_timeout_seconds, 60.0),
+                max_tokens=settings.llm_semantic_max_tokens,
+                reasoning_effort=settings.llm_reasoning_effort,
+                deadline=settings.llm_deadline_seconds)
         else:
             interpreter = RuleBasedSemanticInterpreter()
     if planner is None:
         if provider is not None:
             planner = LLMPlanner(provider, settings.llm_planner_model,
-                                 timeout=max(settings.llm_request_timeout_seconds, 60.0))
+                                 timeout=max(settings.llm_request_timeout_seconds, 60.0),
+                                 max_tokens=settings.llm_planner_max_tokens,
+                                 reasoning_effort=settings.llm_reasoning_effort,
+                                 deadline=settings.llm_deadline_seconds)
         else:
             planner = DeterministicPlanner()
     if composer is None:
         if provider is not None:
             composer = LLMResponseComposer(provider, settings.llm_response_model,
-                                           timeout=max(settings.llm_request_timeout_seconds, 60.0))
+                                           timeout=max(settings.llm_request_timeout_seconds, 60.0),
+                                           max_tokens=settings.llm_response_max_tokens,
+                                           reasoning_effort=settings.llm_reasoning_effort,
+                                           deadline=settings.llm_deadline_seconds)
         else:
             composer = DeterministicResponseComposer()
 

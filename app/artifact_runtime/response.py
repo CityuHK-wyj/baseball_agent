@@ -59,11 +59,16 @@ class DeterministicResponseComposer:
 
 class LLMResponseComposer:
     def __init__(self, provider: ModelProvider, model: str, timeout: float = 45.0,
-                 fallback: ResponseComposer | None = None) -> None:
+                 fallback: ResponseComposer | None = None,
+                 max_tokens: int | None = None, reasoning_effort: str | None = None,
+                 deadline: float | None = None) -> None:
         self._provider = provider
         self._model = model
         self._timeout = timeout
         self._fallback = fallback or DeterministicResponseComposer()
+        self._max_tokens = max_tokens
+        self._reasoning_effort = reasoning_effort
+        self._deadline = deadline
 
     def compose(self, *, message: str, goal: Goal, claims: tuple[Claim, ...],
                 artifacts: tuple[RuntimeArtifact, ...], coverage: GoalCoverage,
@@ -78,7 +83,10 @@ class LLMResponseComposer:
             gaps="; ".join(coverage.gaps) or "(none)")
         try:
             response = self._provider.complete(prompt, model=self._model,
-                                               timeout=self._timeout)
+                                               timeout=self._timeout,
+                                               max_tokens=self._max_tokens,
+                                               reasoning_effort=self._reasoning_effort,
+                                               deadline=self._deadline)
             text = (response.text or "").strip()
             if text:
                 if not coverage.core_goal_supported and coverage.gaps:

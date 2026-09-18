@@ -67,11 +67,16 @@ User message: {message}
 
 class LLMSemanticInterpreter:
     def __init__(self, provider: ModelProvider, model: str, timeout: float = 45.0,
-                 fallback: "SemanticInterpreter | None" = None) -> None:
+                 fallback: "SemanticInterpreter | None" = None,
+                 max_tokens: int | None = None, reasoning_effort: str | None = None,
+                 deadline: float | None = None) -> None:
         self._provider = provider
         self._model = model
         self._timeout = timeout
         self._fallback = fallback or RuleBasedSemanticInterpreter()
+        self._max_tokens = max_tokens
+        self._reasoning_effort = reasoning_effort
+        self._deadline = deadline
 
     def brief(self, *, message: str, history: str, resolved_entities: tuple[str, ...],
               unknowns: tuple[str, ...], today: str) -> SemanticBrief:
@@ -80,7 +85,10 @@ class LLMSemanticInterpreter:
             resolved_entities=", ".join(resolved_entities) or "(none)",
             unknowns=", ".join(unknowns) or "(none)", message=message)
         try:
-            response = self._provider.complete(prompt, model=self._model, timeout=self._timeout)
+            response = self._provider.complete(
+                prompt, model=self._model, timeout=self._timeout,
+                max_tokens=self._max_tokens, reasoning_effort=self._reasoning_effort,
+                deadline=self._deadline)
             return _parse_brief(response.text)
         except (ProviderError, ValueError):
             return self._fallback.brief(message=message, history=history,
@@ -417,11 +425,16 @@ class LLMPlanner:
     """LLM-backed need planner with a deterministic fallback."""
 
     def __init__(self, provider: ModelProvider, model: str, timeout: float = 45.0,
-                 fallback: Planner | None = None) -> None:
+                 fallback: Planner | None = None, max_tokens: int | None = None,
+                 reasoning_effort: str | None = None,
+                 deadline: float | None = None) -> None:
         self._provider = provider
         self._model = model
         self._timeout = timeout
         self._fallback = fallback or DeterministicPlanner()
+        self._max_tokens = max_tokens
+        self._reasoning_effort = reasoning_effort
+        self._deadline = deadline
 
     @staticmethod
     def _prompt(*, goal: Goal, brief: SemanticBrief, context: PlannerContext) -> str:
@@ -440,7 +453,10 @@ class LLMPlanner:
         prompt = self._prompt(goal=goal, brief=brief, context=context)
         try:
             response = self._provider.complete(prompt, model=self._model,
-                                               timeout=self._timeout)
+                                               timeout=self._timeout,
+                                               max_tokens=self._max_tokens,
+                                               reasoning_effort=self._reasoning_effort,
+                                               deadline=self._deadline)
             needs = _parse_needs(response.text)
             if needs:
                 return needs
@@ -461,7 +477,10 @@ class LLMPlanner:
               "Return only NEW needs that reduce these gaps (or an empty list).")
         try:
             response = self._provider.complete(prompt, model=self._model,
-                                               timeout=self._timeout)
+                                               timeout=self._timeout,
+                                               max_tokens=self._max_tokens,
+                                               reasoning_effort=self._reasoning_effort,
+                                               deadline=self._deadline)
             needs = tuple(need for need in _parse_needs(response.text)
                           if need.need_id not in existing_ids)
             return needs
