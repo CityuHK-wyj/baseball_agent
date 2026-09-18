@@ -51,6 +51,9 @@ from app.artifact_runtime.tool_base import RuntimeTool, ToolContext, ToolOutcome
 
 _MAX_ITERATIONS = 6
 _MAX_HISTORY = 8
+# Maximum full semantic replans per turn. Recovery is preserved; runaway replan
+# amplification is not. Repeated identical gaps are skipped independently.
+_MAX_REPLANS = 2
 
 
 @dataclass
@@ -87,6 +90,10 @@ class RuntimeConversation:
     steps: list[str] = field(default_factory=list)
     turns: int = 0
     last_coverage: GoalCoverage | None = None
+    # The semantic brief that produced a pending clarification. Persisted so a reply that
+    # selects a machine-generated option can resume deterministically without re-calling
+    # the semantic model. Free-text replies never use this path.
+    last_brief: SemanticBrief | None = None
     persistence_error: str = ""
 
     # -- persistence -------------------------------------------------------
@@ -111,6 +118,8 @@ class RuntimeConversation:
             "recent_entities": list(self.recent_entities),
             "export_refs": dict(self.export_refs), "steps": list(self.steps),
             "turns": self.turns,
+            "last_brief": (self.last_brief.model_dump(mode="json")
+                           if self.last_brief else None),
         }
 
     @classmethod
@@ -145,6 +154,8 @@ class RuntimeConversation:
         conversation.export_refs = dict(payload.get("export_refs", {}))
         conversation.steps = list(payload.get("steps", ()))
         conversation.turns = int(payload.get("turns", 0))
+        if payload.get("last_brief"):
+            conversation.last_brief = SemanticBrief.model_validate(payload["last_brief"])
         return conversation
 
 
@@ -253,6 +264,7 @@ class ArtifactRuntime:
               ) -> RuntimeTurnResult:
         conversation = self.get_conversation(conversation_id)
         clarification_ref = ""
+        resume_brief: SemanticBrief | None = None
         if conversation.pending_clarification is not None:
             resolved = conversation.pending_clarification
             conversation.accepted_context.append(
@@ -261,6 +273,19 @@ class ArtifactRuntime:
                 "CLARIFICATION_ANSWER", resolved.clarification_id,
                 selector=text[:200], label=resolved.question[:80]).ref_id
             conversation.clarification_refs.append(clarification_ref)
+            # Deterministic resume: a reply that selects a machine-generated option binds
+            # directly to the pending clarification. Only an explicit option match uses
+            # this path; any other reply falls through to full semantic interpretation.
+            if is_clarification:
+                chosen = _match_clarification_option(resolved, text)
+                if chosen is not None and conversation.last_brief is not None:
+                    base = conversation.last_brief
+                    resume_brief = base.model_copy(update={
+                        "clarification_question": "",
+                        "clarification_options": (),
+                        "assumptions": tuple(dict.fromkeys((
+                            *base.assumptions, f"clarification selection: {chosen}"))),
+                    })
             conversation.pending_clarification = None
         conversation.messages.append(AgentMessage(role="user", text=text))
         conversation.turns += 1
@@ -272,12 +297,19 @@ class ArtifactRuntime:
                                  run_id=self._run_id, turn=conversation.turns,
                                  parent_refs=(user_ref.ref_id,), detail=text[:200])
         resolved_entities = self._resolve_entities(text)
-        with self._latency(conversation, "semantic"):
-            brief = self._interpreter.brief(
-                message=text, history=self._history(conversation),
-                resolved_entities=tuple(resolved_entities),
-                unknowns=tuple(conversation.accepted_context[-3:]),
-                today=self._today().isoformat())
+        if resume_brief is not None:
+            brief = resume_brief
+            conversation.events.emit(
+                "CLARIFICATION_RESUMED", conversation_id=conversation_id,
+                run_id=self._run_id, turn=conversation.turns,
+                detail="clarification option bound without a semantic model call")
+        else:
+            with self._latency(conversation, "semantic"):
+                brief = self._interpreter.brief(
+                    message=text, history=self._history(conversation),
+                    resolved_entities=tuple(resolved_entities),
+                    unknowns=tuple(conversation.accepted_context[-3:]),
+                    today=self._today().isoformat())
 
         if brief.clarification_question and not self._already_clarified(
                 conversation, brief.clarification_question):
@@ -286,6 +318,9 @@ class ArtifactRuntime:
                 options=brief.clarification_options, reason="material ambiguity",
                 kind="GENERAL")
             conversation.pending_clarification = pending
+            # Retain the brief that produced the question so a machine-generated option
+            # selection can resume deterministically on the next turn.
+            conversation.last_brief = brief
             conversation.status = "WAITING_FOR_USER"
             conversation.messages.append(AgentMessage(role="agent", text=pending.question))
             conversation.events.emit("CLARIFICATION", conversation_id=conversation_id,
@@ -357,6 +392,8 @@ class ArtifactRuntime:
         attempted: set[tuple[str, str]] = {
             (item.need_id, item.capability) for item in conversation.attempts
             if item.need_id and item.capability}
+        seen_gap_signatures: set[frozenset] = set()
+        replans_used = 0
         with self._latency(conversation, "planner_initial"):
             new_needs = self._planner.initial_needs(goal=goal, brief=brief, context=context)
         for need in new_needs:
@@ -368,8 +405,7 @@ class ArtifactRuntime:
                                      detail=need.proposed_capability or need.objective[:80])
         for iteration in range(_MAX_ITERATIONS):
             with self._latency(conversation, "planner_context",
-                               detail=f"iteration={iteration}"):
-                context = self._planner_context(
+                               detail=f"iteration={iteration}"):                context = self._planner_context(
                     conversation, budget_remaining=_MAX_ITERATIONS - iteration)
             context.attempted = attempted
             with self._latency(conversation, "planner_scheduler"):
@@ -381,6 +417,27 @@ class ArtifactRuntime:
                 if coverage.core_goal_supported:
                     break
                 gaps = tuple(dict.fromkeys((*coverage.gaps, *self._attempt_gaps(conversation))))
+                # Bounded replanning: recovery is preserved, but a turn may not chain an
+                # unbounded number of full (expensive) semantic replans. A repeated
+                # identical gap signature cannot produce new information, so it is a
+                # deterministic continuation rather than another model call.
+                gap_signature = frozenset(gaps)
+                if replans_used >= _MAX_REPLANS:
+                    conversation.events.emit(
+                        "REPLAN_SKIPPED", conversation_id=conversation.conversation_id,
+                        run_id=self._run_id, turn=conversation.turns,
+                        goal_id=goal.goal_id,
+                        detail=f"replan budget exhausted ({_MAX_REPLANS})")
+                    break
+                if gap_signature in seen_gap_signatures:
+                    conversation.events.emit(
+                        "REPLAN_SKIPPED", conversation_id=conversation.conversation_id,
+                        run_id=self._run_id, turn=conversation.turns,
+                        goal_id=goal.goal_id,
+                        detail="deterministic continuation: identical gap signature")
+                    break
+                seen_gap_signatures.add(gap_signature)
+                replans_used += 1
                 with self._latency(conversation, "planner_replan", detail=f"gaps={len(gaps)}"):
                     added = self._planner.add_needs(
                         goal=goal, brief=brief, existing=tuple(conversation.needs),
@@ -961,6 +1018,28 @@ def _scope_summary(artifact: RuntimeArtifact) -> str:
         return "unverified"
     return ",".join(f"{item.dimension}:{item.status}"
                     for item in artifact.scope_verifications)
+
+
+def _match_clarification_option(pending, text: str):
+    """Return the machine-generated option selected by ``text``, or ``None``.
+
+    Only an exact (case-insensitive) option match or a 1-based option index counts. Any
+    other reply is free text and must fall through to semantic interpretation.
+    """
+    options = tuple(getattr(pending, "options", ()) or ())
+    if not options:
+        return None
+    needle = str(text or "").strip()
+    if not needle:
+        return None
+    for option in options:
+        if needle.casefold() == str(option).strip().casefold():
+            return str(option)
+    if needle.isdigit():
+        index = int(needle)
+        if 1 <= index <= len(options):
+            return str(options[index - 1])
+    return None
 
 
 def _latency_summary(conversation: RuntimeConversation) -> dict[str, float]:

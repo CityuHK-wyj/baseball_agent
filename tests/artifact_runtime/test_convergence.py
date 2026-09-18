@@ -769,6 +769,23 @@ class EndToEndReplanningTests(unittest.TestCase):
         self.assertGreaterEqual(planner.add_needs_calls, 1)
         self.assertFalse(result.coverage.core_goal_supported)
 
+    def test_replans_are_bounded_per_turn(self):
+        class AlwaysReplanPlanner(ScriptedPlanner):
+            def __init__(self):
+                super().__init__((need("n1", "ghost_capability"),))
+                self.added = 0
+
+            def add_needs(self, **kwargs):
+                self.added += 1
+                return (need(f"n{self.added + 1}", "ghost_capability"),)
+
+        runtime, _executor = build_test_runtime(needs=())
+        planner = AlwaysReplanPlanner()
+        runtime._planner = planner  # noqa: SLF001
+        runtime.send_message(runtime.start_conversation(), "unresolved request")
+        self.assertEqual(planner.added, 2,
+                         "full semantic replans must be bounded per turn")
+
     def test_verified_obligation_credits_a_closed_core_need(self):
         obligation = UserObligation(obligation_id="o1", kind="SEASON", value="2025",
                                     description="season 2025")
@@ -785,6 +802,58 @@ class EndToEndReplanningTests(unittest.TestCase):
             goal, (core, other), (core_assessment, other_assessment),
             obligation_coverage={"o1": "VERIFIED"}, closed_needs=("core",))
         self.assertTrue(coverage.core_goal_supported)
+
+
+class ClarificationResumeTests(unittest.TestCase):
+    """A machine-generated clarification option must resume without a semantic call."""
+
+    def _runtime(self, interpreter):
+        return build_test_runtime(
+            needs=(need("n1", "shared_knowledge", parameters={"query": "x"}),),
+            interpreter=interpreter)
+
+    def test_option_selection_resumes_without_semantic_call(self):
+        from tests.artifact_runtime.fakes import ScriptedInterpreter
+        brief = SemanticBrief(brief_id="b", goal_statement="ambiguous",
+                              clarification_question="Which population?",
+                              clarification_options=("Pitchers", "Batters"))
+        interpreter = ScriptedInterpreter(brief)
+        runtime, _executor = self._runtime(interpreter)
+        conversation = runtime.start_conversation()
+        first = runtime.send_message(conversation, "ambiguous request")
+        self.assertEqual(first.status, "WAITING_FOR_USER")
+        calls_before = len(interpreter.calls)
+        second = runtime.respond_to_clarification(conversation, "Pitchers")
+        self.assertEqual(len(interpreter.calls), calls_before,
+                         "selecting a generated option must not re-run the semantic model")
+        self.assertNotEqual(second.status, "WAITING_FOR_USER")
+
+    def test_numeric_option_selection_resumes(self):
+        from tests.artifact_runtime.fakes import ScriptedInterpreter
+        brief = SemanticBrief(brief_id="b", goal_statement="ambiguous",
+                              clarification_question="Which population?",
+                              clarification_options=("Pitchers", "Batters"))
+        interpreter = ScriptedInterpreter(brief)
+        runtime, _executor = self._runtime(interpreter)
+        conversation = runtime.start_conversation()
+        runtime.send_message(conversation, "ambiguous request")
+        calls_before = len(interpreter.calls)
+        runtime.respond_to_clarification(conversation, "2")
+        self.assertEqual(len(interpreter.calls), calls_before)
+
+    def test_free_text_reply_falls_back_to_semantic_interpretation(self):
+        from tests.artifact_runtime.fakes import ScriptedInterpreter
+        brief = SemanticBrief(brief_id="b", goal_statement="ambiguous",
+                              clarification_question="Which population?",
+                              clarification_options=("Pitchers", "Batters"))
+        interpreter = ScriptedInterpreter(brief)
+        runtime, _executor = self._runtime(interpreter)
+        conversation = runtime.start_conversation()
+        runtime.send_message(conversation, "ambiguous request")
+        calls_before = len(interpreter.calls)
+        runtime.respond_to_clarification(conversation, "something unrelated entirely")
+        self.assertEqual(len(interpreter.calls), calls_before + 1,
+                         "free text must fall back to semantic interpretation")
 
 
 class MultilingualConvergenceTests(unittest.TestCase):
