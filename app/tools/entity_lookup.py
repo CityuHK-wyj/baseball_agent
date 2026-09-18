@@ -45,7 +45,12 @@ class EntityLookup:
             return EntityLookupResult(mention=mention, canonical=local.canonical,
                                       candidates=tuple(item.entity for item in local.candidates),
                                       source="LOCAL_DICTIONARY")
-        if self._mlb_search is not None and mention.isascii():
+        local_candidates = tuple(item.entity for item in local.candidates)
+        # Local-first: a genuine local ambiguity is preserved without a remote registry call.
+        # The provider is consulted only when the local dictionary yielded no candidate at
+        # all, so ambiguity does not incur network latency and cannot be silently resolved
+        # by a remote first match.
+        if (self._mlb_search is not None and mention.isascii() and not local_candidates):
             found = self._mlb_search(mention)
             if found:
                 return EntityLookupResult(mention=mention, canonical=found, source="MLB_REGISTRY")
@@ -56,7 +61,6 @@ class EntityLookup:
         if scanned:
             return EntityLookupResult(mention=mention, candidates=scanned, source="EVIDENCE",
                                       reason="ambiguous evidence match")
-        local_candidates = tuple(item.entity for item in local.candidates)
         if local_candidates:
             # Preserve a genuine dictionary ambiguity instead of silently dropping it.
             return EntityLookupResult(mention=mention, candidates=local_candidates,

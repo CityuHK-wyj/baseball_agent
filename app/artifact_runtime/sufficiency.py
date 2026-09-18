@@ -192,10 +192,9 @@ class CoverageJudge:
         core = [need for need in needs if need.criticality == "CORE"]
         by_need = {item.need_id: item for item in assessments}
         closed = set(closed_needs)
-        missing = [need.need_id for need in core
-                   if (by_need.get(need.need_id) is None
-                       or by_need[need.need_id].verdict != "SATISFIED")
-                   and need.need_id not in closed]
+        missing_all = [need.need_id for need in core
+                       if (by_need.get(need.need_id) is None
+                           or by_need[need.need_id].verdict != "SATISFIED")]
         gaps: list[str] = []
         for need in needs:
             # A structurally closed Need (its durable outcome says no plan of that shape can
@@ -229,12 +228,22 @@ class CoverageJudge:
             gaps.extend(f"user requirement is not satisfiable: {note}" for note in conflict_notes)
         obligations_complete = (not goal.obligations) or not missing_obligations
         satisfied = [item for item in assessments if item.verdict == "SATISFIED"]
-        # A closed core Need does not by itself block COMPLETE when the frozen obligations
-        # are independently verified by other accepted work; otherwise it does. This is
-        # deterministic (durable outcome + obligation coverage), not planner self-approval.
-        recoverable = bool(goal.obligations) and obligations_complete and bool(satisfied)
-        if recoverable:
-            missing = [item for item in missing if item not in closed]
+        # A closed CORE Need stays unresolved unless it is explicitly superseded by a valid
+        # alternate route, or the frozen obligations are independently verified by other
+        # accepted work. The closed credit is an explicit gate, never an unconditional
+        # exclusion: a failed unresolved CORE Need with no accepted work must keep
+        # ``core_goal_supported`` false so the planner is asked to recover.
+        satisfied_ids = {item.need_id for item in satisfied}
+        satisfied_needs = [need for need in needs if need.need_id in satisfied_ids]
+
+        def _closed_need_credited(need_id: str) -> bool:
+            if goal.obligations and obligations_complete and satisfied:
+                return True
+            return any(getattr(item, "route_of", "") == need_id
+                       for item in satisfied_needs)
+
+        missing = [item for item in missing_all
+                   if not (item in closed and _closed_need_credited(item))]
         core_supported = (bool(core) and not missing and obligations_complete
                           and not hard_conflict)
         quality = (sum(item.evidence_quality for item in satisfied) / len(satisfied)

@@ -734,6 +734,58 @@ class EndToEndReplanningTests(unittest.TestCase):
         needs = {item.need_id: item for item in result.trace.needs}
         self.assertEqual(needs["alternate"].route_of, "primary")
 
+    def test_failed_unresolved_core_need_is_not_credited_without_evidence(self):
+        """A structurally closed CORE Need with no accepted work must stay unresolved.
+
+        Regression for the v0.5 defect where closed Needs were excluded from ``missing``
+        unconditionally, yielding ``core_goal_supported=True`` and suppressing recovery.
+        """
+        goal = Goal(goal_id="g", statement="anything")
+        core = Need(need_id="core", objective="fail", criticality="CORE",
+                    proposed_capability="local_analytics")
+        assessment = CoverageAssessment(assessment_id="a", goal_id="g", need_id="core",
+                                        verdict="UNSATISFIED")
+        coverage = CoverageJudge().summarize(goal, (core,), (assessment,),
+                                             closed_needs=("core",))
+        self.assertFalse(coverage.core_goal_supported)
+        self.assertIn("core", coverage.missing_needs)
+
+    def test_failed_core_need_is_asked_to_recover_when_no_obligations_exist(self):
+        """The planner must be consulted so a corrected plan can be proposed."""
+        class RecordingReplanPlanner(ScriptedPlanner):
+            def __init__(self):
+                super().__init__((need("core", "no_such_capability",
+                                       produces=("STATISTICAL_RESULT",)),))
+                self.add_needs_calls = 0
+
+            def add_needs(self, **kwargs):
+                self.add_needs_calls += 1
+                return ()
+
+        runtime, _executor = build_test_runtime(needs=())
+        planner = RecordingReplanPlanner()
+        runtime._planner = planner  # noqa: SLF001
+        result = runtime.send_message(runtime.start_conversation(), "unresolved request")
+        self.assertGreaterEqual(planner.add_needs_calls, 1)
+        self.assertFalse(result.coverage.core_goal_supported)
+
+    def test_verified_obligation_credits_a_closed_core_need(self):
+        obligation = UserObligation(obligation_id="o1", kind="SEASON", value="2025",
+                                    description="season 2025")
+        goal = Goal(goal_id="g", statement="season", obligations=(obligation,))
+        core = Need(need_id="core", objective="fail", criticality="CORE",
+                    proposed_capability="local_analytics")
+        other = Need(need_id="other", objective="ok", criticality="CORE",
+                     proposed_capability="local_analytics")
+        core_assessment = CoverageAssessment(assessment_id="a", goal_id="g",
+                                             need_id="core", verdict="UNSATISFIED")
+        other_assessment = CoverageAssessment(assessment_id="b", goal_id="g",
+                                              need_id="other", verdict="SATISFIED")
+        coverage = CoverageJudge().summarize(
+            goal, (core, other), (core_assessment, other_assessment),
+            obligation_coverage={"o1": "VERIFIED"}, closed_needs=("core",))
+        self.assertTrue(coverage.core_goal_supported)
+
 
 class MultilingualConvergenceTests(unittest.TestCase):
     @staticmethod

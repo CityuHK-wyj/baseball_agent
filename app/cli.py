@@ -144,6 +144,21 @@ def _print_runtime_trace(trace) -> None:
         print(f"  {attempt.capability} need={attempt.need_id or '-'} "
               f"status={attempt.status} code={attempt.outcome_code} "
               f"retryable={attempt.retryable} detail={attempt.detail[:120]}")
+    latency = getattr(trace, "latency", None) or {}
+    if latency:
+        print("Latency")
+        order = ["semantic", "goal_construction", "planner_total", "planner_initial",
+                 "planner_replan", "planner_context", "planner_scheduler",
+                 "binding_resolution", "tool_execute", "ir_compile", "db_execute",
+                 "scope_verification", "judge", "verification", "claim_grounding",
+                 "state_projection", "response_composition", "trace_build",
+                 "persistence"]
+        for phase in order:
+            if phase in latency:
+                print(f"  {phase:22} {latency[phase]:10.1f} ms")
+        for phase in sorted(set(latency) - set(order)):
+            print(f"  {phase:22} {latency[phase]:10.1f} ms")
+        print(f"  {'total(measured)':22} {sum(latency.values()):10.1f} ms")
     print("Recovery / notes")
     for step in trace.steps:
         print(f"  {step}")

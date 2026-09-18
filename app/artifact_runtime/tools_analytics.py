@@ -7,6 +7,7 @@ roster -> SQL, and so on.
 
 from __future__ import annotations
 
+import time
 from datetime import date, datetime, timezone
 
 from app.models.artifact_runtime import (EvidenceSource, RuntimeArtifact, Scope,
@@ -190,8 +191,10 @@ class LocalAnalyticsTool(RuntimeTool):
             if source_ref is not None:
                 upstream.append(source_ref.target_id)
         relation = context.relation_sql(query.source_kind, query.table)
+        compile_started = time.perf_counter()
         compiled = compile_analytical_query(query, context.catalog, resolve_export=resolve,
                                             relation_sql=relation)
+        ir_compile_ms = (time.perf_counter() - compile_started) * 1000.0
         requested = _scope_from_inputs(request.structured_inputs.get("requested_scope"))
         if not compiled.ok:
             artifact = RuntimeArtifact(
@@ -209,7 +212,9 @@ class LocalAnalyticsTool(RuntimeTool):
         if executor is None:
             return ToolOutcome(recovery_code="EXECUTOR_UNAVAILABLE",
                                detail=f"no executor for {query.source_kind}")
+        db_started = time.perf_counter()
         tool_result, rows = executor.execute_with_rows(compiled.sql)
+        db_execute_ms = (time.perf_counter() - db_started) * 1000.0
         if tool_result.status not in ("OK", "EMPTY"):
             return ToolOutcome(recovery_code=tool_result.error_code or "SOURCE_QUERY_FAILED",
                                detail=tool_result.safe_error_summary or "query failed")
@@ -252,6 +257,8 @@ class LocalAnalyticsTool(RuntimeTool):
             "source_coverage": [query.source_kind],
             "source_snapshot": f"{query.source_kind}:{query.table}:{compiled.ir_digest}",
             "ir_digest": compiled.ir_digest, "row_count": len(ordered_rows),
+            "ir_compile_ms": round(ir_compile_ms, 3),
+            "db_execute_ms": round(db_execute_ms, 3),
             "truncated": bool(query.limit is not None and len(ordered_rows) >= query.limit),
             "evidence_refs": list(compiled.referenced_exports),
         }

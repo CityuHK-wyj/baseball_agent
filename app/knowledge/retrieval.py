@@ -13,6 +13,7 @@ and language. It is deterministic and inspectable; there is no embedding involve
 
 import re
 from datetime import date
+from functools import lru_cache
 from typing import Callable
 
 from app.knowledge.freshness import freshness_rank, is_stale
@@ -34,11 +35,21 @@ def _ordered_tokens(text: str) -> tuple[str, ...]:
     return tuple(dict.fromkeys(_TOKEN.findall(text.casefold())))
 
 
+@lru_cache(maxsize=8192)
+def _mention_pattern(surface: str) -> "re.Pattern[str]":
+    """Cache the boundary-anchored mention pattern.
+
+    Compiling a fresh pattern for every (candidate, name) pair dominated knowledge
+    retrieval latency; the pattern depends only on the surface form, so it is cached.
+    """
+    return re.compile(r"(?<![a-z0-9])" + re.escape(surface) + r"(?![a-z0-9])")
+
+
 def _mentions(surface: str, query: str) -> bool:
     surface = surface.casefold().strip()
     if len(surface) < 2:
         return False
-    return bool(re.search(r"(?<![a-z0-9])" + re.escape(surface) + r"(?![a-z0-9])", query.casefold()))
+    return bool(_mention_pattern(surface).search(query.casefold()))
 
 
 class KnowledgeRetriever:

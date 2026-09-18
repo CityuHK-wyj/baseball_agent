@@ -714,6 +714,10 @@ class RuntimeEvent(_Envelope):
     parent_refs: tuple[str, ...] = ()
     detail: str = ""
     data: dict[str, Any] = Field(default_factory=dict)
+    # Native latency telemetry: a named phase and its measured wall-clock duration.
+    # Never contains prompts or hidden reasoning.
+    phase: str = ""
+    duration_ms: float | None = None
     created_at: datetime = Field(default_factory=utcnow)
 
 
@@ -736,3 +740,5 @@ class RuntimeTrace(_Envelope):
     sql_statements: tuple[str, ...] = ()
     status: str = ""
     answer: str = ""
+    # Compact measured latency summary: phase -> total milliseconds for this turn.
+    latency: dict[str, float] = Field(default_factory=dict)

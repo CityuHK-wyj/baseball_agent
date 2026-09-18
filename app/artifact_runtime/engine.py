@@ -18,7 +18,9 @@ v0.4 invariants enforced here:
 from __future__ import annotations
 
 import json
+import time
 from collections import defaultdict
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from uuid import uuid4
@@ -270,11 +272,12 @@ class ArtifactRuntime:
                                  run_id=self._run_id, turn=conversation.turns,
                                  parent_refs=(user_ref.ref_id,), detail=text[:200])
         resolved_entities = self._resolve_entities(text)
-        brief = self._interpreter.brief(
-            message=text, history=self._history(conversation),
-            resolved_entities=tuple(resolved_entities),
-            unknowns=tuple(conversation.accepted_context[-3:]),
-            today=self._today().isoformat())
+        with self._latency(conversation, "semantic"):
+            brief = self._interpreter.brief(
+                message=text, history=self._history(conversation),
+                resolved_entities=tuple(resolved_entities),
+                unknowns=tuple(conversation.accepted_context[-3:]),
+                today=self._today().isoformat())
 
         if brief.clarification_question and not self._already_clarified(
                 conversation, brief.clarification_question):
@@ -294,58 +297,68 @@ class ArtifactRuntime:
             return RuntimeTurnResult(conversation_id, "WAITING_FOR_USER", pending.question,
                                      pending, (), (), None, trace)
 
-        goal = self._new_goal(conversation, brief, text, user_ref, clarification_ref)
-        self._run_planner(conversation, goal, brief)
+        with self._latency(conversation, "goal_construction"):
+            goal = self._new_goal(conversation, brief, text, user_ref, clarification_ref)
+        with self._latency(conversation, "planner_total"):
+            self._run_planner(conversation, goal, brief)
 
         assessments = tuple(item for item in conversation.assessments
                             if any(need.need_id == item.need_id
                                    for need in conversation.needs))
         self._project_need_statuses(conversation)
-        coverage_map = obligation_coverage(goal, tuple(conversation.needs), assessments,
-                                           conversation.artifacts.all())
-        coverage = self._judge.summarize(goal, tuple(conversation.needs), assessments,
-                                         obligation_coverage=coverage_map,
-                                         closed_needs=self._closed_needs(conversation))
-        coverage = self._with_attempt_gaps(conversation, coverage)
-        conversation.last_coverage = coverage
-        claims = build_claims(goal, tuple(conversation.needs),
-                              conversation.artifacts.all(), assessments)
-        claims = validate_claims(claims, conversation.artifacts.all(), conversation.refs)
+        with self._latency(conversation, "verification"):
+            coverage_map = obligation_coverage(goal, tuple(conversation.needs), assessments,
+                                               conversation.artifacts.all())
+            coverage = self._judge.summarize(goal, tuple(conversation.needs), assessments,
+                                             obligation_coverage=coverage_map,
+                                             closed_needs=self._closed_needs(conversation))
+            coverage = self._with_attempt_gaps(conversation, coverage)
+            conversation.last_coverage = coverage
+        with self._latency(conversation, "claim_grounding"):
+            claims = build_claims(goal, tuple(conversation.needs),
+                                  conversation.artifacts.all(), assessments)
+            claims = validate_claims(claims, conversation.artifacts.all(), conversation.refs)
         for claim in claims:
             conversation.events.emit("CLAIM_ACCEPTED", conversation_id=conversation_id,
                                      run_id=self._run_id, turn=conversation.turns,
                                      goal_id=goal.goal_id, need_id="",
                                      detail=f"{claim.claim_id} [{claim.claim_type}]")
-        state = self._projector.project_goal(coverage, claims,
-                                             coverage.accepted_artifact_ids)
+        with self._latency(conversation, "state_projection"):
+            state = self._projector.project_goal(coverage, claims,
+                                                 coverage.accepted_artifact_ids)
         conversation.events.emit("STATE_TRANSITION", conversation_id=conversation_id,
                                  run_id=self._run_id, turn=conversation.turns,
                                  goal_id=goal.goal_id, detail=state.status)
-        answer = self._composer.compose(
-            message=text, goal=goal, claims=claims,
-            artifacts=conversation.artifacts.all(), coverage=coverage,
-            assumptions=brief.assumptions)
+        with self._latency(conversation, "response_composition"):
+            answer = self._composer.compose(
+                message=text, goal=goal, claims=claims,
+                artifacts=conversation.artifacts.all(), coverage=coverage,
+                assumptions=brief.assumptions)
         conversation.messages.append(AgentMessage(role="agent", text=answer))
         conversation.status = state.status
         self._record_entities(conversation, resolved_entities)
         self._record_candidates(conversation, brief, text)
-        trace = self._build_trace(text, conversation, claims, coverage, answer)
+        with self._latency(conversation, "trace_build"):
+            trace = self._build_trace(text, conversation, claims, coverage, answer)
         self._remember_trace(conversation, trace)
-        self._persist(conversation)
+        with self._latency(conversation, "persistence"):
+            self._persist(conversation)
         return RuntimeTurnResult(conversation_id, state.status, answer, None, claims,
                                  conversation.artifacts.all(), coverage, trace)
 
     # -- planner loop ------------------------------------------------------
     def _run_planner(self, conversation: RuntimeConversation, goal: Goal,
                      brief: SemanticBrief) -> None:
-        context = self._planner_context(conversation)
+        with self._latency(conversation, "planner_context"):
+            context = self._planner_context(conversation)
         # Durable attempt identity: an action already attempted for a Need is not repeated
         # blindly after restart. Uncertain external work in particular is never assumed
         # safe to retry.
         attempted: set[tuple[str, str]] = {
             (item.need_id, item.capability) for item in conversation.attempts
             if item.need_id and item.capability}
-        new_needs = self._planner.initial_needs(goal=goal, brief=brief, context=context)
+        with self._latency(conversation, "planner_initial"):
+            new_needs = self._planner.initial_needs(goal=goal, brief=brief, context=context)
         for need in new_needs:
             self._upsert_need(conversation, need)
             conversation.events.emit("NEED_CREATED", conversation_id=conversation.conversation_id,
@@ -354,21 +367,25 @@ class ArtifactRuntime:
                                      need_revision=need.revision,
                                      detail=need.proposed_capability or need.objective[:80])
         for iteration in range(_MAX_ITERATIONS):
-            context = self._planner_context(
-                conversation, budget_remaining=_MAX_ITERATIONS - iteration)
+            with self._latency(conversation, "planner_context",
+                               detail=f"iteration={iteration}"):
+                context = self._planner_context(
+                    conversation, budget_remaining=_MAX_ITERATIONS - iteration)
             context.attempted = attempted
-            action = self._planner.next_action(goal=goal, needs=tuple(conversation.needs),
-                                               artifacts=conversation.artifacts.all(),
-                                               context=context)
+            with self._latency(conversation, "planner_scheduler"):
+                action = self._planner.next_action(goal=goal, needs=tuple(conversation.needs),
+                                                   artifacts=conversation.artifacts.all(),
+                                                   context=context)
             if action is None:
                 coverage = self._summarize(conversation, goal)
                 if coverage.core_goal_supported:
                     break
                 gaps = tuple(dict.fromkeys((*coverage.gaps, *self._attempt_gaps(conversation))))
-                added = self._planner.add_needs(
-                    goal=goal, brief=brief, existing=tuple(conversation.needs),
-                    artifacts=conversation.artifacts.all(), gaps=gaps,
-                    context=context)
+                with self._latency(conversation, "planner_replan", detail=f"gaps={len(gaps)}"):
+                    added = self._planner.add_needs(
+                        goal=goal, brief=brief, existing=tuple(conversation.needs),
+                        artifacts=conversation.artifacts.all(), gaps=gaps,
+                        context=context)
                 if not added:
                     break
                 for need in added:
@@ -403,11 +420,12 @@ class ArtifactRuntime:
         else:
             bindings = ()
             if need is not None:
-                bindings, binding_gaps = resolve_bindings_with_gaps(
-                    need, artifacts=conversation.artifacts.all(),
-                    export_refs=conversation.export_refs,
-                    by_need=artifact_index(tuple(conversation.needs)),
-                    accepted_types=tool.contract.accepts)
+                with self._latency(conversation, "binding_resolution", need_id=need.need_id):
+                    bindings, binding_gaps = resolve_bindings_with_gaps(
+                        need, artifacts=conversation.artifacts.all(),
+                        export_refs=conversation.export_refs,
+                        by_need=artifact_index(tuple(conversation.needs)),
+                        accepted_types=tool.contract.accepts)
                 for gap in binding_gaps:
                     conversation.events.emit(
                         "BINDING_REJECTED", conversation_id=conversation.conversation_id,
@@ -444,10 +462,14 @@ class ArtifactRuntime:
                 status="INTERRUPTED", outcome_code="INTERRUPTED",
                 detail="started", external_effect_possible=bool(tool.contract.cost > 1))
             conversation.attempts.append(pending)
-            self._persist(conversation)
+            with self._latency(conversation, "persistence", detail="pre_tool"):
+                self._persist(conversation)
             context = self._tool_context(conversation)
             try:
-                raw_outcome = tool.run(request, context)
+                with self._latency(conversation, "tool_execute", detail=tool.name,
+                                   need_id=need.need_id if need else "",
+                                   request_id=request.request_id, attempt_id=attempt_id):
+                    raw_outcome = tool.run(request, context)
                 outcome = normalize_outcome(tool.name, raw_outcome)
             except Exception as error:  # noqa: BLE001 - central exception -> safe outcome
                 outcome = normalize_outcome(tool.name, None, error)
@@ -463,10 +485,12 @@ class ArtifactRuntime:
             lineage_upstream = tuple(
                 conversation.artifacts.maybe(parent) for parent in artifact.lineage)
             parents = tuple(item for item in lineage_upstream if item is not None) or upstream
-            verifications = verify_artifact_scope(
-                requested, artifact,
-                receipt=artifact.metadata.get("execution_receipt"),
-                upstream=parents)
+            with self._latency(conversation, "scope_verification",
+                               detail=f"{artifact.artifact_id}"):
+                verifications = verify_artifact_scope(
+                    requested, artifact,
+                    receipt=artifact.metadata.get("execution_receipt"),
+                    upstream=parents)
             updated = artifact.model_copy(update={"scope_verifications": verifications})
             conversation.artifacts.update(updated)
             verified.append(updated)
@@ -479,6 +503,23 @@ class ArtifactRuntime:
                            f"{verification.status}")
 
         self._add_artifacts(conversation, tuple(verified))
+        # Surface bounded sub-phase timings reported by a tool's execution receipt
+        # (for example Safe-IR compilation and database execution) as native events.
+        for artifact in outcome.artifacts:
+            receipt = artifact.metadata.get("execution_receipt") or {}
+            for phase, key in (("ir_compile", "ir_compile_ms"),
+                               ("db_execute", "db_execute_ms")):
+                if key in receipt:
+                    try:
+                        conversation.events.emit(
+                            "LATENCY", conversation_id=conversation.conversation_id,
+                            run_id=self._run_id, turn=conversation.turns,
+                            goal_id=goal.goal_id,
+                            need_id=need.need_id if need else "",
+                            detail=f"{phase}: {float(receipt[key]):.1f}ms ({artifact.artifact_id})",
+                            phase=phase, duration_ms=round(float(receipt[key]), 3))
+                    except (TypeError, ValueError):
+                        continue
         if need is not None:
             need.linked_artifacts = tuple(dict.fromkeys(
                 (*need.linked_artifacts, *(item.artifact_id for item in verified))))
@@ -519,13 +560,15 @@ class ArtifactRuntime:
             if other.need_id != (need.need_id if need else None):
                 self._assess_need(conversation, goal, other)
         self._project_need_statuses(conversation)
-        self._persist(conversation)
+        with self._latency(conversation, "persistence", detail="post_tool"):
+            self._persist(conversation)
 
     # -- assessment --------------------------------------------------------
     def _assess_need(self, conversation: RuntimeConversation, goal: Goal, need: Need) -> None:
         if not need.linked_artifacts:
             return
-        assessment = self._judge.assess_need(goal, need, conversation.artifacts.all())
+        with self._latency(conversation, "judge", need_id=need.need_id):
+            assessment = self._judge.assess_need(goal, need, conversation.artifacts.all())
         conversation.assessments = [item for item in conversation.assessments
                                     if item.need_id != need.need_id]
         conversation.assessments.append(assessment)
@@ -869,11 +912,33 @@ class ArtifactRuntime:
             tool_calls=tuple(f"{decision.request.capability}({decision.need_id})"
                              for decision in conversation.decisions
                              if decision.request is not None),
-            sql_statements=tuple(sql), status=conversation.status, answer=answer)
+            sql_statements=tuple(sql), status=conversation.status, answer=answer,
+            latency=_latency_summary(conversation))
 
     @staticmethod
     def _remember_trace(conversation: RuntimeConversation, trace: RuntimeTrace) -> None:
         setattr(conversation, "_last_trace", trace)
+
+    @contextmanager
+    def _latency(self, conversation: RuntimeConversation, phase: str,
+                 detail: str = "", **context):
+        """Emit a bounded native latency event for one runtime phase.
+
+        Only a phase name and a measured duration are recorded; never prompts, payloads
+        or hidden reasoning. A raising block still records its duration and re-raises.
+        """
+        started = time.perf_counter()
+        try:
+            yield
+        finally:
+            duration_ms = (time.perf_counter() - started) * 1000.0
+            text = f"{phase}: {duration_ms:.1f}ms"
+            if detail:
+                text += f" ({detail})"
+            conversation.events.emit(
+                "LATENCY", conversation_id=conversation.conversation_id,
+                run_id=self._run_id, turn=conversation.turns,
+                detail=text, phase=phase, duration_ms=round(duration_ms, 3), **context)
 
     def _persist(self, conversation: RuntimeConversation) -> None:
         if self._store is None:
@@ -896,3 +961,14 @@ def _scope_summary(artifact: RuntimeArtifact) -> str:
         return "unverified"
     return ",".join(f"{item.dimension}:{item.status}"
                     for item in artifact.scope_verifications)
+
+
+def _latency_summary(conversation: RuntimeConversation) -> dict[str, float]:
+    """Aggregate native LATENCY events into a phase -> total-ms map."""
+    summary: dict[str, float] = {}
+    for event in conversation.events.all():
+        if event.event_type != "LATENCY" or not event.phase:
+            continue
+        summary[event.phase] = round(
+            summary.get(event.phase, 0.0) + float(event.duration_ms or 0.0), 3)
+    return summary
