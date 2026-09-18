@@ -94,10 +94,15 @@ class _Compiler:
         return IRCompilationResult(code=code, detail=detail)
 
     def field(self, name: str):
-        spec = self.catalog.field(self.query.source_kind, self.query.table, name)
+        # Controlled semantic resolution: a planner may name a catalog field directly or a
+        # canonical semantic handle (for example ``exit_velocity``); only a trusted
+        # catalog field survives and the physical name is what reaches SQL. Unknown names
+        # still fail with UNKNOWN_FIELD.
+        from app.artifact_runtime.field_resolver import resolve_field
+        spec = resolve_field(self.catalog, self.query.source_kind, self.query.table, name)
         if spec is None:
             return None
-        self.applied.append(name)
+        self.applied.append(spec.name)
         return spec
 
     @staticmethod
@@ -375,6 +380,47 @@ class _Compiler:
             walk(condition)
         return tuple(dict.fromkeys(values))
 
+    def _compile_qualification(self) -> tuple[str, IRCompilationResult | None]:
+        """Translate a typed qualification into a deterministic HAVING predicate.
+
+        The denominator is the *measured* sample the semantics require, never a generic
+        row count. Unsupported bases/fields are rejected rather than approximated.
+        """
+        spec = self.query.qualification
+        if spec is None:
+            if self.query.min_rows is None:
+                return "", None
+            if self.query.min_rows < 0:
+                return "", self.fail("INVALID_IR", "min_rows must be non-negative")
+            return f"{self._qualification_denominator()} >= {int(self.query.min_rows)}", None
+        if spec.minimum < 0:
+            return "", self.fail("INVALID_IR", "qualification minimum must be non-negative")
+        minimum = int(spec.minimum)
+        if spec.basis == "MEASURED":
+            if not spec.field:
+                return "", self.fail("INVALID_IR", "MEASURED qualification needs a field")
+            field_spec = self.field(spec.field)
+            if field_spec is None:
+                return "", self.fail("UNKNOWN_FIELD",
+                                     f"unknown qualification field {spec.field!r}")
+            if field_spec.role not in ("MEASURE", "DATE", "IDENTIFIER"):
+                return "", self.fail(
+                    "UNSUPPORTED_OPERATION",
+                    f"{spec.field!r} (role {field_spec.role}) is not a measurable denominator")
+            return f"COUNT({field_spec.name}) >= {minimum}", None
+        if spec.basis == "GAMES":
+            field_spec = self.field("game_pk")
+            if field_spec is None:
+                return "", self.fail("UNSUPPORTED_OPERATION",
+                                     "GAMES qualification needs a game_pk field")
+            return f"COUNT(DISTINCT {field_spec.name}) >= {minimum}", None
+        if spec.basis in ("ROWS", "EVENTS"):
+            return f"COUNT(*) >= {minimum}", None
+        if spec.basis == "ENTITIES_PER_GROUP":
+            return f"{self._qualification_denominator()} >= {minimum}", None
+        return "", self.fail("UNSUPPORTED_OPERATION",
+                             f"unknown qualification basis {spec.basis!r}")
+
     def compile(self) -> IRCompilationResult:
         if self.catalog.table(self.query.source_kind, self.query.table) is None:
             return self.fail("UNKNOWN_TABLE",
@@ -469,11 +515,11 @@ class _Compiler:
         if group_keys:
             sql += " GROUP BY " + ", ".join(group_keys)
         qualification = ""
-        if self.query.min_rows is not None:
-            if self.query.min_rows < 0:
-                return self.fail("INVALID_IR", "min_rows must be non-negative")
-            denominator = self._qualification_denominator()
-            qualification = f"{denominator} >= {int(self.query.min_rows)}"
+        qualification_sql, error = self._compile_qualification()
+        if error is not None:
+            return error
+        if qualification_sql:
+            qualification = qualification_sql
             sql += f" HAVING {qualification}"
         order_alias = self.query.order_by or (self.query.selections[-1].alias)
         if order_alias not in self.query.alias_names():

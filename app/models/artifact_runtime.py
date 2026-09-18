@@ -304,6 +304,7 @@ ToolOutcomeCode = Literal[
     "SUCCESS",
     "EMPTY_RESULT",
     "UNSUPPORTED_CAPABILITY",
+    "UNSUPPORTED_OPERATION",
     "INPUT_UNRESOLVED",
     "INPUT_INCOMPATIBLE",
     "INVALID_IR",
@@ -316,6 +317,7 @@ ToolOutcomeCode = Literal[
     "INTERNAL_FAILURE",
     "INTERRUPTED",
     "UNCERTAIN",
+    "IDENTITY_AMBIGUOUS",
 ]
 AttemptStatus = Literal["SUCCEEDED", "FAILED", "INTERRUPTED", "UNCERTAIN"]
 
@@ -410,6 +412,7 @@ class Goal(BaseModel):
     changed_obligations: tuple[str, ...] = ()
     constraint_refs: tuple[str, ...] = ()
     constraints: tuple[str, ...] = ()
+    conflicts: tuple["UserConflict", ...] = ()
     ambiguity_notes: tuple[str, ...] = ()
     source_refs: tuple[str, ...] = ()
     clarification_refs: tuple[str, ...] = ()
@@ -443,6 +446,37 @@ class UserObligation(BaseModel):
     source_ref: str = ""
     origin: str = "USER_EXPLICIT"  # or USER_CONFIRMED
     status: ObligationStatus = "OPEN"
+
+
+# Classes of user requirement that cannot simultaneously be true, or cannot be true yet.
+# These are *typed* structural facts derived from the frozen obligations, never
+# sentence-pattern branches. ``IMPOSSIBLE`` means no evidence could ever satisfy the
+# conjunction; ``UNKNOWN`` means the future has not happened; ``UNAVAILABLE`` is a
+# capability/data limitation rather than a logical contradiction.
+ConflictSeverity = Literal["IMPOSSIBLE", "UNKNOWN", "UNAVAILABLE"]
+ConflictKind = Literal[
+    "IMPOSSIBLE_TIME_RANGE",
+    "CONTRADICTORY_THRESHOLD",
+    "INCOMPATIBLE_SCOPE",
+    "FUTURE_RESULT",
+    "EMPTY_DEFINITION",
+]
+
+
+class UserConflict(_Envelope):
+    """A typed contradiction or impossibility in the frozen user requirements.
+
+    A conflict is a *semantic* fact about the request, not a Provider failure. It must
+    be distinguishable from an unsupported capability and from a valid empty result, so
+    the runtime can report ``logically impossible`` rather than ``data unavailable``.
+    """
+
+    conflict_id: str
+    kind: ConflictKind
+    description: str
+    severity: ConflictSeverity = "IMPOSSIBLE"
+    obligation_ids: tuple[str, ...] = ()
+    source_refs: tuple[str, ...] = ()
 
 
 Goal.model_rebuild()

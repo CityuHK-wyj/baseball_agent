@@ -28,13 +28,18 @@ from app.models.artifact_runtime import (Claim, CoverageAssessment, Goal, Need, 
                                          RuntimeArtifact, RuntimeEvent, RuntimeTrace, Scope,
                                          SemanticBrief, ToolAttempt, ToolRequest, utcnow)
 from app.artifact_runtime.artifacts import ArtifactStore
-from app.artifact_runtime.bindings import (apply_bindings, artifact_index, resolve_bindings)
+from app.artifact_runtime.bindings import (apply_bindings, artifact_index,
+                                           resolve_bindings_with_gaps)
 from app.artifact_runtime.claims import build_claims, validate_claims
+from app.artifact_runtime.convergence import (build_feedback, capability_views,
+                                              export_views, schema_views,
+                                              unavailable_capabilities)
 from app.artifact_runtime.events import EventJournal
-from app.artifact_runtime.obligations import (extract_obligations, obligation_coverage,
-                                              obligation_gaps)
+from app.artifact_runtime.obligations import (detect_conflicts, extract_obligations,
+                                              obligation_coverage, obligation_gaps)
 from app.artifact_runtime.planner import Planner, PlannerContext, PlannerAction, SemanticInterpreter
-from app.artifact_runtime.recovery import attempt_for, gap_for_attempt, normalize_outcome
+from app.artifact_runtime.recovery import (attempt_for, gap_for_attempt, normalize_outcome,
+                                           requires_replan)
 from app.artifact_runtime.references import ReferenceStore
 from app.artifact_runtime.response import DeterministicResponseComposer, ResponseComposer
 from app.artifact_runtime.scope_verification import verify_artifact_scope
@@ -178,6 +183,9 @@ class ArtifactRuntime:
         self._projector = projector or StateProjector()
         self._id = id_factory or (lambda prefix: f"{prefix}-{uuid4().hex}")
         self._conversations: dict[str, RuntimeConversation] = {}
+        self._catalog_cache = None
+        self._schema_views_cache: tuple = ()
+        self._capability_views_cache: tuple = ()
 
     # -- public API --------------------------------------------------------
     def start_conversation(self) -> str:
@@ -296,7 +304,8 @@ class ArtifactRuntime:
         coverage_map = obligation_coverage(goal, tuple(conversation.needs), assessments,
                                            conversation.artifacts.all())
         coverage = self._judge.summarize(goal, tuple(conversation.needs), assessments,
-                                         obligation_coverage=coverage_map)
+                                         obligation_coverage=coverage_map,
+                                         closed_needs=self._closed_needs(conversation))
         coverage = self._with_attempt_gaps(conversation, coverage)
         conversation.last_coverage = coverage
         claims = build_claims(goal, tuple(conversation.needs),
@@ -345,7 +354,8 @@ class ArtifactRuntime:
                                      need_revision=need.revision,
                                      detail=need.proposed_capability or need.objective[:80])
         for iteration in range(_MAX_ITERATIONS):
-            context = self._planner_context(conversation)
+            context = self._planner_context(
+                conversation, budget_remaining=_MAX_ITERATIONS - iteration)
             context.attempted = attempted
             action = self._planner.next_action(goal=goal, needs=tuple(conversation.needs),
                                                artifacts=conversation.artifacts.all(),
@@ -393,11 +403,18 @@ class ArtifactRuntime:
         else:
             bindings = ()
             if need is not None:
-                bindings = resolve_bindings(
+                bindings, binding_gaps = resolve_bindings_with_gaps(
                     need, artifacts=conversation.artifacts.all(),
                     export_refs=conversation.export_refs,
                     by_need=artifact_index(tuple(conversation.needs)),
                     accepted_types=tool.contract.accepts)
+                for gap in binding_gaps:
+                    conversation.events.emit(
+                        "BINDING_REJECTED", conversation_id=conversation.conversation_id,
+                        run_id=self._run_id, turn=conversation.turns,
+                        goal_id=goal.goal_id, need_id=need.need_id, detail=gap)
+                    need.unsatisfied_inputs = tuple(dict.fromkeys(
+                        (*need.unsatisfied_inputs, "INCOMPATIBLE_BINDING")))
                 if bindings:
                     need = apply_bindings(need, bindings)
                     self._upsert_need(conversation, need)
@@ -541,7 +558,30 @@ class ArtifactRuntime:
         coverage_map = obligation_coverage(goal, tuple(conversation.needs), assessments,
                                            conversation.artifacts.all())
         return self._judge.summarize(goal, tuple(conversation.needs), assessments,
-                                     obligation_coverage=coverage_map)
+                                     obligation_coverage=coverage_map,
+                                     closed_needs=self._closed_needs(conversation))
+
+    @staticmethod
+    def _closed_needs(conversation: RuntimeConversation) -> tuple[str, ...]:
+        """Needs whose durable outcome says no plan of that shape can produce evidence.
+
+        A closed Need is not a silent omission: it is disclosed through its attempt gap.
+        It only stops blocking COMPLETE when the frozen obligations are verified by other
+        accepted work (see ``CoverageJudge.summarize``).
+        """
+        closed: set[str] = set()
+        produced: set[str] = set()
+        status = {artifact.artifact_id: artifact.status
+                  for artifact in conversation.artifacts.all()}
+        for attempt in conversation.attempts:
+            if attempt.need_id and any(status.get(artifact_id) in ("OK", "PARTIAL")
+                                       for artifact_id in attempt.artifact_ids):
+                produced.add(attempt.need_id)
+        for attempt in conversation.attempts:
+            if (attempt.need_id and attempt.need_id not in produced
+                    and requires_replan(attempt.outcome_code)):
+                closed.add(attempt.need_id)
+        return tuple(sorted(closed))
 
     def _attempt_gaps(self, conversation: RuntimeConversation) -> tuple[str, ...]:
         gaps: list[str] = []
@@ -565,6 +605,7 @@ class ArtifactRuntime:
             missing_needs=coverage.missing_needs,
             obligation_coverage=coverage.obligation_coverage,
             missing_obligations=coverage.missing_obligations,
+            conflicts=coverage.conflicts,
             judge_available=coverage.judge_available,
             accepted_artifact_ids=coverage.accepted_artifact_ids)
 
@@ -593,6 +634,12 @@ class ArtifactRuntime:
                 inherited.append(obligation.obligation_id)
                 obligations.append(obligation.model_copy(update={"status": "OPEN"}))
             changed = [item.obligation_id for item in fresh]
+        # Typed conflicts are structural facts about the frozen requirements, not a
+        # Planner conclusion: they cannot be silently dropped or interpreted away.
+        conflicts = detect_conflicts(scope=brief.proposed_scope,
+                                     constraints=tuple(brief.constraints),
+                                     obligations=tuple(obligations),
+                                     today=self._today())
         # Fresh need graph: prior Artifacts remain available only through explicit
         # bindings and are re-assessed under the new Goal revision.
         conversation.needs = []
@@ -605,6 +652,7 @@ class ArtifactRuntime:
             scope=brief.proposed_scope,
             obligations=tuple(obligations),
             inherited_obligations=tuple(inherited), changed_obligations=tuple(changed),
+            conflicts=conflicts,
             constraint_refs=tuple(constraint_refs), constraints=tuple(brief.constraints),
             ambiguity_notes=tuple(brief.ambiguities), source_refs=(user_ref.ref_id,),
             clarification_refs=tuple(filter(None, conversation.clarification_refs)))
@@ -616,6 +664,12 @@ class ArtifactRuntime:
             detail=goal.statement[:200],
             data={"obligations": [item.kind for item in goal.obligations],
                   "inherited": list(inherited), "changed": list(changed)})
+        for conflict in conflicts:
+            conversation.events.emit(
+                "USER_CONFLICT", conversation_id=conversation.conversation_id,
+                run_id=self._run_id, turn=conversation.turns, goal_id=goal.goal_id,
+                goal_revision=goal.revision,
+                detail=f"{conflict.severity}/{conflict.kind}: {conflict.description}")
         return goal
 
     def _upsert_need(self, conversation: RuntimeConversation, need: Need) -> None:
@@ -651,9 +705,11 @@ class ArtifactRuntime:
                 detail=f"{artifact.artifact_id} [{artifact.kind}/{artifact.status}]",
                 data={"exports": [item.export_type for item in artifact.exports]})
 
-    def _planner_context(self, conversation: RuntimeConversation) -> PlannerContext:
+    def _planner_context(self, conversation: RuntimeConversation,
+                         budget_remaining: int = _MAX_ITERATIONS) -> PlannerContext:
+        registry = self._registry
         capabilities = {tool.name: (tool.contract.accepts, tool.contract.produces)
-                        for tool in self._registry.all()}
+                        for tool in registry.all()}
         available = {"SEARCH_QUERY", "ENTITY_MENTION", "TEAM_NAME"}
         hints: dict[str, list[str]] = defaultdict(list)
         for artifact in conversation.artifacts.all():
@@ -662,12 +718,35 @@ class ArtifactRuntime:
                 ref_id = conversation.export_refs.get(export.export_id)
                 if ref_id:
                     hints[export.export_type].append(ref_id)
+        budget_remaining = max(0, budget_remaining)
+        goal = conversation.goal
+        coverage_map: dict[str, str] = {}
+        gaps: tuple[str, ...] = ()
+        feedback = None
+        if goal is not None:
+            coverage_map = obligation_coverage(
+                goal, tuple(conversation.needs), tuple(conversation.assessments),
+                conversation.artifacts.all())
+            gaps = obligation_gaps(goal, coverage_map)
+            feedback = build_feedback(
+                goal=goal, needs=tuple(conversation.needs),
+                artifacts=conversation.artifacts.all(),
+                attempts=tuple(conversation.attempts),
+                obligation_coverage=coverage_map, gaps=gaps,
+                budget_remaining=budget_remaining, registry=registry)
         return PlannerContext(
-            capability_names=tuple(tool.name for tool in self._registry.all()),
+            capability_names=tuple(tool.name for tool in registry.all()),
             available_input_types=tuple(sorted(available)),
             tool_capabilities=capabilities, catalog_summary=self._catalog_summary(),
             export_ref_hints={key: tuple(value) for key, value in hints.items()},
-            budget_remaining=_MAX_ITERATIONS)
+            budget_remaining=budget_remaining,
+            capabilities=self._capability_views(),
+            schema_tables=self._schema_views(),
+            available_exports=export_views(
+                conversation.artifacts.all(), artifact_index(tuple(conversation.needs))),
+            feedback=feedback,
+            unavailable_capabilities=unavailable_capabilities(
+                tuple(conversation.attempts), registry=registry))
 
     def _tool_context(self, conversation: RuntimeConversation) -> ToolContext:
         return ToolContext(
@@ -679,11 +758,25 @@ class ArtifactRuntime:
             player_names=self._player_names, field_mapping=self._field_mapping,
             roster_provider=self._roster_provider, candidate_sink=self._candidate_sink)
 
+    def _catalog(self):
+        if self._catalog_cache is None:
+            from app.artifact_runtime.schema_catalog import catalog_from_registry
+            self._catalog_cache = catalog_from_registry()
+        return self._catalog_cache
+
+    def _schema_views(self) -> tuple:
+        if not self._schema_views_cache:
+            self._schema_views_cache = schema_views(self._catalog())
+        return self._schema_views_cache
+
+    def _capability_views(self) -> tuple:
+        if not self._capability_views_cache:
+            self._capability_views_cache = capability_views(self._registry)
+        return self._capability_views_cache
+
     def _catalog_summary(self) -> str:
-        from app.artifact_runtime.schema_catalog import catalog_from_registry
-        catalog = catalog_from_registry()
         lines: list[str] = []
-        for table in catalog.tables():
+        for table in self._catalog().tables():
             field_text = ", ".join(
                 f"{field.name}({field.role},{field.data_type})" for field in table.fields)
             lines.append(f"- {table.source_kind}:{table.name} grain={table.grain} "

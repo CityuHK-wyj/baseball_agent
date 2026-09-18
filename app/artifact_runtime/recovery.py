@@ -29,8 +29,9 @@ _CODE_MAP: dict[str, ToolOutcomeCode] = {
     "INVALID_IR": "INVALID_IR",
     "UNKNOWN_FIELD": "UNKNOWN_FIELD",
     "UNKNOWN_TABLE": "UNKNOWN_FIELD",
-    "UNSUPPORTED_OPERATION": "UNSUPPORTED_CAPABILITY",
-    "UNSUPPORTED_COMPUTE_OPERATION": "UNSUPPORTED_CAPABILITY",
+    "UNSUPPORTED_CAPABILITY": "UNSUPPORTED_CAPABILITY",
+    "UNSUPPORTED_OPERATION": "UNSUPPORTED_OPERATION",
+    "UNSUPPORTED_COMPUTE_OPERATION": "UNSUPPORTED_OPERATION",
     "INVALID_LIMIT": "INVALID_IR",
     "ENTITY_SET_TOO_LARGE": "INPUT_INCOMPATIBLE",
     "INSUFFICIENT_SOURCE_COVERAGE": "COVERAGE_UNAVAILABLE",
@@ -51,7 +52,93 @@ _CODE_MAP: dict[str, ToolOutcomeCode] = {
     "MODEL_UNAVAILABLE": "MODEL_UNAVAILABLE",
     "INTERRUPTED": "INTERRUPTED",
     "UNCERTAIN": "UNCERTAIN",
+    "IDENTITY_AMBIGUOUS": "IDENTITY_AMBIGUOUS",
 }
+
+# Coarse *failure class* for planning. Distinct classes must produce materially
+# different replanning: a retryable source problem may be retried after a delay, a wrong
+# binding needs a different upstream Artifact, an unknown schema concept needs a different
+# (or corrected) plan, and an unsupported capability cannot be retried at all.
+FAILURE_CLASS: dict[str, str] = {
+    "SUCCESS": "SUCCESS",
+    "EMPTY_RESULT": "VALID_EMPTY",
+    "UNSUPPORTED_CAPABILITY": "UNSUPPORTED_CAPABILITY",
+    "UNSUPPORTED_OPERATION": "UNSUPPORTED_ANALYSIS",
+    "INPUT_UNRESOLVED": "WRONG_BINDING",
+    "INPUT_INCOMPATIBLE": "WRONG_BINDING",
+    "INVALID_IR": "UNSUPPORTED_ANALYSIS",
+    "UNKNOWN_FIELD": "UNKNOWN_SCHEMA",
+    "SCOPE_MISMATCH": "SCOPE_MISMATCH",
+    "COVERAGE_UNAVAILABLE": "INSUFFICIENT_EVIDENCE",
+    "SOURCE_TRANSIENT": "RETRYABLE_SOURCE",
+    "POLICY_BLOCKED": "POLICY_BLOCKED",
+    "MODEL_UNAVAILABLE": "RETRYABLE_MODEL",
+    "INTERNAL_FAILURE": "INTERNAL_FAILURE",
+    "INTERRUPTED": "INTERRUPTED",
+    "UNCERTAIN": "UNCERTAIN",
+    "IDENTITY_AMBIGUOUS": "IDENTITY_AMBIGUITY",
+}
+
+# Classes whose structural precondition is known to be impossible under the current
+# capabilities. A planner must not re-propose the same capability after one of these
+# unless some relevant state has changed (a new provider, a new schema, a new binding).
+_STRUCTURALLY_IMPOSSIBLE = frozenset({"UNSUPPORTED_CAPABILITY", "POLICY_BLOCKED"})
+
+# Classes that may become possible again if the plan materially changes (a different
+# field, a compatible binding, corrected IR) rather than by blind repetition.
+_REPLAN_REQUIRED = frozenset({"WRONG_BINDING", "UNKNOWN_SCHEMA", "UNSUPPORTED_ANALYSIS",
+                              "SCOPE_MISMATCH"})
+
+
+def failure_class(code: str) -> str:
+    """Map a durable outcome code to a planning-relevant failure class."""
+    return FAILURE_CLASS.get(code, "INTERNAL_FAILURE")
+
+
+def is_structurally_impossible(code: str) -> bool:
+    return failure_class(code) in _STRUCTURALLY_IMPOSSIBLE
+
+
+def requires_replan(code: str) -> bool:
+    """True when a blind retry of the same shape cannot help; the plan must change."""
+    return failure_class(code) in (_STRUCTURALLY_IMPOSSIBLE | _REPLAN_REQUIRED)
+
+
+def replan_hint(attempt: ToolAttempt) -> str:
+    """A bounded, operational hint describing what a planner should try instead."""
+    category = failure_class(attempt.outcome_code)
+    if category == "RETRYABLE_SOURCE":
+        return ("the source was temporarily unavailable; a bounded retry or an "
+                "alternate source is reasonable")
+    if category == "RETRYABLE_MODEL":
+        return "the model/provider was unavailable; a bounded retry is reasonable"
+    if category == "WRONG_BINDING":
+        return ("the action did not receive a compatible upstream input; bind a "
+                "different accepted export or produce the missing artifact first")
+    if category == "UNKNOWN_SCHEMA":
+        return ("the plan named a field/table outside the trusted catalog; choose a "
+                "catalog field or derive the value from available fields")
+    if category == "UNSUPPORTED_ANALYSIS":
+        return ("the analytical operation is unsupported as expressed; express it with "
+                "supported operators/roles or choose a different measure")
+    if category == "SCOPE_MISMATCH":
+        return ("the produced evidence did not cover the requested scope; change the "
+                "scope, population or window rather than reusing the same request")
+    if category == "IDENTITY_AMBIGUITY":
+        return ("an entity mention is ambiguous; resolve candidates with more context "
+                "instead of assuming the first match")
+    if category == "INSUFFICIENT_EVIDENCE":
+        return ("the source does not cover the request; use a broader source, a "
+                "different window, or report the coverage limit")
+    if category == "POLICY_BLOCKED":
+        return "the action is blocked by policy and must not be attempted again"
+    if category == "UNSUPPORTED_CAPABILITY":
+        return "no available capability can produce this; do not retry the same action"
+    if category == "VALID_EMPTY":
+        return ("the action executed and legitimately returned no rows; this is a data "
+                "fact, not a failure")
+    return "the attempt failed internally; do not blindly repeat it"
+
 
 
 def classify(code: str) -> ToolOutcomeCode:

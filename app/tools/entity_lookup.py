@@ -56,6 +56,12 @@ class EntityLookup:
         if scanned:
             return EntityLookupResult(mention=mention, candidates=scanned, source="EVIDENCE",
                                       reason="ambiguous evidence match")
+        local_candidates = tuple(item.entity for item in local.candidates)
+        if local_candidates:
+            # Preserve a genuine dictionary ambiguity instead of silently dropping it.
+            return EntityLookupResult(mention=mention, candidates=local_candidates,
+                                      source="LOCAL_DICTIONARY",
+                                      reason=local.reason or "ambiguous dictionary match")
         return EntityLookupResult(mention=mention, reason="not found locally or in evidence")
 
     def scan(self, text: str) -> tuple[CanonicalEntity, ...]:

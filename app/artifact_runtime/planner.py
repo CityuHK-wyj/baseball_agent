@@ -18,6 +18,7 @@ from app.llm.parsing import parse_json_object
 from app.llm.provider import ModelProvider, ProviderError
 from app.models.artifact_runtime import (Goal, Need, RuntimeArtifact, Scope, SemanticBrief,
                                          ToolRequest)
+from app.artifact_runtime.convergence import (PlannerFeedback, READY, planning_state)
 from app.artifact_runtime.temporal import parse_season, parse_time_window
 
 
@@ -231,6 +232,12 @@ class PlannerContext:
     catalog_summary: str = ""
     export_ref_hints: dict[str, tuple[str, ...]] = field(default_factory=dict)
     budget_remaining: int = 6
+    # v0.5 convergence surface: bounded, trustworthy views built by ``convergence``.
+    capabilities: tuple = ()
+    schema_tables: tuple = ()
+    available_exports: tuple = ()
+    feedback: PlannerFeedback | None = None
+    unavailable_capabilities: tuple[str, ...] = ()
 
     def produces_for(self, tool_name: str) -> tuple[str, ...]:
         entry = self.tool_capabilities.get(tool_name)
@@ -239,6 +246,26 @@ class PlannerContext:
     def accepts_for(self, tool_name: str) -> tuple[str, ...]:
         entry = self.tool_capabilities.get(tool_name)
         return entry[0] if entry else ()
+
+    def render_capabilities(self) -> str:
+        if self.capabilities:
+            return "\n".join(item.render() for item in self.capabilities)
+        return json.dumps(self.tool_capabilities, ensure_ascii=False)
+
+    def render_schema(self) -> str:
+        if self.schema_tables:
+            return "\n".join(item.render() for item in self.schema_tables)
+        return self.catalog_summary
+
+    def render_available_exports(self) -> str:
+        if not self.available_exports:
+            return "(no Artifacts produced yet in this run)"
+        return "\n".join(item.render() for item in self.available_exports)
+
+    def render_feedback(self) -> str:
+        if self.feedback is None:
+            return "(no prior attempts in this run)"
+        return self.feedback.render()
 
 
 class DeterministicPlanner:
@@ -278,19 +305,17 @@ class DeterministicPlanner:
                     context: PlannerContext) -> PlannerAction | None:
         # A dependency is ready for *dataflow* once it has produced evidence, even if its
         # own Need verdict is only PARTIAL: a partial upstream product can still feed a
-        # downstream action that needs its value.
-        ready: set[str] = set()
+        # downstream action that needs its value. Structurally impossible capabilities and
+        # already-attempted pairs are not re-proposed blindly.
+        unavailable = set(context.unavailable_capabilities)
+        if context.feedback is not None:
+            unavailable |= set(context.feedback.unavailable_capabilities)
         for need in needs:
-            if need.status in ("SATISFIED", "PARTIAL") or need.linked_artifacts:
-                ready.add(need.need_id)
-        for need in needs:
-            if need.status in ("SATISFIED", "FAILED", "BLOCKED"):
-                continue
-            if any(dep not in ready for dep in need.depends_on):
+            state = planning_state(need, needs, attempted=context.attempted,
+                                   unavailable=unavailable)
+            if state != READY:
                 continue
             tool_name = need.proposed_capability
-            if not tool_name or (need.need_id, tool_name) in context.attempted:
-                continue
             request = self._build_request(need, goal, context)
             return PlannerAction(need_id=need.need_id, request=request,
                                  rationale=f"capability {tool_name} reduces uncertainty")
@@ -318,8 +343,16 @@ NEEDS_PROMPT = """You are the artifact/dataflow planner of a baseball agent. Cre
 minimum set of information Needs that would satisfy the goal. You may chain tools: a
 Need may consume an Artifact produced by another Need through `input_needs`.
 
-Available tools (name: accepts -> produces):
+Available tools (name: accepts -> produces [truthful restrictions]):
 {tool_catalog}
+
+Already produced Artifacts and exports in THIS run (bind only these exact export ids; do
+not invent an export name):
+{available_exports}
+
+Operational feedback from prior attempts (use it to change strategy; do not blindly
+repeat an action whose failure class makes it impossible):
+{feedback}
 
 Trusted schema catalog for local analytics (use ONLY these table/field identifiers):
 {catalog}
@@ -336,12 +369,24 @@ Safe analytical IR shape for `parameters.analytical_query` (use only catalog fie
   "entity_set":{{"field":"batter_id","export_ref":"ref id"}} or null,
   "periods":[{{"label":"a","time_range":{{"start":"YYYY-MM-DD","end":"YYYY-MM-DD"}}}}],
   "date_field":"game_date","order_by":"alias","direction":"DESC","limit":10,
-  "min_rows":20,"window":{{"start":"YYYY-MM-DD","end":"YYYY-MM-DD"}} or null}}
+  "min_rows":20,
+  "qualification":{{"basis":"ROWS|MEASURED|EVENTS|GAMES|ENTITIES_PER_GROUP",
+                     "minimum":20,"field":"measured field for MEASURED"}} or null,
+  "window":{{"start":"YYYY-MM-DD","end":"YYYY-MM-DD"}} or null}}
 
 Rules:
 - NEVER output SQL or arbitrary expressions. Only the JSON above.
+- A qualification must name its measured basis: use `min_rows` only for a raw row
+  minimum; use `qualification` with basis MEASURED/GAMES/EVENTS for minimum measured
+  events, games or events.
+- Never name an export, source, table or field that is not shown above. If the needed
+  value cannot be produced by an available capability, say so and stop.
+- For evidence entity extraction, pass the specific mentions to look for as
+  `parameters.focus` (a list) instead of requesting every recognizable entity.
 - Put a reusable PLAYER_ID_SET need BEFORE an analytics need that filters on it, and
-  reference it in `input_needs`.
+  reference it in `input_needs`; the runtime resolves that dependency's export.
+- In `analytical_query.entity_set.export_ref`, use the exact export id (for example
+  `roster-...:PLAYER_ID_SET`) from the available-exports list, never a need id.
 - If the request needs a team population, use the `roster` tool (authoritative), never a
   city-name guess. Do NOT give a roster need a time_range (a roster is a player set).
 - Use `parameters` with these EXACT concrete keys (never capability names):
@@ -351,6 +396,7 @@ Rules:
     web_research / shared_knowledge -> {{"query": "..."}}
     compute           -> {{"op": "DIFFERENCE|RATIO|PERCENTAGE|MEAN|RANK", ...}}
     entity_resolution -> {{"mentions": [...]}}
+    evidence_entities -> {{"focus": ["specific mentions from the goal/context"]}}
 - Preserve every explicit user constraint in `required_scope` / `parameters`.
 
 Goal: {goal}
@@ -377,14 +423,21 @@ class LLMPlanner:
         self._timeout = timeout
         self._fallback = fallback or DeterministicPlanner()
 
-    def initial_needs(self, *, goal: Goal, brief: SemanticBrief, context: PlannerContext
-                      ) -> tuple[Need, ...]:
-        prompt = NEEDS_PROMPT.format(
-            tool_catalog=json.dumps(context.tool_capabilities, ensure_ascii=False),
-            catalog=context.catalog_summary, goal=goal.statement,
+    @staticmethod
+    def _prompt(*, goal: Goal, brief: SemanticBrief, context: PlannerContext) -> str:
+        return NEEDS_PROMPT.format(
+            tool_catalog=context.render_capabilities(),
+            catalog=context.render_schema(),
+            available_exports=context.render_available_exports(),
+            feedback=context.render_feedback(),
+            goal=goal.statement,
             constraints="; ".join(goal.constraints) or "(none)",
             ambiguities="; ".join(brief.ambiguities) or "(none)",
             hints="; ".join(brief.analysis_hints) or "(none)")
+
+    def initial_needs(self, *, goal: Goal, brief: SemanticBrief, context: PlannerContext
+                      ) -> tuple[Need, ...]:
+        prompt = self._prompt(goal=goal, brief=brief, context=context)
         try:
             response = self._provider.complete(prompt, model=self._model,
                                                timeout=self._timeout)
@@ -402,12 +455,7 @@ class LLMPlanner:
             return ()
         existing_ids = {need.need_id for need in existing}
         prompt = (
-            NEEDS_PROMPT.format(
-                tool_catalog=json.dumps(context.tool_capabilities, ensure_ascii=False),
-                catalog=context.catalog_summary, goal=goal.statement,
-                constraints="; ".join(goal.constraints) or "(none)",
-                ambiguities="; ".join(brief.ambiguities) or "(none)",
-                hints="; ".join(brief.analysis_hints) or "(none)")
+            self._prompt(goal=goal, brief=brief, context=context)
             + f"\n\nExisting needs: {[need.need_id for need in existing]}\n"
               f"Coverage gaps to reduce: {list(gaps)}\n"
               "Return only NEW needs that reduce these gaps (or an empty list).")

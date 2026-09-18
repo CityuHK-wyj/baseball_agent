@@ -57,7 +57,7 @@ class BattingTool(RuntimeTool):
         if metric not in self.contract.supported_measures:
             # Never silently downgrade an unsupported measure to OPS.
             return ToolOutcome(
-                recovery_code="UNSUPPORTED_CAPABILITY",
+                recovery_code="UNSUPPORTED_OPERATION",
                 detail=f"batting provider does not support measure {metric!r}; "
                        f"supported: {', '.join(self.contract.supported_measures)}")
         names = tuple(str(item) for item in (inputs.get("names") or ()) if str(item).strip())
@@ -162,29 +162,29 @@ class LocalAnalyticsTool(RuntimeTool):
         # from the request's referenced Artifacts (composition, not a hard-coded join).
         entity_labels: list[str] = []
         upstream: list[str] = []
-        if query.entity_set is not None and not query.entity_set.export_ref:
-            for ref in request.input_refs:
-                export = resolve_export_ref(context, ref)
-                if export is not None and export.export_type == "PLAYER_ID_SET":
-                    query = query.model_copy(update={
-                        "entity_set": query.entity_set.model_copy(
-                            update={"export_ref": ref})})
-                    if isinstance(export.metadata, dict) and export.metadata.get("team"):
-                        entity_labels.append(str(export.metadata["team"]))
-                    reference = context.refs.maybe(ref)
-                    if reference is not None:
-                        upstream.append(reference.target_id)
-                    break
-            else:
-                return ToolOutcome(
-                    recovery_code="MISSING_ENTITY_SET",
-                    detail="the entity-set filter needs a referenced PLAYER_ID_SET artifact")
         resolve = lambda ref: resolve_export_ref(context, ref)  # noqa: E731
-        if (query.entity_set is not None and query.entity_set.export_ref
-                and not entity_labels):
-            export = resolve(query.entity_set.export_ref)
-            if export is not None and isinstance(export.metadata, dict) \
-                    and export.metadata.get("team"):
+        if query.entity_set is not None:
+            export = resolve(query.entity_set.export_ref) if query.entity_set.export_ref \
+                else None
+            if export is None or export.export_type != "PLAYER_ID_SET":
+                # A model-supplied export_ref that names a need id (or is otherwise
+                # unresolvable) is replaced by the compatible export the engine already
+                # bound explicitly from this Need's declared dependencies. This is still
+                # explicit binding, not ambient export injection.
+                replacement = None
+                for ref in request.input_refs:
+                    candidate = resolve(ref)
+                    if candidate is not None and candidate.export_type == "PLAYER_ID_SET":
+                        replacement = (ref, candidate)
+                        break
+                if replacement is None:
+                    return ToolOutcome(
+                        recovery_code="MISSING_ENTITY_SET",
+                        detail="the entity-set filter needs a bound PLAYER_ID_SET export")
+                ref, export = replacement
+                query = query.model_copy(update={
+                    "entity_set": query.entity_set.model_copy(update={"export_ref": ref})})
+            if isinstance(export.metadata, dict) and export.metadata.get("team"):
                 entity_labels.append(str(export.metadata["team"]))
             source_ref = context.refs.maybe(query.entity_set.export_ref)
             if source_ref is not None:

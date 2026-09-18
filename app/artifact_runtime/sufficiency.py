@@ -45,6 +45,7 @@ class GoalCoverage:
     missing_needs: tuple[str, ...] = field(default_factory=tuple)
     obligation_coverage: dict[str, str] = field(default_factory=dict)
     missing_obligations: tuple[str, ...] = field(default_factory=tuple)
+    conflicts: tuple[str, ...] = field(default_factory=tuple)
     judge_available: bool = True
     accepted_artifact_ids: tuple[str, ...] = field(default_factory=tuple)
 
@@ -185,15 +186,22 @@ class CoverageJudge:
     # -- goal --------------------------------------------------------------
     def summarize(self, goal: Goal, needs: tuple[Need, ...],
                   assessments: tuple[CoverageAssessment, ...], *,
-                  obligation_coverage: dict[str, str] | None = None
+                  obligation_coverage: dict[str, str] | None = None,
+                  closed_needs: tuple[str, ...] = ()
                   ) -> GoalCoverage:
         core = [need for need in needs if need.criticality == "CORE"]
         by_need = {item.need_id: item for item in assessments}
+        closed = set(closed_needs)
         missing = [need.need_id for need in core
-                   if by_need.get(need.need_id) is None
-                   or by_need[need.need_id].verdict != "SATISFIED"]
+                   if (by_need.get(need.need_id) is None
+                       or by_need[need.need_id].verdict != "SATISFIED")
+                   and need.need_id not in closed]
         gaps: list[str] = []
         for need in needs:
+            # A structurally closed Need (its durable outcome says no plan of that shape can
+            # produce it) is disclosed through its attempt gap, not as a silent omission.
+            if need.need_id in closed and by_need.get(need.need_id) is None:
+                continue
             assessment = by_need.get(need.need_id)
             if assessment is not None:
                 gaps.extend(assessment.gaps)
@@ -208,9 +216,27 @@ class CoverageJudge:
             if state != "VERIFIED":
                 missing_obligations.append(obligation.obligation_id)
                 gaps.append(f"user obligation not covered: {obligation.description}")
+        # Typed user conflicts are semantic facts, not generic gaps: a contradictory or
+        # future/impossible requirement can never be certified COMPLETE even if unrelated
+        # evidence exists.
+        conflict_notes: list[str] = []
+        hard_conflict = False
+        for conflict in goal.conflicts:
+            conflict_notes.append(f"{conflict.severity} {conflict.kind}: {conflict.description}")
+            if conflict.severity in ("IMPOSSIBLE", "UNKNOWN"):
+                hard_conflict = True
+        if conflict_notes:
+            gaps.extend(f"user requirement is not satisfiable: {note}" for note in conflict_notes)
         obligations_complete = (not goal.obligations) or not missing_obligations
-        core_supported = bool(core) and not missing and obligations_complete
         satisfied = [item for item in assessments if item.verdict == "SATISFIED"]
+        # A closed core Need does not by itself block COMPLETE when the frozen obligations
+        # are independently verified by other accepted work; otherwise it does. This is
+        # deterministic (durable outcome + obligation coverage), not planner self-approval.
+        recoverable = bool(goal.obligations) and obligations_complete and bool(satisfied)
+        if recoverable:
+            missing = [item for item in missing if item not in closed]
+        core_supported = (bool(core) and not missing and obligations_complete
+                          and not hard_conflict)
         quality = (sum(item.evidence_quality for item in satisfied) / len(satisfied)
                    if satisfied else 0.0)
         judge_available = all(item.assessment_available for item in assessments)
@@ -229,5 +255,6 @@ class CoverageJudge:
                             missing_needs=tuple(missing),
                             obligation_coverage=coverage,
                             missing_obligations=tuple(missing_obligations),
+                            conflicts=tuple(conflict_notes),
                             judge_available=judge_available,
                             accepted_artifact_ids=accepted)

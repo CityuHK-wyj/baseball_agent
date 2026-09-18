@@ -129,6 +129,20 @@ class PeriodSelector(_Envelope):
     time_range: TimeRange
 
 
+# Qualification vocabulary. A qualification must name the *measured basis* it actually
+# counts, not a generic row count: an average over at least N measured events is not the
+# same as at least N rows. Only bases with deterministic compiled semantics are accepted.
+QualificationBasis = Literal["ROWS", "MEASURED", "EVENTS", "GAMES", "ENTITIES_PER_GROUP"]
+
+
+class Qualification(_Envelope):
+    """A minimum-sample qualification over a named measured denominator."""
+
+    basis: QualificationBasis = "ROWS"
+    minimum: int
+    field: str = ""  # required for MEASURED (e.g. the measured event field)
+
+
 class AnalyticalQuery(BaseModel):
     """One bounded analytical request. Runtime-mutable only through re-planning."""
 
@@ -144,6 +158,7 @@ class AnalyticalQuery(BaseModel):
     direction: Literal["ASC", "DESC"] = "DESC"
     limit: int | None = None
     min_rows: int | None = None
+    qualification: Qualification | None = None
     date_field: str = ""
     periods: tuple[PeriodSelector, ...] = ()
     window: TimeRange | None = None

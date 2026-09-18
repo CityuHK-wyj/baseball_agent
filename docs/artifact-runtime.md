@@ -88,6 +88,58 @@ and useful actions exist. Planner failure is not Goal failure. `LLMPlanner` crea
 from the goal; `DeterministicPlanner` is a generic capability planner with no
 phrase-specific analysis. `ScriptedPlanner` exists for embedding/tests.
 
+### Planner convergence surface (v0.5)
+
+ADR 0027 adds a bounded, planner-facing view of what the runtime can actually do. It is
+guidance only; execution remains closed. `app/artifact_runtime/convergence.py` builds:
+
+- `CapabilityView` — truthful per-tool restrictions (`availability`, `authority`,
+  `temporal_modes`, `population_modes`, `game_types`, `entity_namespace`,
+  `supported_measures`, `required_inputs`, `cost`);
+- `SchemaTableView` — per-table grain/coverage/description and per-field name, role, type,
+  meaning, entity and allowed operations (the trusted catalog stays authoritative);
+- `ExportView` — exact available export ids with accepted state, owning artifact, typed
+  contract (namespace/role/grain/cardinality), producer, scope summary and verified
+  dimensions, so the Planner cannot invent an export;
+- `AttemptView` / `PlannerFeedback` — prior outcomes, failure class, retryability, next-step
+  hint, obligation coverage, conflicts, unavailable capabilities and blocked/impossible
+  Needs.
+
+`PlannerContext` carries these views and renders them into both the initial and
+replanning prompts. `planning_state` distinguishes `READY`, `BLOCKED_WAITING`,
+`DEPENDENCY_REJECTED`, `IMPOSSIBLE_CAPABILITY` and `ATTEMPTED`, so a scheduler does not
+re-propose an impossible action or a satisfied dependency check.
+
+### Explicit binding compatibility (v0.5)
+
+An export-type match is not sufficient to bind. `bindings.export_compatible` also checks
+the owning Artifact's accepted state and the typed contract/scope (entity namespace,
+population, membership, game type, season, time-window overlap). Incompatible candidates
+are reported as structured `BINDING_REJECTED` facts. When a Planner names an
+`entity_set.export_ref` that is not a real export id, `local_analytics` falls back to the
+compatible export the engine already bound explicitly from the declared dependency — still
+binding, never ambient injection.
+
+### Recovery classes (v0.5)
+
+`recovery.failure_class` maps outcome codes to `RETRYABLE_SOURCE`, `RETRYABLE_MODEL`,
+`WRONG_BINDING`, `UNKNOWN_SCHEMA`, `UNSUPPORTED_ANALYSIS`, `SCOPE_MISMATCH`,
+`IDENTITY_AMBIGUITY`, `INSUFFICIENT_EVIDENCE`, `POLICY_BLOCKED`, `UNSUPPORTED_CAPABILITY`,
+`VALID_EMPTY` or `INTERNAL_FAILURE`, with a bounded `replan_hint` per class. Two outcome
+codes were added: `UNSUPPORTED_OPERATION` (this plan is unsupported) is distinct from
+`UNSUPPORTED_CAPABILITY` (no capability can do this), and `IDENTITY_AMBIGUOUS` records a
+preserved entity ambiguity.
+
+### Typed user conflicts and qualification (v0.5)
+
+`obligations.detect_conflicts` derives typed `UserConflict`s (impossible time range,
+contradictory thresholds, future result) from the frozen requirements rather than sentence
+patterns; a conflict is disclosed in the trace and can never reach `COMPLETE`. The Safe IR
+gains a `qualification` object whose basis names the measured denominator (`ROWS`,
+`MEASURED`, `EVENTS`, `GAMES`, `ENTITIES_PER_GROUP`); unsupported bases/fields are
+rejected rather than approximated.
+
+
 ## Tool capability contracts
 
 Each tool declares `accepts` and `produces` export capabilities:

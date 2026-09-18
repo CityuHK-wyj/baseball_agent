@@ -252,6 +252,8 @@ class EntityResolutionTool(RuntimeTool):
         ids: list[int] = []
         refs: list[str] = []
         provenance: list[EvidenceSource] = []
+        ambiguous: dict[str, list[str]] = {}
+        unresolved: list[str] = []
         for mention in mentions:
             result = context.entity_lookup.resolve(mention)
             if result.resolved and result.canonical is not None:
@@ -266,22 +268,47 @@ class EntityResolutionTool(RuntimeTool):
                     source=result.source or "entity-resolution", source_kind="ENTITY",
                     reference=result.canonical.entity_key,
                     title=result.canonical.display_name))
-        status = "OK" if mapping else "EMPTY"
+            elif result.candidates:
+                # Preserve genuine ambiguity: do not silently choose the first match.
+                ambiguous[mention] = [item.entity_key for item in result.candidates]
+            else:
+                unresolved.append(mention)
+        if mapping and not ambiguous and not unresolved:
+            status = "OK"
+        elif mapping or ambiguous:
+            status = "PARTIAL"
+        else:
+            status = "EMPTY"
+        recovery = ""
+        detail = ""
+        if ambiguous:
+            recovery = "IDENTITY_AMBIGUOUS"
+            detail = ("ambiguous mentions preserved as candidates: "
+                      + ", ".join(sorted(ambiguous)))
+        elif unresolved:
+            recovery = "INPUT_UNRESOLVED"
+            detail = "unresolved mentions: " + ", ".join(sorted(unresolved))
         artifact = RuntimeArtifact(
             artifact_id=context.artifacts.next_id("entities"), kind="entity_mapping",
-            structured_data={"mapping": mapping, "mentions": list(mentions)},
+            structured_data={"mapping": mapping, "mentions": list(mentions),
+                             "ambiguous": ambiguous, "unresolved": unresolved},
             text_content=", ".join(f"{k} -> {v}" for k, v in mapping.items()),
             provenance=tuple(provenance), references=tuple(refs),
             requested_scope=Scope(entities=mentions),
             actual_scope=Scope(entities=tuple(mapping.values())),
-            confidence=0.8 if mapping else 0.0, status=status,
+            confidence=0.8 if status == "OK" else (0.3 if mapping else 0.0),
+            status=status,
             metadata={"execution_receipt": {
                 "canonical_entities": list(mapping.values()),
+                "ambiguous_mentions": ambiguous,
+                "unresolved_mentions": unresolved,
                 "resolver": "entity-lookup", "evidence_refs": list(refs),
                 "source_snapshot": ",".join(list(mapping.values())[:8])}})
         exports = [build_export(artifact, "ENTITY_MAPPING", mapping,
                                 references=tuple(refs), provenance="entity-resolution",
-                                confidence=artifact.confidence)]
+                                confidence=artifact.confidence,
+                                metadata={"ambiguous": ambiguous,
+                                          "unresolved": unresolved})]
         if ids:
             exports.append(build_export(artifact, "PLAYER_ID_SET", list(dict.fromkeys(ids)),
                                         references=tuple(refs),
@@ -289,7 +316,7 @@ class EntityResolutionTool(RuntimeTool):
                                         confidence=artifact.confidence))
         artifact = artifact.model_copy(update={"exports": tuple(exports)})
         context.artifacts.add(artifact)
-        return ToolOutcome(artifacts=(artifact,))
+        return ToolOutcome(artifacts=(artifact,), recovery_code=recovery, detail=detail)
 
 
 class EvidenceEntityTool(RuntimeTool):
@@ -309,8 +336,18 @@ class EvidenceEntityTool(RuntimeTool):
         if context.entity_lookup is None:
             return ToolOutcome(recovery_code="ENTITY_RESOLUTION_UNAVAILABLE",
                                detail="entity resolution is not configured")
-        texts: list[str] = []
-        source_ids: list[str] = []
+        inputs = request.structured_inputs
+        focus = tuple(str(item) for item in
+                      (inputs.get("focus") or inputs.get("focus_mentions") or ())
+                      if str(item).strip())
+        entity_types = tuple(str(item).upper() for item in (inputs.get("entity_types") or ())
+                             if str(item).strip())
+        try:
+            max_entities = max(1, min(int(inputs.get("max_entities") or 25), 200))
+        except (TypeError, ValueError):
+            max_entities = 25
+        source_pairs: list[tuple[str, str]] = []
+        evidence_refs: list[str] = []
         for ref in request.input_refs:
             reference = context.refs.maybe(ref)
             if reference is not None and reference.ref_type in ("ARTIFACT", "ARTIFACT_EXPORT"):
@@ -322,36 +359,126 @@ class EvidenceEntityTool(RuntimeTool):
                     continue
                 # Only grounded text is eligible; ungrounded snippets in structured_data
                 # are explicitly excluded from the scan.
-                texts.append(artifact.text_content)
-                source_ids.append(artifact.artifact_id)
-        if not texts:
+                source_pairs.append((artifact.artifact_id, artifact.text_content))
+                evidence_refs.extend(artifact.references)
+        if not source_pairs:
             return ToolOutcome(recovery_code="INPUT_INCOMPATIBLE",
                                detail="evidence_entities needs an accepted grounded "
                                       "evidence artifact")
-        found = context.entity_lookup.scan(" ".join(texts))
-        mapping = {entity.display_name: entity.entity_key for entity in found}
-        ids = [int(entity.entity_key.partition(":")[2]) for entity in found
-               if entity.entity_key.partition(":")[2].isdigit()]
-        refs = [context.refs.add("KNOWLEDGE_ENTRY", entity.entity_key,
-                                 label=entity.display_name).ref_id for entity in found]
+        joined = " ".join(text for _artifact_id, text in source_pairs)
+        mapping: dict[str, str] = {}
+        ids: list[int] = []
+        ambiguous: dict[str, list[str]] = {}
+        unresolved: list[str] = []
+        spans: list[dict] = []
+
+        def _span(surface: str) -> dict | None:
+            for artifact_id, text in source_pairs:
+                index = text.casefold().find(surface.casefold())
+                if index >= 0:
+                    return {"artifact_id": artifact_id, "surface": surface,
+                            "start": index, "end": index + len(surface),
+                            "context": text[max(0, index - 40): index + len(surface) + 40]}
+            return None
+
+        if focus:
+            # Need-directed extraction: only the propositions relevant to the Need's
+            # requested mentions are turned into a population, not every recognizable
+            # entity in the document.
+            for mention in focus[:max_entities]:
+                result = context.entity_lookup.resolve(mention, joined)
+                if result.resolved and result.canonical is not None:
+                    key = result.canonical.entity_key
+                    mapping[result.canonical.display_name] = key
+                    identifier = key.partition(":")[2]
+                    if identifier.isdigit():
+                        ids.append(int(identifier))
+                    span = _span(result.canonical.display_name) or _span(mention)
+                    if span is not None:
+                        span["mention"] = mention
+                        spans.append(span)
+                elif result.candidates:
+                    ambiguous[mention] = [item.entity_key for item in result.candidates]
+                else:
+                    unresolved.append(mention)
+        else:
+            found = context.entity_lookup.scan(joined)
+            if entity_types:
+                found = tuple(item for item in found
+                              if item.entity_type.upper() in entity_types)
+            # A broad scan can still encounter several distinct identities sharing one
+            # surface form; that is ambiguity, not a population.
+            by_name: dict[str, list] = {}
+            for entity in found:
+                by_name.setdefault(entity.display_name, []).append(entity)
+            for name, entities in list(by_name.items())[:max_entities]:
+                keys = list(dict.fromkeys(item.entity_key for item in entities))
+                if len(keys) > 1:
+                    ambiguous[name] = keys
+                    continue
+                entity = entities[0]
+                mapping[name] = entity.entity_key
+                identifier = entity.entity_key.partition(":")[2]
+                if identifier.isdigit():
+                    ids.append(int(identifier))
+                span = _span(entity.display_name)
+                if span is not None:
+                    span["mention"] = entity.display_name
+                    spans.append(span)
+                elif entity.aliases:
+                    for alias in entity.aliases:
+                        span = _span(alias)
+                        if span is not None:
+                            span["mention"] = alias
+                            spans.append(span)
+                            break
+        status = "OK" if mapping and not ambiguous and not unresolved else (
+            "PARTIAL" if (mapping or ambiguous) else "EMPTY")
+        recovery = ""
+        detail = ""
+        if ambiguous:
+            recovery = "IDENTITY_AMBIGUOUS"
+            detail = ("ambiguous mentions preserved as candidates: "
+                      + ", ".join(sorted(ambiguous)))
+        elif unresolved:
+            recovery = "INPUT_UNRESOLVED"
+            detail = "unresolved mentions: " + ", ".join(sorted(unresolved))
+        refs = [context.refs.add("KNOWLEDGE_ENTRY", entity_key,
+                                 label=name).ref_id
+                for name, entity_key in mapping.items()]
+        refs.extend(evidence_refs)
         artifact = RuntimeArtifact(
             artifact_id=context.artifacts.next_id("entities"), kind="entity_mapping",
-            structured_data={"mapping": mapping, "source_artifacts": source_ids},
-            text_content=", ".join(mapping), references=tuple(refs),
-            lineage=tuple(source_ids), status="OK" if mapping else "EMPTY",
-            confidence=0.6 if mapping else 0.0,
+            structured_data={"mapping": mapping, "source_artifacts": [item[0] for item in source_pairs],
+                             "focus": list(focus), "ambiguous": ambiguous,
+                             "unresolved": unresolved, "spans": spans},
+            text_content=", ".join(mapping), references=tuple(dict.fromkeys(refs)),
+            lineage=tuple(item[0] for item in source_pairs), status=status,
+            confidence=0.6 if status == "OK" else (0.3 if mapping else 0.0),
             metadata={"execution_receipt": {
                 "canonical_entities": list(mapping.values()),
+                "focus": list(focus),
+                "extraction_mode": "FOCUSED" if focus else "BROAD",
+                "ambiguous_mentions": ambiguous,
+                "unresolved_mentions": unresolved,
+                "source_spans": spans,
                 "resolver": "evidence-entities", "evidence_refs": list(refs),
-                "source_snapshot": ",".join(source_ids)}})
+                "source_snapshot": ",".join(item[0] for item in source_pairs)}})
         exports = [build_export(artifact, "ENTITY_MAPPING", mapping,
-                                references=tuple(refs), provenance="evidence-entities")]
+                                references=tuple(refs), provenance="evidence-entities",
+                                confidence=artifact.confidence,
+                                metadata={"focus": list(focus),
+                                          "ambiguous": ambiguous,
+                                          "unresolved": unresolved,
+                                          "source_spans": spans})]
         if ids:
             exports.append(build_export(artifact, "PLAYER_ID_SET", ids,
-                                        references=tuple(refs), provenance="evidence-entities"))
+                                        references=tuple(refs), provenance="evidence-entities",
+                                        metadata={"focus": list(focus),
+                                                  "source_spans": spans}))
         artifact = artifact.model_copy(update={"exports": tuple(exports)})
         context.artifacts.add(artifact)
-        return ToolOutcome(artifacts=(artifact,))
+        return ToolOutcome(artifacts=(artifact,), recovery_code=recovery, detail=detail)
 
 
 class RosterTool(RuntimeTool):

@@ -17,10 +17,13 @@ from __future__ import annotations
 import re
 
 from app.models.artifact_runtime import (Goal, Need, RuntimeArtifact, Scope, SemanticBrief,
-                                         UserObligation)
+                                         UserConflict, UserObligation)
 
 _YEAR = re.compile(r"(?<!\d)((?:19|20)\d{2})(?!\d)")
 _ISO_DATE = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
+_TIME_SCOPE = re.compile(r"(\d{4}-\d{2}-\d{2})\s*\.\.\s*(\d{4}-\d{2}-\d{2})")
+_GE = re.compile(r">=\s*(\d+(?:\.\d+)?)")
+_LE = re.compile(r"<=\s*(\d+(?:\.\d+)?)")
 _THRESHOLD = re.compile(
     r"(?:at\s+least|minimum\s+of|>=|≥|至少|不少于)\s*(\d+(?:\.\d+)?)", re.IGNORECASE)
 _UPPER_BOUND = re.compile(
@@ -248,7 +251,8 @@ def _reflected(obligation: UserObligation, need: Need,
         if need.parameters.get("qualification"):
             return True
         query = need.parameters.get("analytical_query")
-        if isinstance(query, dict) and query.get("min_rows") is not None:
+        if isinstance(query, dict) and (query.get("min_rows") is not None
+                                        or query.get("qualification")):
             return True
         if scope is not None and scope.qualification:
             return True
@@ -331,4 +335,90 @@ def obligation_gaps(goal: Goal, coverage: dict[str, str]) -> tuple[str, ...]:
             gaps.append(f"user obligation not covered: {obligation.description}")
         elif state == "PARTIAL":
             gaps.append(f"user obligation only partially covered: {obligation.description}")
+    for conflict in goal.conflicts:
+        gaps.append(f"user requirement is not satisfiable ({conflict.kind}, "
+                    f"{conflict.severity}): {conflict.description}")
     return tuple(gaps)
+
+
+# ---------------------------------------------------------------------------
+# Typed conflicts / impossibility
+# ---------------------------------------------------------------------------
+
+
+def detect_conflicts(*, scope: Scope | None,
+                     constraints: tuple[str, ...] = (),
+                     obligations: tuple[UserObligation, ...] = (),
+                     today: "date | None" = None) -> tuple[UserConflict, ...]:
+    """Derive typed, structural conflicts from the frozen requirements.
+
+    This is deliberately *not* sentence matching. It reasons over typed values already
+    extracted from the request (a ``Scope`` window/season, ``QUALIFICATION`` obligation
+    bounds encoded as ``>=``/``<=``). The output distinguishes a logical impossibility
+    from a not-yet-observed future result, so the runtime never fabricates evidence for
+    an unsatisfiable request and never collapses it into a generic data gap.
+    """
+    from datetime import date as _date
+    reference = today or _date.today()
+    conflicts: list[UserConflict] = []
+    seen: set[tuple[str, str]] = set()
+
+    def add(kind: str, severity: str, description: str,
+            ids: tuple[str, ...] = ()) -> None:
+        key = (kind, description)
+        if key in seen:
+            return
+        seen.add(key)
+        conflicts.append(UserConflict(
+            conflict_id=f"conflict-{len(conflicts) + 1}", kind=kind,
+            severity=severity, description=description, obligation_ids=ids))
+
+    windows: list[tuple[_date, _date, str]] = []
+    if scope is not None and scope.time_range is not None:
+        windows.append((scope.time_range.start, scope.time_range.end, "scope time_range"))
+    for constraint in constraints:
+        for match in _TIME_SCOPE.finditer(str(constraint)):
+            try:
+                windows.append((_date.fromisoformat(match.group(1)),
+                                _date.fromisoformat(match.group(2)), str(constraint)))
+            except ValueError:
+                add("IMPOSSIBLE_TIME_RANGE", "IMPOSSIBLE",
+                    f"time window {match.group(1)}..{match.group(2)} is not a valid date "
+                    f"range")
+    for start, end, origin in windows:
+        if start > end:
+            add("IMPOSSIBLE_TIME_RANGE", "IMPOSSIBLE",
+                f"time window {start.isoformat()}..{end.isoformat()} starts after it ends "
+                f"({origin})")
+        elif start > reference:
+            add("FUTURE_RESULT", "UNKNOWN",
+                f"time window {start.isoformat()}..{end.isoformat()} is in the future")
+
+    if scope is not None:
+        for season in scope.seasons:
+            try:
+                year = int(season)
+            except (TypeError, ValueError):
+                continue
+            if year > reference.year:
+                add("FUTURE_RESULT", "UNKNOWN", f"season {year} has not happened yet")
+
+    lower: list[float] = []
+    upper: list[float] = []
+    lower_ids: list[str] = []
+    upper_ids: list[str] = []
+    for obligation in obligations:
+        if obligation.kind != "QUALIFICATION":
+            continue
+        for match in _GE.finditer(obligation.value):
+            lower.append(float(match.group(1)))
+            lower_ids.append(obligation.obligation_id)
+        for match in _LE.finditer(obligation.value):
+            upper.append(float(match.group(1)))
+            upper_ids.append(obligation.obligation_id)
+    if lower and upper and max(lower) > min(upper):
+        add("CONTRADICTORY_THRESHOLD", "IMPOSSIBLE",
+            f"minimum qualification {max(lower):g} exceeds maximum {min(upper):g}",
+            tuple(dict.fromkeys((*lower_ids, *upper_ids))))
+
+    return tuple(conflicts)
