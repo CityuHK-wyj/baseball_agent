@@ -13,7 +13,7 @@ No merge and no tag were made; `main` is untouched.
 ## Commits
 
 - `6534b18 feat(runtime): planner-runtime convergence surface (v0.5)`
-- `docs(review): record v0.5 implementation SHA` (tip)
+- `5cfa663 docs(review): v0.5 planner-convergence stop report`
 
 ## Modules changed
 
