@@ -1,396 +1,232 @@
-"""Persistent Shared Knowledge store.
+"""Shared Knowledge: persistent ACTIVE knowledge with an explicit governance split.
 
-This is the truth source for long-lived MLB knowledge: structured, versioned, sourced
-items plus a source registry, relations and snapshots. It is physically separate from the
-read-only analytics plane and from the agent runtime object tables. SQLite is the local
-and test implementation; PostgreSQL stores the same tables in a dedicated ``knowledge``
-schema behind the same Protocol.
+Read path:  ACTIVE Knowledge -> Knowledge Artifact -> runtime.
+Write path: runtime discovery -> CandidateKnowledge -> (admin review) -> ACTIVE.
 
-SQL is dialect-agnostic (``ON CONFLICT`` upsert, positional rows). Full-text retrieval is
-a candidate filter plus deterministic ranking; no vector store is required.
+The MVP reads a curated seed and writes candidates to a local candidate journal. Runtime
+evidence is never auto-promoted into ACTIVE knowledge.
 """
 
+from __future__ import annotations
+
 import json
-import sqlite3
-from datetime import date, datetime, timezone
+import re
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Protocol
+from typing import Any
 
-from app.models.knowledge import (
-    KnowledgeItem,
-    KnowledgeRelation,
-    KnowledgeSnapshot,
-    KnowledgeSource,
-    KnowledgeStatus,
-    KnowledgeType,
-)
+DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "knowledge"
 
-_COLUMNS = (
-    "knowledge_id", "canonical_key", "knowledge_type", "status", "language", "version",
-    "effective_from", "effective_to", "payload", "updated_at",
-)
-
-_SCHEMA_STATEMENTS = (
-    """
-    CREATE TABLE IF NOT EXISTS {p}sources (
-        source_id TEXT PRIMARY KEY,
-        authority_level TEXT NOT NULL,
-        source_type TEXT NOT NULL,
-        active INTEGER NOT NULL,
-        payload TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-    )
-    """,
-    """
-    CREATE TABLE IF NOT EXISTS {p}items (
-        knowledge_id TEXT PRIMARY KEY,
-        canonical_key TEXT NOT NULL,
-        knowledge_type TEXT NOT NULL,
-        status TEXT NOT NULL,
-        language TEXT NOT NULL,
-        version INTEGER NOT NULL,
-        effective_from TEXT,
-        effective_to TEXT,
-        payload TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-    )
-    """,
-    "CREATE INDEX IF NOT EXISTS idx_{s}key ON {p}items(canonical_key)",
-    "CREATE INDEX IF NOT EXISTS idx_{s}type ON {p}items(knowledge_type, status)",
-    "CREATE INDEX IF NOT EXISTS idx_{s}status ON {p}items(status)",
-    """
-    CREATE TABLE IF NOT EXISTS {p}versions (
-        knowledge_id TEXT NOT NULL,
-        version INTEGER NOT NULL,
-        status TEXT NOT NULL,
-        payload TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        PRIMARY KEY (knowledge_id, version)
-    )
-    """,
-    """
-    CREATE TABLE IF NOT EXISTS {p}relations (
-        relation_id TEXT PRIMARY KEY,
-        from_key TEXT NOT NULL,
-        relation_type TEXT NOT NULL,
-        to_key TEXT NOT NULL,
-        payload TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-    )
-    """,
-    "CREATE INDEX IF NOT EXISTS idx_{s}rel_from ON {p}relations(from_key, relation_type)",
-    "CREATE INDEX IF NOT EXISTS idx_{s}rel_to ON {p}relations(to_key, relation_type)",
-    """
-    CREATE TABLE IF NOT EXISTS {p}snapshots (
-        snapshot_id TEXT PRIMARY KEY,
-        label TEXT NOT NULL,
-        activated INTEGER NOT NULL,
-        payload TEXT NOT NULL,
-        created_at TEXT NOT NULL
-    )
-    """,
-)
-
-_LIKE_ESCAPE = str.maketrans({"%": r"\%", "_": r"\_", "\\": r"\\"})
+# WSA-07 / GA-08: the stable/mutable split. Stable semantic knowledge (definitions, aliases,
+# terminology, rules, stable identity) may assist interpretation and ground definition/identity
+# obligations. Mutable factual state is *evidence*: it must re-enter the normal evidence path
+# and can never be asserted merely because it is cached in Shared Knowledge.
+SEMANTIC_KNOWLEDGE_TYPES = frozenset({
+    "DEFINITION", "ENTITY_ALIAS", "ALIAS", "RULE", "TERMINOLOGY", "IDENTITY",
+    "METRIC", "GLOSSARY", "REFERENCE",
+})
+MUTABLE_KNOWLEDGE_TYPES = frozenset({
+    "FACT", "STATUS", "INJURY", "INJURY_STATUS", "TRANSACTION", "CONTRACT", "ROSTER",
+    "ROSTER_STATUS", "NEWS", "CURRENT", "CURRENT_STATE", "PERFORMANCE", "SALARY", "ROLE",
+})
 
 
-def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+def knowledge_class(item_type: str) -> str:
+    """Classify a KnowledgeItem type as stable semantic knowledge or mutable factual state."""
+    normalized = (item_type or "").strip().upper()
+    if normalized in SEMANTIC_KNOWLEDGE_TYPES:
+        return "SEMANTIC"
+    if normalized in MUTABLE_KNOWLEDGE_TYPES:
+        return "MUTABLE_FACT"
+    return "UNKNOWN"
 
 
-def _iso(value: date | None) -> str | None:
-    return value.isoformat() if value is not None else None
+@dataclass
+class KnowledgeItem:
+    id: str
+    type: str
+    title: str
+    aliases: list[str] = field(default_factory=list)
+    language: str = "en"
+    summary: str = ""
+    payload: dict[str, Any] = field(default_factory=dict)
+    authority: str = "OFFICIAL"
+    status: str = "ACTIVE"
+    source_refs: list[str] = field(default_factory=list)
+
+    @property
+    def knowledge_class(self) -> str:
+        return knowledge_class(self.type)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "type": self.type,
+            "knowledge_class": self.knowledge_class,
+            "title": self.title,
+            "aliases": self.aliases,
+            "language": self.language,
+            "summary": self.summary,
+            "payload": self.payload,
+            "authority": self.authority,
+            "status": self.status,
+            "source_refs": self.source_refs,
+        }
 
 
-class KnowledgeStore(Protocol):
-    def upsert_source(self, source: KnowledgeSource) -> KnowledgeSource: ...
-    def get_source(self, source_id: str) -> KnowledgeSource | None: ...
-    def list_sources(self, *, active_only: bool = False) -> tuple[KnowledgeSource, ...]: ...
-    def upsert_item(self, item: KnowledgeItem) -> KnowledgeItem: ...
-    def get_item(self, knowledge_id: str) -> KnowledgeItem | None: ...
-    def get_by_canonical_key(self, canonical_key: str) -> KnowledgeItem | None: ...
-    def list_items(self, *, knowledge_type: KnowledgeType | None = None,
-                   status: KnowledgeStatus | None = None) -> tuple[KnowledgeItem, ...]: ...
-    def history(self, knowledge_id: str) -> tuple[KnowledgeItem, ...]: ...
-    def search_items(self, needle: str) -> tuple[KnowledgeItem, ...]: ...
-    def item_count(self) -> int: ...
-    def counts_by_type(self) -> dict[str, int]: ...
-    def counts_by_status(self) -> dict[str, int]: ...
-    def upsert_relation(self, relation: KnowledgeRelation) -> KnowledgeRelation: ...
-    def relations(self, *, from_key: str | None = None, to_key: str | None = None,
-                  relation_type: str | None = None) -> tuple[KnowledgeRelation, ...]: ...
-    def save_snapshot(self, snapshot: KnowledgeSnapshot) -> KnowledgeSnapshot: ...
-    def list_snapshots(self) -> tuple[KnowledgeSnapshot, ...]: ...
-    def activate_snapshot(self, snapshot_id: str) -> KnowledgeSnapshot | None: ...
-    def close(self) -> None: ...
+class KnowledgeStore:
+    def __init__(self, seed_dir: Path | None = None, candidate_path: Path | None = None, active_path: Path | None = None):
+        self.seed_dir = seed_dir or DATA_DIR
+        self.candidate_path = candidate_path
+        self.active_path = active_path
+        self.items: list[KnowledgeItem] = []
+        self._alias_index: dict[str, KnowledgeItem] = {}
+        self._load()
 
+    def _load(self) -> None:
+        self.items = []
+        self._alias_index = {}
+        if self.seed_dir.exists():
+            for path in sorted(self.seed_dir.glob("*.json")):
+                self._load_items_from(path)
+        if self.active_path and self.active_path.exists():
+            self._load_items_from(self.active_path)
 
-class SqlKnowledgeStore:
-    """Dialect-agnostic store. Subclasses set the table qualifier and connection."""
+    def _load_items_from(self, path: Path) -> None:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            return
+        for raw in payload.get("items", []):
+            if raw.get("status", "ACTIVE") != "ACTIVE":
+                continue
+            item = KnowledgeItem(
+                id=raw["id"],
+                type=raw.get("type", "DEFINITION"),
+                title=raw.get("title", ""),
+                aliases=[a for a in raw.get("aliases", []) if a],
+                language=raw.get("language", "en"),
+                summary=raw.get("summary", ""),
+                payload=raw.get("payload", {}),
+                authority=raw.get("authority", "OFFICIAL"),
+                status=raw.get("status", "ACTIVE"),
+                source_refs=raw.get("source_refs", []),
+            )
+            self.items.append(item)
+            for alias in [item.title, *item.aliases]:
+                self._alias_index.setdefault(_normalize(alias), item)
 
-    placeholder = "?"
-    _qualifier = "knowledge_"
+    # -- reads --------------------------------------------------------------
+    def match_alias(self, text: str) -> KnowledgeItem | None:
+        return self._alias_index.get(_normalize(text))
 
-    def __init__(self, connection) -> None:
-        self._connection = connection
-        self._ensure_schema()
+    def search(self, query: str, limit: int = 5) -> list[KnowledgeItem]:
+        needle = _normalize(query)
+        if not needle:
+            return []
+        scored: list[tuple[int, KnowledgeItem]] = []
+        for item in self.items:
+            haystacks = [item.title, *item.aliases, item.summary]
+            if any(needle in _normalize(h) for h in haystacks if h):
+                scored.append((0, item))
+            elif any(_normalize(h) in needle for h in haystacks if h and len(h) > 1):
+                scored.append((1, item))
+        scored.sort(key=lambda pair: pair[0])
+        return [item for _, item in scored[:limit]]
 
-    # -- helpers ---------------------------------------------------------------
-    def _execute(self, sql: str, params: tuple = ()):
-        cursor = self._connection.cursor()
-        cursor.execute(sql, params)
-        return cursor
+    def semantic_context(self, query: str, limit: int = 8) -> list[dict[str, Any]]:
+        """Bounded stable interpretation context, never mutable factual authority."""
+        items = [item for item in self.search(query, limit=max(len(self.items), 1))
+                 if item.knowledge_class == "SEMANTIC" and item.status == "ACTIVE"]
+        taxonomy = [item for item in self.items if item.id in {"semantic_evidence_intents", "semantic_native_records"}
+                    and item.knowledge_class == "SEMANTIC" and item.status == "ACTIVE"]
+        selected = {item.id: item for item in [*taxonomy, *items]}
+        return [{"id": item.id, "type": item.type, "title": item.title,
+                 "aliases": list(item.aliases)[:12], "definition": item.summary[:600]}
+                for item in list(selected.values())[:max(0, min(limit, 12))]]
 
-    def _t(self, name: str) -> str:
-        return f"{self._qualifier}{name}"
+    def by_type(self, item_type: str) -> list[KnowledgeItem]:
+        return [i for i in self.items if i.type == item_type]
 
-    def _ensure_schema(self) -> None:
-        for statement in _SCHEMA_STATEMENTS:
-            self._execute(statement.format(p=self._t(""), s="knowledge_"))
-        self._connection.commit()
+    # -- candidate knowledge (never ACTIVE automatically) -------------------
+    def record_candidate(self, item: dict[str, Any], *, origin: str, evidence: list[str]) -> str:
+        if not self.candidate_path:
+            return ""
+        self.candidate_path.parent.mkdir(parents=True, exist_ok=True)
+        candidate_id = f"cand_{abs(hash((item.get('title', ''), origin))) % 10**10:010d}"
+        record = {
+            "candidate_id": candidate_id,
+            "status": "CANDIDATE",
+            "proposed": item,
+            "origin": origin,
+            "evidence": evidence,
+        }
+        self._append_candidate_record(record)
+        return candidate_id
 
-    @staticmethod
-    def _row_to_item(row) -> KnowledgeItem:
-        # Every item query selects only the JSON payload column.
-        return KnowledgeItem.model_validate_json(row[0])
+    def _append_candidate_record(self, record: dict[str, Any]) -> None:
+        if not self.candidate_path:
+            return
+        self.candidate_path.parent.mkdir(parents=True, exist_ok=True)
+        with self.candidate_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(record, ensure_ascii=False) + "\n")
 
-    # -- sources ---------------------------------------------------------------
-    def upsert_source(self, source: KnowledgeSource) -> KnowledgeSource:
-        existing = self.get_source(source.source_id)
-        if existing is not None and existing.model_dump() == source.model_dump():
-            return existing
-        p = self.placeholder
-        self._execute(
-            f"INSERT INTO {self._t('sources')} "
-            f"(source_id, authority_level, source_type, active, payload, updated_at) "
-            f"VALUES ({p}, {p}, {p}, {p}, {p}, {p}) "
-            f"ON CONFLICT(source_id) DO UPDATE SET authority_level=excluded.authority_level, "
-            f"source_type=excluded.source_type, active=excluded.active, "
-            f"payload=excluded.payload, updated_at=excluded.updated_at",
-            (source.source_id, source.authority_level, source.source_type,
-             int(source.active), source.model_dump_json(), _now()))
-        self._connection.commit()
-        return source
+    def list_candidates(self) -> list[dict[str, Any]]:
+        if not self.candidate_path or not self.candidate_path.exists():
+            return []
+        merged: dict[str, dict[str, Any]] = {}
+        for line in self.candidate_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            candidate_id = record.get("candidate_id")
+            if not candidate_id:
+                continue
+            current = merged.get(candidate_id, {})
+            current.update(record)
+            merged[candidate_id] = current
+        return list(merged.values())
 
-    def get_source(self, source_id: str) -> KnowledgeSource | None:
-        p = self.placeholder
-        row = self._execute(
-            f"SELECT payload FROM {self._t('sources')} WHERE source_id = {p}", (source_id,)).fetchone()
-        return KnowledgeSource.model_validate_json(row[0]) if row else None
+    def get_candidate(self, candidate_id: str) -> dict[str, Any] | None:
+        for record in self.list_candidates():
+            if record.get("candidate_id") == candidate_id:
+                return record
+        return None
 
-    def list_sources(self, *, active_only: bool = False) -> tuple[KnowledgeSource, ...]:
-        p = self.placeholder
-        clause = f" WHERE active = {p}" if active_only else ""
-        params = (1,) if active_only else ()
-        rows = self._execute(
-            f"SELECT payload FROM {self._t('sources')}{clause} ORDER BY source_id", params).fetchall()
-        return tuple(KnowledgeSource.model_validate_json(row[0]) for row in rows)
-
-    # -- items -----------------------------------------------------------------
-    def upsert_item(self, item: KnowledgeItem) -> KnowledgeItem:
-        existing = self.get_item(item.knowledge_id)
-        if existing is not None and existing.model_dump(exclude={"version"}) == item.model_dump(exclude={"version"}):
-            return existing
-        version = existing.version + 1 if existing is not None else 1
-        stored = item.model_copy(update={"version": version})
-        p = self.placeholder
-        with self._transaction():
-            self._execute(
-                f"INSERT INTO {self._t('items')} "
-                f"(knowledge_id, canonical_key, knowledge_type, status, language, version, "
-                f"effective_from, effective_to, payload, updated_at) "
-                f"VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p}, {p}, {p}, {p}) "
-                f"ON CONFLICT(knowledge_id) DO UPDATE SET canonical_key=excluded.canonical_key, "
-                f"knowledge_type=excluded.knowledge_type, status=excluded.status, "
-                f"language=excluded.language, version=excluded.version, "
-                f"effective_from=excluded.effective_from, effective_to=excluded.effective_to, "
-                f"payload=excluded.payload, updated_at=excluded.updated_at",
-                (stored.knowledge_id, stored.canonical_key, stored.knowledge_type, stored.status,
-                 stored.language, stored.version, _iso(stored.effective_from),
-                 _iso(stored.effective_to), stored.model_dump_json(), _now()))
-            self._execute(
-                f"INSERT INTO {self._t('versions')} "
-                f"(knowledge_id, version, status, payload, created_at) VALUES ({p}, {p}, {p}, {p}, {p}) "
-                f"ON CONFLICT(knowledge_id, version) DO UPDATE SET status=excluded.status, "
-                f"payload=excluded.payload",
-                (stored.knowledge_id, stored.version, stored.status,
-                 stored.model_dump_json(), _now()))
-        return stored
-
-    def get_item(self, knowledge_id: str) -> KnowledgeItem | None:
-        p = self.placeholder
-        row = self._execute(
-            f"SELECT payload FROM {self._t('items')} WHERE knowledge_id = {p}", (knowledge_id,)).fetchone()
-        return self._row_to_item(row) if row else None
-
-    def get_by_canonical_key(self, canonical_key: str) -> KnowledgeItem | None:
-        p = self.placeholder
-        row = self._execute(
-            f"SELECT payload FROM {self._t('items')} WHERE canonical_key = {p} "
-            f"ORDER BY version DESC", (canonical_key,)).fetchone()
-        return self._row_to_item(row) if row else None
-
-    def list_items(self, *, knowledge_type: KnowledgeType | None = None,
-                   status: KnowledgeStatus | None = None) -> tuple[KnowledgeItem, ...]:
-        clauses, params = [], []
-        p = self.placeholder
-        if knowledge_type is not None:
-            clauses.append(f"knowledge_type = {p}")
-            params.append(knowledge_type)
-        if status is not None:
-            clauses.append(f"status = {p}")
-            params.append(status)
-        where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
-        rows = self._execute(
-            f"SELECT payload FROM {self._t('items')}{where} ORDER BY knowledge_id",
-            tuple(params)).fetchall()
-        return tuple(self._row_to_item(row) for row in rows)
-
-    def history(self, knowledge_id: str) -> tuple[KnowledgeItem, ...]:
-        p = self.placeholder
-        rows = self._execute(
-            f"SELECT payload FROM {self._t('versions')} WHERE knowledge_id = {p} "
-            f"ORDER BY version", (knowledge_id,)).fetchall()
-        return tuple(self._row_to_item(row) for row in rows)
-
-    def search_items(self, needle: str) -> tuple[KnowledgeItem, ...]:
-        """Candidate filter: canonical key, title and full payload (aliases, summary)."""
-        escaped = needle.translate(_LIKE_ESCAPE)
-        like = f"%{escaped}%"
-        p = self.placeholder
-        rows = self._execute(
-            f"SELECT payload FROM {self._t('items')} "
-            f"WHERE canonical_key LIKE {p} ESCAPE '\\' OR payload LIKE {p} ESCAPE '\\' "
-            f"ORDER BY knowledge_id", (like, like)).fetchall()
-        return tuple(self._row_to_item(row) for row in rows)
-
-    def item_count(self) -> int:
-        row = self._execute(f"SELECT COUNT(*) FROM {self._t('items')}").fetchone()
-        return int(row[0]) if row else 0
-
-    def counts_by_type(self) -> dict[str, int]:
-        rows = self._execute(
-            f"SELECT knowledge_type, COUNT(*) FROM {self._t('items')} "
-            f"GROUP BY knowledge_type ORDER BY knowledge_type").fetchall()
-        return {row[0]: int(row[1]) for row in rows}
-
-    def counts_by_status(self) -> dict[str, int]:
-        rows = self._execute(
-            f"SELECT status, COUNT(*) FROM {self._t('items')} "
-            f"GROUP BY status ORDER BY status").fetchall()
-        return {row[0]: int(row[1]) for row in rows}
-
-    # -- relations -------------------------------------------------------------
-    def upsert_relation(self, relation: KnowledgeRelation) -> KnowledgeRelation:
-        p = self.placeholder
-        self._execute(
-            f"INSERT INTO {self._t('relations')} "
-            f"(relation_id, from_key, relation_type, to_key, payload, updated_at) "
-            f"VALUES ({p}, {p}, {p}, {p}, {p}, {p}) "
-            f"ON CONFLICT(relation_id) DO UPDATE SET from_key=excluded.from_key, "
-            f"relation_type=excluded.relation_type, to_key=excluded.to_key, "
-            f"payload=excluded.payload, updated_at=excluded.updated_at",
-            (relation.relation_id, relation.from_key, relation.relation_type, relation.to_key,
-             relation.model_dump_json(), _now()))
-        self._connection.commit()
-        return relation
-
-    def relations(self, *, from_key: str | None = None, to_key: str | None = None,
-                  relation_type: str | None = None) -> tuple[KnowledgeRelation, ...]:
-        clauses, params = [], []
-        p = self.placeholder
-        for column, value in (("from_key", from_key), ("to_key", to_key),
-                              ("relation_type", relation_type)):
-            if value is not None:
-                clauses.append(f"{column} = {p}")
-                params.append(value)
-        where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
-        rows = self._execute(
-            f"SELECT payload FROM {self._t('relations')}{where} ORDER BY relation_id",
-            tuple(params)).fetchall()
-        return tuple(KnowledgeRelation.model_validate_json(row[0]) for row in rows)
-
-    # -- snapshots -------------------------------------------------------------
-    def save_snapshot(self, snapshot: KnowledgeSnapshot) -> KnowledgeSnapshot:
-        p = self.placeholder
-        self._execute(
-            f"INSERT INTO {self._t('snapshots')} "
-            f"(snapshot_id, label, activated, payload, created_at) VALUES ({p}, {p}, {p}, {p}, {p}) "
-            f"ON CONFLICT(snapshot_id) DO UPDATE SET label=excluded.label, "
-            f"activated=excluded.activated, payload=excluded.payload",
-            (snapshot.snapshot_id, snapshot.label, int(snapshot.activated),
-             snapshot.model_dump_json(), snapshot.created_at.isoformat()))
-        self._connection.commit()
-        return snapshot
-
-    def list_snapshots(self) -> tuple[KnowledgeSnapshot, ...]:
-        rows = self._execute(
-            f"SELECT payload FROM {self._t('snapshots')} "
-            f"ORDER BY created_at, snapshot_id").fetchall()
-        return tuple(KnowledgeSnapshot.model_validate_json(row[0]) for row in rows)
-
-    def activate_snapshot(self, snapshot_id: str) -> KnowledgeSnapshot | None:
-        p = self.placeholder
-        row = self._execute(
-            f"SELECT payload FROM {self._t('snapshots')} WHERE snapshot_id = {p}",
-            (snapshot_id,)).fetchone()
-        if row is None:
-            return None
-        snapshot = KnowledgeSnapshot.model_validate_json(row[0]).model_copy(update={"activated": True})
-        self.save_snapshot(snapshot)
-        return snapshot
-
-    # -- transactions ----------------------------------------------------------
-    class _Transaction:
-        def __init__(self, connection, commit: bool) -> None:
-            self._connection = connection
-            self._commit = commit
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, exc_type, exc, tb):
-            if self._commit:
-                self._connection.commit()
-            else:
-                self._connection.rollback()
+    def approve_candidate(self, candidate_id: str, *, reviewer: str = "admin") -> bool:
+        record = self.get_candidate(candidate_id)
+        if not record or record.get("status") not in {"CANDIDATE", "UNDER_REVIEW"}:
             return False
+        item = dict(record.get("proposed") or {})
+        item.setdefault("status", "ACTIVE")
+        item.setdefault("authority", "REVIEWED")
+        if not self.active_path:
+            return False
+        payload = {"items": []}
+        if self.active_path.exists():
+            try:
+                payload = json.loads(self.active_path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                payload = {"items": []}
+        items = [i for i in payload.get("items", []) if i.get("id") != item.get("id")]
+        items.append(item)
+        self.active_path.parent.mkdir(parents=True, exist_ok=True)
+        self.active_path.write_text(json.dumps({"items": items}, ensure_ascii=False, indent=2), encoding="utf-8")
+        self._append_candidate_record({"candidate_id": candidate_id, "status": "APPROVED", "reviewer": reviewer})
+        self._load()
+        return True
 
-    def _transaction(self) -> "_Transaction":
-        return self._Transaction(self._connection, True)
-
-    def close(self) -> None:
-        self._connection.close()
-
-
-class SqliteKnowledgeStore(SqlKnowledgeStore):
-    """Local/dev and test knowledge store. Rebuildable from seed packs + manifests."""
-
-    placeholder = "?"
-    _qualifier = "knowledge_"
-
-    def __init__(self, path: str | Path = ":memory:") -> None:
-        if path != ":memory:":
-            Path(path).parent.mkdir(parents=True, exist_ok=True)
-        super().__init__(sqlite3.connect(str(path)))
+    def reject_candidate(self, candidate_id: str, *, reason: str = "", reviewer: str = "admin") -> bool:
+        record = self.get_candidate(candidate_id)
+        if not record or record.get("status") not in {"CANDIDATE", "UNDER_REVIEW"}:
+            return False
+        self._append_candidate_record({"candidate_id": candidate_id, "status": "REJECTED", "reviewer": reviewer, "reason": reason})
+        return True
 
 
-class PostgresKnowledgeStore(SqlKnowledgeStore):
-    """Production control-plane knowledge store in a dedicated ``knowledge`` schema.
-
-    Accepts an injected DB-API connection so callers control credentials and pooling.
-    The schema is created if missing and never mixes with ``baseball_analytics``.
-    """
-
-    placeholder = "%s"
-
-    def __init__(self, connection, schema: str = "knowledge") -> None:
-        self._schema = schema
-        self._qualifier = f"{schema}."
-        super().__init__(connection)
-
-    def _ensure_schema(self) -> None:
-        cursor = self._connection.cursor()
-        cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {self._schema}")
-        self._connection.commit()
-        super()._ensure_schema()
+def _normalize(text: str) -> str:
+    return re.sub(r"[\s\.,，。·\-_]+", "", (text or "").strip().lower())

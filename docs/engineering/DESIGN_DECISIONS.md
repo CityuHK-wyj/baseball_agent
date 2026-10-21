@@ -1,0 +1,31 @@
+# Design Decisions — Reading Index
+
+This index explains current decisions without rewriting historical ADRs. The original
+[ADR directory/index](../adr/README.md) remains the decision archive; the
+[accepted migration set](../adr/drafts/README.md) retains its original draft paths.
+Accepted architecture is not automatically completed implementation: use
+[Implementation Status](IMPLEMENTATION_STATUS.md) and code for baseline behavior.
+
+| Decision | Original records | Current consequence |
+|---|---|---|
+| Custom orchestration rather than a framework authority graph | [0001 clean-room runtime](../adr/0001-clean-room-rebuild.md), [0004 Planner](../adr/0004-planner-contract.md), [migration 03 lifecycle](../adr/drafts/ADR-draft-03-conformance-orchestrator-lifecycle.md) | Engine owns one execution flow; small explicit Orchestrator owns bounded continuation/regeneration/fallback. No LangChain/LangGraph integration in this baseline. The ADRs establish these boundaries, not a measured framework performance comparison. |
+| Fixed envelopes, open semantics, late privileged convergence | [0002](../adr/0002-fixed-envelope-flexible-payload.md), [0006](../adr/0006-sql-convergence.md), [0007](../adr/0007-web-open-semantics.md) | Preserve open-language requests; only the analytical lane narrows to catalog/Safe IR/SQL. No arbitrary generated SQL or universal web DSL. |
+| Requirement authority versus Planner work selection | [0003](../adr/0003-user-requirement-vs-planner-need.md), [0005 Binder](../adr/0005-runtime-binder.md), [0016 completion](../adr/0016-semantic-requirement-completion.md), [migration 04 ancestry](../adr/drafts/ADR-draft-04-authority-ancestry-and-derived-computation.md) | User obligations and finite validated derivations own requested meaning; Needs choose work, runtime binds exports and derives criticality. |
+| Collected versus approved evidence | [0014 hypothesis/evidence/claim](../adr/0014-hypothesis-evidence-claim.md), [0022 evidence verification](../adr/0022-evidence-verification.md), [0025 boundary](../adr/0025-verification-responsibility-boundary.md) | Tool success/material existence never suffices. Span/record replay, gates and Judge-local admission precede factual use. |
+| Judge-only Claim ownership and governed state | [0021 propositions](../adr/0021-answer-propositions-and-completion.md), [migration 02](../adr/drafts/ADR-draft-02-judge-governed-state.md) | Judge aggregates mandatory coverage and immediately seals AnswerProjection. AnswerPackage supplies read-only presentation navigation, not a second completion policy. |
+| Governed factual computation | [0013 measure/binding](../adr/0013-measure-verification-and-binding-contract.md), [0011 artifact compute](../adr/0011-python-compute.md), [0020 enumeration](../adr/0020-enumeration-completeness.md), [migration 04](../adr/drafts/ADR-draft-04-authority-ancestry-and-derived-computation.md) | Requested/executed conformance plus exact-cell finite operation replay and recursive ancestry; AST safety/replay alone is not factual grounding. Bounded scalar roots do not implement all operations envisioned historically. |
+| Composer / Conformance separation | [0023 consistency](../adr/0023-status-answer-consistency.md), [0025](../adr/0025-verification-responsibility-boundary.md), [migration 03](../adr/drafts/ADR-draft-03-conformance-orchestrator-lifecycle.md) | Independent package/draft-bound expression review; untrusted draft labels cannot self-certify. Migration decisions supersede historical post-composition mutation/downgrade; consistency is now telemetry/repair only. |
+| Partial-result preservation | [0008](../adr/0008-scope-sufficienty.md), [0017 scoped recovery](../adr/0017-planner-recovery-and-claim-verification.md), [0033 amendment](../adr/0033-frontend-interaction-presentation-boundary.md), [implementation evidence](../audit/REQUIREMENT_LOCAL_PARTIAL_APPROVAL.md) | Requirement-local independent support survives unresolved siblings; dependencies block unsafe subsets; Goal completion still requires all mandatory obligations. |
+| Shared safe acquisition and small research surface | [0026](../adr/0026-single-capability-multi-source-web-research.md), [0030 retrieval/computation](../adr/0030-official-structured-sources-retrieval-vs-computation.md), [migration 01](../adr/drafts/ADR-draft-01-tool-acquisition-shared-knowledge.md) | Providers and structured records use acquisition infrastructure, not independent factual authority. Shared Safe Transport is the current implementation boundary. Seven specs still coexist with two domain families. |
+| Resource representations and bounded content resolution | [0031](../adr/0031-content-artifacts-and-lazy-representation.md), [0032](../adr/0032-agentic-content-resolution.md) | RetrievedDocument is ContentArtifact; native/derived representations preserve lineage. Resolver output is neither finding nor Claim; new URIs return to safe acquisition. |
+| Context, clarification and frontend semantics | [0009](../adr/0009-multiturn.md), [0018](../adr/0018-contextual-entity-reference.md), [migration 05](../adr/drafts/ADR-draft-05-conversation-context-vs-user-authority.md), [0033](../adr/0033-frontend-interaction-presentation-boundary.md) | Surface identity/context ancestry survives; assistant prose is not evidence. Browser choices are opaque backend options; typed presentation never owns semantics. |
+| Budget/freshness/cache targets | [0028](../adr/0028-research-budget-goal-level-quota.md), [0029](../adr/0029-fact-vs-document-freshness-caching.md) | Goal-wide quotas/deadlines and full cache remain targets; types/counters/local bounds do not establish M3 enforcement. |
+
+Further original records: [0010 routing](../adr/0010-routing.md),
+[0012 same-runtime developer mode](../adr/0012-dev-mode.md),
+[0015 identity levels](../adr/0015-iterative-entity-resolution.md),
+[0019 explicit conversion](../adr/0019-artifact-projection-interop.md),
+[0024 diagnostics](../adr/0024-diagnostics-and-latency.md),
+[0027 relationship retrieval/versioning](../adr/0027-relationship-aware-retrieval-and-evidence-versioning.md).
+Historical diagnostic body capture and post-expression status writing described in
+older records are not current behavior; see [data/provenance](../architecture/DATA_AND_PROVENANCE_FLOW.md).

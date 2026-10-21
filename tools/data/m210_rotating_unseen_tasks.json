@@ -1,0 +1,30 @@
+[
+  {
+    "id": "m210_rotating_embedded_interview",
+    "query": "Find a direct public interview in which Mookie Betts described adjusting to shortstop during the 2024 season. What challenge did he describe?",
+    "language": "en",
+    "category": "interview_embedded_content",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m210_rotating_indirect_news",
+    "query": "What did a contemporary news report say prompted the 2023 Oakland Athletics relocation vote, and what was the vote result?",
+    "language": "en",
+    "category": "indirect_news_locator",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 2}
+  },
+  {
+    "id": "m210_rotating_structured_release",
+    "query": "According to the 2024 official MLB rule changes announcement, how was the pitch clock changed with runners on base?",
+    "language": "en",
+    "category": "structured_official_content",
+    "obligation": {"kind": "FACT", "mandatory": 1}
+  },
+  {
+    "id": "m210_rotating_multilingual_article",
+    "query": "¿Qué explicó un medio deportivo japonés sobre el regreso de Shohei Ohtani al montículo en 2025?",
+    "language": "es",
+    "category": "multilingual_embedded_article",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  }
+]

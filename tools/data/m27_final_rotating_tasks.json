@@ -1,0 +1,23 @@
+[
+  {
+    "id": "m27_holdout_1990_lockout",
+    "query": "What caused the 1990 Major League Baseball lockout, and what happened to spring training because of it?",
+    "language": "en",
+    "category": "historical_directionality",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 2}
+  },
+  {
+    "id": "m27_holdout_2002_allstar",
+    "query": "What led to the tie in the 2002 MLB All-Star Game, and what rule change followed it?",
+    "language": "en",
+    "category": "historical_directionality",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 2}
+  },
+  {
+    "id": "m27_holdout_2017_scandal",
+    "query": "What caused the 2017 Houston Astros sign-stealing investigation, and what consequences followed the findings?",
+    "language": "en",
+    "category": "historical_directionality",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 2}
+  }
+]

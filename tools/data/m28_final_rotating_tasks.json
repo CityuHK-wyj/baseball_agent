@@ -1,0 +1,30 @@
+[
+  {
+    "id": "m28_final_interview",
+    "query": "Find a public interview in which Juan Soto discussed joining the Mets in 2025, and report what he said.",
+    "language": "en",
+    "category": "interview",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28_final_japanese_media",
+    "query": "日本のスポーツメディアは2025年の大谷翔平の投手復帰をどう報じましたか？",
+    "language": "ja",
+    "category": "local_media",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28_final_spanish_community",
+    "query": "¿Cómo discutieron los foros de aficionados hispanohablantes la Serie Mundial de 2024 entre Dodgers y Yankees?",
+    "language": "es",
+    "category": "community",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28_final_official",
+    "query": "What did MLB's official announcement say about the runner's lane rule change for 2024?",
+    "language": "en",
+    "category": "official_current",
+    "obligation": {"kind": "FACT", "mandatory": 1}
+  }
+]

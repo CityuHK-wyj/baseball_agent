@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "id": "semantic_evidence_intents",
+      "type": "TERMINOLOGY",
+      "title": "Requested evidence roles",
+      "summary": "CONFIRMED_STATE requests an established factual state. REPORTED_ACCOUNT requests what reporting says, rather than confirmation of that underlying state. FIRSTHAND_ACCOUNT requests participants' or community accounts themselves. PREDICTION requests a forecast, not a confirmed event. Mentioning or rejecting a role does not request it. Injury, roster, transaction, contract and current status are mutable factual domains, never stable semantic knowledge.",
+      "authority": "SEMANTIC",
+      "status": "ACTIVE"
+    },
+    {
+      "id": "semantic_native_records",
+      "type": "RULE",
+      "title": "Native record and analytical relation semantics",
+      "summary": "TEAM_MEMBERSHIP names a team's membership relation for a particular subject, not injury, transactions or a historical event. A current-state endpoint supports only the observation time it actually records. An empty relation target is an answer slot, not an asserted target. A grouped table or separate split values is AGGREGATION; a comparative predicate requires its two operands and relation, and arithmetic requires a replayable operation. These are interpretation definitions, never factual evidence.",
+      "authority": "SEMANTIC",
+      "status": "ACTIVE"
+    }
+  ]
+}

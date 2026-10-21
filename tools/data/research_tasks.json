@@ -1,0 +1,42 @@
+[
+  {
+    "id": "historical_strike_zh",
+    "query": "解释一下1994年美国职棒大联盟罢工的原因和影响。",
+    "language": "zh",
+    "category": "historical_explanation",
+    "obligation": {
+      "kind": "EXPLANATION",
+      "mandatory": 2
+    }
+  },
+  {
+    "id": "historical_strike_en",
+    "query": "What caused the 1994 Major League Baseball strike, and what were its effects?",
+    "language": "en",
+    "category": "historical_explanation",
+    "obligation": {
+      "kind": "EXPLANATION",
+      "mandatory": 2
+    }
+  },
+  {
+    "id": "current_injury",
+    "query": "Aaron Judge 最近有伤病报道吗？",
+    "language": "zh",
+    "category": "current_factual",
+    "obligation": {
+      "kind": "FACT",
+      "mandatory": 1
+    }
+  },
+  {
+    "id": "narrative_interview",
+    "query": "找一篇解释2025赛季本垒打领先者表现原因的采访报道。",
+    "language": "zh",
+    "category": "narrative",
+    "obligation": {
+      "kind": "EXPLANATION",
+      "mandatory": 1
+    }
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "m28_rotating_interview",
+    "query": "Find a public interview in which Mookie Betts explained his move to shortstop in 2024, and summarize what he said.",
+    "language": "en",
+    "category": "interview",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28_rotating_japanese_reporting",
+    "query": "日本のスポーツメディアは2024年ワールドシリーズでの山本由伸の投球をどう報じましたか？",
+    "language": "ja",
+    "category": "local_media",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28_rotating_community",
+    "query": "How did online baseball fan communities discuss MLB's 2023 pitch clock rollout?",
+    "language": "en",
+    "category": "community",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28_rotating_official",
+    "query": "What did MLB officially announce about the 2023 pitch timer rules?",
+    "language": "en",
+    "category": "official_current",
+    "obligation": {"kind": "FACT", "mandatory": 1}
+  }
+]

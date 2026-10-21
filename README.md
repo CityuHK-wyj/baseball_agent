@@ -1,293 +1,204 @@
 # Baseball Agent
 
-**v0.1.0 — Dual Semantic Runtime.** An explainable, verifiable MLB analytics agent. It
-turns a natural-language baseball question into a set of analysis objectives, decomposes
-them into information requirements, plans and routes work to data sources, validates and
-judges the results, tracks requirement/objective state, and produces a sourced answer with
-explicit limitations.
+**An evidence-governed MLB analytics and research agent, with an explicit path from
+user intent to supported answers.**
 
-The architecture is **frozen** (blog decisions D001–D066). This repository is the working
-implementation: a deterministic vertical slice with a passing regression suite and
-provider-agnostic LLM seams. See
-[docs/blog-implementation-matrix.md](docs/blog-implementation-matrix.md) for exactly which
-blog decisions are implemented.
+Baseball questions often combine statistics, changing facts and explanations. A query
+returning rows—or a model producing fluent prose—does not prove that the question was
+answered. Baseball Agent makes those boundaries inspectable: preserve the user's
+obligations, plan work, compute or acquire evidence, verify its scope and lineage,
+and only then compose an answer.
 
-**New to the project? Start with [docs/usage.md](docs/usage.md)** — it covers activation,
-required variables, database requirements, runnable commands, reading the output, trace
-mode and tests.
+This is an independent clean-room Python implementation with a React interface.
+**Architecture Baseline v1** documents the post-Naming-Refactor implementation. It is
+an engineering/research prototype, not a production-ready service or a claim of
+universal query coverage, unmeasured accuracy or guaranteed source availability.
 
-```bash
-source /root/.virtualenvs/baseball_agent/bin/activate
-export DEEPSEEK_API_KEY='<your API key>'
-export POSTGRES_PASSWORD='<baseball_readonly password>'
-python3 scripts/smoke_test.py                       # non-destructive PASS/WARN/FAIL preflight
-python3 -m app.cli ask "DFA是什么意思？"              # knowledge question
-python3 -m app.cli ask "top 5 by maximum exit velocity on fastballs at least 95 mph with at least 20 BBE in 2025" --trace
-```
+## Implemented capabilities
 
-## What it does today
-
-- **Semantic normalization** — entity resolution with aliases/nicknames, clarification on
-  ambiguity, constraint authority, and objective extraction (no re-parsing of intent by
-  the Planner).
-- **Dual semantic parsing** — a constrained extractor LLM proposes a closed, typed,
-  provenance-carrying `SemanticCandidate`; an independent reviewer LLM reconstructs the
-  meaning *without seeing the extractor's candidate*; a deterministic `SemanticReconciler`
-  compares both against narrow lexical anchors; and the deterministic validator is the
-  final authority. Material disagreement or ambiguity becomes a Clarification instead of
-  executing a maybe-wrong interpretation. No single model may both propose and approve
-  meaning. Includes exact compound count states (`0-2 or 1-1` is `{(0,2),(1,1)}`), explicit
-  population precedence and fail-safe provider-failure handling. See
-  [ADR 0021](docs/adr/0021-constrained-hybrid-semantic-parsing.md) and
-  [ADR 0022](docs/adr/0022-dual-semantic-runtime.md).
-- **Requirement decomposition** — a narrow Requirement Decomposer turns an objective into
-  semantic-atomic, immutable Initial Requirements.
-- **Planning** — a Planner that returns `PLAN` / `REPLAN` / `STOP_PLANNING` with a
-  terminal latch that prevents infinite loops.
-- **Routing** — a narrow Router with the mandated precedence
-  (System Policy > User Constraint > Capability/Source Mapping > Planner Preference >
-  Optimization), plus Source Mapping execution (DIRECT / CALCULATED / NO_MAPPING).
-- **Deterministic validation + Judge** — hard failures (wrong entity, missing schema,
-  integrity, time-range) cannot be overridden; soft signals (sample, coverage, freshness)
-  are interpreted contextually.
-- **Contextual assessment and state** — `ArtifactAssessment`, `RequirementState`,
-  `ObjectiveState` as separate runtime projections.
-- **Persistence and checkpoint/resume** — operational store, artifact payload storage,
-  checkpoints and idempotent resume that reuses artifacts.
-- **Provenance and lineage** — every artifact records where it came from; a Feature Engine
-  emits derived metric artifacts with `derived_from` lineage.
-- **Provider-agnostic LLM seams** — Planner, Judge and Response have deterministic
-  implementations and LLM implementations behind the same Protocols.
-- **Read-only safety** — an AST-based SQL guard validated before any connection, a
-  read-only PostgreSQL transaction, a DuckDB path sandbox, and a redacted result contract.
-- **Typed analytical constraints** — two-strike count (exact counts stay exact), pitch
-  velocity (distinct from exit velocity), pitch family (fastball → explicit FF/SI/FC/FA
-  codes), upper-zone location definitions, ranking intent with explicit aggregation, an
-  explicit game-type/event population, and a frozen qualification threshold are typed, not
-  opaque strings, and flow from the query into the Planner without leaking physical column
-  names.
-- **Semantic/physical separation** — semantic keys (`pitch_velocity`, `exit_velocity`,
-  `pitch_type`, `count`, `pitch_location`, `batter`) map to physical columns
-  (`release_speed`, `launch_speed`, `zone`, `strikes`, …) only in the deterministic
-  `FieldMappingRegistry` + read-only adapters, never in the Planner.
-- **Real read-only Statcast adapters** — `ParquetStatcastTool` (DuckDB) and
-  `PostgresStatcastTool` (read-only PostgreSQL) build one validated read-only query from
-  the semantic descriptor and typed constraints, returning an `Artifact` with provenance.
-- **Shared Knowledge base** — a persistent, sourced, versioned MLB domain knowledge base
-  (rules, transactions, bilingual glossary and metrics, all 30 teams, ballparks, players,
-  awards, trusted sources and the community directory) behind `ContextService`.
-
-Status: **v0.1.0 RELEASED — DUAL_SEMANTIC_RUNTIME**. The dual semantic runtime is
-integrated: independent extractor and reviewer roles, a first-class `SemanticReconciler`,
-narrow lexical anchors, a deterministic validator and durable review reuse. The nine
-demonstrated adversarial containment failures now clarify or reject instead of reaching
-SQL, and all previously repaired compositional blockers remain repaired. Definition
-questions use stored knowledge; synthetic analytics requires `--demo`. The real analytics
-vertical slice runs end to end against the historical Parquet archive and live PostgreSQL
-(typed two-strike / fastball / pitch-velocity / upper-zone constraints + exit-velocity
-ranking + explicit population/qualification). See [docs/usage.md](docs/usage.md) for the
-runnable commands and [the dual semantic review](docs/reviews/v01-dual-semantic-runtime.md)
-for gate evidence and remaining gaps.
+- Chinese/English semantic interpretation, contextual entity references, multi-turn
+  follow-ups and backend-owned clarification.
+- User-owned Requirements distinct from Planner work items, with provenance,
+  source-clause conservation and finite derivation checks.
+- Read-only PostgreSQL and historical Parquet/DuckDB analytics: canonical metric
+  packs plus catalog-validated Safe IR, deterministic SQL compilation and
+  requested-versus-executed conformance receipts.
+- External research with source representations, replayable spans/structured fragments,
+  typed evidence verification, bounded content resolution and shared safe acquisition.
+- Judge-only factual Claims and Requirement-local partial-result retention; independent
+  supported work can survive an unresolved sibling without claiming Goal completion.
+- Finite governed derived operations with exact-cell operands and recursive ancestry.
+- Immutable Judge projection and response package, untrusted Composer drafts,
+  independent representation conformance and bounded regeneration/fallback.
+- FastAPI REST/SSE with generated TypeScript contracts, Zod validation and trusted
+  React tables/charts. The backend—not the browser—owns semantics and approval.
 
 ## Architecture
 
 ```mermaid
 flowchart TD
-    U[User query] --> S[Semantic normalization<br/>entities, constraints, objectives]
-    S --> C{Ambiguous?}
-    C -- yes --> CL[Clarification request<br/>options + recommendation]
-    C -- no --> RD[Requirement Decomposer]
-    RD --> P[Planner<br/>PLAN / REPLAN / STOP_PLANNING]
-    P --> R[Router + Source Mapping]
-    R --> T[Tools: PostgreSQL / DuckDB / Web / Feature]
-    T --> A[Artifact + Provenance + Lineage]
-    A --> V[Deterministic validation]
-    V --> J[Judge]
-    J --> AA[ArtifactAssessment]
-    AA --> RS[RequirementState]
-    RS --> OS[ObjectiveState]
-    RS --> P
-    OS --> O[Orchestrator finalization]
-    O --> CR[CompletionReport]
-    CR --> RP[ResponsePackage]
-    RP --> RESP[Response]
-    subgraph Cross-cutting
-      SK[Shared Knowledge and Context]
-      PS[Persistence + Checkpoints]
-      GV[Governance: policy, read-only, secrets, budgets]
-    end
+    U[User input] --> S[SemanticInterpreter]
+    S --> I[SemanticInterpretation]
+    I --> R[UserRequirement and provenance]
+    R --> P[Planner and runtime binding]
+    P --> L[Local analytics]
+    P --> W[External research]
+    L --> A[Artifacts and candidate evidence]
+    W --> A
+    A --> J[Judge: Claims and RequirementAssessments]
+    J --> G[Immutable AnswerProjection]
+    G --> K[Immutable AnswerPackage]
+    K --> D[Untrusted ComposerDraft]
+    D --> C[Representation ConformanceResult]
+    K --> C
+    C --> O[Orchestrator: accept, regenerate or fallback]
+    O --> F[Final answer and approved presentation]
 ```
 
-Layers are responsibilities, not deployed services. See
-[docs/development/architecture.md](docs/development/architecture.md).
+This is a conceptual flow, not a literal call graph. `Engine.ask` owns the runtime;
+Planner selects work, Binder resolves exports, Judge approves factual material, and
+Orchestrator owns bounded continuation/presentation lifecycle. Conformance checks
+faithfulness to approved material, **not original factual truth**.
 
-## Install
+## Engineering contributions
 
-Requires Python 3.11+ (developed and verified on 3.14). In the current WSL environment the
-environment already exists at `/root/.virtualenvs/baseball_agent`:
+The central work is in semantic and authority boundaries, not just model prompting:
+source-bound obligations, independent execution receipts, structural measure
+verification, partial-result independence, exact subject/output granularity,
+recursive derived-operation proofs, deep immutable snapshots and contract-tested
+frontend/backend interaction. The project uses custom orchestration rather than a
+framework-controlled authority graph; no LangChain/LangGraph integration is claimed.
+
+### Technology stack
+
+- **Backend:** Python, Pydantic, FastAPI/Uvicorn, OpenAI-compatible model client,
+  HTTPX, BeautifulSoup, SQLGlot, pytest.
+- **Storage/computation:** PostgreSQL/psycopg2, DuckDB/Parquet, SQLite conversation
+  persistence; bounded subprocess computation.
+- **Frontend:** React 19, TypeScript, Vite, Tailwind, TanStack Query/Table, Recharts,
+  OpenAPI-generated types, Zod, Vitest and Playwright.
+
+## Local setup and execution
+
+Use Python **3.14** and Node **24+** for the documented development baseline
+(the available environment is Python 3.14.4 / Node 24.21.0). A broader Python
+compatibility matrix is not established. Dependencies and scripts are defined in
+[`requirements.txt`](requirements.txt) and [`frontend/package.json`](frontend/package.json).
 
 ```bash
-cd /home/158112/baseball_agent/baseball_agent
-source /root/.virtualenvs/baseball_agent/bin/activate
-```
-
-Fresh checkout:
-
-```bash
-git clone https://github.com/CityuHK-wyj/baseball_agent.git
-cd baseball_agent
+# From the repository root
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-## Configure
-
-Configuration is read from environment variables at process start; Python does **not**
-load `.env` automatically. Copy the template and fill it in, or export variables yourself.
-
-```bash
+python -m pip install -r requirements.txt
 cp .env.example .env
-# edit .env, or export variables in your shell
 ```
 
-Nothing is required for the offline CLI. See
-[docs/usage/configuration.md](docs/usage/configuration.md) for every variable.
+Edit `.env` locally; never commit credentials:
 
-## Run
+- Set `DEEPSEEK_API_KEY` (or `OPENAI_API_KEY`) and the compatible provider base URL/model
+  as needed. Runtime defaults are in [`app/config.py`](app/config.py).
+- Configure an existing read-only PostgreSQL analytics source with `POSTGRES_*`,
+  and/or set `PARQUET_ARCHIVE_PATH` to **your own** directory of
+  `mlb_statcast_<year>.parquet` files. Replace the path placeholder in `.env.example`
+  with your local archive directory. Private datasets and database provisioning are not included.
+- The catalog expects the verified Statcast tables/columns and supported source windows;
+  an arbitrary baseball database is not automatically compatible. Offline fallback
+  is useful for tests, not equivalent to real-model query coverage.
 
 ```bash
-# Non-destructive preflight: config, PostgreSQL read-only identity, Parquet,
-# knowledge store and model reachability
-python3 scripts/smoke_test.py          # or: python3 -m app.cli doctor
-
-# A sourced definition from local Shared Knowledge
-python3 -m app.cli ask "DFA是什么意思？"
-
-# Real analytics (PostgreSQL 2025) with a structured decision trace
-python3 -m app.cli ask "top 5 by maximum exit velocity on fastballs at least 95 mph with at least 20 BBE in 2025" --trace
-
-# Cross-source 2023 vs 2024
-python3 -m app.cli ask "top 5 by maximum exit velocity in the regular season in 2023 vs 2024"
-
-# Explicit synthetic demonstration (not a real performance result)
-python3 -m app.cli ask "How did Aaron Judge perform at the plate?" --demo
-
-# Shared Knowledge: inspect, search and refresh the domain knowledge base
-python3 -m app.cli knowledge status
-python3 -m app.cli knowledge search "DFA"
-python3 -m app.cli knowledge show TEAM:LAD
-
-# Reproduce persisted ask/answer/inspect/resume/metrics in a temporary directory
-python3 scripts/verify_v01_workflows.py
+python -m app.cli doctor                    # probes configured sources
+python -m app.cli chat                      # interactive conversation
+python -m app.cli dev --trace-level verbose # same runtime, added diagnostics
+python -m app.cli ask "Show Shohei Ohtani's 2023 regular-season batting statistics"
 ```
 
-Ambiguous analytics queries return a Clarification with options; resume them with
-`python3 -m app.cli answer --run-id <run_id> --request-id <id> --choice <option>`. The full
-walkthrough, output guide and trace mode are in **[docs/usage.md](docs/usage.md)**.
-```
+These commands match the CLI/configuration; no live data/provider success is asserted
+by this documentation cycle. `doctor` itself connects to sources. Conversation state
+is stored under `.runtime/` by default; private runtime evidence stays out of Git.
 
-See [docs/usage/quickstart.md](docs/usage/quickstart.md),
-[docs/usage/knowledge-base.md](docs/usage/knowledge-base.md) and
-[docs/usage/examples.md](docs/usage/examples.md).
-
-## Test
+For the web UI, run these in separate shells:
 
 ```bash
-python3 -m unittest discover -s tests -q
-python3 scripts/secret_scan.py             # credential tripwire (exit 0 = clean)
-python3 -m compileall -q app tests scripts
+# Repository root
+python -m uvicorn app.api.main:app --reload --host 127.0.0.1 --port 8000
 ```
-
-## Shared Knowledge
-
-Shared Knowledge is a persistent MLB domain knowledge base — rules, transactions, a
-bilingual glossary and metric definitions, all 30 current teams and ballparks, notable
-player identities, awards, trusted sources and community creators. It is a capability,
-not a retrieval agent.
-
-Physical layout:
-
-- code: `app/knowledge/` (store, ingestion, refresh, retrieval, service) and
-  `app/context/knowledge_source.py`;
-- persistent store: SQLite at `.runtime/knowledge.db` locally, or the PostgreSQL
-  `knowledge` schema in production (separate from `baseball_analytics`);
-- runtime artifact: the `.db` file, never committed and rebuildable;
-- source manifests: `knowledge/sources/*.json`; structured seed: `knowledge/seed/*.json`.
 
 ```bash
-python3 -m app.cli knowledge status
-python3 -m app.cli knowledge search "infield fly"
-python3 -m app.cli knowledge show PLAYER:660271
-python3 -m app.cli knowledge sources --community
+cd frontend
+npm ci
+npm run dev
 ```
 
-See [docs/usage/knowledge-base.md](docs/usage/knowledge-base.md),
-[docs/development/shared-knowledge.md](docs/development/shared-knowledge.md) and
-[ADR 0019](docs/adr/0019-shared-knowledge-base.md).
+Open `http://127.0.0.1:5173/conversation/new`; Vite proxies `/api` to port 8000.
+OpenAPI UI: `http://127.0.0.1:8000/docs`. Keep provider/database credentials on the
+backend, never in `VITE_*` variables. These are local development servers, not an
+authenticated public deployment. See [frontend development](docs/architecture/FRONTEND_LOCAL_DEVELOPMENT.md).
 
-## Security boundaries
+## Testing and maturity
 
-- Baseball analytics (PostgreSQL, DuckDB/Parquet) is **read-only** for the runtime. SQL is
-  parsed and rejected before any connection; PostgreSQL runs in a read-only transaction.
-- Agent runtime data lives in a **separate** operational store, never in the analytics DB.
-- Secrets come only from the environment and are redacted from every error and metric.
-- See [docs/usage/security.md](docs/usage/security.md).
+Latest **historical Naming Refactor** validation:
 
-## Project layout
+| Check | Result |
+|---|---|
+| Backend | **4184 passed, 63 skipped** |
+| Frontend | **10 passed** |
+| Production frontend build | **Passed** |
+| Focused live smoke | **5 passed** |
+| OpenAPI | **5 paths / 35 schemas**, byte-identical to the pre-refactor baseline |
 
-```
-app/
-  semantic/      entity resolution, objectives, requirement decomposition, registries,
-                 typed analytical intent + semantic/physical field mapping
-  models/        domain contracts (definitions and runtime state, including knowledge)
-  knowledge/     persistent Shared Knowledge store, ingestion, refresh and retrieval
-  agent/         planner, router, source mapping, executor, orchestrator, response, review
-  assessment/    deterministic validator, judge, adequacy rules
-  context/       Shared Context retrieval (not an agent)
-  persistence/   operational store, artifact storage, recorder, resume, checkpoints
-  tools/         guarded read-only execution, results, real Statcast adapters, synthetic source
-  features/      deterministic Feature Engine
-  llm/           provider abstraction, prompts, LLM planner/judge/response
-  observability/ redacted events and evaluation metrics
-  validation/    SQL guard, policy, permissions
-  pipeline.py    end-to-end composition
-  cli.py         command-line interface
-knowledge/
-  sources/       committed source manifests (authority, refresh policy, best_for)
-  seed/          committed structured knowledge packs (reference, rules, glossary, players, community)
-docs/
-  adr/           architecture decision records
-  usage/         how to install, configure, run, extend
-  development/   architecture and extension guides
-  blog-implementation-matrix.md
-  development-status.md
-  codex-handoff.md
+**Full live integration was not rerun after Naming Refactor.** These totals are not
+new documentation-cycle test results. See [Testing and Validation](docs/engineering/TESTING_AND_VALIDATION.md)
+for current checks and how to run the relevant suites without confusing offline,
+fixture-backed and real-provider evidence.
+
+```bash
+python -m pytest tests -q
+# Explicitly opt into real LLM/data/network tests when intended:
+RUN_INTEGRATION=1 python -m pytest tests/test_integration_live.py -v
+# Frontend checks:
+cd frontend
+npm test
+npm run build
 ```
 
-## Status and limitations
+## Known limitations and next steps
 
-`v0.1.0 RELEASED — DUAL_SEMANTIC_RUNTIME`. Both the historical Parquet archive
-(2015–2023) and the live analytical PostgreSQL database (2024-03-15…2026-09-14) are
-`LIVE_VERIFIED` through the real read-only analytics path. The dual semantic runtime runs
-two independent DeepSeek calls (`deepseek-chat` by default) through the real `ModelProvider`
-seam, reconciles them, and executes only anchor-consistent semantics. The narrow compound
-query legitimately returns zero qualifying rows at the requested minimum 20 BBE and is
-reported `FAILED`, never a false `COMPLETE`; a broader query returns real rows. PostgreSQL
-is strictly read-only (`SELECT` only; writes denied) as `baseball_readonly`.
+- **U-1:** English per-player paraphrases can be rejected by source review.
+- **U-2:** Split per-player requests fail closed before execution.
+- **F-3/F-5:** Multi-subject analytical capabilities remain incomplete; scoped
+  subject-cell proofs are not universal comparison/ranking coverage.
+- **F-4:** Forecast execution is limited; prediction research is not a general
+  forecasting engine.
+- Finite measures/operations/source windows and bounded scalar derived roots;
+  no arbitrary query/model support or invented unavailable baseball metrics.
+- Public source/provider/network restrictions and real-model variability affect
+  discovery, semantic acceptance and response wording. No paywall or credential bypass.
+- Goal-wide research quotas/deadline enforcement and full retrieval cache remain
+  planned; local limits and budget metadata are not M3 completion.
+- Artifacts and SSE replay are not durable across process restart; turns are serialized
+  per Engine. No safe token streaming, formal retraction, cancellation protocol or
+  production multi-user authentication/scaling is claimed.
 
-The full test suite, both adversarial gates, the dual reconciliation gate, `compileall`,
-the secret scan, the doctor preflight and live PostgreSQL/Parquet/cross-source E2E are
-recorded in [docs/reviews/v01-dual-semantic-runtime.md](docs/reviews/v01-dual-semantic-runtime.md).
+See [Implementation Status](docs/engineering/IMPLEMENTATION_STATUS.md) and
+[Next Steps](docs/roadmap/NEXT_STEPS.md). This baseline cycle does not begin UAT or
+framework integration.
 
-Known limitations:
+## Documentation index
 
-* The semantic vocabulary is closed and narrow (metrics `pitch_velocity` /
-  `exit_velocity`; three upper-zone location definitions).
-* Generalized temporal NLP, current-period comparisons and RAG/pgvector remain DEFERRED.
-* Web Evidence and the separate Operational PostgreSQL control plane remain
-  UNVERIFIED_LIVE.
-* Report artifacts do not include pitch-grain reconciliation against upstream feeds.
+| Topic | Document |
+|---|---|
+| Architecture and subsystem map | [Architecture Overview](docs/architecture/ARCHITECTURE_OVERVIEW.md) |
+| Scheduling, clarification and retries | [Control Flow](docs/architecture/CONTROL_FLOW.md) |
+| Receipts, evidence and lineage | [Data and Provenance Flow](docs/architecture/DATA_AND_PROVENANCE_FLOW.md) |
+| Decision ownership | [Authority Model](docs/architecture/AUTHORITY_MODEL.md) |
+| Exact symbols and semantic identity audit | [Domain Concept Registry](docs/architecture/DOMAIN_CONCEPT_REGISTRY.md) |
+| Naming policy / compatibility history | [Naming Conventions](docs/architecture/NAMING_CONVENTIONS.md), [Refactor Map](docs/architecture/NAMING_REFACTOR_MAP.md) |
+| Implemented versus planned | [Implementation Status](docs/engineering/IMPLEMENTATION_STATUS.md) |
+| Evidence and check commands | [Testing and Validation](docs/engineering/TESTING_AND_VALIDATION.md) |
+| Decisions and original records | [Design Decisions](docs/engineering/DESIGN_DECISIONS.md), [ADRs](docs/adr/README.md) |
+| Detailed contracts | [SPEC](docs/SPEC.md) |
+| Frontend wire/presentation boundary | [Frontend Foundation](docs/architecture/FRONTEND_INTERACTION_FOUNDATION.md) |
+| Future scoped work | [Next Steps](docs/roadmap/NEXT_STEPS.md) |
 
-Run `python3 scripts/smoke_test.py` before asking real questions; see
-[docs/usage.md](docs/usage.md).
+Historical audit and milestone documents remain original evidence, not current
+implementation promises. Repository-wide agent guidance is in [AGENTS.md](AGENTS.md).
