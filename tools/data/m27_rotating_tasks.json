@@ -1,0 +1,23 @@
+[
+  {
+    "id": "m27_rotating_1981_stoppage",
+    "query": "What led to the 1981 Major League Baseball players' strike, and what happened because of it?",
+    "language": "en",
+    "category": "historical_directionality",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 2}
+  },
+  {
+    "id": "m27_rotating_1972_stoppage",
+    "query": "What caused the 1972 Major League Baseball strike, and what were its effects on the season?",
+    "language": "en",
+    "category": "historical_directionality",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 2}
+  },
+  {
+    "id": "m27_rotating_pitch_clock",
+    "query": "What prompted MLB to introduce the pitch clock in 2023, and what effect did it have on game duration?",
+    "language": "en",
+    "category": "policy_directionality",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 2}
+  }
+]

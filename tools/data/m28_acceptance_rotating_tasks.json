@@ -1,0 +1,30 @@
+[
+  {
+    "id": "m28_acceptance_interview",
+    "query": "Find a public interview in which Francisco Lindor discussed the Mets' 2024 postseason, and report what he said.",
+    "language": "en",
+    "category": "interview",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28_acceptance_local_media",
+    "query": "¿Qué informó la prensa dominicana sobre el debut de Juan Soto con los Mets en 2025?",
+    "language": "es",
+    "category": "local_media",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28_acceptance_community",
+    "query": "How did Japanese baseball fan forums discuss Shohei Ohtani's 2024 World Series performance?",
+    "language": "en",
+    "category": "community",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28_acceptance_official",
+    "query": "What did MLB officially announce about the 2025 All-Star Game venue?",
+    "language": "en",
+    "category": "official_current",
+    "obligation": {"kind": "FACT", "mandatory": 1}
+  }
+]

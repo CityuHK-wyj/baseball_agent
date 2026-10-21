@@ -1,0 +1,44 @@
+[
+  {
+    "id": "dogfood_strike",
+    "query": "What caused the 1994 Major League Baseball strike, and what were its effects?",
+    "language": "en",
+    "category": "historical_explanation",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 2}
+  },
+  {
+    "id": "dogfood_ohtani_interview",
+    "query": "Find a recent interview that explains why Shohei Ohtani changed his hitting approach.",
+    "language": "en",
+    "category": "narrative_interview",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "dogfood_judge_injury",
+    "query": "Is there a recent injury report about Aaron Judge?",
+    "language": "en",
+    "category": "current_factual",
+    "obligation": {"kind": "FACT", "mandatory": 1}
+  },
+  {
+    "id": "dogfood_stats_narrative",
+    "query": "Explain the story behind the 2025 MLB home run leader's performance.",
+    "language": "en",
+    "category": "narrative",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "dogfood_japanese_source",
+    "query": "日本媒体如何评价大谷翔平最近的打击调整？",
+    "language": "zh",
+    "category": "language_community",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "dogfood_chinese_community",
+    "query": "中文棒球社区如何评价大谷翔平加盟道奇队？",
+    "language": "zh",
+    "category": "language_community",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  }
+]

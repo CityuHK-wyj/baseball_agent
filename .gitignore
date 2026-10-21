@@ -1,26 +1,25 @@
-# Secrets and local configuration
 .env
-.env.*
-!.env.example
-*.pem
-*.key
-.runtime/
-
-# Python
 __pycache__/
-*.py[cod]
+*.pyc
+.runtime/
+*.sqlite3
+*.db
 .pytest_cache/
-.mypy_cache/
-
-# Virtual environments
 .venv/
-venv/
-
-# IDE
-.idea/
-.vscode/
-
-# Generated outputs and local data
-*.png
-data_loader/parquet_archive/
-pgdata/
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+frontend/*.tsbuildinfo
+# Private holdout traces and local scratch data must never be committed.
+.scratch/
+# Local backups / archives.
+backups/
+*.tar.gz
+# Raw milestone audit evidence: large live/holdout traces, copied corpora and
+# generated diagnostics. These are produced by the evaluation tools; they are not
+# production inputs. The summarized, reviewable evidence lives in the audit
+# markdown reports under docs/audit/.
+docs/audit/m211/
+docs/audit/m212_independent/
+docs/audit/m212r4/

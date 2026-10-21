@@ -1,0 +1,258 @@
+{
+  "historical_strike_zh": [
+    {
+      "goal_status": "COMPLETE",
+      "mandatory_total": 2,
+      "mandatory_satisfied": 2,
+      "evidence_findings": [
+        {
+          "id": "fx1",
+          "status": "SUPPORTED",
+          "genuine": true
+        },
+        {
+          "id": "fx2",
+          "status": "SUPPORTED",
+          "genuine": true
+        },
+        {
+          "id": "fx3",
+          "status": "INSUFFICIENT",
+          "genuine": null
+        }
+      ],
+      "latency": {
+        "web:search": 4200,
+        "web:source:wikipedia": 1500,
+        "web:source:publisher_feeds": 2700,
+        "web:fetch": 3100,
+        "web:verify": 800,
+        "tool:web_research": 9200,
+        "goal_end_to_end": 18000
+      },
+      "provider_calls": 3,
+      "fetched_documents": 2,
+      "provider_errors": 0,
+      "information_gain": {
+        "mandatory_propositions_moved": 2,
+        "verified_facts": 2
+      },
+      "answer_completion_adjudicated": true
+    },
+    {
+      "goal_status": "COMPLETE",
+      "mandatory_total": 2,
+      "mandatory_satisfied": 2,
+      "evidence_findings": [
+        {
+          "id": "fx4",
+          "status": "SUPPORTED",
+          "genuine": true
+        },
+        {
+          "id": "fx5",
+          "status": "INSUFFICIENT",
+          "genuine": null
+        }
+      ],
+      "latency": {
+        "web:search": 3800,
+        "web:source:wikipedia": 1300,
+        "web:source:publisher_feeds": 2500,
+        "web:fetch": 2900,
+        "web:verify": 700,
+        "tool:web_research": 8600,
+        "goal_end_to_end": 16500
+      },
+      "provider_calls": 3,
+      "fetched_documents": 2,
+      "provider_errors": 0,
+      "information_gain": {
+        "mandatory_propositions_moved": 2,
+        "verified_facts": 1
+      },
+      "answer_completion_adjudicated": true
+    }
+  ],
+  "historical_strike_en": [
+    {
+      "goal_status": "LIMITED",
+      "mandatory_total": 2,
+      "mandatory_satisfied": 1,
+      "evidence_findings": [
+        {
+          "id": "fx6",
+          "status": "SUPPORTED",
+          "genuine": true
+        }
+      ],
+      "latency": {
+        "web:search": 5100,
+        "web:source:wikipedia": 2100,
+        "web:source:publisher_feeds": 3000,
+        "web:fetch": 4000,
+        "web:verify": 0,
+        "tool:web_research": 11000,
+        "goal_end_to_end": 21000
+      },
+      "provider_calls": 3,
+      "fetched_documents": 2,
+      "provider_errors": 1,
+      "information_gain": {
+        "mandatory_propositions_moved": 1,
+        "verified_facts": 1
+      },
+      "answer_completion_adjudicated": false
+    },
+    {
+      "goal_status": "COMPLETE",
+      "mandatory_total": 2,
+      "mandatory_satisfied": 2,
+      "evidence_findings": [
+        {
+          "id": "fx7",
+          "status": "SUPPORTED",
+          "genuine": true
+        },
+        {
+          "id": "fx8",
+          "status": "SUPPORTED",
+          "genuine": false
+        }
+      ],
+      "latency": {
+        "web:search": 4600,
+        "web:source:wikipedia": 1800,
+        "web:source:publisher_feeds": 2800,
+        "web:fetch": 3600,
+        "web:verify": 900,
+        "tool:web_research": 10200,
+        "goal_end_to_end": 19500
+      },
+      "provider_calls": 3,
+      "fetched_documents": 2,
+      "provider_errors": 0,
+      "information_gain": {
+        "mandatory_propositions_moved": 2,
+        "verified_facts": 2
+      },
+      "answer_completion_adjudicated": true
+    }
+  ],
+  "current_injury": [
+    {
+      "goal_status": "LIMITED",
+      "mandatory_total": 1,
+      "mandatory_satisfied": 0,
+      "evidence_findings": [
+        {
+          "id": "fx9",
+          "status": "INSUFFICIENT",
+          "genuine": null
+        }
+      ],
+      "latency": {
+        "web:search": 2600,
+        "web:source:publisher_feeds": 2600,
+        "web:fetch": 1800,
+        "web:verify": 400,
+        "tool:web_research": 5200,
+        "goal_end_to_end": 12000
+      },
+      "provider_calls": 1,
+      "fetched_documents": 1,
+      "provider_errors": 1,
+      "information_gain": {
+        "mandatory_propositions_moved": 0,
+        "verified_facts": 0
+      },
+      "answer_completion_adjudicated": false
+    },
+    {
+      "goal_status": "COMPLETE",
+      "mandatory_total": 1,
+      "mandatory_satisfied": 1,
+      "evidence_findings": [
+        {
+          "id": "fx10",
+          "status": "SUPPORTED",
+          "genuine": true
+        }
+      ],
+      "latency": {
+        "web:search": 2400,
+        "web:source:publisher_feeds": 2400,
+        "web:fetch": 1600,
+        "web:verify": 500,
+        "tool:web_research": 4800,
+        "goal_end_to_end": 11000
+      },
+      "provider_calls": 1,
+      "fetched_documents": 1,
+      "provider_errors": 0,
+      "information_gain": {
+        "mandatory_propositions_moved": 1,
+        "verified_facts": 1
+      },
+      "answer_completion_adjudicated": true
+    }
+  ],
+  "narrative_interview": [
+    {
+      "goal_status": "LIMITED",
+      "mandatory_total": 1,
+      "mandatory_satisfied": 0,
+      "evidence_findings": [
+        {
+          "id": "fx11",
+          "status": "SUPPORTED",
+          "genuine": false
+        }
+      ],
+      "latency": {
+        "web:search": 3300,
+        "web:source:publisher_feeds": 3300,
+        "web:fetch": 2200,
+        "web:verify": 600,
+        "tool:web_research": 6600,
+        "goal_end_to_end": 14000
+      },
+      "provider_calls": 1,
+      "fetched_documents": 1,
+      "provider_errors": 0,
+      "information_gain": {
+        "mandatory_propositions_moved": 0,
+        "verified_facts": 1
+      },
+      "answer_completion_adjudicated": false
+    },
+    {
+      "goal_status": "LIMITED",
+      "mandatory_total": 1,
+      "mandatory_satisfied": 0,
+      "evidence_findings": [
+        {
+          "id": "fx12",
+          "status": "INSUFFICIENT",
+          "genuine": null
+        }
+      ],
+      "latency": {
+        "web:search": 3000,
+        "web:source:publisher_feeds": 3000,
+        "web:fetch": 2000,
+        "web:verify": 500,
+        "tool:web_research": 6100,
+        "goal_end_to_end": 13000
+      },
+      "provider_calls": 1,
+      "fetched_documents": 1,
+      "provider_errors": 0,
+      "information_gain": {
+        "mandatory_propositions_moved": 0,
+        "verified_facts": 0
+      },
+      "answer_completion_adjudicated": false
+    }
+  ]
+}

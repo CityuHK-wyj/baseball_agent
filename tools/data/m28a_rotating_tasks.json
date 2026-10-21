@@ -1,0 +1,37 @@
+[
+  {
+    "id": "m28a_interview",
+    "query": "Find a direct interview in which Freddie Freeman described playing through his ankle injury during the 2024 World Series, and report what he said.",
+    "language": "en",
+    "category": "interview",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28a_local_reporting",
+    "query": "¿Qué informó la prensa dominicana sobre la participación de Vladimir Guerrero Jr. en el Juego de Estrellas de 2025?",
+    "language": "es",
+    "category": "local_reporting",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28a_community",
+    "query": "日本の野球ファン掲示板では2025年の大谷翔平の投手復帰をどう議論しましたか？",
+    "language": "ja",
+    "category": "community",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  },
+  {
+    "id": "m28a_official",
+    "query": "What did MLB's official announcement say about the starting pitchers for the 2025 All-Star Game?",
+    "language": "en",
+    "category": "official_current",
+    "obligation": {"kind": "FACT", "mandatory": 1}
+  },
+  {
+    "id": "m28a_analysis",
+    "query": "What did contemporary reporting say about the Dodgers' bullpen strategy during the 2024 World Series?",
+    "language": "en",
+    "category": "analysis",
+    "obligation": {"kind": "EXPLANATION", "mandatory": 1}
+  }
+]
